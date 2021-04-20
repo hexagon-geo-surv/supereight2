@@ -20,6 +20,26 @@ Octree<DataT, ResT, BlockSizeT>::Octree(const unsigned size) : size_(size)
 
 
 template <typename DataT,
+        Res      ResT,
+        unsigned BlockSizeT
+>
+OctreeIterator<Octree<DataT, ResT, BlockSizeT>> Octree<DataT, ResT, BlockSizeT>::begin() {
+  return OctreeIterator<Octree<DataT, ResT, BlockSizeT>>(this);
+}
+
+
+
+template <typename DataT,
+            Res      ResT,
+            unsigned BlockSizeT
+>
+OctreeIterator<Octree<DataT, ResT, BlockSizeT>> Octree<DataT, ResT, BlockSizeT>::end() {
+  return OctreeIterator<Octree<DataT, ResT, BlockSizeT>>();
+}
+
+
+
+template <typename DataT,
             Res      ResT,
             unsigned BlockSizeT
     >

@@ -83,7 +83,8 @@ bool BaseIterator<DerivedT>::operator==(const BaseIterator& other) const
 {
   // The volume_ is obtained from the current place in the octree so checking
   // it would be redundant.
-  return (octant_stack_ == other.octant_stack_);
+  return (octant_stack_ == other.octant_stack_ &&
+          octant_       == other.octant_);
 }
 
 

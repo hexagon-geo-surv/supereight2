@@ -10,6 +10,7 @@
 #include "utils/memory pool.hpp"
 #include "utils/key_util.hpp"
 #include "utils/setup_util.hpp"
+#include "se/iterator.hpp"
 
 namespace se {
 
@@ -54,6 +55,9 @@ public:
   ~Octree() {};                               ///< TODO:
   Octree(const Octree&) = delete;             ///< Delete copy constructor
   Octree & operator=(const Octree&) = delete; ///< Delete copy assignment operator
+
+  OctreeIterator<Octree<DataT, ResT, BlockSizeT>> begin();
+  OctreeIterator<Octree<DataT, ResT, BlockSizeT>> end();
 
   NodeType* getRoot() { return root_; };
 
