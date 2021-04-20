@@ -51,6 +51,13 @@ const Eigen::Vector3i& OctantBase::getCoord()
 
 
 
+const Eigen::Vector3i& OctantBase::getCoord() const
+{
+  return coord_;
+}
+
+
+
 bool OctantBase::getParent(const se::OctantBase*& parent_ptr)
 {
   parent_ptr = parent_ptr_;
@@ -59,7 +66,19 @@ bool OctantBase::getParent(const se::OctantBase*& parent_ptr)
 
 
 
-const unsigned int OctantBase::getTimeStamp() { return time_stamp_; }
+bool OctantBase::getParent(const se::OctantBase*& parent_ptr) const
+{
+  parent_ptr = parent_ptr_;
+  return parent_ptr_ != nullptr;
+}
+
+
+
+unsigned int OctantBase::getTimeStamp() { return time_stamp_; }
+
+
+
+unsigned int OctantBase::getTimeStamp() const { return time_stamp_; }
 
 
 
@@ -67,7 +86,11 @@ void OctantBase::setTimeStamp(const unsigned int time_stamp) { time_stamp_ = tim
 
 
 
-const unsigned char OctantBase::getChildrenMask() { return children_mask_; }
+unsigned char OctantBase::getChildrenMask() { return children_mask_; }
+
+
+
+unsigned char OctantBase::getChildrenMask() const { return children_mask_; }
 
 
 
@@ -160,7 +183,20 @@ BlockBase<DerivedT, SizeT>::BlockBase(const Eigen::Vector3i& coord,
 
 template <typename DerivedT, typename DataT, unsigned SizeT>
 bool BlockSingleRes<DerivedT, DataT, SizeT>::getData(const Eigen::Vector3i& voxel_coord,
-                                                    DataType&              data)
+                                                     DataType&              data)
+{
+  Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().getCoord();
+  data = block_data_[voxel_offset.x() +
+                     voxel_offset.y() * this->underlying().size +
+                     voxel_offset.z() * this->underlying().size_qu];
+  return true;
+}
+
+
+
+template <typename DerivedT, typename DataT, unsigned SizeT>
+bool BlockSingleRes<DerivedT, DataT, SizeT>::getData(const Eigen::Vector3i& voxel_coord,
+                                                     DataType&              data) const
 {
   Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().getCoord();
   data = block_data_[voxel_offset.x() +
@@ -174,6 +210,16 @@ bool BlockSingleRes<DerivedT, DataT, SizeT>::getData(const Eigen::Vector3i& voxe
 template <typename DerivedT, typename DataT, unsigned SizeT>
 bool BlockSingleRes<DerivedT, DataT, SizeT>::getData(const unsigned voxel_idx,
                                                      DataType&      data)
+{
+  data = block_data_[voxel_idx];
+  return true;
+}
+
+
+
+template <typename DerivedT, typename DataT, unsigned SizeT>
+bool BlockSingleRes<DerivedT, DataT, SizeT>::getData(const unsigned voxel_idx,
+                                                     DataType&      data) const
 {
   data = block_data_[voxel_idx];
   return true;

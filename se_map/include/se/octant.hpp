@@ -23,13 +23,21 @@ public:
 
     const Eigen::Vector3i& getCoord();
 
+    const Eigen::Vector3i& getCoord() const;
+
     bool getParent(const OctantBase*& parent_ptr);
 
-    const unsigned int getTimeStamp();
+    bool getParent(const OctantBase*& parent_ptr) const;
+
+    unsigned int getTimeStamp();
+
+    unsigned int getTimeStamp() const;
 
     void setTimeStamp(const unsigned int time_stamp);
 
-    const unsigned char getChildrenMask();
+    unsigned char getChildrenMask();
+
+    unsigned char getChildrenMask() const;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -61,6 +69,8 @@ public:
 
     bool isBlock() { return false; }
 
+    bool isBlock() const { return false; }
+
     unsigned int getSize();
 
     bool getChild(const unsigned child_idx, se::OctantBase*& child_ptr);
@@ -86,9 +96,9 @@ public:
     Node(Node*              parent_ptr,
          const unsigned int child_idx);
 
-    bool setData(const DataT& data);
-
     bool getData(const DataT& data);
+
+    bool setData(const DataT& data);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -133,8 +143,14 @@ public:
     bool getData(const Eigen::Vector3i& voxel_coord,
                  DataType&              data);
 
+    bool getData(const Eigen::Vector3i& voxel_coord,
+                 DataType&              data) const;
+
     bool getData(const unsigned voxel_idx,
                  DataT&         data);
+
+    bool getData(const unsigned voxel_idx,
+                 DataT&         data) const;
 
     bool setData(const Eigen::Vector3i& voxel_coord,
                  const DataT&           data);
