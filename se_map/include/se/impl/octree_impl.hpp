@@ -40,6 +40,32 @@ OctreeIterator<Octree<DataT, ResT, BlockSizeT>> Octree<DataT, ResT, BlockSizeT>:
 
 
 template <typename DataT,
+        Res      ResT,
+        unsigned BlockSizeT
+>
+bool Octree<DataT, ResT, BlockSizeT>::contains(const Eigen::Vector3i& voxel_coord)
+{
+  return voxel_coord.x() >= 0 && voxel_coord.x() < size_ &&
+         voxel_coord.y() >= 0 && voxel_coord.y() < size_ &&
+         voxel_coord.z() >= 0 && voxel_coord.z() < size_;
+}
+
+
+
+template <typename DataT,
+            Res      ResT,
+            unsigned BlockSizeT
+  >
+bool Octree<DataT, ResT, BlockSizeT>::contains(const Eigen::Vector3i& voxel_coord) const
+{
+  return voxel_coord.x() >=0 && voxel_coord.x() < size_ &&
+         voxel_coord.y() >=0 && voxel_coord.y() < size_ &&
+         voxel_coord.z() >=0 && voxel_coord.z() < size_;
+}
+
+
+
+template <typename DataT,
             Res      ResT,
             unsigned BlockSizeT
     >

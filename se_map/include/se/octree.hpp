@@ -59,6 +59,10 @@ public:
   OctreeIterator<Octree<DataT, ResT, BlockSizeT>> begin();
   OctreeIterator<Octree<DataT, ResT, BlockSizeT>> end();
 
+  bool contains(const Eigen::Vector3i& voxel_coord);
+
+  bool contains(const Eigen::Vector3i& voxel_coord) const;
+
   NodeType* getRoot() { return root_; };
 
   /**
