@@ -18,9 +18,9 @@
 namespace se {
 
 // Default values
-Eigen::Vector3f default_map_dim    = Eigen::Vector3f(10, 10, 3); ///< 10m x 10m x 3m
-float           default_map_res    = 0.1;                                 ///< 10cm
-Eigen::Vector3f default_map_origin = default_map_dim / 2;
+static const Eigen::Vector3f default_map_dim    = Eigen::Vector3f(10, 10, 3); ///< 10m x 10m x 3m
+static const float           default_map_res    = 0.1;                                 ///< 10cm
+static const Eigen::Vector3f default_map_origin = default_map_dim / 2;
 
 struct MapConfig {
 public:
