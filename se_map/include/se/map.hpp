@@ -94,6 +94,23 @@ public:
     return true;
   }
 
+  bool saveMesh()
+  {
+    se::vector<se::Triangle> mesh;
+    TICK("meshing")
+    se::algorithms::marching_cube(octree_, mesh);
+    TOCK("meshing")
+
+    se::io::save_mesh_vtk(mesh, "./mesh.vtk", Eigen::Matrix4f::Identity());
+
+    se::vector<se::Triangle> dual_mesh;
+    TICK("dual_meshing")
+    se::algorithms::dual_marching_cube(octree_, dual_mesh);
+    TOCK("dual_meshing")
+
+    se::io::save_mesh_vtk(dual_mesh, "./dual_mesh.vtk", Eigen::Matrix4f::Identity());
+  }
+
   void voxelToPoint(const Eigen::Vector3i& voxel_coord, Eigen::Vector3f& point_M);
 
   static constexpr Field     fld_ = FldT;

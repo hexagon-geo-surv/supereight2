@@ -121,6 +121,7 @@ int main() {
 
   map_tsdf.saveSlice(se::math::to_translation(T_MS));
   map_tsdf.saveStrucutre();
+  map_tsdf.saveMesh();
 
   se::perfstats.writeToFilestream();
 
