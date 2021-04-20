@@ -107,10 +107,10 @@ int save_octree_structure_ply(std::shared_ptr<OctreeT>  octree_ptr,
 
   std::stringstream ss_nodes_corners;
   std::stringstream ss_faces;
-  auto octant_buffer = octree_ptr->getOctantBuffer();
   int nodes_corners_count = 0;
   int faces_count  = 0;
-  for (auto octant_ptr : octant_buffer) {
+  for (auto octant_ptr_itr = octree_ptr->begin(); octant_ptr_itr != octree_ptr->end(); ++octant_ptr_itr) {
+    auto octant_ptr = *octant_ptr_itr;
     const Eigen::Vector3i node_coord = octant_ptr->getCoord();
     int node_size;
     if (octant_ptr->isBlock())
