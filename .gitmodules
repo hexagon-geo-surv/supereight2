@@ -1,0 +1,3 @@
+[submodule "third_party/srl_projection"]
+	path = third_party/srl_projection
+	url = git@bitbucket.org:smartroboticslab/srl_projection.git
