@@ -1,0 +1,6 @@
+#ifndef SE_ITERATOR_HPP
+#define SE_ITERATOR_HPP
+
+
+
+#endif // SE_ITERATOR_HPP

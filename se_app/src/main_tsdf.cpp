@@ -1,6 +1,7 @@
 #include "se/sensor.hpp"
 #include "se/octree.hpp"
 #include "se/map.hpp"
+#include "se/map_integrator.hpp"
 #include "se/utils/type_util.hpp"
 #include "se/raycaster.hpp"
 #include "se/preprocessor.hpp"

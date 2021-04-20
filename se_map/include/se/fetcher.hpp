@@ -8,7 +8,7 @@
 #include "se/utils/type_util.hpp"
 #include "se/image/image.hpp"
 #include "se/timings.hpp"
-
+#include "se/allocator.hpp"
 
 
 namespace se {

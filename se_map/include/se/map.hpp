@@ -15,6 +15,7 @@
 
 #include "se/raycaster.hpp"
 
+
 namespace se {
 
 // Default values
@@ -29,11 +30,14 @@ public:
   Eigen::Vector3f origin = default_map_origin;
 };
 
+
+
 // Forward Declaration
 template <typename DataT      = se::Data<Field::TSDF, Colour::Off, Semantics::Off>,
           Res      ResT       = Res::Single,
           unsigned BlockSizeT = 8
 > class Map;
+
 
 
 
