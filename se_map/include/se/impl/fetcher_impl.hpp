@@ -1,0 +1,4 @@
+#ifndef SE_FETCHER_IMPL_HPP
+#define SE_FETCHER_IMPL_HPP
+
+#endif // SE_FETCHER_IMPL_HPP
