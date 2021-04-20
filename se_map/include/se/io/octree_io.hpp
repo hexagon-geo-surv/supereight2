@@ -15,8 +15,11 @@ int save_octree_structure_ply(std::shared_ptr<OctreeT>  octree_ptr,
                               const std::string         filename);
 
 }
+
+
+
 }
 
-#include "se/impl/octree_io_impl.hpp"
+#include "se/io/impl/octree_io_impl.hpp"
 
 #endif // SE_OCTREE_IO_HPP
