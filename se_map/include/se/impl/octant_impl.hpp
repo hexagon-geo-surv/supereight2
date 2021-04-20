@@ -38,7 +38,7 @@ bool get_child_idx(const Eigen::Vector3i& voxel_coord,
  */
 OctantBase::OctantBase(const Eigen::Vector3i& coord,
                        const OctantBase*      parent_ptr)
-        : parent_ptr_(parent_ptr), coord_(coord)
+        : parent_ptr_(parent_ptr), coord_(coord), time_stamp_(0)
     {
 }
 
@@ -56,6 +56,16 @@ bool OctantBase::getParent(const se::OctantBase*& parent_ptr)
   parent_ptr = parent_ptr_;
   return parent_ptr_ != nullptr;
 }
+
+
+
+const unsigned int OctantBase::getTimeStamp() { return time_stamp_; }
+
+
+
+void OctantBase::setTimeStamp(const unsigned int time_stamp) { time_stamp_ = time_stamp; }
+
+
 
 template <typename DerivedT>
 NodeBase<DerivedT>::NodeBase(const Eigen::Vector3i&                coord,
