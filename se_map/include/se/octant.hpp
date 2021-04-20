@@ -31,7 +31,7 @@ public:
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-private:
+protected:
     const OctantBase*     parent_ptr_; ///< Every node/block (other than root) needs a parent
     const Eigen::Vector3i coord_;      ///< The coordinates of the block (left, front , bottom corner)
     unsigned int          time_stamp_;
