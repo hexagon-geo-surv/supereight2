@@ -37,11 +37,11 @@
 #include "se/algorithms/marching_cube.hpp"
 #include "se/io/meshing_io.hpp"
 #include "se/data.hpp"
-#include "se/iterator.hpp"
-#include "se/octree.hpp"
+#include "se/octree/iterator.hpp"
+#include "se/octree/octree.hpp"
 #include "se/utils/math_util.hpp"
 #include "se/utils/key_util.hpp"
-#include "se/allocator.hpp"
+#include "se/octree/allocator.hpp"
 
 TEST(MeshingTest, EqualScaleNeighbour) {
 

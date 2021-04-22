@@ -7,7 +7,8 @@
 #include <sstream>
 #include <iostream>
 
-#include "se/node_iterator.hpp"
+#include "se/image/image.hpp"
+
 
 
 namespace se {

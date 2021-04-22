@@ -3,8 +3,7 @@
 
 #include <stack>
 
-#include "se/octree.hpp"
-#include "se/octree.hpp"
+#include "se/octree/octree.hpp"
 
 
 

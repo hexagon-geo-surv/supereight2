@@ -35,9 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "se/utils/key_util.hpp"
 #include "se/utils/octant_util.hpp"
 #include "se/utils/math_util.hpp"
+#include "se/octree/octree.hpp"
+#include "se/octree/allocator.hpp"
 #include "se/data.hpp"
-#include "se/octree.hpp"
-#include "se/allocator.hpp"
 
 // Helper function to create ought values.
 Eigen::Vector3i adapt_to_scale(const Eigen::Vector3i& coord, const se::scale_t scale) {

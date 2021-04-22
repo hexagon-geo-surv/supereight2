@@ -4,13 +4,13 @@
 #include <memory>
 #include <deque>
 
+#include "se/utils/memory pool.hpp"
+#include "se/utils/key_util.hpp"
+#include "se/utils/setup_util.hpp"
+#include "se/octree/octant.hpp"
+#include "se/octree/iterator.hpp"
 
-#include "octant.hpp"
 
-#include "utils/memory pool.hpp"
-#include "utils/key_util.hpp"
-#include "utils/setup_util.hpp"
-#include "se/iterator.hpp"
 
 namespace se {
 

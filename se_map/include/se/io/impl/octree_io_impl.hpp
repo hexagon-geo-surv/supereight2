@@ -5,7 +5,7 @@
 #include <sstream>
 #include <iostream>
 
-#include "se/visitor.hpp"
+#include "se/octree/visitor.hpp"
 
 
 

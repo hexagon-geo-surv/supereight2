@@ -7,11 +7,11 @@
 #include "se/utils/math_util.hpp"
 #include "se/utils/setup_util.hpp"
 #include "se/data.hpp"
-#include "se/octree.hpp"
+#include "se/octree/octree.hpp"
+#include "se/octree/visitor.hpp"
+#include "se/octree/fetcher.hpp"
 #include "se/io/octree_io.hpp"
 #include "se/io/meshing_io.hpp"
-#include "se/visitor.hpp"
-#include "se/fetcher.hpp"
 
 #include "se/raycaster.hpp"
 
@@ -38,7 +38,6 @@ template <typename DataT      = se::Data<Field::TSDF, Colour::Off, Semantics::Of
           Res      ResT       = Res::Single,
           unsigned BlockSizeT = 8
 > class Map;
-
 
 
 
@@ -79,55 +78,13 @@ public:
   template<Safe SafeB = Safe::Off>
   bool getData(const Eigen::Vector3f& point_M, DataType& data);
 
-  void saveSlice(const Eigen::Vector3f& point_M)
-  {
-    Eigen::Vector3i voxel_coord;
-    pointToVoxel(point_M, voxel_coord);
-    se::io::save_3d_slice_vtk(octree_, "./slice_x.vtk", Eigen::Vector3i(voxel_coord.x(), 0, 0), Eigen::Vector3i(voxel_coord.x() + 1, octree_->getSize(), octree_->getSize()));
-    se::io::save_3d_slice_vtk(octree_, "./slice_y.vtk", Eigen::Vector3i(0, voxel_coord.y(), 0), Eigen::Vector3i(octree_->getSize(), voxel_coord.y() + 1, octree_->getSize()));
-    se::io::save_3d_slice_vtk(octree_, "./slice_z.vtk", Eigen::Vector3i(0,0, voxel_coord.z()), Eigen::Vector3i(octree_->getSize(), octree_->getSize(), voxel_coord.z() + 1));
-  };
+  void saveSlice(const Eigen::Vector3f& point_M);
 
-  bool saveStrucutre()
-  {
-    se::io::save_octree_structure_ply(octree_, "./structure.ply");
-    return true;
-  }
+  void saveStrucutre();
 
-  bool saveMesh()
-  {
-    se::vector<se::Triangle> mesh;
-    TICK("meshing")
-    se::algorithms::marching_cube(octree_, mesh);
-    TOCK("meshing")
-
-    se::io::save_mesh_vtk(mesh, "./mesh.vtk", Eigen::Matrix4f::Identity());
-
-    se::vector<se::Triangle> dual_mesh;
-    TICK("dual_meshing")
-    se::algorithms::dual_marching_cube(octree_, dual_mesh);
-    TOCK("dual_meshing")
-
-    se::io::save_mesh_vtk(dual_mesh, "./dual_mesh.vtk", Eigen::Matrix4f::Identity());
-  }
+  void saveMesh();
 
   void voxelToPoint(const Eigen::Vector3i& voxel_coord, Eigen::Vector3f& point_M);
-
-  static constexpr Field     fld_ = FldT;
-  static constexpr Colour    col_ = ColB;
-  static constexpr Semantics sem_ = SemB;
-
-  static constexpr Res       ress_ = ResT;
-
-
-
-//protected:
-
-  bool initialiseOctree();
-
-  template<se::Safe SafeB = se::Safe::On>
-  inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
-  pointToVoxel(const Eigen::Vector3f& point_M, Eigen::Vector3i& voxel_coord);
 
   /**
    *
@@ -138,14 +95,13 @@ public:
    * \param voxel_coord
    * \return
    */
+  template<se::Safe SafeB = se::Safe::On>
+  inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
+  pointToVoxel(const Eigen::Vector3f& point_M, Eigen::Vector3i& voxel_coord);
+
   template<se::Safe SafeB>
   typename std::enable_if_t<SafeB == se::Safe::Off, bool>
   inline pointToVoxel(const Eigen::Vector3f& point_M, Eigen::Vector3i& voxel_coord);
-
-  template<se::Safe SafeB = se::Safe::On>
-  typename std::enable_if_t<SafeB == se::Safe::On, bool>
-  pointsToVoxels(const se::vector<Eigen::Vector3f>& points_M,
-                 se::vector<Eigen::Vector3i>&       voxel_coords);
 
   /**
    *
@@ -156,10 +112,29 @@ public:
    * \param voxel_coords
    * \return
    */
+  template<se::Safe SafeB = se::Safe::On>
+  typename std::enable_if_t<SafeB == se::Safe::On, bool>
+  pointsToVoxels(const se::vector<Eigen::Vector3f>& points_M,
+                 se::vector<Eigen::Vector3i>&       voxel_coords);
+
   template<se::Safe SafeB>
   typename std::enable_if_t<SafeB == se::Safe::Off, bool>
   pointsToVoxels(const se::vector<Eigen::Vector3f>& points_M,
                  se::vector<Eigen::Vector3i>&       voxel_coords);
+
+  std::shared_ptr< OctreeType > getOctree() { return octree_; };
+
+  static constexpr Field     fld_ = FldT;
+  static constexpr Colour    col_ = ColB;
+  static constexpr Semantics sem_ = SemB;
+
+  static constexpr Res       ress_ = ResT;
+
+
+
+protected:
+
+  bool initialiseOctree();
 
   const Eigen::Vector3f dim_;      ///< The dimensions of the map
   const float res_;                ///< The resolution of the map
@@ -169,13 +144,6 @@ public:
   const Eigen::Vector3f ub_;       ///< The upper map bound
 
   std::shared_ptr< OctreeType >octree_ = nullptr;
-
-  friend class SimpleIntegrator;
-  template<typename SensorT, typename MapT>
-  friend std::vector<typename MapT::OctreeType::BlockType::Ptr> se::fetcher::frustum(const se::Image<depth_t>& depth_img,
-                                                                                     SensorT&                  sensor,
-                                                                                     const Eigen::Matrix4f&    T_MS,
-                                                                                     MapT&                     map);
 };
 
 //// Full alias template for alternative setup

@@ -1,8 +1,12 @@
 #ifndef SE_ALLOCATOR_IMPL_HPP
 #define SE_ALLOCATOR_IMPL_HPP
 
-#include "se/timings.hpp"
 #include <parallel/algorithm>
+
+#include "se/timings.hpp"
+#include "se/image/image.hpp"
+
+
 
 namespace se {
 namespace allocator {
@@ -30,10 +34,10 @@ typename OctreeT::BlockType* block(const se::key_t             voxel_key,
     base_parent_ptr = octree_ptr->getRoot();
   }
   assert(base_parent_ptr); // Verify parent ptr
-  //    assert(se::keyops::is_child(base_parent_ptr->getKey(), voxel_key)); // TODO:
+  assert(se::keyops::is_child(base_parent_ptr->getKey(), voxel_key));
   assert(se::keyops::key_to_scale(voxel_key) <= octree_ptr->max_block_scale); // Verify scale is within block
 
-  se::OctantBase* child_ptr = se::allocator::allocate(voxel_key, octree_ptr, base_parent_ptr);
+  se::OctantBase* child_ptr = se::allocator::allocate_key(voxel_key, octree_ptr, base_parent_ptr);
   return static_cast<typename OctreeT::BlockType*>(child_ptr);
 }
 
@@ -64,58 +68,6 @@ se::vector<typename OctreeT::BlockType*> blocks(const se::vector<Eigen::Vector3i
 
 
 
-//template <typename OctreeT>
-//se::vector<typename OctreeT::BlockType*> blocks(se::vector<se::key_t>       voxel_keys,
-//                                                std::shared_ptr<OctreeT>    octree_ptr,
-//                                                typename OctreeT::NodeType* base_parent_ptr)
-//{
-//  assert(octree_ptr);      // Verify octree ptr
-//  if (!base_parent_ptr)
-//  {
-//    base_parent_ptr = octree_ptr->getRoot();
-//  }
-//  assert(base_parent_ptr); // Verify parent ptr
-//
-//  TICK("sort-keys")
-//  // Sort keys smallest to largest
-//#if defined(_OPENMP) && !defined(__clang__)
-//  __gnu_parallel::sort(voxel_keys.begin(), voxel_keys.end());
-//#else
-//  se::keyops::sort_keys<se::keyops::Sort::SmallToLarge>(voxel_keys);
-//#endif
-//  TOCK("sort-keys")
-//
-//  TICK("filter-keys")
-//  se::vector<se::key_t> unique_voxel_keys;
-//  se::keyops::unique_allocation<se::Safe::Off>(voxel_keys, octree_ptr->max_block_scale, unique_voxel_keys);
-//  TOCK("filter-keys")
-//
-//
-//
-//  se::vector<typename OctreeT::BlockType*> block_ptrs;
-//
-//
-//  TICK("allocate-keys")
-//  omp_set_num_threads(10);
-//#pragma omp parallel for
-//  for (unsigned int i = 0; i < unique_voxel_keys.size(); i++)
-//  {
-//    const auto unique_voxel_key = unique_voxel_keys[i];
-//    assert(se::keyops::key_to_scale(unique_voxel_key) <= octree_ptr->max_block_scale); // Verify scale is within block
-//
-//    se::OctantBase* child_ptr = se::allocator::allocate(unique_voxel_key, octree_ptr, base_parent_ptr);
-//
-//#pragma omp critical
-//    {
-//      block_ptrs.push_back(static_cast<typename OctreeT::BlockType*>(child_ptr));
-//    }
-//  }
-//  TOCK("allocate-keys")
-//  return block_ptrs;
-//}
-
-
-
 template <typename OctreeT>
 se::vector<typename OctreeT::BlockType*> blocks(se::vector<se::key_t>       unique_voxel_keys,
                                                 std::shared_ptr<OctreeT>    octree_ptr,
@@ -138,7 +90,7 @@ se::vector<typename OctreeT::BlockType*> blocks(se::vector<se::key_t>       uniq
     const auto unique_voxel_key = unique_voxel_keys[i];
     assert(se::keyops::key_to_scale(unique_voxel_key) <= octree_ptr->max_block_scale); // Verify scale is within block
 
-    se::OctantBase* child_ptr = se::allocator::allocate(unique_voxel_key, octree_ptr, base_parent_ptr);
+    se::OctantBase* child_ptr = se::allocator::allocate_key(unique_voxel_key, octree_ptr, base_parent_ptr);
 
 #pragma omp critical
     {
@@ -153,9 +105,9 @@ se::vector<typename OctreeT::BlockType*> blocks(se::vector<se::key_t>       uniq
 
 namespace { // anonymous namespace
 template <typename OctreeT>
-se::OctantBase* allocate(const se::key_t             key,
-                         std::shared_ptr<OctreeT>    octree_ptr,
-                         typename OctreeT::NodeType* base_parent_ptr)
+se::OctantBase* allocate_key(const se::key_t             key,
+                             std::shared_ptr<OctreeT>    octree_ptr,
+                             typename OctreeT::NodeType* base_parent_ptr)
 {
   assert(se::keyops::is_valid(key)); // Verify if the key is valid
   typename OctreeT::NodeType* parent_ptr = base_parent_ptr;

@@ -1,7 +1,7 @@
 #ifndef SE_INTEGRATOR_HPP
 #define SE_INTEGRATOR_HPP
 
-#include "allocator.hpp"
+#include "se/octree/allocator.hpp"
 
 namespace se {
 

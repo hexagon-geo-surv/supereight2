@@ -1,9 +1,9 @@
 #ifndef SE_MARCHING_CUBE_IMPL_HPP
 #define SE_MARCHING_CUBE_IMPL_HPP
 
-#include "se/fetcher.hpp"
-#include "se/iterator.hpp"
-#include "se/visitor.hpp"
+#include "se/octree/fetcher.hpp"
+#include "se/octree/iterator.hpp"
+#include "se/octree/visitor.hpp"
 
 namespace se {
 
