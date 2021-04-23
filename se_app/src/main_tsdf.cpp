@@ -111,9 +111,10 @@ int main() {
     TOCK("draw")
 
 
-    if (frame == 50)
+    unsigned int final_frame = 800;
+    if (frame == final_frame)
     {
-      std::cout << "Reached FRAME = 50" << std::endl;
+      std::cout << "Reached FRAME = " << final_frame << std::endl;
       break;
     }
     se::perfstats.writeToFilestream();
