@@ -78,11 +78,11 @@ public:
   template<Safe SafeB = Safe::Off>
   bool getData(const Eigen::Vector3f& point_M, DataType& data);
 
-  void saveSlice(const Eigen::Vector3f& point_M);
+  void saveSlice(const Eigen::Vector3f& point_M, const std::string num);
 
-  void saveStrucutre();
+  void saveStrucutre(const std::string num);
 
-  void saveMesh();
+  void saveMesh(const std::string num);
 
   void voxelToPoint(const Eigen::Vector3i& voxel_coord, Eigen::Vector3f& point_M);
 

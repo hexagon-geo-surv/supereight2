@@ -99,42 +99,42 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::pointToVoxel(const Eigen::Vector3
 
 
 template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
-void Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::saveSlice(const Eigen::Vector3f& point_M)
+void Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::saveSlice(const Eigen::Vector3f& point_M, const std::string num)
 {
   Eigen::Vector3i voxel_coord;
   pointToVoxel(point_M, voxel_coord);
-  se::io::save_3d_slice_vtk(octree_, "./slice_x.vtk", Eigen::Vector3i(voxel_coord.x(), 0, 0), Eigen::Vector3i(voxel_coord.x() + 1, octree_->getSize(), octree_->getSize()));
-  se::io::save_3d_slice_vtk(octree_, "./slice_y.vtk", Eigen::Vector3i(0, voxel_coord.y(), 0), Eigen::Vector3i(octree_->getSize(), voxel_coord.y() + 1, octree_->getSize()));
-  se::io::save_3d_slice_vtk(octree_, "./slice_z.vtk", Eigen::Vector3i(0,0, voxel_coord.z()), Eigen::Vector3i(octree_->getSize(), octree_->getSize(), voxel_coord.z() + 1));
+  se::io::save_3d_slice_vtk(octree_, "./slice_x_" + num + ".vtk", Eigen::Vector3i(voxel_coord.x(), 0, 0), Eigen::Vector3i(voxel_coord.x() + 1, octree_->getSize(), octree_->getSize()));
+  se::io::save_3d_slice_vtk(octree_, "./slice_y_" + num + ".vtk", Eigen::Vector3i(0, voxel_coord.y(), 0), Eigen::Vector3i(octree_->getSize(), voxel_coord.y() + 1, octree_->getSize()));
+  se::io::save_3d_slice_vtk(octree_, "./slice_z_" + num + ".vtk", Eigen::Vector3i(0,0, voxel_coord.z()), Eigen::Vector3i(octree_->getSize(), octree_->getSize(), voxel_coord.z() + 1));
 }
 
 
 
 template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
-void Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::saveStrucutre()
+void Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::saveStrucutre(const std::string num)
 {
-  se::io::save_octree_structure_ply(octree_, "./structure.ply");
+  se::io::save_octree_structure_ply(octree_, "./structure_" + num + ".ply");
 }
 
 
 
 
 template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
-void Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::saveMesh()
+void Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::saveMesh(const std::string num)
 {
   se::vector<se::Triangle> mesh;
   TICK("meshing")
   se::algorithms::marching_cube(octree_, mesh);
   TOCK("meshing")
 
-  se::io::save_mesh_vtk(mesh, "./mesh.vtk", Eigen::Matrix4f::Identity());
+  se::io::save_mesh_vtk(mesh, "./mesh_" + num + ".vtk", Eigen::Matrix4f::Identity());
 
   se::vector<se::Triangle> dual_mesh;
   TICK("dual_meshing")
   se::algorithms::dual_marching_cube(octree_, dual_mesh);
   TOCK("dual_meshing")
 
-  se::io::save_mesh_vtk(dual_mesh, "./dual_mesh.vtk", Eigen::Matrix4f::Identity());
+  se::io::save_mesh_vtk(dual_mesh, "./dual_mesh_" + num + ".vtk", Eigen::Matrix4f::Identity());
 }
 
 

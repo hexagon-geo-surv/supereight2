@@ -112,6 +112,13 @@ int main() {
 
 
     unsigned int final_frame = 800;
+    if (frame == 1 || frame % 100 == 0)
+    {
+      map_tsdf.saveMesh(std::to_string(frame));
+      map_tsdf.saveSlice(se::math::to_translation(T_MS), std::to_string(frame));
+      map_tsdf.saveStrucutre(std::to_string(frame));
+    }
+
     if (frame == final_frame)
     {
       std::cout << "Reached FRAME = " << final_frame << std::endl;
@@ -119,11 +126,7 @@ int main() {
     }
     se::perfstats.writeToFilestream();
   }
-
-  map_tsdf.saveSlice(se::math::to_translation(T_MS));
-  map_tsdf.saveStrucutre();
-  map_tsdf.saveMesh();
-
+  
   se::perfstats.writeToFilestream();
 
   delete[] output_rgba_img_data;
