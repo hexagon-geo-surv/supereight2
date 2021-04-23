@@ -27,22 +27,22 @@ namespace allocator {
 template <typename OctreeT>
 typename OctreeT::BlockType* block(const Eigen::Vector3i&      voxel_coord,
                                    std::shared_ptr<OctreeT>    octree_ptr,
-                                   typename OctreeT::NodeType* base_parent_ptr = nullptr);
+                                   typename OctreeT::NodeType* base_parent_ptr);
 
 template <typename OctreeT>
 typename OctreeT::BlockType* block(const se::key_t             voxel_key,
                                    std::shared_ptr<OctreeT>    octree_ptr,
-                                   typename OctreeT::NodeType* base_parent_ptr = nullptr);
+                                   typename OctreeT::NodeType* base_parent_ptr);
 
 template <typename OctreeT>
 se::vector<typename OctreeT::BlockType*> blocks(const se::vector<Eigen::Vector3i>& voxel_coord,
                                                 std::shared_ptr<OctreeT>           octree_ptr,
-                                                typename OctreeT::NodeType*        base_parent_ptr = nullptr);
+                                                typename OctreeT::NodeType*        base_parent_ptr);
 
 template <typename OctreeT>
 se::vector<typename OctreeT::BlockType*> blocks(se::vector<se::key_t>       voxel_keys,
                                                 std::shared_ptr<OctreeT>    octree_ptr,
-                                                typename OctreeT::NodeType* base_parent_ptr = nullptr);
+                                                typename OctreeT::NodeType* base_parent_ptr);
 
 namespace { // anonymous namespace
 template <typename OctreeT>

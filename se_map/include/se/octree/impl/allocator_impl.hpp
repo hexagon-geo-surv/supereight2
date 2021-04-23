@@ -30,9 +30,6 @@ typename OctreeT::BlockType* block(const se::key_t             voxel_key,
                                    typename OctreeT::NodeType* base_parent_ptr)
 {
   assert(octree_ptr); // Verify octree ptr
-  if (!base_parent_ptr) {
-    base_parent_ptr = octree_ptr->getRoot();
-  }
   assert(base_parent_ptr); // Verify parent ptr
   assert(se::keyops::is_child(base_parent_ptr->getKey(), voxel_key));
   assert(se::keyops::key_to_scale(voxel_key) <= octree_ptr->max_block_scale); // Verify scale is within block
@@ -74,10 +71,6 @@ se::vector<typename OctreeT::BlockType*> blocks(se::vector<se::key_t>       uniq
                                                 typename OctreeT::NodeType* base_parent_ptr)
 {
   assert(octree_ptr);      // Verify octree ptr
-  if (!base_parent_ptr)
-  {
-    base_parent_ptr = octree_ptr->getRoot();
-  }
   assert(base_parent_ptr); // Verify parent ptr
 
   se::vector<typename OctreeT::BlockType*> block_ptrs;
