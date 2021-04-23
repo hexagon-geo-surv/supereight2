@@ -140,6 +140,23 @@ inline bool encode_key(const Eigen::Vector3i& coord,
                        key_t&                 key);
 
 /**
+ * \brief Encodes given morton code and scale in a key.
+ *
+ * \note  The key will only hold as much detail as possible at the given scale.
+ *        I.e. if the code is at a higher resolution than the scale can represent,
+ *        the details will be lost.
+ *
+ * \param[in]  coord The coordinates to be encoded
+ * \param[in]  scale The scale at which to encode the cooridinates
+ * \param[out] key   The encoded key
+ *
+ * \return True if no detail is lost, false otherwise
+ */
+inline bool encode_key(const se::key_t&  code,
+                       const se::scale_t scale,
+                       key_t&            key);
+
+/**
  * \brief Extracts the 3D coordinates and scale from a given key.
  *
  * \param[in]  key      The key to be encoded
@@ -187,6 +204,15 @@ inline idx_t code_to_child_idx(const se::code_t code,
  * \return The Morton code of the key
  */
 inline se::code_t key_to_code(const se::key_t key);
+
+/**
+ * \brief Reduce a key to only its Morton code.
+ *
+ * \param[in] key The key containing the Morton code
+ *
+ * \return The Morton code of the key
+ */
+inline Eigen::Vector3i key_to_coord(const se::key_t key);
 
 /**
  * \brief Reduce a key to only its scale.
@@ -257,6 +283,19 @@ inline se::key_t block_key(const se::key_t   key,
  */
 inline se::code_t block_code(const se::key_t   key,
                              const se::scale_t max_block_scale);
+
+/**
+ * \brief Compute the child key for a given parent key and child index
+ *
+ * \note `code_at_scale` is equivalent to `se::code_t(child_idx)`
+ *
+ * \param[in]  parent_key    The key of parent
+ * \param[in]  code_at_scale The morton code segment at the scale e.g. 000, 001, ... , 110, ... , 111
+ * \param[out] child_key     The key of the child
+ */
+inline void parent_to_child_key(const se::key_t  parent_key,
+                                const se::code_t code_at_scale,
+                                se::key_t&       child_key);
 
 /**
  * \brief Verify if a key is a child of a different key

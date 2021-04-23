@@ -8,8 +8,8 @@ namespace keyops {
 
 inline bool is_valid(const se::key_t key, const se::scale_t limit)
 {
-  se::scale_t scale = se::keyops::key_to_scale(key);
-  se::code_t  code  = se::keyops::key_to_code(key);
+  se::scale_t scale = key & SCALE_MASK;;
+  se::code_t  code  = key >> SCALE_OFFSET;
   se::code_t  code_remain = code & ~CODE_MASK[scale];
   return  scale <= limit && code_remain == 0;
 }
@@ -72,6 +72,21 @@ inline bool encode_key(const Eigen::Vector3i& coord,
 
 
 
+inline bool encode_key(const se::key_t&  code,
+                       const se::scale_t scale,
+                       key_t&            key)
+{
+  assert(scale <= KEY_SCALE_LIMIT);        // Verify scale is within key limits
+
+  se::code_t code_filtered = code & CODE_MASK[scale];
+
+  key = code << SCALE_OFFSET | scale;
+
+  return (code == code_filtered);
+}
+
+
+
 inline void decode_key(const se::key_t  key,
                        Eigen::Vector3i& coord,
                        scale_t&         scale)
@@ -120,13 +135,30 @@ inline se::idx_t code_to_child_idx(const se::code_t code,
 
 inline se::code_t key_to_code(const se::key_t key)
 {
+  assert(se::keyops::is_valid(key)); // Verify key is valid
+
   return key >> SCALE_OFFSET;
+}
+
+
+
+inline Eigen::Vector3i key_to_coord(const se::key_t key)
+{
+  assert(se::keyops::is_valid(key)); // Verify key is valid
+
+  code_t code = se::keyops::key_to_code(key);
+
+  Eigen::Vector3i coord;
+  se::keyops::decode_code(code, coord);
+  return coord;
 }
 
 
 
 inline scale_t key_to_scale(const se::key_t key)
 {
+  assert(se::keyops::is_valid(key)); // Verify key is valid
+
   return key & SCALE_MASK;
 }
 
@@ -167,6 +199,7 @@ inline void parent_key(const se::key_t child_key,
 }
 
 
+
 inline se::key_t block_key(const se::key_t   key,
                            const se::scale_t max_block_scale)
 {
@@ -181,6 +214,17 @@ inline se::code_t block_code(const se::key_t   key,
 {
   assert(is_valid(key)); // Verify key is valid
   return se::keyops::key_to_code(key) & CODE_MASK[max_block_scale];
+}
+
+
+
+inline void parent_to_child_key(const se::key_t  parent_key,
+                                const se::code_t code_at_scale,
+                                se::key_t&       child_key)
+{
+  se::scale_t child_scale = key_to_scale(parent_key) - 1;
+  child_key = parent_key | (code_at_scale << ((child_scale * NUM_DIM) + SCALE_OFFSET));
+  child_key = (child_key & ~SCALE_MASK) | child_scale;
 }
 
 
