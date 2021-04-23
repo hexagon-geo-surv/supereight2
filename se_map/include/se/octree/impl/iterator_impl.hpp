@@ -33,6 +33,23 @@ BaseIterator<DerivedT>::BaseIterator(OctreeType* octree_ptr) : octree_ptr_(octre
           octant_stack_.push(child_ptr);
         }
       }
+
+      // Check if root is part of iterator
+      if constexpr (DerivedT::has_ignore_condition == true)
+      {
+        if (this->underlying().doIgnore(root))
+        {
+          nextData();
+          return;
+        }
+      }
+
+      if (this->underlying().isNext(root))
+      {
+        octant_ = root;
+        return;
+      }
+
       // Find the next Volume
       nextData();
     }
@@ -108,7 +125,8 @@ se::OctantBase* BaseIterator<DerivedT>::operator*() const
 template <typename DerivedT>
 void BaseIterator<DerivedT>::nextData()
 {
-  while (true) {
+  while (true)
+  {
     if (octant_stack_.empty())
     {
       clear();
