@@ -108,7 +108,7 @@ std::vector<typename MapT::OctreeType::BlockType*> frustum(const se::Image<depth
   const float band = 2.f * 0.1f;
   const int num_steps = ceil(band / map.getRes());
 
-  const Eigen::Vector3f t_MC = T_MS.topRightCorner<3, 1>();
+  const Eigen::Vector3f t_MS = T_MS.topRightCorner<3, 1>();
 
 #pragma omp declare reduction (merge : std::set<se::key_t> : omp_out.insert(omp_in.begin(), omp_in.end()))
   se::set<se::key_t> voxel_key_set;
@@ -131,7 +131,7 @@ std::vector<typename MapT::OctreeType::BlockType*> frustum(const se::Image<depth
       sensor.model.backProject(pixel_f, &ray_dir_C);
       const Eigen::Vector3f point_M = (T_MS * (depth_value * ray_dir_C).homogeneous()).head<3>();
 
-      const Eigen::Vector3f reverse_ray_dir_M = (t_MC - point_M).normalized();
+      const Eigen::Vector3f reverse_ray_dir_M = (t_MS - point_M).normalized();
 
       const Eigen::Vector3f ray_origin_M = point_M - (band * 0.5f) * reverse_ray_dir_M;
       const Eigen::Vector3f step = (reverse_ray_dir_M * band) / num_steps;
