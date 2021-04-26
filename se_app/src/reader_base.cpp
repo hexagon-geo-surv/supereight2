@@ -15,7 +15,7 @@
 #include <sstream>
 #include <thread>
 
-#include "se/str_utils.hpp"
+#include "se/utils/str_utils.hpp"
 
 
 

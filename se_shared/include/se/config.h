@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Eigen/Dense>
 
 #include "se/utils/math_util.hpp"
-#include "se/str_utils.hpp"
+#include "se/utils/str_utils.hpp"
 
 
 

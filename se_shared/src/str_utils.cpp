@@ -1,4 +1,4 @@
-#include "se/str_utils.hpp"
+#include "se/utils/str_utils.hpp"
 
 #include <algorithm>
 

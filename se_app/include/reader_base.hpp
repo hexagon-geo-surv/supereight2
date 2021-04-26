@@ -17,7 +17,7 @@
 #include <Eigen/Dense>
 
 #include "se/image/image.hpp"
-#include "se/str_utils.hpp"
+#include "se/utils/str_utils.hpp"
 
 
 
