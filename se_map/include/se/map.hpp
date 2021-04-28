@@ -78,6 +78,9 @@ public:
   template<Safe SafeB = Safe::Off>
   bool getData(const Eigen::Vector3f& point_M, DataType& data);
 
+  template<Safe SafeB = Safe::Off>
+  bool interpField(const Eigen::Vector3f& point_M, float& field_value);
+
   void saveSlice(const Eigen::Vector3f& point_M, const std::string num);
 
   void saveStrucutre(const std::string num);
@@ -103,6 +106,14 @@ public:
   typename std::enable_if_t<SafeB == se::Safe::Off, bool>
   inline pointToVoxel(const Eigen::Vector3f& point_M, Eigen::Vector3i& voxel_coord);
 
+  template<se::Safe SafeB = se::Safe::On>
+  inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
+  pointToVoxel(const Eigen::Vector3f& point_M, Eigen::Vector3f& voxel_coord_f);
+
+  template<se::Safe SafeB>
+  typename std::enable_if_t<SafeB == se::Safe::Off, bool>
+  inline pointToVoxel(const Eigen::Vector3f& point_M, Eigen::Vector3f& voxel_coord_f);
+
   /**
    *
    * \note Use as `map. template pointsToVoxels<se::Safe::Off>(...)
@@ -123,6 +134,12 @@ public:
                  se::vector<Eigen::Vector3i>&       voxel_coords);
 
   std::shared_ptr< OctreeType > getOctree() { return octree_; };
+
+  void setOctree(std::shared_ptr< OctreeType > octree_ptr)
+  {
+//    delete octree_;
+    octree_ = octree_ptr;
+  };
 
   static constexpr Field     fld_ = FldT;
   static constexpr Colour    col_ = ColB;

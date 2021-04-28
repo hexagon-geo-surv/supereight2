@@ -63,6 +63,28 @@ bool Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::getData(const Eigen::Vector3
 
 
 template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
+template<Safe SafeB>
+bool Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::interpField(const Eigen::Vector3f& point_M,
+                                                                float&                 field_value)
+{
+  Eigen::Vector3f voxel_coord_f;
+
+  if constexpr(SafeB == Safe::Off) // Evaluate at compile time
+  {
+    pointToVoxel<Safe::Off>(point_M, voxel_coord_f);
+  } else
+  {
+    if (!pointToVoxel<Safe::On>(point_M, voxel_coord_f))
+    {
+      return false;
+    }
+  }
+  return se::visitor::interpField(octree_, voxel_coord_f, field_value);
+}
+
+
+
+template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
 bool Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::initialiseOctree()
 {
   if (octree_ != nullptr)
@@ -76,23 +98,6 @@ bool Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::initialiseOctree()
   unsigned oct_size = math::power_two_up(max_size);
   octree_ =
           std::shared_ptr<se::Octree<DataType, ResT, BlockSizeT> >(new se::Octree<DataType, ResT, BlockSizeT>(oct_size));
-  return true;
-}
-
-
-
-template <Field FldT, Colour ColB, Semantics SemB, Res ResT, unsigned BlockSizeT>
-template<se::Safe SafeB>
-inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
-Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::pointToVoxel(const Eigen::Vector3f& point_M,
-                                                            Eigen::Vector3i&       voxel_coord)
-{
-  if (!contains(point_M))
-  {
-    voxel_coord = Eigen::Vector3i::Constant(-1);
-    return false;
-  }
-  voxel_coord = ((point_M + origin_M_) / res_).cast<int>();
   return true;
 }
 
@@ -139,14 +144,59 @@ void Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::saveMesh(const std::string n
 
 
 
+template <Field FldT, Colour ColB, Semantics SemB, Res ResT, unsigned BlockSizeT>
+template<se::Safe SafeB>
+inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
+        Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::pointToVoxel(const Eigen::Vector3f& point_M,
+                                                                    Eigen::Vector3i&       voxel_coord)
+{
+  if (!contains(point_M))
+  {
+  voxel_coord = Eigen::Vector3i::Constant(-1);
+  return false;
+  }
+  voxel_coord = ((point_M + origin_M_) / res_).cast<int>();
+  return true;
+}
+
+
+
 template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
 template<se::Safe SafeB>
 inline typename std::enable_if_t<SafeB == se::Safe::Off, bool>
 Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::pointToVoxel(const Eigen::Vector3f& point_M,
-                                                            Eigen::Vector3i& voxel_coord)
+                                                            Eigen::Vector3i&       voxel_coord)
 {
-  std::cout << "Risk it all!" << std::endl;
   voxel_coord = ((point_M + origin_M_) / res_).cast<int>();
+  return true;
+}
+
+
+
+template <Field FldT, Colour ColB, Semantics SemB, Res ResT, unsigned BlockSizeT>
+template<se::Safe SafeB>
+inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
+        Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::pointToVoxel(const Eigen::Vector3f& point_M,
+                                                                    Eigen::Vector3f&       voxel_coord_f)
+{
+  if (!contains(point_M))
+  {
+    voxel_coord_f = Eigen::Vector3f::Constant(-1);
+    return false;
+  }
+  voxel_coord_f = ((point_M + origin_M_) / res_);
+  return true;
+}
+
+
+
+template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
+template<se::Safe SafeB>
+inline typename std::enable_if_t<SafeB == se::Safe::Off, bool>
+        Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::pointToVoxel(const Eigen::Vector3f& point_M,
+                                                                    Eigen::Vector3f&       voxel_coord_f)
+{
+  voxel_coord_f = ((point_M + origin_M_) / res_);
   return true;
 }
 

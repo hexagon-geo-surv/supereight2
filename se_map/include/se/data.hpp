@@ -158,19 +158,19 @@ template <se::Field     FldT,
           se::Colour    ColB,
           se::Semantics SemB
 >
-float get_field(const Data<FldT, ColB, SemB>& data);
+float get_field(const Data<FldT, ColB, SemB> data);
 
 template <se::Colour    ColB,
           se::Semantics SemB
 >
-float get_field(const Data<se::Field::TSDF, ColB, SemB>& data) {
+float get_field(const Data<se::Field::TSDF, ColB, SemB> data) {
   return data.tsdf;
 }
 
 template <se::Colour    ColB,
         se::Semantics SemB
 >
-float get_field(const Data<se::Field::Occupancy, ColB, SemB>& data) {
+float get_field(const Data<se::Field::Occupancy, ColB, SemB> data) {
   return data.occupancy;
 }
 
