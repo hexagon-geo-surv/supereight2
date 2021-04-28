@@ -31,7 +31,7 @@ typename OctreeT::BlockType* block(const se::key_t             voxel_key,
 {
   assert(octree_ptr); // Verify octree ptr
   assert(base_parent_ptr); // Verify parent ptr
-  assert(se::keyops::is_child(base_parent_ptr->getKey(), voxel_key));
+//  assert(se::keyops::is_child(base_parent_ptr->getKey(), voxel_key)); // TODO:
   assert(se::keyops::key_to_scale(voxel_key) <= octree_ptr->max_block_scale); // Verify scale is within block
 
   se::OctantBase* child_ptr = se::allocator::allocate_key(voxel_key, octree_ptr, base_parent_ptr);
