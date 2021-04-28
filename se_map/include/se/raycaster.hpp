@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include "se/image/image.hpp"
+#include "se/octree/voxel_block_ray_iterator.hpp"
 
 
 
@@ -36,7 +37,9 @@ void pointCloudToNormalKernel(se::Image<Eigen::Vector3f>&       normals,
 //  TICKD("pointCloudToNormalKernel");
   const int width = point_cloud.width();
   const int height = point_cloud.height();
-//#pragma omp parallel for
+
+  omp_set_num_threads(10);
+#pragma omp parallel for
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       const Eigen::Vector3f point = point_cloud[x + width * y];
@@ -172,25 +175,33 @@ inline Eigen::Vector4f raycast(MapT&                  map,
                                const float            step,
                                const float            largestep) {
 
+//  se::VoxelBlockRayIterator ray(map, ray_origin_M, ray_dir_M, t_near, t_far);
+//  ray.next();
+//
+//  const float t_min = ray.tmin(); /* Get distance to the first intersected block */
+//  if (t_min <= 0.f) {
+//    return Eigen::Vector4f::Zero();
+//  }
+//  const float t_max = ray.tmax();
+
   if (t_near < t_far) {
     // first walk with largesteps until we found a hit
     float t = t_near;
     float stepsize = largestep;
     Eigen::Vector3f position = ray_origin_M + ray_dir_M * t;
-    typename MapT::DataType data_t;
-    map. template getData<se::Safe::On>(position, data_t);
-    float f_t = data_t.tsdf;
+    typename MapT::DataType data;
+    float field_value;
+    map.template interpField<se::Safe::On>(position, field_value);
+    float f_t = field_value;
     float f_tt = 0;
-    if (data_t.tsdf > 0) { // ups, if we were already in it, then don't render anything here
+    if (f_t >= 0) { // ups, if we were already in it, then don't render anything here
       for (; t < t_far; t += stepsize) {
-        typename MapT::DataType data_tmp;
-        map.getData(position, data_tmp);
-        if(data_tmp.weight == 0){
+        if (!map.template interpField<se::Safe::On>(position, field_value)){
           stepsize = largestep;
           position += stepsize * ray_dir_M;
           continue;
         }
-        f_tt = data_tmp.tsdf;
+        f_tt = field_value;
         if (f_tt < 0){
           break;
         }                  // got it, jump out of inner loop
@@ -218,10 +229,11 @@ void raycastVolume(MapT&                       map,
                    const Eigen::Matrix4f&      raycast_T_MC,
                    const SensorT&              sensor) {
 
-//#pragma omp parallel for
+  omp_set_num_threads(10);
+#pragma omp parallel for
   for (int y = 0; y < surface_point_cloud_M.height(); y++)
   {
-//#pragma omp simd
+#pragma omp simd
     for (int x = 0; x < surface_point_cloud_M.width(); x++)
     {
       Eigen::Vector4f surface_intersection_M;
@@ -253,9 +265,11 @@ void renderVolumeKernel(uint32_t*                         volume_RGBA_image_data
 
   const int h = volume_RGBA_image_res.y(); // clang complains if this is inside the for loop
   const int w = volume_RGBA_image_res.x(); // clang complains if this is inside the for loop
-//#pragma omp parallel for
+
+  omp_set_num_threads(10);
+#pragma omp parallel for
   for (int y = 0; y < h; y++) {
-//#pragma omp simd
+#pragma omp simd
     for (int x = 0; x < w; x++) {
 
       const size_t pixel_idx = x + w * y;
