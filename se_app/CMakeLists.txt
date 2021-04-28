@@ -17,7 +17,7 @@ add_executable(${EXE_NAME}  "src/main_tsdf.cpp" ${READER_SRC})
 target_include_directories(${EXE_NAME} BEFORE PRIVATE include)
 target_link_libraries(${EXE_NAME}
   PRIVATE
-    SE::Integrator
+    SE::Tracker
     stdc++fs
 )
 

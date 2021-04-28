@@ -8,14 +8,14 @@ find_package(Eigen3 REQUIRED)
 
 # Create library #
 set(LIB_NAME "se-map")
-add_library(${LIB_NAME} INTERFACE)
+add_library(${LIB_NAME} STATIC src/preprocessor.cpp)
 target_include_directories(${LIB_NAME}
-  INTERFACE
+  PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
 target_link_libraries(${LIB_NAME}
-  INTERFACE
+  PUBLIC
     SE::Shared
     Eigen3::Eigen
 )

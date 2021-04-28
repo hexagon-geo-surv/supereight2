@@ -3,6 +3,7 @@
 #include "se/map.hpp"
 #include "se/map_integrator.hpp"
 #include "se/raycaster.hpp"
+#include "se/tracker.hpp"
 #include "se/sensor.hpp"
 #include "se/preprocessor.hpp"
 #include "se/perfstats.hpp"
@@ -73,11 +74,24 @@ int main() {
   static uint32_t* output_depth_img_data  =  new uint32_t[processed_img_res.x() * processed_img_res.y()];
   static uint32_t* output_volume_img_data = new uint32_t[processed_img_res.x() * processed_img_res.y()];
 
+  se::TrackerConfig tracker_config;
+  tracker_config.iterations = {1,2,3,4};
+  se::Tracker tracker(map_tsdf, sensor, tracker_config);
+
   unsigned int frame = 0;
   while (read_ok == se::ReaderStatus::ok) {
     se::perfstats.setIter(frame++);
-    // Read next imgs (rgba + depth + pose)
-    read_ok = reader->nextData(input_depth_img, input_rgba_img, T_MS);
+
+    if (frame == 1)
+    {
+      read_ok = reader->nextData(input_depth_img, input_rgba_img, T_MS);
+    } else
+    {
+      read_ok = reader->nextData(input_depth_img, input_rgba_img);
+
+    }
+
+
 
     // Preprocess depth
     se::preprocessor::downsample_depth(input_depth_img, processed_depth_img);
@@ -126,11 +140,11 @@ int main() {
     }
     se::perfstats.writeToFilestream();
   }
-  
+
   se::perfstats.writeToFilestream();
 
   delete[] output_rgba_img_data;
   delete[] output_depth_img_data;
-  
+
   return 0;
 }
