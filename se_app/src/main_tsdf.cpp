@@ -75,7 +75,7 @@ int main() {
   static uint32_t* output_volume_img_data = new uint32_t[processed_img_res.x() * processed_img_res.y()];
 
   se::TrackerConfig tracker_config;
-  tracker_config.iterations = {1,2,3,4};
+  tracker_config.iterations = {10, 5, 4};
   se::Tracker tracker(map_tsdf, sensor, tracker_config);
 
   unsigned int frame = 0;
