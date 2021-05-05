@@ -165,6 +165,8 @@ void pointCloudToNormalKernel(se::Image<Eigen::Vector3f>&       normals,
 //  return Eigen::Vector4f::Constant(-1.f);
 //}
 
+#define MU 0.16
+
 template <typename MapT>
 inline Eigen::Vector4f raycast(MapT&                  map,
                                const Eigen::Vector3f& ray_origin_M,

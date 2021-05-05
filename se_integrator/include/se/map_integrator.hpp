@@ -10,7 +10,7 @@
 #include "se/timings.hpp"
 
 
-
+#define MU 0.16
 //template <typename BlockT>
 //class BlockIterator {
 //  struct Voxel {
@@ -105,7 +105,7 @@ std::vector<typename MapT::OctreeType::BlockType*> frustum(const se::Image<depth
   typedef typename MapT::OctreeType::BlockType BlockType;
   auto octree_ptr = map.getOctree();
 
-  const float band = 2.f * 0.1f;
+  const float band = 2.f * MU;
   const int num_steps = ceil(band / map.getRes());
 
   const Eigen::Vector3f t_MS = T_MS.topRightCorner<3, 1>();
@@ -347,8 +347,8 @@ struct IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>
             // Update the TSDF
             const float m = sensor.measurementFromPoint(point_S);
             const float sdf_value = (depth_value - m) / m * point_S.norm();
-            if (sdf_value > -0.1) {
-              const float tsdf_value = fminf(1.f, sdf_value / 0.1);
+            if (sdf_value > -MU) {
+              const float tsdf_value = fminf(1.f, sdf_value / MU);
               typename MapT::DataType data;
               block_ptr->getData(voxel_coord, data);
               data.tsdf = (data.tsdf * data.weight + tsdf_value) / (data.weight + 1.f);
