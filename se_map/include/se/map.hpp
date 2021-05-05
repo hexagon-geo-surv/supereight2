@@ -81,6 +81,9 @@ public:
   template<Safe SafeB = Safe::Off>
   bool interpField(const Eigen::Vector3f& point_M, float& field_value);
 
+  template<Safe SafeB = Safe::Off>
+  bool gradField(const Eigen::Vector3f& point_M, Eigen::Vector3f& field_grad);
+
   void saveSlice(const Eigen::Vector3f& point_M, const std::string num);
 
   void saveStrucutre(const std::string num);

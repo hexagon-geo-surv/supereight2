@@ -85,6 +85,27 @@ bool Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::interpField(const Eigen::Vec
 
 
 template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
+template<Safe SafeB>
+bool Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::gradField(const Eigen::Vector3f& point_M, Eigen::Vector3f& field_grad)
+{
+  Eigen::Vector3f voxel_coord_f;
+
+  if constexpr(SafeB == Safe::Off) // Evaluate at compile time
+  {
+    pointToVoxel<Safe::Off>(point_M, voxel_coord_f);
+  } else
+  {
+    if (!pointToVoxel<Safe::On>(point_M, voxel_coord_f))
+    {
+    return false;
+    }
+  }
+  return se::visitor::gradField(octree_, voxel_coord_f, field_grad);
+}
+
+
+
+template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
 bool Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::initialiseOctree()
 {
   if (octree_ != nullptr)
