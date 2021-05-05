@@ -32,11 +32,10 @@ bool interpField(const std::shared_ptr<OctreeT> octree_ptr,
                  const Eigen::Vector3f&         voxel_coord_f,
                  FieldT&                        interp_field_value);
 
-
 template <typename OctreeT>
-bool gradData(const std::shared_ptr<OctreeT>             octree_ptr,
-              const Eigen::Vector3f&                     voxel_coord_f,
-              std::array<typename OctreeT::DataType, 3>& grad_data); ///< TODO:
+bool gradField(const std::shared_ptr<OctreeT> octree_ptr,
+               const Eigen::Vector3f&         voxel_coord_f,
+               Eigen::Vector3f&               grad_field_value);
 
 } // namespace visitor
 
