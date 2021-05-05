@@ -74,6 +74,8 @@ public:
 
   unsigned int getSize() { return size_; }
 
+  unsigned int getMaxScale() { return se::math::log2_const(size_); }
+
   /**
    * \brief Allocate a node for a given parent node.
    *
