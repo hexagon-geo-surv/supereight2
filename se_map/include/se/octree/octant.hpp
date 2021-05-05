@@ -39,6 +39,8 @@ public:
 
     unsigned int getChildrenMask() const;
 
+    void setChildrenMask(const unsigned int child_idx);
+
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 protected:

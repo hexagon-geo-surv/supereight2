@@ -94,6 +94,10 @@ unsigned int OctantBase::getChildrenMask() const { return children_mask_; }
 
 
 
+void OctantBase::setChildrenMask(const unsigned int child_idx) { children_mask_ |= 1 << child_idx; }
+
+
+
 template <typename DerivedT>
 NodeBase<DerivedT>::NodeBase(const Eigen::Vector3i& coord,
                              const unsigned         size,
