@@ -47,7 +47,9 @@ se::vector<typename OctreeT::BlockType*> blocks(const se::vector<Eigen::Vector3i
 {
   se::set<se::key_t> voxel_key_set;
 
+#ifdef _OPENMP
   omp_set_num_threads(10);
+#endif
 #pragma omp declare reduction (merge : std::set<se::key_t> : omp_out.insert(omp_in.begin(), omp_in.end()))
 #pragma omp parallel for reduction(merge: voxel_key_set)
   for (unsigned int i = 0; i < voxel_coords.size(); i++)
@@ -74,12 +76,13 @@ se::vector<typename OctreeT::BlockType*> blocks(se::vector<se::key_t>       uniq
   assert(base_parent_ptr); // Verify parent ptr
 
   se::vector<typename OctreeT::BlockType*> block_ptrs;
-
-  TICK("allocate-keys")
+#ifdef _OPENMP
   omp_set_num_threads(10);
+#endif
 #pragma omp parallel for
   for (unsigned int i = 0; i < unique_voxel_keys.size(); i++)
   {
+
     const auto unique_voxel_key = unique_voxel_keys[i];
     assert(se::keyops::key_to_scale(unique_voxel_key) <= octree_ptr->max_block_scale); // Verify scale is within block
 
@@ -90,6 +93,7 @@ se::vector<typename OctreeT::BlockType*> blocks(se::vector<se::key_t>       uniq
       block_ptrs.push_back(static_cast<typename OctreeT::BlockType*>(child_ptr));
     }
   }
+
   TOCK("allocate-keys")
   return block_ptrs;
 }
