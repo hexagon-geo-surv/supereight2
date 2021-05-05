@@ -35,7 +35,7 @@
 
 #include "se/octree/octree.hpp"
 
-#define CAST_STACK_DEPTH 19
+#define CAST_STACK_DEPTH 23
 
 namespace se {
 
@@ -50,7 +50,7 @@ public:
                         const Eigen::Vector3f& ray_dir_M,
                         const float            near_plane,
                         const float            far_plane)
-          : map_(map), octree_ptr_(map_.getOctree())
+          : map_(map), octree_ptr_(map_.getOctree()), scaling_((octree_ptr_->getSize() * map_.getRes()))
   {
 
     pos_        = Eigen::Vector3f::Ones();
@@ -77,7 +77,6 @@ public:
                      copysignf(epsilon, ray_dir_M.z()) : ray_dir_M.z();
 
     // Scale the origin to be in the interval [1, 2].
-
     Eigen::Vector3f ray_origin;
     map_.template pointToVoxel<Safe::Off>(ray_origin_M, ray_origin);
     ray_origin = ray_origin / octree_ptr_->getSize() + Eigen::Vector3f::Ones();
@@ -111,8 +110,8 @@ public:
     t_min_init_ = (2.0f * t_coef_ - t_bias_).maxCoeff();
     t_max_init_ = (t_coef_ - t_bias_).minCoeff();
     h_ = t_max_init_;
-    t_min_init_ = fmaxf(t_min_init_, near_plane / map_.getDim().x()); // TODO:
-    t_max_init_ = fminf(t_max_init_, far_plane  / map_.getDim().x()); // TODO:
+    t_min_init_ = fmaxf(t_min_init_, near_plane / scaling_); // TODO: [x]
+    t_max_init_ = fminf(t_max_init_, far_plane  / scaling_); // TODO: [x]
     t_min_ = t_min_init_;
     t_max_ = t_max_init_;
 
@@ -183,7 +182,7 @@ public:
    */
   float tmin() const
   {
-    return t_min_init_ * map_.getDim().x();
+    return t_min_init_ * scaling_;
   }
 
 
@@ -195,7 +194,7 @@ public:
    */
   float tmax() const
   {
-    return t_max_init_ * map_.getDim().x();
+    return t_max_init_ * scaling_;
   }
 
 
@@ -211,7 +210,7 @@ public:
    */
   float tcmin() const
   {
-    return t_min_ * map_.getDim().x();
+    return t_min_ * scaling_;
   }
 
 
@@ -227,7 +226,7 @@ public:
    */
   float tcmax() const
   {
-    return tc_max_ * map_.getDim().x();
+    return tc_max_  * scaling_;
   }
 
 
@@ -263,6 +262,7 @@ private:
   se::OctantBase* child_ptr_;
   int idx_;
   int scale_;
+  float scaling_;
   int min_scale_;
   int octant_mask_;
   float scale_exp2_;
