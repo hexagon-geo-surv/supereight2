@@ -34,8 +34,8 @@ int main() {
   sensor_config.height =  480   / ds;
   sensor_config.fx     =  481.2 / ds;
   sensor_config.fy     = -480.0 / ds;
-  sensor_config.cx     =  319.5 / ds;
-  sensor_config.cy     =  239.5 / ds;
+  sensor_config.cx     =  (319.5 + 0.5f) / ds - 0.5f;
+  sensor_config.cy     =  (239.5 + 0.5f) / ds - 0.5f;
   sensor_config.left_hand_frame = sensor_config.fy < 0;
   sensor_config.near_plane      = 0.4f;
   sensor_config.far_plane       = 6.f;
