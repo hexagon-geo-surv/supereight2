@@ -60,7 +60,7 @@ TEST(SingleResAllocation, BlockKey)
   typedef se::Node<DataType, se::Res::Single> NodeType;
   
   const NodeType* node_ptr = nullptr;
-  const se::OctantBase* octant_ptr = nullptr;
+  se::OctantBase* octant_ptr = nullptr;
 
   se::vector<Eigen::Vector3i> voxel_coords =
   {
@@ -99,7 +99,7 @@ TEST(SingleResAllocation, BlockKey)
       coord_is    = node_ptr->getCoord();
       coord_ought = adapt_to_scale(voxel_coord, s);
       EXPECT_EQ(coord_ought, coord_is);
-      const se::OctantBase* octant_tmp_ptr = nullptr;
+      se::OctantBase* octant_tmp_ptr = nullptr;
       octant_ptr->getParent(octant_tmp_ptr);
       octant_ptr = octant_tmp_ptr;
     }
@@ -134,7 +134,7 @@ TEST(SingleResAllocation, BlockKey)
       coord_is    = node_ptr->getCoord();
       coord_ought = adapt_to_scale(voxel_coord, s);
       EXPECT_EQ(coord_ought, coord_is);
-      const se::OctantBase* octant_tmp_ptr = nullptr;
+      se::OctantBase* octant_tmp_ptr = nullptr;
       octant_ptr->getParent(octant_tmp_ptr);
       octant_ptr = octant_tmp_ptr;
     }
@@ -169,7 +169,7 @@ TEST(SingleResAllocation, BlockKey)
       coord_is    = node_ptr->getCoord();
       coord_ought = adapt_to_scale(voxel_coord, s);
       EXPECT_EQ(coord_ought, coord_is);
-      const se::OctantBase* octant_tmp_ptr = nullptr;
+      se::OctantBase* octant_tmp_ptr = nullptr;
       octant_ptr->getParent(octant_tmp_ptr);
       octant_ptr = octant_tmp_ptr;
     }
@@ -204,7 +204,7 @@ TEST(SingleResAllocation, BlockKey)
       coord_is    = node_ptr->getCoord();
       coord_ought = adapt_to_scale(voxel_coord, s);
       EXPECT_EQ(coord_ought, coord_is);
-      const se::OctantBase* octant_tmp_ptr = nullptr;
+      se::OctantBase* octant_tmp_ptr = nullptr;
       octant_ptr->getParent(octant_tmp_ptr);
       octant_ptr = octant_tmp_ptr;
     }
@@ -239,7 +239,7 @@ TEST(SingleResAllocation, BlockKey)
       coord_is    = node_ptr->getCoord();
       coord_ought = adapt_to_scale(voxel_coord, s);
       EXPECT_EQ(coord_ought, coord_is);
-      const se::OctantBase* octant_tmp_ptr = nullptr;
+      se::OctantBase* octant_tmp_ptr = nullptr;
       octant_ptr->getParent(octant_tmp_ptr);
       octant_ptr = octant_tmp_ptr;
     }
@@ -266,7 +266,7 @@ TEST(SingleResAllocation, BlockCoord)
 
   BlockType* block_ptr = nullptr;
   const NodeType*  node_ptr = nullptr;
-  const se::OctantBase* octant_ptr = nullptr;
+  se::OctantBase* octant_ptr = nullptr;
 
   se::vector<Eigen::Vector3i> voxel_coords =
   {
@@ -289,7 +289,7 @@ TEST(SingleResAllocation, BlockCoord)
       coord_is    = node_ptr->getCoord();
       coord_ought = adapt_to_scale(voxel_coord, s);
       EXPECT_EQ(coord_ought, coord_is);
-      const se::OctantBase* octant_tmp_ptr = nullptr;
+      se::OctantBase* octant_tmp_ptr = nullptr;
       octant_ptr->getParent(octant_tmp_ptr);
       octant_ptr = octant_tmp_ptr;
     }
@@ -314,7 +314,7 @@ TEST(SingleResAllocation, BlockKeys)
   Eigen::Vector3i coord_is;
 
   const NodeType* node_ptr = nullptr;
-  const se::OctantBase* octant_ptr = nullptr;
+  se::OctantBase* octant_ptr = nullptr;
 
   se::vector<Eigen::Vector3i> voxel_coords =
   {
@@ -352,7 +352,7 @@ TEST(SingleResAllocation, BlockKeys)
       coord_is    = node_ptr->getCoord();
       coord_ought = adapt_to_scale(voxel_coord, s);
       EXPECT_EQ(coord_ought, coord_is);
-      const se::OctantBase* octant_tmp_ptr = nullptr;
+      se::OctantBase* octant_tmp_ptr = nullptr;
       octant_ptr->getParent(octant_tmp_ptr);
       octant_ptr = octant_tmp_ptr;
     }
@@ -377,7 +377,7 @@ TEST(SingleResAllocation, BlockCoords)
   Eigen::Vector3i coord_is;
 
   const NodeType* node_ptr = nullptr;
-  const se::OctantBase* octant_ptr = nullptr;
+  se::OctantBase* octant_ptr = nullptr;
 
   se::vector<Eigen::Vector3i> voxel_coords =
   {
@@ -416,7 +416,7 @@ TEST(SingleResAllocation, BlockCoords)
       coord_is    = node_ptr->getCoord();
       coord_ought = adapt_to_scale(voxel_coord, s);
       EXPECT_EQ(coord_ought, coord_is);
-      const se::OctantBase* octant_tmp_ptr = nullptr;
+      se::OctantBase* octant_tmp_ptr = nullptr;
       octant_ptr->getParent(octant_tmp_ptr);
       octant_ptr = octant_tmp_ptr;
     }

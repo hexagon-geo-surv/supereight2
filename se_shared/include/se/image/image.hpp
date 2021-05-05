@@ -13,7 +13,8 @@ template <typename T>
 class Image {
 
   public:
-    Image(const unsigned w, const unsigned h)
+    Image(
+            const unsigned w, const unsigned h)
         : width_(w), height_(h), data_(width_ * height_) {
       assert(width_ > 0 && height_ > 0);
     }

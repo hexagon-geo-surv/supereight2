@@ -17,7 +17,7 @@ class OctantBase
 public:
 
     OctantBase(const Eigen::Vector3i& coord,
-               const OctantBase*      parent_ptr = nullptr);
+               OctantBase*            parent_ptr = nullptr);
 
     virtual bool isBlock() = 0;
 
@@ -25,9 +25,9 @@ public:
 
     const Eigen::Vector3i& getCoord() const;
 
-    bool getParent(const OctantBase*& parent_ptr);
+    bool getParent(OctantBase*& parent_ptr);
 
-    bool getParent(const OctantBase*& parent_ptr) const;
+    bool getParent(OctantBase*& parent_ptr) const;
 
     unsigned int getTimeStamp();
 
@@ -42,7 +42,7 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 protected:
-    const OctantBase*     parent_ptr_;    ///< Every node/block (other than root) needs a parent
+    OctantBase*           parent_ptr_;    ///< Every node/block (other than root) needs a parent
     const Eigen::Vector3i coord_;         ///< The coordinates of the block (left, front , bottom corner)
     unsigned int          time_stamp_;    ///< The frame of the last update
     unsigned int          children_mask_; ///< The allocated children
@@ -65,7 +65,7 @@ class NodeBase : public OctantBase
 public:
     NodeBase(const Eigen::Vector3i& coord,
              const unsigned         size,
-             const OctantBase*      parent_ptr = nullptr);
+             OctantBase*            parent_ptr = nullptr);
 
     bool isBlock() { return false; }
 
@@ -118,7 +118,7 @@ template <typename DerivedT, unsigned SizeT>
 class BlockBase : public OctantBase {
 public:
     BlockBase(const Eigen::Vector3i& coord,
-              const se::OctantBase*  parent_ptr = nullptr);
+              se::OctantBase*        parent_ptr = nullptr);
 
     bool isBlock() { return true; }
 

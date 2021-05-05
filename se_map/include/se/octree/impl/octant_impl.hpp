@@ -37,9 +37,9 @@ bool get_child_idx(const Eigen::Vector3i& voxel_coord,
  * \brief Sets the Base for every node and block.
  */
 OctantBase::OctantBase(const Eigen::Vector3i& coord,
-                       const OctantBase*      parent_ptr)
+                       OctantBase*            parent_ptr)
         : parent_ptr_(parent_ptr), coord_(coord), time_stamp_(0), children_mask_(0)
-    {
+{
 }
 
 
@@ -58,7 +58,7 @@ const Eigen::Vector3i& OctantBase::getCoord() const
 
 
 
-bool OctantBase::getParent(const se::OctantBase*& parent_ptr)
+bool OctantBase::getParent(se::OctantBase*& parent_ptr)
 {
   parent_ptr = parent_ptr_;
   return parent_ptr_ != nullptr;
@@ -66,7 +66,7 @@ bool OctantBase::getParent(const se::OctantBase*& parent_ptr)
 
 
 
-bool OctantBase::getParent(const se::OctantBase*& parent_ptr) const
+bool OctantBase::getParent(se::OctantBase*& parent_ptr) const
 {
   parent_ptr = parent_ptr_;
   return parent_ptr_ != nullptr;
@@ -95,9 +95,9 @@ unsigned int OctantBase::getChildrenMask() const { return children_mask_; }
 
 
 template <typename DerivedT>
-NodeBase<DerivedT>::NodeBase(const Eigen::Vector3i&                coord,
-                             const unsigned                        size,
-                             const se::OctantBase* parent_ptr)
+NodeBase<DerivedT>::NodeBase(const Eigen::Vector3i& coord,
+                             const unsigned         size,
+                             se::OctantBase*        parent_ptr)
         : OctantBase(coord, parent_ptr), size_(size)
 {
   children_ptr_.fill(nullptr);
@@ -174,7 +174,7 @@ bool Node<DataT, ResT>::getData(const DataT& data)
 
 template <typename DerivedT, unsigned SizeT>
 BlockBase<DerivedT, SizeT>::BlockBase(const Eigen::Vector3i& coord,
-                                      const se::OctantBase*  parent_ptr)
+                                      se::OctantBase*        parent_ptr)
         : OctantBase(coord, parent_ptr)
 {
 }
