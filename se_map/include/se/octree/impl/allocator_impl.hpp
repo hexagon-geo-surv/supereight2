@@ -75,6 +75,25 @@ se::vector<typename OctreeT::BlockType*> blocks(se::vector<se::key_t>       uniq
   assert(octree_ptr);      // Verify octree ptr
   assert(base_parent_ptr); // Verify parent ptr
 
+  // Allocate nodes up to block_scale
+  TICK("allocate-keys")
+  for (scale_t scale = octree_ptr->getMaxScale(); scale > octree_ptr->max_block_scale; scale--)
+  {
+    se::vector<se::key_t> unique_voxel_keys_at_scale;
+    se::keyops::unique_at_scale(unique_voxel_keys, scale, unique_voxel_keys_at_scale);
+
+#ifdef _OPENMP
+    omp_set_num_threads(10);
+#endif
+#pragma omp parallel for
+    for (unsigned int i = 0; i < unique_voxel_keys_at_scale.size(); i++)
+    {
+      const auto unique_voxel_key_at_scale = unique_voxel_keys_at_scale[i];
+      se::allocator::allocate_key(unique_voxel_key_at_scale, octree_ptr, base_parent_ptr);
+    }
+  }
+
+  // Allocate blocks and store block pointers
   se::vector<typename OctreeT::BlockType*> block_ptrs;
 #ifdef _OPENMP
   omp_set_num_threads(10);
