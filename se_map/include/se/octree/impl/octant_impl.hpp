@@ -86,11 +86,11 @@ void OctantBase::setTimeStamp(const unsigned int time_stamp) { time_stamp_ = tim
 
 
 
-unsigned char OctantBase::getChildrenMask() { return children_mask_; }
+unsigned int OctantBase::getChildrenMask() { return children_mask_; }
 
 
 
-unsigned char OctantBase::getChildrenMask() const { return children_mask_; }
+unsigned int OctantBase::getChildrenMask() const { return children_mask_; }
 
 
 

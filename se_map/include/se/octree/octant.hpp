@@ -35,9 +35,9 @@ public:
 
     void setTimeStamp(const unsigned int time_stamp);
 
-    unsigned char getChildrenMask();
+    unsigned int getChildrenMask();
 
-    unsigned char getChildrenMask() const;
+    unsigned int getChildrenMask() const;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -45,7 +45,7 @@ protected:
     const OctantBase*     parent_ptr_;    ///< Every node/block (other than root) needs a parent
     const Eigen::Vector3i coord_;         ///< The coordinates of the block (left, front , bottom corner)
     unsigned int          time_stamp_;    ///< The frame of the last update
-    unsigned char         children_mask_; ///< The allocated children
+    unsigned int          children_mask_; ///< The allocated children
 };
 
 
