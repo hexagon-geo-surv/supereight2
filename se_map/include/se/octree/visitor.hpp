@@ -4,6 +4,7 @@
 /**
  * Helper wrapper to traverse the octree. All functions take a const octree and as no manipulation of the octree is done.
  */
+namespace se {
 namespace visitor {
 
 /**
@@ -38,6 +39,7 @@ bool gradField(const std::shared_ptr<OctreeT> octree_ptr,
                Eigen::Vector3f&               grad_field_value);
 
 } // namespace visitor
+} // namespace se
 
 #include "impl/visitor_impl.hpp"
 
