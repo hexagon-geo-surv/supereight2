@@ -125,7 +125,6 @@ int main() {
     TOCK("draw")
 
 
-    unsigned int final_frame = 800;
     if (frame == 1 || frame % 100 == 0)
     {
       map_tsdf.saveMesh(std::to_string(frame));
@@ -133,6 +132,7 @@ int main() {
       map_tsdf.saveStrucutre(std::to_string(frame));
     }
 
+    unsigned int final_frame = 800;
     if (frame == final_frame)
     {
       std::cout << "Reached FRAME = " << final_frame << std::endl;
