@@ -267,7 +267,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::pointsToVoxels(const se::vector<E
 template <Field FldT, Colour ColB, Semantics SemB, Res ResT, unsigned BlockSizeT>
 void Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::voxelToPoint(const Eigen::Vector3i& voxel_coord, Eigen::Vector3f& point_M)
 {
-  point_M = (voxel_coord.cast<float>() * res_) - origin_M_;
+  point_M = ((voxel_coord.cast<float>() + sample_offset_frac) * res_) - origin_M_;
 }
 
 } // namespace se
