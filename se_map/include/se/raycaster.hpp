@@ -38,7 +38,9 @@ void pointCloudToNormalKernel(se::Image<Eigen::Vector3f>&       normals,
   const int width = point_cloud.width();
   const int height = point_cloud.height();
 
+#ifdef _OPENMP
   omp_set_num_threads(10);
+#endif
 #pragma omp parallel for
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
@@ -231,7 +233,9 @@ void raycastVolume(MapT&                       map,
                    const Eigen::Matrix4f&      raycast_T_MC,
                    const SensorT&              sensor) {
 
+#ifdef _OPENMP
   omp_set_num_threads(10);
+#endif
 #pragma omp parallel for
   for (int y = 0; y < surface_point_cloud_M.height(); y++)
   {
@@ -268,7 +272,9 @@ void renderVolumeKernel(uint32_t*                         volume_RGBA_image_data
   const int h = volume_RGBA_image_res.y(); // clang complains if this is inside the for loop
   const int w = volume_RGBA_image_res.x(); // clang complains if this is inside the for loop
 
+#ifdef _OPENMP
   omp_set_num_threads(10);
+#endif
 #pragma omp parallel for
   for (int y = 0; y < h; y++) {
 #pragma omp simd
