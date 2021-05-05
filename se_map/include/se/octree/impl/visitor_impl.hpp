@@ -70,8 +70,7 @@ inline bool get_neighbours(const std::shared_ptr<OctreeT> octree_ptr,
                            const Eigen::Vector3i&         base_coord,
                            typename OctreeT::DataType     neighbour_data[8])
 {
-
-  const int stride = 1; // TODO:
+  unsigned int stride = 1;
   unsigned int block_size = OctreeT::BlockType::getSize();
   unsigned int crossmask
           = (((base_coord.x() & (block_size - 1)) == block_size - stride) << 2)
@@ -100,8 +99,7 @@ inline bool get_neighbours(const std::shared_ptr<OctreeT> octree_ptr,
         return false;
       }
 
-      const Eigen::Vector3i offset_coord = base_coord + stride * interp_offsets[offs2[0]];
-      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(offset_coord, octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs2[0]], octree_ptr, octree_ptr->getRoot()));
       if (!block_2_ptr)
       {
         return false;
@@ -122,8 +120,7 @@ inline bool get_neighbours(const std::shared_ptr<OctreeT> octree_ptr,
         return false;
       }
 
-      const Eigen::Vector3i offset_coord = base_coord + stride * interp_offsets[offs2[0]];
-      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(offset_coord, octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs2[0]], octree_ptr, octree_ptr->getRoot()));
       if (!block_2_ptr)
       {
         return false;
@@ -140,26 +137,22 @@ inline bool get_neighbours(const std::shared_ptr<OctreeT> octree_ptr,
       const unsigned int offs3[2] = {4, 5};
       const unsigned int offs4[2] = {6, 7};
 
-      const Eigen::Vector3i base_2_coord = base_coord + interp_offsets[offs2[0]];
-      const Eigen::Vector3i base_3_coord = base_coord + interp_offsets[offs3[0]];
-      const Eigen::Vector3i base_4_coord = base_coord + interp_offsets[offs4[0]];
-
       typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree_ptr, octree_ptr->getRoot()));
       if (!block_1_ptr) { return false; }
 
-      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_2_coord, octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs2[0]], octree_ptr, octree_ptr->getRoot()));
       if (!block_2_ptr) { return false; }
 
-      typename OctreeT::BlockType* block_3_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_3_coord, octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_3_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs3[0]], octree_ptr, octree_ptr->getRoot()));
       if (!block_3_ptr) { return false; }
 
-      typename OctreeT::BlockType* block_4_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_4_coord, octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_4_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs4[0]], octree_ptr, octree_ptr->getRoot()));
       if (!block_4_ptr) { return false; }
 
       gather_2(block_1_ptr, base_coord,   offs1, neighbour_data);
-      gather_2(block_2_ptr, base_2_coord, offs2, neighbour_data);
-      gather_2(block_4_ptr, base_4_coord, offs4, neighbour_data);
-      gather_2(block_3_ptr, base_3_coord, offs3, neighbour_data);
+      gather_2(block_2_ptr, base_coord, offs2, neighbour_data);
+      gather_2(block_4_ptr, base_coord, offs4, neighbour_data);
+      gather_2(block_3_ptr, base_coord, offs3, neighbour_data);
     }
       break;
     case 4: /* x crosses */
@@ -173,8 +166,7 @@ inline bool get_neighbours(const std::shared_ptr<OctreeT> octree_ptr,
         return false;
       }
 
-      const Eigen::Vector3i offset_coord = base_coord + stride * interp_offsets[offs2[0]];
-      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(offset_coord, octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs2[0]], octree_ptr, octree_ptr->getRoot()));
       if (!block_2_ptr)
       {
         return false;
@@ -191,26 +183,22 @@ inline bool get_neighbours(const std::shared_ptr<OctreeT> octree_ptr,
       const unsigned int offs3[2] = {4, 6};
       const unsigned int offs4[2] = {5, 7};
 
-      const Eigen::Vector3i base_2_coord = base_coord + interp_offsets[offs2[0]];
-      const Eigen::Vector3i base_3_coord = base_coord + interp_offsets[offs3[0]];
-      const Eigen::Vector3i base_4_coord = base_coord + interp_offsets[offs4[0]];
-
       typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree_ptr, octree_ptr->getRoot()));
       if (!block_1_ptr) { return false; }
 
-      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_2_coord, octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs2[0]], octree_ptr, octree_ptr->getRoot()));
       if (!block_2_ptr) { return false; }
 
-      typename OctreeT::BlockType* block_3_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_3_coord, octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_3_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs3[0]], octree_ptr, octree_ptr->getRoot()));
       if (!block_3_ptr) { return false; }
 
-      typename OctreeT::BlockType* block_4_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_4_coord, octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_4_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs4[0]], octree_ptr, octree_ptr->getRoot()));
       if (!block_4_ptr) { return false; }
 
       gather_2(block_1_ptr, base_coord,   offs1, neighbour_data);
-      gather_2(block_2_ptr, base_2_coord, offs2, neighbour_data);
-      gather_2(block_4_ptr, base_4_coord, offs4, neighbour_data);
-      gather_2(block_3_ptr, base_3_coord, offs3, neighbour_data);
+      gather_2(block_2_ptr, base_coord, offs2, neighbour_data);
+      gather_2(block_3_ptr, base_coord, offs3, neighbour_data);
+      gather_2(block_4_ptr, base_coord, offs4, neighbour_data);
     }
       break;
     case 6: /* x,y cross */
@@ -220,26 +208,22 @@ inline bool get_neighbours(const std::shared_ptr<OctreeT> octree_ptr,
       const unsigned int offs3[2] = {2, 6};
       const unsigned int offs4[2] = {3, 7};
 
-      const Eigen::Vector3i base_2_coord = base_coord + interp_offsets[offs2[0]];
-      const Eigen::Vector3i base_3_coord = base_coord + interp_offsets[offs3[0]];
-      const Eigen::Vector3i base_4_coord = base_coord + interp_offsets[offs4[0]];
-
       typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree_ptr, octree_ptr->getRoot()));
       if (!block_1_ptr) { return false; }
 
-      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_2_coord, octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs2[0]], octree_ptr, octree_ptr->getRoot()));
       if (!block_2_ptr) { return false; }
 
-      typename OctreeT::BlockType* block_3_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_3_coord, octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_3_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs3[0]], octree_ptr, octree_ptr->getRoot()));
       if (!block_3_ptr) { return false; }
 
-      typename OctreeT::BlockType* block_4_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_4_coord, octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_4_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs4[0]], octree_ptr, octree_ptr->getRoot()));
       if (!block_4_ptr) { return false; }
 
-      gather_2(block_1_ptr, base_coord,   offs1, neighbour_data);
-      gather_2(block_2_ptr, base_2_coord, offs2, neighbour_data);
-      gather_2(block_4_ptr, base_4_coord, offs4, neighbour_data);
-      gather_2(block_3_ptr, base_3_coord, offs3, neighbour_data);
+      gather_2(block_1_ptr, base_coord, offs1, neighbour_data);
+      gather_2(block_2_ptr, base_coord, offs2, neighbour_data);
+      gather_2(block_3_ptr, base_coord, offs3, neighbour_data);
+      gather_2(block_4_ptr, base_coord, offs4, neighbour_data);
     }
       break;
 
@@ -298,15 +282,6 @@ bool interpField(const std::shared_ptr<OctreeT> octree_ptr,
   }
   
   get_neighbours(octree_ptr, base_coord, neighbour_data);
-  
-  for (int n = 0; n < 8; n++) //< 8 neighbours
-  {
-    if (se::is_invalid(neighbour_data[n]))
-    {
-      interp_field_value = se::get_field(init_data);
-      return false;
-    }
-  }
 
   interp_field_value =  (((se::get_field(neighbour_data[0]) * (1 - factor.x())
                          + se::get_field(neighbour_data[1]) * factor.x()) * (1 - factor.y())
@@ -316,6 +291,14 @@ bool interpField(const std::shared_ptr<OctreeT> octree_ptr,
                          + se::get_field(neighbour_data[5]) * factor.x()) * (1 - factor.y())
                         + (se::get_field(neighbour_data[6]) * (1 - factor.x())
                          + se::get_field(neighbour_data[7]) * factor.x()) * factor.y()) * factor.z());
+
+  for (int n = 0; n < 8; n++) //< 8 neighbours
+  {
+    if (se::is_invalid(neighbour_data[n]))
+    {
+      return false;
+    }
+  }
 
   // Interpolate the value based on the fractional part.
   return true;
