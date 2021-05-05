@@ -10,7 +10,7 @@ namespace se {
 // Typedefs and defaults
 
 typedef float tsdf_t;
-static const tsdf_t dflt_tsdf = 0.f;
+static const tsdf_t dflt_tsdf = 1.f;
 
 typedef int weight_t;
 static const weight_t dflt_weight = 0;
