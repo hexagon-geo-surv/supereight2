@@ -70,37 +70,48 @@ int main() {
   static se::Image<se::depth_t> processed_depth_img(processed_img_res.x(), processed_img_res.y());
   static se::Image<uint32_t>    processed_rgba_img(processed_img_res.x(), processed_img_res.y());
 
-  static uint32_t* output_rgba_img_data   =  new uint32_t[processed_img_res.x() * processed_img_res.y()];
-  static uint32_t* output_depth_img_data  =  new uint32_t[processed_img_res.x() * processed_img_res.y()];
-  static uint32_t* output_volume_img_data = new uint32_t[processed_img_res.x() * processed_img_res.y()];
+  static uint32_t* output_rgba_img_data     =  new uint32_t[processed_img_res.x() * processed_img_res.y()];
+  static uint32_t* output_depth_img_data    =  new uint32_t[processed_img_res.x() * processed_img_res.y()];
+  static uint32_t* output_tracking_img_data =  new uint32_t[processed_img_res.x() * processed_img_res.y()];
+  static uint32_t* output_volume_img_data   =  new uint32_t[processed_img_res.x() * processed_img_res.y()];
 
   se::TrackerConfig tracker_config;
   tracker_config.iterations = {10, 5, 4};
   se::Tracker tracker(map_tsdf, sensor, tracker_config);
 
+  // Integrated depth at given pose
+  struct IntegrConfig {};
+  IntegrConfig integr_config;
+  se::MapIntegrator integrator(map_tsdf, integr_config);
+
+#define TRACK true
+
   unsigned int frame = 0;
   while (read_ok == se::ReaderStatus::ok) {
     se::perfstats.setIter(frame++);
 
-    if (frame == 1)
+    if constexpr (TRACK)
     {
-      read_ok = reader->nextData(input_depth_img, input_rgba_img, T_MS);
+      if (frame == 1)
+      {
+        read_ok = reader->nextData(input_depth_img, input_rgba_img, T_MS);
+      } else
+      {
+        read_ok = reader->nextData(input_depth_img, input_rgba_img);
+      }
     } else
     {
-      read_ok = reader->nextData(input_depth_img, input_rgba_img);
-
+      read_ok = reader->nextData(input_depth_img, input_rgba_img, T_MS);
     }
-
-
 
     // Preprocess depth
     se::preprocessor::downsample_depth(input_depth_img, processed_depth_img);
     se::preprocessor::downsample_rgba(input_rgba_img,  processed_rgba_img);
 
-    // Integrated depth at given pose
-    struct IntegrConfig {};
-    IntegrConfig integr_config;
-    se::MapIntegrator integrator(map_tsdf, integr_config);
+    if (frame > 1)
+    {
+      std::cout << "TRACKED = " << tracker.track(processed_depth_img, T_MS) << std::endl;
+    }
 
     TICK("integration")
     integrator.integrateDepth(processed_depth_img, sensor, T_MS);
@@ -116,12 +127,13 @@ int main() {
     // Visualise imgs
     convert_to_output_rgba_img(processed_rgba_img, output_rgba_img_data);
     convert_to_output_depth_img(processed_depth_img, output_depth_img_data);
+    tracker.renderTrackingResult(output_tracking_img_data);
 
     TICK("draw")
-    drawthem(output_rgba_img_data,   processed_img_res,
-             output_depth_img_data,  processed_img_res,
-             output_volume_img_data, processed_img_res,
-             output_volume_img_data, processed_img_res);
+    drawthem(output_rgba_img_data,     processed_img_res,
+             output_depth_img_data,    processed_img_res,
+             output_tracking_img_data, processed_img_res,
+             output_volume_img_data,   processed_img_res);
     TOCK("draw")
 
 
