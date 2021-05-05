@@ -21,6 +21,12 @@ bool getData(std::shared_ptr<OctreeT>     octree_ptr,
              const Eigen::Vector3i&       voxel_coord,
              typename OctreeT::DataType&  data);
 
+template <typename OctreeT>
+float getField(std::shared_ptr<OctreeT> octree_ptr,
+               const int                x,
+               const int                y,
+               const int                z);
+
 template <typename OctreeT, typename FieldT>
 bool interpField(const std::shared_ptr<OctreeT> octree_ptr,
                  const Eigen::Vector3f&         voxel_coord_f,
