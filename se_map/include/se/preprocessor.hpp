@@ -60,7 +60,27 @@ void bilateralFilterKernel(se::Image<float>&         out,
 template<typename SensorT>
 void depthToPointCloudKernel(se::Image<Eigen::Vector3f>& point_cloud_C,
                              const se::Image<float>&     depth_image,
-                             const SensorT&              sensor);
+                             const SensorT&              sensor)
+{
+#pragma omp parallel for
+  for (int y = 0; y < depth_image.height(); y++)
+  {
+    for (int x = 0; x < depth_image.width(); x++)
+    {
+      const Eigen::Vector2i pixel(x, y);
+      if (depth_image(pixel.x(), pixel.y()) > 0)
+      {
+        const Eigen::Vector2f pixel_f = pixel.cast<float>();
+        Eigen::Vector3f ray_dir_C;
+        sensor.model.backProject(pixel_f, &ray_dir_C);
+        point_cloud_C[pixel.x() + pixel.y() * depth_image.width()] = depth_image(pixel.x(), pixel.y()) * ray_dir_C;
+      } else
+      {
+        point_cloud_C[pixel.x() + pixel.y() * depth_image.width()] = Eigen::Vector3f::Zero();
+      }
+    }
+  }
+}
 
 
 
