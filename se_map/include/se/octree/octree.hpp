@@ -59,10 +59,29 @@ public:
   OctreeIterator<Octree<DataT, ResT, BlockSizeT>> begin();
   OctreeIterator<Octree<DataT, ResT, BlockSizeT>> end();
 
+  /**
+   * \brief Verify if the voxel coordinates are contained in the octree.
+   *
+   * \param[in] voxel_coord The voxel coordinates to be verified
+   *
+   * \return True if contained in the octree, False otherwise
+   */
   bool contains(const Eigen::Vector3i& voxel_coord);
 
+  /**
+   * \brief Verify if the voxel coordinates are contained in the octree.
+   *
+   * \param[in] voxel_coord The voxel coordinates to be verified
+   *
+   * \return True if contained in the octree, False otherwise
+   */
   bool contains(const Eigen::Vector3i& voxel_coord) const;
 
+  /**
+   * \brief Get the node pointer to the root of the octree.
+   *
+   * \return The pointer to the root of the octree
+   */
   NodeType* getRoot() { return root_; };
 
   /**
@@ -72,8 +91,18 @@ public:
    */
   se::vector<se::OctantBase*> getOctantBuffer();
 
+  /**
+   * \brief Get the size of the octree in [voxel] units.
+   *
+   * \return The size of the octree
+   */
   unsigned int getSize() { return size_; }
 
+  /**
+   * \brief Get the maximum scale of the octree. This is equivalent to the scale of the root.
+   *
+   * \return The max scale of the octree
+   */
   unsigned int getMaxScale() { return se::math::log2_const(size_); }
 
   /**
@@ -113,11 +142,11 @@ private:
    */
   void addOctantRecurse(se::OctantBase* octant_ptr);
 
-  unsigned int size_;                         ///< The size in [voxel] of the octree
-  NodeType* root_ = nullptr;  ///< The pointer to the root node of the octree
+  unsigned int size_;                          ///< The size in [voxel] of the octree
+  NodeType* root_ = nullptr;                   ///< The pointer to the root node of the octree
   std::vector<se::OctantBase*> octant_buffer_;
 
-  MemoryPool memory_pool_;
+  MemoryPool memory_pool_;       ///< The memory pool pre-allocating memory for nodes and blocks
 };
 
 
