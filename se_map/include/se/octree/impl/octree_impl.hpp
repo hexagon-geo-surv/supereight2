@@ -11,10 +11,8 @@ Octree<DataT, ResT, BlockSizeT>::Octree(const unsigned size) : size_(size)
 {
   assert(math::is_power_of_two(size)); // Verify that the octree size is a multiple of 2.
   assert(BlockSizeT < size);           // Verify that the block size is smaller than the root.
-
-// REMOVE  root_ = std::shared_ptr<NodeType>(new NodeType(Eigen::Vector3i(0,0,0), size_)); // Initialise root
+  
   root_ptr_ = memory_pool_.allocateNode(Eigen::Vector3i(0,0,0), size_);
-  std::cout << "octree.size_ = " << size_ << std::endl;
 }
 
 
