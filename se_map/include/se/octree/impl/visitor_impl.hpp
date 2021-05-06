@@ -257,6 +257,74 @@ inline bool get_neighbours(const std::shared_ptr<OctreeT> octree_ptr,
 
 
 
+template <typename OctreeT>
+bool getData(std::shared_ptr<OctreeT>     octree_ptr,
+             const Eigen::Vector3i&       voxel_coord,
+             typename OctreeT::DataType&  data)
+{
+
+  se::OctantBase* octant_ptr = octree_ptr->getRoot();
+  se::OctantBase* octant_tmp_ptr = nullptr;
+  if(!octant_ptr) // Return false if the octree root isn't allocated, this should never be the case.
+  {
+    std::cerr << "Re-initalise octree. Root missing" << std::endl;
+    return false;
+  }
+
+  unsigned int child_size = octree_ptr->getSize() >> 1;
+  for (; child_size >= OctreeT::block_size; child_size = child_size >> 1)
+  {
+    typename OctreeT::NodeType* node_ptr = static_cast<typename OctreeT::NodeType*>(octant_ptr);
+
+    unsigned int child_idx;
+    get_child_idx(voxel_coord, node_ptr, child_idx);
+    if (!node_ptr->getChild(child_idx, octant_tmp_ptr)) // Return false if the voxel is not allocated
+    {
+      return false;
+    }
+    octant_ptr = octant_tmp_ptr;
+  }
+
+  static_cast<typename OctreeT::BlockType*>(octant_ptr)->getData(voxel_coord, data);
+
+  return true;
+}
+
+
+
+template <typename OctreeT>
+se::field_t getField(std::shared_ptr<OctreeT> octree_ptr,
+                     const Eigen::Vector3i&   voxel_coord)
+{
+  se::OctantBase* octant_ptr = octree_ptr->getRoot();
+  se::OctantBase* octant_tmp_ptr = nullptr;
+  if(!octant_ptr) // Return false if the octree root isn't allocated, this should never be the case.
+  {
+    std::cerr << "Re-initalise octree. Root missing" << std::endl;
+    return false;
+  }
+
+  unsigned int child_size = octree_ptr->getSize() >> 1;
+  for (; child_size >= OctreeT::block_size; child_size = child_size >> 1)
+  {
+    typename OctreeT::NodeType* node_ptr = static_cast<typename OctreeT::NodeType*>(octant_ptr);
+
+    unsigned int child_idx;
+    get_child_idx(voxel_coord, node_ptr, child_idx);
+    if (!node_ptr->getChild(child_idx, octant_tmp_ptr)) // Return false if the voxel is not allocated
+    {
+      return 0;
+    }
+    octant_ptr = octant_tmp_ptr;
+  }
+
+  typename OctreeT::DataType data;
+  static_cast<typename OctreeT::BlockType*>(octant_ptr)->getData(voxel_coord, data);
+  return se::get_field(data);
+}
+
+
+
 template <typename OctreeT, typename FieldT>
 bool interpField(const std::shared_ptr<OctreeT> octree_ptr,
                  const Eigen::Vector3f&         voxel_coord_f,
@@ -334,56 +402,56 @@ bool gradField(const std::shared_ptr<OctreeT> octree_ptr,
     return false;
   }
 
-  gradient.x() = (((se::visitor::getField(octree_ptr, upper_lower_coord.x(), lower_coord.y(), lower_coord.z())
-                    - se::visitor::getField(octree_ptr, lower_lower_coord.x(), lower_coord.y(), lower_coord.z())) * (1 - factor.x())
-                   +(se::visitor::getField(octree_ptr, upper_upper_coord.x(), lower_coord.y(), lower_coord.z())
-                     - se::visitor::getField(octree_ptr, lower_upper_coord.x(), lower_coord.y(), lower_coord.z())) * factor.x()) * (1 - factor.y())
-                  + ((se::visitor::getField(octree_ptr, upper_lower_coord.x(), upper_coord.y(), lower_coord.z())
-                      - se::visitor::getField(octree_ptr, lower_lower_coord.x(), upper_coord.y(), lower_coord.z())) * (1 - factor.x())
-                     +(se::visitor::getField(octree_ptr, upper_upper_coord.x(), upper_coord.y(), lower_coord.z())
-                       - se::visitor::getField(octree_ptr, lower_upper_coord.x(), upper_coord.y(), lower_coord.z())) * factor.x()) * factor.y()) * (1 - factor.z())
-                 + (((se::visitor::getField(octree_ptr, upper_lower_coord.x(), lower_coord.y(), upper_coord.z())
-                      - se::visitor::getField(octree_ptr, lower_lower_coord.x(), lower_coord.y(), upper_coord.z())) * (1 - factor.x())
-                     +(se::visitor::getField(octree_ptr, upper_upper_coord.x(), lower_coord.y(), upper_coord.z())
-                       - se::visitor::getField(octree_ptr, lower_upper_coord.x(), lower_coord.y(), upper_coord.z())) * factor.x()) * (1 - factor.y())
-                    + ((se::visitor::getField(octree_ptr, upper_lower_coord.x(), upper_coord.y(), upper_coord.z())
-                        - se::visitor::getField(octree_ptr, lower_lower_coord.x(), upper_coord.y(), upper_coord.z())) * (1 - factor.x())
-                       +(se::visitor::getField(octree_ptr, upper_upper_coord.x(), upper_coord.y(), upper_coord.z())
-                         - se::visitor::getField(octree_ptr, lower_upper_coord.x(), upper_coord.y(), upper_coord.z())) * factor.x()) * factor.y()) * factor.z();
+  gradient.x() = (((se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_lower_coord.x(), lower_coord.y(), lower_coord.z()))
+                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_lower_coord.x(), lower_coord.y(), lower_coord.z()))) * (1 - factor.x())
+                  +(se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_upper_coord.x(), lower_coord.y(), lower_coord.z()))
+                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_upper_coord.x(), lower_coord.y(), lower_coord.z()))) * factor.x()) * (1 - factor.y())
+                + ((se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_lower_coord.x(), upper_coord.y(), lower_coord.z()))
+                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_lower_coord.x(), upper_coord.y(), lower_coord.z()))) * (1 - factor.x())
+                  +(se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_upper_coord.x(), upper_coord.y(), lower_coord.z()))
+                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_upper_coord.x(), upper_coord.y(), lower_coord.z()))) * factor.x()) * factor.y()) * (1 - factor.z())
+               + (((se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_lower_coord.x(), lower_coord.y(), upper_coord.z()))
+                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_lower_coord.x(), lower_coord.y(), upper_coord.z()))) * (1 - factor.x())
+                  +(se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_upper_coord.x(), lower_coord.y(), upper_coord.z()))
+                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_upper_coord.x(), lower_coord.y(), upper_coord.z()))) * factor.x()) * (1 - factor.y())
+                + ((se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_lower_coord.x(), upper_coord.y(), upper_coord.z()))
+                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_lower_coord.x(), upper_coord.y(), upper_coord.z()))) * (1 - factor.x())
+                  +(se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_upper_coord.x(), upper_coord.y(), upper_coord.z()))
+                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_upper_coord.x(), upper_coord.y(), upper_coord.z()))) * factor.x()) * factor.y()) * factor.z();
 
-  gradient.y() = (((se::visitor::getField(octree_ptr, lower_coord.x(), upper_lower_coord.y(), lower_coord.z())
-                    - se::visitor::getField(octree_ptr, lower_coord.x(), lower_lower_coord.y(), lower_coord.z())) * (1 - factor.x())
-                   +(se::visitor::getField(octree_ptr, upper_coord.x(), upper_lower_coord.y(), lower_coord.z())
-                     - se::visitor::getField(octree_ptr, upper_coord.x(), lower_lower_coord.y(), lower_coord.z())) * factor.x()) * (1 - factor.y())
-                  + ((se::visitor::getField(octree_ptr, lower_coord.x(), upper_upper_coord.y(), lower_coord.z())
-                      - se::visitor::getField(octree_ptr, lower_coord.x(), lower_upper_coord.y(), lower_coord.z())) * (1 - factor.x())
-                     +(se::visitor::getField(octree_ptr, upper_coord.x(), upper_upper_coord.y(), lower_coord.z())
-                       - se::visitor::getField(octree_ptr, upper_coord.x(), lower_upper_coord.y(), lower_coord.z())) * factor.x()) * factor.y()) * (1 - factor.z())
-                 + (((se::visitor::getField(octree_ptr, lower_coord.x(), upper_lower_coord.y(), upper_coord.z())
-                      - se::visitor::getField(octree_ptr, lower_coord.x(), lower_lower_coord.y(), upper_coord.z())) * (1 - factor.x())
-                     +(se::visitor::getField(octree_ptr, upper_coord.x(), upper_lower_coord.y(), upper_coord.z())
-                       - se::visitor::getField(octree_ptr, upper_coord.x(), lower_lower_coord.y(), upper_coord.z())) * factor.x()) * (1 - factor.y())
-                    + ((se::visitor::getField(octree_ptr, lower_coord.x(), upper_upper_coord.y(), upper_coord.z())
-                        - se::visitor::getField(octree_ptr, lower_coord.x(), lower_upper_coord.y(), upper_coord.z())) * (1 - factor.x())
-                       +(se::visitor::getField(octree_ptr, upper_coord.x(), upper_upper_coord.y(), upper_coord.z())
-                         - se::visitor::getField(octree_ptr, upper_coord.x(), lower_upper_coord.y(), upper_coord.z())) * factor.x()) * factor.y()) * factor.z();
+  gradient.y() = (((se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), upper_lower_coord.y(), lower_coord.z()))
+                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), lower_lower_coord.y(), lower_coord.z()))) * (1 - factor.x())
+                  +(se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), upper_lower_coord.y(), lower_coord.z()))
+                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), lower_lower_coord.y(), lower_coord.z()))) * factor.x()) * (1 - factor.y())
+                + ((se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), upper_upper_coord.y(), lower_coord.z()))
+                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), lower_upper_coord.y(), lower_coord.z()))) * (1 - factor.x())
+                  +(se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), upper_upper_coord.y(), lower_coord.z()))
+                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), lower_upper_coord.y(), lower_coord.z()))) * factor.x()) * factor.y()) * (1 - factor.z())
+               + (((se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), upper_lower_coord.y(), upper_coord.z()))
+                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), lower_lower_coord.y(), upper_coord.z()))) * (1 - factor.x())
+                  +(se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), upper_lower_coord.y(), upper_coord.z()))
+                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), lower_lower_coord.y(), upper_coord.z()))) * factor.x()) * (1 - factor.y())
+                + ((se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), upper_upper_coord.y(), upper_coord.z()))
+                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), lower_upper_coord.y(), upper_coord.z()))) * (1 - factor.x())
+                  +(se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), upper_upper_coord.y(), upper_coord.z()))
+                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), lower_upper_coord.y(), upper_coord.z()))) * factor.x()) * factor.y()) * factor.z();
 
-  gradient.z() = (((se::visitor::getField(octree_ptr, lower_coord.x(), lower_coord.y(), upper_lower_coord.z())
-                    - se::visitor::getField(octree_ptr, lower_coord.x(), lower_coord.y(), lower_lower_coord.z())) * (1 - factor.x())
-                   +(se::visitor::getField(octree_ptr, upper_coord.x(), lower_coord.y(), upper_lower_coord.z())
-                     - se::visitor::getField(octree_ptr, upper_coord.x(), lower_coord.y(), lower_lower_coord.z())) * factor.x()) * (1 - factor.y())
-                  + ((se::visitor::getField(octree_ptr, lower_coord.x(), upper_coord.y(), upper_lower_coord.z())
-                      - se::visitor::getField(octree_ptr, lower_coord.x(), upper_coord.y(), lower_lower_coord.z())) * (1 - factor.x())
-                     +(se::visitor::getField(octree_ptr, upper_coord.x(), upper_coord.y(), upper_lower_coord.z())
-                       - se::visitor::getField(octree_ptr, upper_coord.x(), upper_coord.y(), lower_lower_coord.z())) * factor.x()) * factor.y()) * (1 - factor.z())
-                 + (((se::visitor::getField(octree_ptr, lower_coord.x(), lower_coord.y(), upper_upper_coord.z())
-                      - se::visitor::getField(octree_ptr, lower_coord.x(), lower_coord.y(), lower_upper_coord.z())) * (1 - factor.x())
-                     +(se::visitor::getField(octree_ptr, upper_coord.x(), lower_coord.y(), upper_upper_coord.z())
-                       - se::visitor::getField(octree_ptr, upper_coord.x(), lower_coord.y(), lower_upper_coord.z())) * factor.x()) * (1 - factor.y())
-                    +((se::visitor::getField(octree_ptr, lower_coord.x(), upper_coord.y(), upper_upper_coord.z())
-                       - se::visitor::getField(octree_ptr, lower_coord.x(), upper_coord.y(), lower_upper_coord.z())) * (1 - factor.x())
-                      +(se::visitor::getField(octree_ptr, upper_coord.x(), upper_coord.y(), upper_upper_coord.z())
-                        - se::visitor::getField(octree_ptr, upper_coord.x(), upper_coord.y(), lower_upper_coord.z())) * factor.x()) * factor.y()) * factor.z();
+  gradient.z() = (((se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), lower_coord.y(), upper_lower_coord.z()))
+                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), lower_coord.y(), lower_lower_coord.z()))) * (1 - factor.x())
+                  +(se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), lower_coord.y(), upper_lower_coord.z()))
+                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), lower_coord.y(), lower_lower_coord.z()))) * factor.x()) * (1 - factor.y())
+                + ((se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), upper_coord.y(), upper_lower_coord.z()))
+                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), upper_coord.y(), lower_lower_coord.z()))) * (1 - factor.x())
+                  +(se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), upper_coord.y(), upper_lower_coord.z()))
+                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), upper_coord.y(), lower_lower_coord.z()))) * factor.x()) * factor.y()) * (1 - factor.z())
+               + (((se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), lower_coord.y(), upper_upper_coord.z()))
+                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), lower_coord.y(), lower_upper_coord.z()))) * (1 - factor.x())
+                  +(se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), lower_coord.y(), upper_upper_coord.z()))
+                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), lower_coord.y(), lower_upper_coord.z()))) * factor.x()) * (1 - factor.y())
+                 +((se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), upper_coord.y(), upper_upper_coord.z()))
+                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), upper_coord.y(), lower_upper_coord.z()))) * (1 - factor.x())
+                  +(se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), upper_coord.y(), upper_upper_coord.z()))
+                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), upper_coord.y(), lower_upper_coord.z()))) * factor.x()) * factor.y()) * factor.z();
 
   float voxel_dim_ = 0.04f;
   grad_field_value = (0.5f * voxel_dim_) * gradient;
@@ -391,74 +459,6 @@ bool gradField(const std::shared_ptr<OctreeT> octree_ptr,
   return true;
 }
 
-template <typename OctreeT>
-bool getData(std::shared_ptr<OctreeT>     octree_ptr,
-             const Eigen::Vector3i&       voxel_coord,
-             typename OctreeT::DataType&  data)
-{
-
-  se::OctantBase* octant_ptr = octree_ptr->getRoot();
-  se::OctantBase* octant_tmp_ptr = nullptr;
-  if(!octant_ptr) // Return false if the octree root isn't allocated, this should never be the case.
-  {
-    std::cerr << "Re-initalise octree. Root missing" << std::endl;
-    return false;
-  }
-
-  unsigned int child_size = octree_ptr->getSize() >> 1;
-  for (; child_size >= OctreeT::block_size; child_size = child_size >> 1)
-  {
-    typename OctreeT::NodeType* node_ptr = static_cast<typename OctreeT::NodeType*>(octant_ptr);
-
-    unsigned int child_idx;
-    get_child_idx(voxel_coord, node_ptr, child_idx);
-    if (!node_ptr->getChild(child_idx, octant_tmp_ptr)) // Return false if the voxel is not allocated
-    {
-      return false;
-    }
-    octant_ptr = octant_tmp_ptr;
-  }
-
-  static_cast<typename OctreeT::BlockType*>(octant_ptr)->getData(voxel_coord, data);
-
-  return true;
-}
-
-
-
-template <typename OctreeT>
-float getField(std::shared_ptr<OctreeT> octree_ptr,
-               const int                x,
-               const int                y,
-               const int                z)
-{
-  const Eigen::Vector3i voxel_coord(x, y, z);
-  se::OctantBase* octant_ptr = octree_ptr->getRoot();
-  se::OctantBase* octant_tmp_ptr = nullptr;
-  if(!octant_ptr) // Return false if the octree root isn't allocated, this should never be the case.
-  {
-    std::cerr << "Re-initalise octree. Root missing" << std::endl;
-    return false;
-  }
-
-  unsigned int child_size = octree_ptr->getSize() >> 1;
-  for (; child_size >= OctreeT::block_size; child_size = child_size >> 1)
-  {
-    typename OctreeT::NodeType* node_ptr = static_cast<typename OctreeT::NodeType*>(octant_ptr);
-
-    unsigned int child_idx;
-    get_child_idx(voxel_coord, node_ptr, child_idx);
-    if (!node_ptr->getChild(child_idx, octant_tmp_ptr)) // Return false if the voxel is not allocated
-    {
-      return 0;
-    }
-    octant_ptr = octant_tmp_ptr;
-  }
-
-  typename OctreeT::DataType data;
-  static_cast<typename OctreeT::BlockType*>(octant_ptr)->getData(voxel_coord, data);
-  return se::get_field(data);
-}
 
 } // namespace visitor
 } // namespace se

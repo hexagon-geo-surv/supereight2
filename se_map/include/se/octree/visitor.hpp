@@ -15,6 +15,7 @@ namespace visitor {
  * \param[in]  octree_ptr   The pointer to the octree
  * \param[in]  voxel_coord  The voxel coordinates to be accessed
  * \param[out] data         The data in the voxel to be accessed
+ *
  * \return True if the data is available, False otherwise
  */
 template <typename OctreeT>
@@ -23,10 +24,8 @@ bool getData(std::shared_ptr<OctreeT>     octree_ptr,
              typename OctreeT::DataType&  data);
 
 template <typename OctreeT>
-float getField(std::shared_ptr<OctreeT> octree_ptr,
-               const int                x,
-               const int                y,
-               const int                z);
+se::field_t getField(std::shared_ptr<OctreeT> octree_ptr,
+                     const Eigen::Vector3i&   voxel_coord);
 
 template <typename OctreeT, typename FieldT>
 bool interpField(const std::shared_ptr<OctreeT> octree_ptr,
