@@ -19,9 +19,30 @@ namespace visitor {
  * \return True if the data is available, False otherwise
  */
 template <typename OctreeT>
-bool getData(std::shared_ptr<OctreeT>     octree_ptr,
-             const Eigen::Vector3i&       voxel_coord,
-             typename OctreeT::DataType&  data);
+bool getData(std::shared_ptr<OctreeT>    octree_ptr,
+             const Eigen::Vector3i&      voxel_coord,
+             typename OctreeT::DataType& data);
+
+/**
+ * \brief Get the voxel data for a given coordinate.
+ *        The function returns false and invalid data if the data is not allocated.
+ *
+ * \warning The data might be invalid.
+ *
+ * \tparam OctreeT          The type of the octree used
+ * \param[in] octree_ptr   The pointer to the octree
+ * \param[in] voxel_coord  The voxel coordinates to be accessed
+ *
+ * \return The data in the voxel to be accessed
+ */
+template <typename OctreeT>
+typename OctreeT::DataType getData(std::shared_ptr<OctreeT> octree_ptr,
+                                   const Eigen::Vector3i&   voxel_coord);
+
+template <typename OctreeT>
+bool getField(std::shared_ptr<OctreeT> octree_ptr,
+              const Eigen::Vector3i&   voxel_coord,
+              se::field_t&             field_value);
 
 template <typename OctreeT>
 se::field_t getField(std::shared_ptr<OctreeT> octree_ptr,
