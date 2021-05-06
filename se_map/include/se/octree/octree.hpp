@@ -82,7 +82,7 @@ public:
    *
    * \return The pointer to the root of the octree
    */
-  NodeType* getRoot() { return root_; };
+  NodeType* getRoot() { return root_ptr_; };
 
   /**
    * \brief Get a pointer with all allocated octant pointers (nodes and blocks).
@@ -143,7 +143,7 @@ private:
   void addOctantRecurse(se::OctantBase* octant_ptr);
 
   unsigned int size_;                          ///< The size in [voxel] of the octree
-  NodeType* root_ = nullptr;                   ///< The pointer to the root node of the octree
+  NodeType* root_ptr_ = nullptr;                   ///< The pointer to the root node of the octree
   std::vector<se::OctantBase*> octant_buffer_;
 
   MemoryPool memory_pool_;       ///< The memory pool pre-allocating memory for nodes and blocks

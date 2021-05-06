@@ -13,7 +13,7 @@ Octree<DataT, ResT, BlockSizeT>::Octree(const unsigned size) : size_(size)
   assert(BlockSizeT < size);           // Verify that the block size is smaller than the root.
 
 // REMOVE  root_ = std::shared_ptr<NodeType>(new NodeType(Eigen::Vector3i(0,0,0), size_)); // Initialise root
-  root_ = memory_pool_.allocateNode(Eigen::Vector3i(0,0,0), size_);
+  root_ptr_ = memory_pool_.allocateNode(Eigen::Vector3i(0,0,0), size_);
   std::cout << "octree.size_ = " << size_ << std::endl;
 }
 
@@ -72,7 +72,7 @@ template <typename DataT,
 se::vector<se::OctantBase*> Octree<DataT, ResT, BlockSizeT>::getOctantBuffer()
 {
   octant_buffer_.clear();
-  addOctantRecurse(root_);
+  addOctantRecurse(root_ptr_);
   return octant_buffer_;
 }
 
