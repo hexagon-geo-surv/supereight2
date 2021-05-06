@@ -85,13 +85,6 @@ public:
   NodeType* getRoot() { return root_ptr_; };
 
   /**
-   * \brief Get a pointer with all allocated octant pointers (nodes and blocks).
-   *
-   * \return The list of all allocated octant pointers
-   */
-  se::vector<se::OctantBase*> getOctantBuffer();
-
-  /**
    * \brief Get the size of the octree in [voxel] units.
    *
    * \return The size of the octree
@@ -135,16 +128,8 @@ public:
 
 private:
 
-  /**
-   * \brief Recursively add octant to octant_buffer_ until all octants are added
-   *
-   * \param[in] octant_ptr The node from which to start the recursive operation
-   */
-  void addOctantRecurse(se::OctantBase* octant_ptr);
-
-  unsigned int size_;                          ///< The size in [voxel] of the octree
-  NodeType* root_ptr_ = nullptr;                   ///< The pointer to the root node of the octree
-  std::vector<se::OctantBase*> octant_buffer_;
+  unsigned int size_;            ///< The size in [voxel] of the octree
+  NodeType* root_ptr_ = nullptr; ///< The pointer to the root node of the octree
 
   MemoryPool memory_pool_;       ///< The memory pool pre-allocating memory for nodes and blocks
 };

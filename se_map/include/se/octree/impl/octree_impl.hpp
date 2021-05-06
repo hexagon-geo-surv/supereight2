@@ -69,19 +69,6 @@ template <typename DataT,
           Res      ResT,
           unsigned BlockSizeT
 >
-se::vector<se::OctantBase*> Octree<DataT, ResT, BlockSizeT>::getOctantBuffer()
-{
-  octant_buffer_.clear();
-  addOctantRecurse(root_ptr_);
-  return octant_buffer_;
-}
-
-
-
-template <typename DataT,
-          Res      ResT,
-          unsigned BlockSizeT
->
 bool Octree<DataT, ResT, BlockSizeT>::allocate(NodeType*          parent_ptr,
                                                const unsigned int child_idx)
 {
@@ -121,30 +108,6 @@ bool Octree<DataT, ResT, BlockSizeT>::allocate(NodeType*          parent_ptr,
   }
   parent_ptr->setChild(child_idx, child_ptr); // Update parent
   return true;
-}
-
-
-
-template <typename DataT,
-          Res      ResT,
-          unsigned BlockSizeT
->
-void Octree<DataT, ResT, BlockSizeT>::addOctantRecurse(se::OctantBase* octant_ptr)
-{
-  octant_buffer_.push_back(octant_ptr);
-  for (int child_idx = 0; child_idx < 8; child_idx++)
-  {
-    if (!octant_ptr->isBlock())
-    {
-      auto node_ptr = static_cast<NodeType*>(octant_ptr);
-      se::OctantBase* node_child_ptr;
-      node_ptr->getChild(child_idx, node_child_ptr);
-      if (node_child_ptr)
-      {
-        addOctantRecurse(node_child_ptr);
-      }
-    }
-  }
 }
 
 
