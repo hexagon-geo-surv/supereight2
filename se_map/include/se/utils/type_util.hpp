@@ -25,15 +25,22 @@ namespace se {
  *       The tree cannot allocate any depth further than 19 allowing a map size = 524288 * map resolution
  *       That is a maximum map size of 1 x 1 x 1 km^3 at 2 mm resolution
  */
-typedef uint64_t key_t;   ///< code | scale
+typedef uint64_t key_t;       ///< The type of the Key i.e. code | scale
+typedef uint64_t code_t;      ///< The type of the Morton code
+typedef uint64_t scale_t;     ///< The type of the scale in the morton code
 
-typedef uint64_t code_t;  ///< Morton code
-typedef uint64_t scale_t; ///< Scale
+typedef unsigned int idx_t;   ///< Child or voxel index type
 
-typedef unsigned int idx_t; ///< Child or voxel index type
+typedef float depth_t;        ///< The type of the processed depth measurements
 
-typedef float    depth_t;
+typedef float field_t;        ///< The type of the stored field (e.g. TSDF, ESDF or occupancy)
 
+
+/**
+ *
+ * Define se containers with appropriate allocators for Eigen types.
+ *
+ */
 
 template<typename T>
 struct vector_impl
@@ -84,7 +91,7 @@ using set = typename set_impl<T>::type;
 template <typename T, size_t N>
 using array = typename std::array<T, N>;
 
-}
+} // namespace se
 
 
 #endif // SE_TYPE_UTIL_HPP
