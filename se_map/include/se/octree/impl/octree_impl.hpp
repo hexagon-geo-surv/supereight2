@@ -11,35 +11,37 @@ Octree<DataT, ResT, BlockSizeT>::Octree(const unsigned size) : size_(size)
 {
   assert(math::is_power_of_two(size)); // Verify that the octree size is a multiple of 2.
   assert(BlockSizeT < size);           // Verify that the block size is smaller than the root.
-  
+
   root_ptr_ = memory_pool_.allocateNode(Eigen::Vector3i(0,0,0), size_);
 }
 
 
 
 template <typename DataT,
-        Res      ResT,
-        unsigned BlockSizeT
+          Res      ResT,
+          unsigned BlockSizeT
 >
-OctreeIterator<Octree<DataT, ResT, BlockSizeT>> Octree<DataT, ResT, BlockSizeT>::begin() {
+OctreeIterator<Octree<DataT, ResT, BlockSizeT>> Octree<DataT, ResT, BlockSizeT>::begin()
+{
   return OctreeIterator<Octree<DataT, ResT, BlockSizeT>>(this);
 }
 
 
 
 template <typename DataT,
-            Res      ResT,
-            unsigned BlockSizeT
+          Res      ResT,
+          unsigned BlockSizeT
 >
-OctreeIterator<Octree<DataT, ResT, BlockSizeT>> Octree<DataT, ResT, BlockSizeT>::end() {
+OctreeIterator<Octree<DataT, ResT, BlockSizeT>> Octree<DataT, ResT, BlockSizeT>::end()
+{
   return OctreeIterator<Octree<DataT, ResT, BlockSizeT>>();
 }
 
 
 
 template <typename DataT,
-        Res      ResT,
-        unsigned BlockSizeT
+          Res      ResT,
+          unsigned BlockSizeT
 >
 bool Octree<DataT, ResT, BlockSizeT>::contains(const Eigen::Vector3i& voxel_coord)
 {
@@ -51,9 +53,9 @@ bool Octree<DataT, ResT, BlockSizeT>::contains(const Eigen::Vector3i& voxel_coor
 
 
 template <typename DataT,
-            Res      ResT,
-            unsigned BlockSizeT
-  >
+          Res      ResT,
+          unsigned BlockSizeT
+>
 bool Octree<DataT, ResT, BlockSizeT>::contains(const Eigen::Vector3i& voxel_coord) const
 {
   return voxel_coord.x() >=0 && voxel_coord.x() < size_ &&
@@ -64,9 +66,9 @@ bool Octree<DataT, ResT, BlockSizeT>::contains(const Eigen::Vector3i& voxel_coor
 
 
 template <typename DataT,
-            Res      ResT,
-            unsigned BlockSizeT
-    >
+          Res      ResT,
+          unsigned BlockSizeT
+>
 se::vector<se::OctantBase*> Octree<DataT, ResT, BlockSizeT>::getOctantBuffer()
 {
   octant_buffer_.clear();
@@ -77,8 +79,8 @@ se::vector<se::OctantBase*> Octree<DataT, ResT, BlockSizeT>::getOctantBuffer()
 
 
 template <typename DataT,
-        Res      ResT,
-        unsigned BlockSizeT
+          Res      ResT,
+          unsigned BlockSizeT
 >
 bool Octree<DataT, ResT, BlockSizeT>::allocate(NodeType*          parent_ptr,
                                                const unsigned int child_idx)
@@ -89,8 +91,8 @@ bool Octree<DataT, ResT, BlockSizeT>::allocate(NodeType*          parent_ptr,
 
 
 template <typename DataT,
-    Res      ResT,
-    unsigned BlockSizeT
+          Res      ResT,
+          unsigned BlockSizeT
 >
 bool Octree<DataT, ResT, BlockSizeT>::allocate(NodeType*          parent_ptr,
                                                const unsigned int child_idx,
@@ -123,15 +125,17 @@ bool Octree<DataT, ResT, BlockSizeT>::allocate(NodeType*          parent_ptr,
 
 
 
-
 template <typename DataT,
-        Res      ResT,
-        unsigned BlockSizeT
+          Res      ResT,
+          unsigned BlockSizeT
 >
-void Octree<DataT, ResT, BlockSizeT>::addOctantRecurse(se::OctantBase* octant_ptr) {
+void Octree<DataT, ResT, BlockSizeT>::addOctantRecurse(se::OctantBase* octant_ptr)
+{
   octant_buffer_.push_back(octant_ptr);
-  for (int child_idx = 0; child_idx < 8; child_idx++) {
-    if (!octant_ptr->isBlock()) {
+  for (int child_idx = 0; child_idx < 8; child_idx++)
+  {
+    if (!octant_ptr->isBlock())
+    {
       auto node_ptr = static_cast<NodeType*>(octant_ptr);
       se::OctantBase* node_child_ptr;
       node_ptr->getChild(child_idx, node_child_ptr);
