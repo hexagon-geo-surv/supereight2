@@ -26,7 +26,24 @@ se::OctantBase* octant(const se::key_t             key,
                        std::shared_ptr<OctreeT>    octree_ptr,
                        typename OctreeT::NodeType* base_parent_ptr);
 
-
+/**
+ * \brief Fetch the node for given coordinates and scale.
+ *
+ * \node TODO: Function not implemented yet.
+ *
+ * \tparam OctreeT
+ * \param node_coord        The coordinates of the node to be fetched
+ * \param node_scale        The scale of the node to be fetched
+ * \param octree_ptr        The pointer to the octree
+ * \param base_parent_ptr   The parent pointer to start the fetching process from (e.g. the octrees root)
+ *
+ * \return The octant pointer is allocated, nullptr otherwise
+ */
+template <typename OctreeT>
+se::OctantBase* node(const Eigen::Vector3i&      node_coord,
+                     const se::scale_t           scale,
+                     std::shared_ptr<OctreeT>    octree_ptr,
+                     typename OctreeT::NodeType* base_parent_ptr);
 
 /**
  * \brief Fetch the block for given block coordinates.
