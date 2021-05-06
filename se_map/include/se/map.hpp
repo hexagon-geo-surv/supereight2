@@ -24,8 +24,8 @@ static const Eigen::Vector3f default_map_dim    = Eigen::Vector3f(10, 10, 3); //
 static const float           default_map_res    = 0.1;                                 ///< 10cm
 static const Eigen::Vector3f default_map_origin = default_map_dim / 2;
 
-struct MapConfig {
-public:
+struct MapConfig
+{
   Eigen::Vector3f dim    = default_map_dim;
   float           res    = default_map_res;
   Eigen::Vector3f origin = default_map_origin;
@@ -140,7 +140,7 @@ public:
 
   void setOctree(std::shared_ptr< OctreeType > octree_ptr)
   {
-//    delete octree_;
+//    delete octree_; // TODO: Delete old octree when setting a new one.
     octree_ = octree_ptr;
   };
 
@@ -157,7 +157,7 @@ protected:
   bool initialiseOctree();
 
   const Eigen::Vector3f dim_;      ///< The dimensions of the map
-  const float res_;                ///< The resolution of the map
+  const float           res_;      ///< The resolution of the map
   const Eigen::Vector3f origin_M_; ///< The origin of the map frame
 
   const Eigen::Vector3f lb_;       ///< The lower map bound
