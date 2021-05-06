@@ -15,8 +15,8 @@ inline typename std::enable_if_t<SortT == se::Sort::SmallToLarge> sort_blocks(se
 template <typename BlockT, se::Sort SortT>
 inline typename std::enable_if_t<SortT == se::Sort::LargeToSmall> sort_blocks(se::vector<BlockT*>& block_ptrs);
 
-}
-}
+} // namespace octantops
+} // namespace se
 
 #include "impl/octant_util_impl.hpp"
 
