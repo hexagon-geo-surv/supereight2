@@ -1,6 +1,8 @@
 #ifndef SE_MATH_UTIL_HPP
 #define SE_MATH_UTIL_HPP
 
+#include <vector>
+
 namespace se {
 namespace math {
 

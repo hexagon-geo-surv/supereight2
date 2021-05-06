@@ -76,8 +76,8 @@ struct TrackData {
 
 
 
-static inline Eigen::Matrix<float, 6, 6> makeJTJ(
-        const Eigen::Matrix<float, 1, 21>& v) {
+static inline Eigen::Matrix<float, 6, 6> makeJTJ(const Eigen::Matrix<float, 1, 21>& v)
+{
 
   Eigen::Matrix<float, 6, 6> C = Eigen::Matrix<float, 6, 6>::Zero();
   C.row(0) = v.segment(0, 6);
@@ -95,9 +95,8 @@ static inline Eigen::Matrix<float, 6, 6> makeJTJ(
 
 
 
-static inline Eigen::Matrix<float, 6, 1> solve(
-        const Eigen::Matrix<float, 1, 27>& vals) {
-
+static inline Eigen::Matrix<float, 6, 1> solve(const Eigen::Matrix<float, 1, 27>& vals)
+{
   const Eigen::Matrix<float, 6, 1> b = vals.segment(0, 6);
   const Eigen::Matrix<float, 6, 6> C = makeJTJ(vals.segment(6, 21));
   Eigen::LLT <Eigen::Matrix<float, 6, 6> > llt;

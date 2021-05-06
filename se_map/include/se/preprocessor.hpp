@@ -82,13 +82,9 @@ void depthToPointCloudKernel(se::Image<Eigen::Vector3f>& point_cloud_C,
   }
 }
 
-
-
 void pointCloudToDepthKernel(se::Image<float>&                 depth_image,
                              const se::Image<Eigen::Vector3f>& point_cloud_X,
                              const Eigen::Matrix4f&            T_CX);
-
-
 
 /**
 * NegY should only be true when reading an ICL-NUIM dataset which has a
@@ -97,8 +93,6 @@ void pointCloudToDepthKernel(se::Image<float>&                 depth_image,
 template <bool NegY>
 void pointCloudToNormalKernel(se::Image<Eigen::Vector3f>&       out,
                               const se::Image<Eigen::Vector3f>& in);
-
-
 
 /**
 * Downsample the input depth to match the resolution of the output depth.
@@ -111,13 +105,10 @@ void downsampleDepthKernel(const float*           input_depth,
                            const Eigen::Vector2i& input_res,
                            se::Image<float>&      output_depth);
 
-
-
 void halfSampleRobustImageKernel(se::Image<float>&       out,
                                  const se::Image<float>& in,
                                  const float             e_d,
                                  const int               r);
-
 
 /**
 * Downsample an RGBA image and copy into an se::Image class.

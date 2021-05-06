@@ -3,7 +3,7 @@
 
 namespace se {
 
-Eigen::Vector3f sample_offset_frac = Eigen::Vector3f::Constant(0.5f);
+static inline Eigen::Vector3f sample_offset_frac = Eigen::Vector3f::Constant(0.5f);
 
 // Representation enums
 enum class Field     { TSDF, Occupancy };
