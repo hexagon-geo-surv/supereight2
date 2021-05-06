@@ -34,10 +34,13 @@ namespace se {
 
 
   struct PinholeCamera {
-    PinholeCamera(const SensorConfig& c);
+    PinholeCamera(const SensorConfig& config);
+
+    PinholeCamera(const SensorConfig& config,
+                  const float         downsampling_factor);
 
     PinholeCamera(const PinholeCamera& pinhole_camera,
-                  const float          scaling_factor);
+                  const float          downsampling_factor);
 
     /**
      * \brief Determine the corresponding image value of the projected pixel for a point_C in camera frame.

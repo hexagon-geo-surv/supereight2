@@ -70,7 +70,7 @@ bool Tracker<MapT, SensorT>::track(const se::Image<float>&     depth_img,
   // prepare the 3D information from the input depth maps
   for (unsigned int i = 0; i < config_.iterations.size(); ++i)
   {
-    const float scaling_factor = 1.f / (1 << i);
+    const float scaling_factor = 1 << i;
     const SensorT scaled_sensor(sensor_, scaling_factor);
     se::preprocessor::depthToPointCloudKernel(input_point_cloud_C[i], scaled_depth_img[i], scaled_sensor);
     if(sensor_.left_hand_frame)
