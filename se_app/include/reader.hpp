@@ -21,7 +21,7 @@ namespace se {
    * \param[in] config The pipeline configuration.
    * \return A pointer to an instance of a class derived from Reader.
    */
-  Reader* create_reader(const Configuration& config);
+  Reader* create_reader(const se::ReaderConfig& config);
 
 } // namespace se
 

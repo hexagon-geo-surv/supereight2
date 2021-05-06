@@ -57,17 +57,19 @@ int main()
   // Create a pinhole camera and downsample the intrinsics
   const se::PinholeCamera sensor(sensor_config, downsampling_factor);
 
-  // Setup reader
-  se::Configuration config;
-  config.fps                = 24;
-  config.drop_frames        = false;
-  config.enable_benchmark   = false;
-  config.sequence_path      = "/home/nils/workspace_/projects/supereight_2/se_2/datasets/icl_nuim/traj_2/scene.raw";
-  config.ground_truth_file  = "/home/nils/workspace_/projects/supereight_2/se_2/datasets/icl_nuim/traj_2/scene.raw.txt";
+  // Create the reader configuration from the general configuration
+  se::ReaderConfig reader_config;
+  reader_config.reader_type       = se::ReaderType::RAW;
+  reader_config.fps               = 24;
+  reader_config.drop_frames       = false;
+  reader_config.verbose           = 0;
+  reader_config.sequence_path     = "/home/nils/workspace_/projects/supereight_2/se_2/datasets/icl_nuim/traj_2/scene.raw";
+  reader_config.ground_truth_file = "/home/nils/workspace_/projects/supereight_2/se_2/datasets/icl_nuim/traj_2/scene.raw.txt";
+
 
   // ========= READER INITIALIZATION  =========
   static se::Reader* reader = nullptr;
-  reader = se::create_reader(config);
+  reader = se::create_reader(reader_config);
 
   if (reader == nullptr) {
     exit(EXIT_FAILURE);

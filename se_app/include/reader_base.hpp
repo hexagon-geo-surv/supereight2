@@ -23,15 +23,33 @@
 
 namespace se {
 
-  struct ReaderConfig {
-    float fps;
-    bool drop_frames;
-    bool enable_print;
-    std::string sequence_path;
-    std::string ground_truth_file;
+enum class ReaderType { OPENNI, ICLNUIM, RAW, NEWERCOLLEGE };
 
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  };
+static const float dflt_fps = 24;
+static const bool  dflt_drop_frame = false;
+static const int   dflt_verbose = 0;
+
+struct ReaderConfig
+{
+  ReaderConfig()
+      : reader_type(se::ReaderType::RAW),
+        fps(dflt_fps),
+        drop_frames(dflt_drop_frame),
+        verbose(dflt_verbose),
+        sequence_path(""),
+        ground_truth_file("")
+  {
+  }
+
+  ReaderType  reader_type;
+  float       fps;
+  bool        drop_frames;
+  int         verbose;
+  std::string sequence_path;
+  std::string ground_truth_file;
+
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+};
 
 
 
@@ -214,7 +232,7 @@ namespace se {
       float fps_;
       double spf_;
       bool drop_frames_;
-      bool enable_print_;
+      int  verbose_;
       bool is_live_reader_;
       ReaderStatus status_;
       /** The frame_ is initialized to SIZE_MAX, so that when first incremented

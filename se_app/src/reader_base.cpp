@@ -29,7 +29,7 @@ se::Reader::Reader(const se::ReaderConfig& c)
       fps_(c.fps),
       spf_(1.0 / c.fps),
       drop_frames_(c.drop_frames),
-      enable_print_(c.enable_print),
+      verbose_(c.verbose),
       is_live_reader_(false),
       status_(se::ReaderStatus::ok),
       frame_(SIZE_MAX),
@@ -247,7 +247,7 @@ se::ReaderStatus se::Reader::readPose(Eigen::Matrix4f& T_WB, const size_t frame)
     }
     // Ensure all the pose elements are finite
     if (!pose_data_valid) {
-      if (enable_print_) {
+      if (verbose_ == 1) {
         std::cerr << "Warning: Expected finite ground truth pose but got";
         for (uint8_t i = 0; i < 7; ++i) {
           std::cerr << " " << pose_data[i];
@@ -262,7 +262,7 @@ se::ReaderStatus se::Reader::readPose(Eigen::Matrix4f& T_WB, const size_t frame)
                                           pose_data[4], pose_data[5]);
     // Ensure the quaternion represents a valid orientation
     if (std::abs(orientation.norm() - 1.0f) > 1e-3) {
-      if (enable_print_) {
+      if (verbose_ == 1) {
         std::cerr << "Warning: Expected unit quaternion but got "
                   << orientation.x() << " " << orientation.y() << " "
                   << orientation.z() << " " << orientation.w()
