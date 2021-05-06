@@ -107,7 +107,7 @@ TEST(SingleResVisitor, Interpolation)
     }
   }
 
-  se::tsdf_t interp_field_value;
+  se::field_t interp_field_value;
   bool valid_interp = false;
   valid_interp = se::visitor::interpField(octree_ptr_0, Eigen::Vector3f(2.f,2.f,2.f), interp_field_value);
   EXPECT_EQ(true, valid_interp);

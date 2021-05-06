@@ -9,14 +9,12 @@ namespace se {
 
 // Typedefs and defaults
 
-typedef float tsdf_t;
-static const tsdf_t dflt_tsdf = 1.f;
+static const se::field_t dflt_tsdf = 1.f;
 
 typedef int weight_t;
 static const weight_t dflt_weight = 0;
 
-typedef float occupancy_t;
-static const occupancy_t dflt_occupancy = 0.f;
+static const se::field_t dflt_occupancy = 0.f;
 
 typedef float time_stamp_t;
 static const time_stamp_t dflt_time_stamp = 0.f;
@@ -36,7 +34,7 @@ template<>
 struct FieldData<se::Field::Occupancy>
 {
     FieldData() : occupancy(dflt_occupancy), time_stamp(dflt_time_stamp) {}
-    occupancy_t  occupancy;
+    se::field_t  occupancy;
     time_stamp_t time_stamp;
 };
 
@@ -44,8 +42,8 @@ template<>
 struct FieldData<se::Field::TSDF>
 {
     FieldData() : tsdf(dflt_tsdf), weight(dflt_weight) {}
-    tsdf_t   tsdf;
-    weight_t weight; // TODO: int or float
+    se::field_t tsdf;
+    weight_t    weight; // TODO: int or float
 };
 
 // Colour data
