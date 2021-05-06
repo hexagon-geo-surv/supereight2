@@ -292,6 +292,29 @@ bool getData(std::shared_ptr<OctreeT>     octree_ptr,
 
 
 
+template <typename OctreeT, typename BlockT>
+bool getData(std::shared_ptr<OctreeT>    octree_ptr,
+             BlockT*                     block_ptr,
+             const Eigen::Vector3i&      voxel_coord,
+             typename OctreeT::DataType& data)
+{
+  if (block_ptr)
+  {
+    const Eigen::Vector3i lower_coord = block_ptr->getCoord();
+    const Eigen::Vector3i upper_coord = lower_coord + Eigen::Vector3i::Constant(BlockT::getSize() - 1);
+    const int contained = ((voxel_coord.array() >= lower_coord.array()) && (voxel_coord.array() <= upper_coord.array())).all();
+    if(contained)
+    {
+      block_ptr->getData(voxel_coord, data);
+      return true;
+    }
+  }
+
+  return getData(octree_ptr, voxel_coord, data);
+}
+
+
+
 template <typename OctreeT>
 typename OctreeT::DataType getData(std::shared_ptr<OctreeT>     octree_ptr,
                                    const Eigen::Vector3i&       voxel_coord)
@@ -334,6 +357,20 @@ bool getField(std::shared_ptr<OctreeT> octree_ptr,
 {
   typename OctreeT::DataType data;
   bool is_valid = getData(octree_ptr, voxel_coord, data);
+  field_value = get_field(data);
+  return is_valid;
+}
+
+
+
+template <typename OctreeT, typename BlockT>
+bool getField(std::shared_ptr<OctreeT> octree_ptr,
+              BlockT*                  block_ptr,
+              const Eigen::Vector3i&   voxel_coord,
+              se::field_t&             field_value)
+{
+  typename OctreeT::DataType data;
+  bool is_valid = getData(octree_ptr, block_ptr, voxel_coord, data);
   field_value = get_field(data);
   return is_valid;
 }
@@ -403,12 +440,14 @@ bool gradField(const std::shared_ptr<OctreeT> octree_ptr,
                const Eigen::Vector3f&         voxel_coord_f,
                Eigen::Vector3f&               grad_field_value)
 {
-  Eigen::Vector3f factor = Eigen::Vector3f::Constant(0);
+  Eigen::Vector3f factor   = Eigen::Vector3f::Constant(0);
   Eigen::Vector3f gradient = Eigen::Vector3f::Constant(0);
   const int stride = 1;
   const Eigen::Vector3f scaled_voxel_coord_f = 1.f / stride * voxel_coord_f - Eigen::Vector3f::Constant(0.5f);
   factor =  se::math::fracf(scaled_voxel_coord_f);
   const Eigen::Vector3i base_coord = stride * scaled_voxel_coord_f.template cast<int>();
+
+
   Eigen::Vector3i lower_lower_coord = (base_coord - stride * Eigen::Vector3i::Constant(1)).cwiseMax(Eigen::Vector3i::Constant(0));
   Eigen::Vector3i lower_upper_coord = base_coord.cwiseMax(Eigen::Vector3i::Constant(0));
 
@@ -417,72 +456,117 @@ bool gradField(const std::shared_ptr<OctreeT> octree_ptr,
   Eigen::Vector3i upper_upper_coord = (base_coord + stride * Eigen::Vector3i::Constant(2)).cwiseMin(
           Eigen::Vector3i::Constant(octree_ptr->getSize()) - Eigen::Vector3i::Constant(1));
 
-  Eigen::Vector3i & lower_coord = lower_upper_coord;
-  Eigen::Vector3i & upper_coord = upper_lower_coord;
-
   const typename OctreeT::BlockType* block_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree_ptr, octree_ptr->getRoot()));
   if (!block_ptr)
   {
     return false;
   }
 
-  gradient.x() = (((se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_lower_coord.x(), lower_coord.y(), lower_coord.z()))
-                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_lower_coord.x(), lower_coord.y(), lower_coord.z()))) * (1 - factor.x())
-                  +(se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_upper_coord.x(), lower_coord.y(), lower_coord.z()))
-                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_upper_coord.x(), lower_coord.y(), lower_coord.z()))) * factor.x()) * (1 - factor.y())
-                + ((se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_lower_coord.x(), upper_coord.y(), lower_coord.z()))
-                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_lower_coord.x(), upper_coord.y(), lower_coord.z()))) * (1 - factor.x())
-                  +(se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_upper_coord.x(), upper_coord.y(), lower_coord.z()))
-                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_upper_coord.x(), upper_coord.y(), lower_coord.z()))) * factor.x()) * factor.y()) * (1 - factor.z())
-               + (((se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_lower_coord.x(), lower_coord.y(), upper_coord.z()))
-                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_lower_coord.x(), lower_coord.y(), upper_coord.z()))) * (1 - factor.x())
-                  +(se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_upper_coord.x(), lower_coord.y(), upper_coord.z()))
-                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_upper_coord.x(), lower_coord.y(), upper_coord.z()))) * factor.x()) * (1 - factor.y())
-                + ((se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_lower_coord.x(), upper_coord.y(), upper_coord.z()))
-                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_lower_coord.x(), upper_coord.y(), upper_coord.z()))) * (1 - factor.x())
-                  +(se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_upper_coord.x(), upper_coord.y(), upper_coord.z()))
-                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_upper_coord.x(), upper_coord.y(), upper_coord.z()))) * factor.x()) * factor.y()) * factor.z();
+  se::vector<Eigen::Vector3i> grad_coords =
+  {
+    Eigen::Vector3i(lower_lower_coord.x(), lower_upper_coord.y(), lower_upper_coord.z()), //< Unique
+    Eigen::Vector3i(lower_lower_coord.x(), upper_lower_coord.y(), lower_upper_coord.z()), //< Unique
+    Eigen::Vector3i(lower_lower_coord.x(), lower_upper_coord.y(), upper_lower_coord.z()), //< Unique
+    Eigen::Vector3i(lower_lower_coord.x(), upper_lower_coord.y(), upper_lower_coord.z()), //< Unique
 
-  gradient.y() = (((se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), upper_lower_coord.y(), lower_coord.z()))
-                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), lower_lower_coord.y(), lower_coord.z()))) * (1 - factor.x())
-                  +(se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), upper_lower_coord.y(), lower_coord.z()))
-                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), lower_lower_coord.y(), lower_coord.z()))) * factor.x()) * (1 - factor.y())
-                + ((se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), upper_upper_coord.y(), lower_coord.z()))
-                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), lower_upper_coord.y(), lower_coord.z()))) * (1 - factor.x())
-                  +(se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), upper_upper_coord.y(), lower_coord.z()))
-                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), lower_upper_coord.y(), lower_coord.z()))) * factor.x()) * factor.y()) * (1 - factor.z())
-               + (((se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), upper_lower_coord.y(), upper_coord.z()))
-                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), lower_lower_coord.y(), upper_coord.z()))) * (1 - factor.x())
-                  +(se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), upper_lower_coord.y(), upper_coord.z()))
-                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), lower_lower_coord.y(), upper_coord.z()))) * factor.x()) * (1 - factor.y())
-                + ((se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), upper_upper_coord.y(), upper_coord.z()))
-                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), lower_upper_coord.y(), upper_coord.z()))) * (1 - factor.x())
-                  +(se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), upper_upper_coord.y(), upper_coord.z()))
-                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), lower_upper_coord.y(), upper_coord.z()))) * factor.x()) * factor.y()) * factor.z();
+    Eigen::Vector3i(lower_upper_coord.x(), lower_lower_coord.y(), lower_upper_coord.z()), //< Unique
+    Eigen::Vector3i(lower_upper_coord.x(), lower_lower_coord.y(), upper_lower_coord.z()), //< Unique
+    Eigen::Vector3i(lower_upper_coord.x(), lower_upper_coord.y(), lower_lower_coord.z()), //< Unique
+    Eigen::Vector3i(lower_upper_coord.x(), lower_upper_coord.y(), lower_upper_coord.z()), //< Non-unique 3x
+    Eigen::Vector3i(lower_upper_coord.x(), lower_upper_coord.y(), upper_lower_coord.z()), //< Non-unique 3x
+    Eigen::Vector3i(lower_upper_coord.x(), lower_upper_coord.y(), upper_upper_coord.z()), //< Unique
+    Eigen::Vector3i(lower_upper_coord.x(), upper_lower_coord.y(), lower_lower_coord.z()), //< Unique
+    Eigen::Vector3i(lower_upper_coord.x(), upper_lower_coord.y(), lower_upper_coord.z()), //< Non-unique 3x
+    Eigen::Vector3i(lower_upper_coord.x(), upper_lower_coord.y(), upper_lower_coord.z()), //< Non-unique 3x
+    Eigen::Vector3i(lower_upper_coord.x(), upper_lower_coord.y(), upper_upper_coord.z()), //< Unique
+    Eigen::Vector3i(lower_upper_coord.x(), upper_upper_coord.y(), lower_upper_coord.z()), //< Unique
+    Eigen::Vector3i(lower_upper_coord.x(), upper_upper_coord.y(), upper_lower_coord.z()), //< Unique
 
-  gradient.z() = (((se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), lower_coord.y(), upper_lower_coord.z()))
-                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), lower_coord.y(), lower_lower_coord.z()))) * (1 - factor.x())
-                  +(se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), lower_coord.y(), upper_lower_coord.z()))
-                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), lower_coord.y(), lower_lower_coord.z()))) * factor.x()) * (1 - factor.y())
-                + ((se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), upper_coord.y(), upper_lower_coord.z()))
-                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), upper_coord.y(), lower_lower_coord.z()))) * (1 - factor.x())
-                  +(se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), upper_coord.y(), upper_lower_coord.z()))
-                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), upper_coord.y(), lower_lower_coord.z()))) * factor.x()) * factor.y()) * (1 - factor.z())
-               + (((se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), lower_coord.y(), upper_upper_coord.z()))
-                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), lower_coord.y(), lower_upper_coord.z()))) * (1 - factor.x())
-                  +(se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), lower_coord.y(), upper_upper_coord.z()))
-                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), lower_coord.y(), lower_upper_coord.z()))) * factor.x()) * (1 - factor.y())
-                 +((se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), upper_coord.y(), upper_upper_coord.z()))
-                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(lower_coord.x(), upper_coord.y(), lower_upper_coord.z()))) * (1 - factor.x())
-                  +(se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), upper_coord.y(), upper_upper_coord.z()))
-                  - se::visitor::getField(octree_ptr, Eigen::Vector3i(upper_coord.x(), upper_coord.y(), lower_upper_coord.z()))) * factor.x()) * factor.y()) * factor.z();
+    Eigen::Vector3i(upper_lower_coord.x(), lower_lower_coord.y(), lower_upper_coord.z()), //< Unique
+    Eigen::Vector3i(upper_lower_coord.x(), lower_lower_coord.y(), upper_lower_coord.z()), //< Unique
+    Eigen::Vector3i(upper_lower_coord.x(), lower_upper_coord.y(), lower_lower_coord.z()), //< Unique
+    Eigen::Vector3i(upper_lower_coord.x(), lower_upper_coord.y(), lower_upper_coord.z()), //< Non-unique 3x
+    Eigen::Vector3i(upper_lower_coord.x(), lower_upper_coord.y(), upper_lower_coord.z()), //< Non-unique 3x
+    Eigen::Vector3i(upper_lower_coord.x(), lower_upper_coord.y(), upper_upper_coord.z()), //< Unique
+    Eigen::Vector3i(upper_lower_coord.x(), upper_lower_coord.y(), lower_lower_coord.z()), //< Unique
+    Eigen::Vector3i(upper_lower_coord.x(), upper_lower_coord.y(), lower_upper_coord.z()), //< Non-unique 3x
+    Eigen::Vector3i(upper_lower_coord.x(), upper_lower_coord.y(), upper_lower_coord.z()), //< Non-unique 3x
+    Eigen::Vector3i(upper_lower_coord.x(), upper_lower_coord.y(), upper_upper_coord.z()), //< Unique
+    Eigen::Vector3i(upper_lower_coord.x(), upper_upper_coord.y(), lower_upper_coord.z()), //< Unique
+    Eigen::Vector3i(upper_lower_coord.x(), upper_upper_coord.y(), upper_lower_coord.z()), //< Unique
+
+    Eigen::Vector3i(upper_upper_coord.x(), lower_upper_coord.y(), lower_upper_coord.z()), //< Unique
+    Eigen::Vector3i(upper_upper_coord.x(), upper_lower_coord.y(), lower_upper_coord.z()), //< Unique
+    Eigen::Vector3i(upper_upper_coord.x(), lower_upper_coord.y(), upper_lower_coord.z()), //< Unique
+    Eigen::Vector3i(upper_upper_coord.x(), upper_lower_coord.y(), upper_lower_coord.z())  //< Unique
+  };
+
+  se::field_t grad_field_values[32];
+
+  for (unsigned int i = 0; i < grad_coords.size(); i++)
+  {
+    if (!se::visitor::getField(octree_ptr, block_ptr, grad_coords[i], grad_field_values[i]))
+    {
+      return false;
+    }
+  }
+
+  gradient.x() = (((grad_field_values[19]
+                  - grad_field_values[0]) * (1 - factor.x())
+                  +(grad_field_values[28]
+                  - grad_field_values[7]) * factor.x()) * (1 - factor.y())
+                + ((grad_field_values[23]
+                  - grad_field_values[1]) * (1 - factor.x())
+                  +(grad_field_values[29]
+                  - grad_field_values[11]) * factor.x()) * factor.y()) * (1 - factor.z())
+               + (((grad_field_values[20]
+                  - grad_field_values[2]) * (1 - factor.x())
+                  +(grad_field_values[30]
+                  - grad_field_values[8]) * factor.x()) * (1 - factor.y())
+                + ((grad_field_values[24]
+                  - grad_field_values[3]) * (1 - factor.x())
+                  +(grad_field_values[31]
+                  - grad_field_values[12]) * factor.x()) * factor.y()) * factor.z();
+
+  gradient.y() = (((grad_field_values[11]
+                  - grad_field_values[4]) * (1 - factor.x())
+                  +(grad_field_values[23]
+                  - grad_field_values[16]) * factor.x()) * (1 - factor.y())
+                + ((grad_field_values[14]
+                  - grad_field_values[7]) * (1 - factor.x())
+                  +(grad_field_values[26]
+                  - grad_field_values[19]) * factor.x()) * factor.y()) * (1 - factor.z())
+               + (((grad_field_values[12]
+                  - grad_field_values[5]) * (1 - factor.x())
+                  +(grad_field_values[24]
+                  - grad_field_values[17]) * factor.x()) * (1 - factor.y())
+                + ((grad_field_values[15]
+                  - grad_field_values[8]) * (1 - factor.x())
+                  +(grad_field_values[27]
+                  - grad_field_values[20]) * factor.x()) * factor.y()) * factor.z();
+
+  gradient.z() = (((grad_field_values[8]
+                  - grad_field_values[6]) * (1 - factor.x())
+                  +(grad_field_values[20]
+                  - grad_field_values[18]) * factor.x()) * (1 - factor.y())
+                + ((grad_field_values[12]
+                  - grad_field_values[10]) * (1 - factor.x())
+                  +(grad_field_values[24]
+                  - grad_field_values[22]) * factor.x()) * factor.y()) * (1 - factor.z())
+               + (((grad_field_values[9]
+                  - grad_field_values[7]) * (1 - factor.x())
+                  +(grad_field_values[21]
+                  - grad_field_values[19]) * factor.x()) * (1 - factor.y())
+                 +((grad_field_values[13]
+                  - grad_field_values[11]) * (1 - factor.x())
+                  +(grad_field_values[25]
+                  - grad_field_values[23]) * factor.x()) * factor.y()) * factor.z();
 
   float voxel_dim_ = 0.04f;
   grad_field_value = (0.5f * voxel_dim_) * gradient;
 
   return true;
 }
-
 
 } // namespace visitor
 } // namespace se

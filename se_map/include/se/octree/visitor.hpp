@@ -23,6 +23,12 @@ bool getData(std::shared_ptr<OctreeT>    octree_ptr,
              const Eigen::Vector3i&      voxel_coord,
              typename OctreeT::DataType& data);
 
+template <typename OctreeT, typename BlockT>
+bool getData(std::shared_ptr<OctreeT>     octree_ptr,
+             BlockT*                      block_ptr,
+             const Eigen::Vector3i&       voxel_coord,
+             typename OctreeT::DataType&  data);
+
 /**
  * \brief Get the voxel data for a given coordinate.
  *
@@ -51,6 +57,12 @@ typename OctreeT::DataType getData(std::shared_ptr<OctreeT> octree_ptr,
  */
 template <typename OctreeT>
 bool getField(std::shared_ptr<OctreeT> octree_ptr,
+              const Eigen::Vector3i&   voxel_coord,
+              se::field_t&             field_value);
+
+template <typename OctreeT, typename BlockT>
+bool getField(std::shared_ptr<OctreeT> octree_ptr,
+              BlockT*                  block_ptr,
               const Eigen::Vector3i&   voxel_coord,
               se::field_t&             field_value);
 
