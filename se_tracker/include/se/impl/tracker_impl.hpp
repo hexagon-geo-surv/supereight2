@@ -32,10 +32,10 @@ bool Tracker<MapT, SensorT>::track(const se::Image<float>& depth_img,
  * \return The tracking success.
  */
 template <typename MapT, typename SensorT>
-bool Tracker<MapT, SensorT>::track(const se::Image<float>&    depth_img,
-                                   Eigen::Matrix4f&           T_MS,
-                                   se::Image<Eigen::Vector3f> surface_point_cloud_M,
-                                   se::Image<Eigen::Vector3f> surface_normals_M)
+bool Tracker<MapT, SensorT>::track(const se::Image<float>&     depth_img,
+                                   Eigen::Matrix4f&            T_MS,
+                                   se::Image<Eigen::Vector3f>& surface_point_cloud_M,
+                                   se::Image<Eigen::Vector3f>& surface_normals_M)
 {
   assert(depth_img.width() == surface_point_cloud_M.width() && depth_img.height() == surface_point_cloud_M.height());
   assert(depth_img.width() == surface_normals_M.width()     && depth_img.height() == surface_normals_M.height());
@@ -111,7 +111,7 @@ bool Tracker<MapT, SensorT>::track(const se::Image<float>&    depth_img,
   }
   return checkPoseKernel(T_MS, T_MS_ref, reduction_output.data(),
                          depth_img_res, config_.track_threshold);
-};
+}
 
 
 

@@ -141,10 +141,10 @@ public:
    *
    * \return The tracking success.
    */
-  bool track(const se::Image<float>&    depth_img,
-             Eigen::Matrix4f&           T_MS,
-             se::Image<Eigen::Vector3f> surface_point_cloud_M,
-             se::Image<Eigen::Vector3f> surface_normals_M);
+  bool track(const se::Image<float>&     depth_img,
+             Eigen::Matrix4f&            T_MS,
+             se::Image<Eigen::Vector3f>& surface_point_cloud_M,
+             se::Image<Eigen::Vector3f>& surface_normals_M);
 
   void renderTrackingResult(uint32_t* tracking_img_data);
 
