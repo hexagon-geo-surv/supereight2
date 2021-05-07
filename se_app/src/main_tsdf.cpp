@@ -112,9 +112,16 @@ int main()
     se::preprocessor::downsample_depth(input_depth_img, processed_depth_img);
     se::preprocessor::downsample_rgba(input_rgba_img,  processed_rgba_img);
 
+    // Render volume
+    se::Image<Eigen::Vector3f> surface_point_cloud_M(processed_img_res.x(), processed_img_res.y());
+    se::Image<Eigen::Vector3f> surface_normals_M(processed_img_res.x(), processed_img_res.y());
+    se::raycaster::raycastVolume(map_tsdf, surface_point_cloud_M, surface_normals_M, T_MS, sensor);
+
     if (frame > 1)
     {
-      std::cout << "TRACKED = " << tracker.track(processed_depth_img, T_MS) << std::endl;
+      TICK("tracking")
+      tracker.track(processed_depth_img, T_MS, surface_point_cloud_M, surface_normals_M);
+      TOCK("tracking")
     }
 
     TICK("integration")
