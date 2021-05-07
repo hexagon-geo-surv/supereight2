@@ -12,6 +12,8 @@
 #include "draw.h"
 #include "reader.hpp"
 
+#define TRACK true //< Use ICP tracking or ground truth
+
 int main()
 {
   std::string output_path = "./PATH/TO/out";
@@ -93,8 +95,6 @@ int main()
   // Integrated depth at given pose
   se::MapIntegrator integrator(map_tsdf);
 
-#define TRACK true
-
   unsigned int frame = 0;
   while (read_ok == se::ReaderStatus::ok) {
     se::perfstats.setIter(frame++);
@@ -156,18 +156,19 @@ int main()
       map_tsdf.saveStrucutre(output_path + "/struct", std::to_string(frame));
     }
 
+    se::perfstats.writeToFilestream();
+
     unsigned int final_frame = 800;
     if (frame == final_frame)
     {
       break;
     }
-    se::perfstats.writeToFilestream();
   }
-
-  se::perfstats.writeToFilestream();
 
   delete[] output_rgba_img_data;
   delete[] output_depth_img_data;
+  delete[] output_tracking_img_data;
+  delete[] output_volume_img_data;
 
   return 0;
 }
