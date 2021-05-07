@@ -20,15 +20,15 @@
 namespace se {
 
 // Default values
-static const Eigen::Vector3f default_map_dim    = Eigen::Vector3f(10, 10, 3); ///< 10m x 10m x 3m
-static const float           default_map_res    = 0.1;                                 ///< 10cm
-static const Eigen::Vector3f default_map_origin = default_map_dim / 2;
+static const Eigen::Vector3f dflt_map_dim    = Eigen::Vector3f(10, 10, 3); ///< 10m x 10m x 3m
+static const float           dflt_map_res    = 0.1;                        ///< 10cm
+static const Eigen::Vector3f dflt_map_origin = dflt_map_dim / 2;
 
 struct MapConfig
 {
-  Eigen::Vector3f dim    = default_map_dim;
-  float           res    = default_map_res;
-  Eigen::Vector3f origin = default_map_origin;
+  Eigen::Vector3f dim    = dflt_map_dim;
+  float           res    = dflt_map_res;
+  Eigen::Vector3f origin = dflt_map_origin;
 };
 
 
@@ -50,12 +50,15 @@ template <Field     FldT,
 class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSizeT> {
 public:
   typedef Data<FldT, ColB, SemB> DataType;
+  typedef DataConfig<FldT, ColB, SemB> DataConfigType;
   typedef se::Octree<DataType, ResT, BlockSizeT> OctreeType;
 
-  Map(const Eigen::Vector3f& dim,
-      const float            res);
+  Map(const Eigen::Vector3f&                 dim,
+      const float                            res,
+      const se::DataConfig<FldT, ColB, SemB> data_config = se::DataConfig<FldT, ColB, SemB>());
 
-  Map(const MapConfig& mc);
+  Map(const MapConfig&                       map_config,
+      const se::DataConfig<FldT, ColB, SemB> data_config = se::DataConfig<FldT, ColB, SemB>());
 
   bool contains(const Eigen::Vector3f& point_M);
 
@@ -66,6 +69,8 @@ public:
    */
   const Eigen::Vector3f& getDim() { return dim_; }
   float getRes() { return res_; }
+
+  DataConfigType getDataConfig() { return data_config_; }
 
   /**
    * \brief
@@ -150,8 +155,6 @@ public:
 
   static constexpr Res       ress_ = ResT;
 
-
-
 protected:
 
   bool initialiseOctree();
@@ -164,6 +167,8 @@ protected:
   const Eigen::Vector3f ub_;       ///< The upper map bound
 
   std::shared_ptr< OctreeType >octree_ = nullptr;
+
+  DataConfigType data_config_;
 };
 
 //// Full alias template for alternative setup

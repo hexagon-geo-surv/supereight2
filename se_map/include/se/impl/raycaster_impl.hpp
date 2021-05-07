@@ -2,7 +2,6 @@
 #define SE_RAYCASTER_IMPL_HPP
 
 
-#define MU 0.16
 
 namespace se {
 namespace raycaster {
@@ -14,14 +13,14 @@ inline Eigen::Vector4f raycast(MapT&                  map,
                                const Eigen::Vector3f& ray_origin_M,
                                const Eigen::Vector3f& ray_dir_M,
                                const float            t_near,
-                               const float            t_far,
-                               const float            mu,
-                               const float            step,
-                               const float            largestep)
+                               const float            t_far)
 {
 
   se::VoxelBlockRayIterator<MapT> ray(map, ray_origin_M, ray_dir_M, t_near, t_far);
   ray.next();
+
+  float step      = map.getRes();
+  float largestep = MapT::OctreeType::BlockType::getSize() * step;
 
   const float t_min = ray.tcmin(); /* Get distance to the first intersected block */
   if (t_min <= 0.f) {
@@ -29,7 +28,6 @@ inline Eigen::Vector4f raycast(MapT&                  map,
   }
   const float t_max = ray.tmax();
 
-//  float t = t_near;
   float t = t_min;
 
   if (t_near < t_max) {
@@ -53,7 +51,7 @@ inline Eigen::Vector4f raycast(MapT&                  map,
         }
 
         f_tt = data.tsdf;
-        if(f_tt <= 0.15 && f_tt >= -1.5f)
+        if(f_tt <= 0.1 && f_tt >= -0.5f)
         {
           if (map.template interpField(position, field_value))
           {
@@ -66,7 +64,7 @@ inline Eigen::Vector4f raycast(MapT&                  map,
           break;
         } // got it, jump out of inner loop
 
-        stepsize  = fmaxf(f_tt * MU, 0.04);
+        stepsize  = fmaxf(f_tt * map.getDataConfig().truncation_boundary, step);
         position += stepsize * ray_dir_M;
         f_t = f_tt;
       }
@@ -110,12 +108,36 @@ void raycastVolume(MapT&                       map,
       sensor.model.backProject(pixel_f, &ray_dir_C);
       const Eigen::Vector3f ray_dir_M = (se::math::to_rotation(T_MS) * ray_dir_C.normalized()).head(3);
       const Eigen::Vector3f t_MS = se::math::to_translation(T_MS);
-      const float resolution = map.getRes();
-      surface_intersection_M = raycast(map, t_MS, ray_dir_M, sensor.nearDist(ray_dir_C), sensor.farDist(ray_dir_C), 0.1f, resolution, resolution);
-      Eigen::Vector3f surface_intersection_W = surface_intersection_M.head(3) + Eigen::Vector3f::Constant(5.119999);
+      surface_intersection_M = raycast(map, t_MS, ray_dir_M, sensor.nearDist(ray_dir_C), sensor.farDist(ray_dir_C));
+
       if (surface_intersection_M.w() >= 0.f)
       {
         surface_point_cloud_M[x + y * surface_point_cloud_M.width()] = surface_intersection_M.head<3>();
+      } else
+      {
+        surface_point_cloud_M[pixel.x() + pixel.y() * surface_point_cloud_M.width()] = Eigen::Vector3f::Zero();
+      }
+
+    }
+  }
+  TOCK("surface-point-cloud")
+
+  TICK("surface-normals")
+#ifdef _OPENMP
+  omp_set_num_threads(10);
+#endif
+#pragma omp parallel for
+  for (int y = 0; y < surface_point_cloud_M.height(); y++)
+  {
+#pragma omp simd
+    for (int x = 0; x < surface_point_cloud_M.width(); x++)
+    {
+
+      const Eigen::Vector2i pixel(x, y);
+      Eigen::Vector3f surface_intersection_M = surface_point_cloud_M[x + y * surface_point_cloud_M.width()];
+
+      if (surface_intersection_M != Eigen::Vector3f::Zero())
+      {
         Eigen::Vector3f surface_normal;
 
         map.template gradField(surface_intersection_M.head(3), surface_normal);
@@ -132,11 +154,11 @@ void raycastVolume(MapT&                       map,
         }
       } else
       {
-        surface_point_cloud_M[pixel.x() + pixel.y() * surface_point_cloud_M.width()] = Eigen::Vector3f::Zero();
         surface_normals_M[pixel.x() + pixel.y() * surface_normals_M.width()] = Eigen::Vector3f(INVALID, 0.f, 0.f);
       }
     }
   }
+  TOCK("surface-normals")
   TOCK("raycast-volume")
 }
 

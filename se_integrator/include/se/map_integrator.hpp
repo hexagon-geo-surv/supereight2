@@ -161,6 +161,9 @@ struct IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>
                         MapT&                         map,
                         ConfigT&                      /* config */)
   {
+    const float        truncation_boundary = map.getDataConfig().truncation_boundary;
+    const se::weight_t max_weight          = map.getDataConfig().max_weight;
+
     // Allocation
     std::vector<typename MapT::OctreeType::BlockType*> block_ptrs = se::allocator::frustum(depth_img, sensor, T_MS, map);
 
@@ -212,13 +215,14 @@ struct IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>
             // Update the TSDF
             const float m = sensor.measurementFromPoint(point_S);
             const float sdf_value = (depth_value - m) / m * point_S.norm();
-            if (sdf_value > -MU) {
-              const float tsdf_value = fminf(1.f, sdf_value / MU);
+            if (sdf_value > -truncation_boundary)
+            {
+              const float tsdf_value = fminf(1.f, sdf_value / truncation_boundary);
               typename MapT::DataType data;
               block_ptr->getData(voxel_coord, data);
               data.tsdf = (data.tsdf * data.weight + tsdf_value) / (data.weight + 1.f);
               data.tsdf = se::math::clamp(data.tsdf, -1.f, 1.f);
-              data.weight = fminf(data.weight + 1, 100);
+              data.weight = fminf(data.weight + 1, max_weight);
               block_ptr->setData(voxel_coord, data);
             }
           }

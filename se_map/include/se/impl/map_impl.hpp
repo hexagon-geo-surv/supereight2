@@ -9,9 +9,11 @@ namespace se {
 
 template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
 Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::Map(const Eigen::Vector3f& dim,
-                                                   const float            res)
+                                                   const float            res,
+                                                   const se::DataConfig<FldT, ColB, SemB> data_config)
          : dim_(dim), res_(res), origin_M_(dim / 2),
-           lb_(- origin_M_), ub_(dim - origin_M_)
+           lb_(- origin_M_), ub_(dim - origin_M_),
+           data_config_(data_config)
 {
   initialiseOctree();
 }
@@ -19,9 +21,11 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::Map(const Eigen::Vector3f& dim,
 
 
 template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
-Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::Map(const MapConfig& mc)
-        : dim_(mc.dim), res_(mc.res), origin_M_(mc.origin),
-          lb_(- origin_M_), ub_(mc.dim - origin_M_)
+Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::Map(const MapConfig&                       map_config,
+                                                   const se::DataConfig<FldT, ColB, SemB> data_config)
+        : dim_(map_config.dim), res_(map_config.res), origin_M_(map_config.origin),
+          lb_(- origin_M_), ub_(map_config.dim - origin_M_),
+          data_config_(data_config)
 {
   if (!contains(origin_M_))
   {

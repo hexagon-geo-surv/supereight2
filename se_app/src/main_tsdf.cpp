@@ -22,7 +22,13 @@ int main()
   // Creating a single-res TSDF map
   const Eigen::Vector3f map_dim(10.f, 10.f, 20.f);
   const float           map_res(0.02f);
-  se::TSDFMap<se::Res::Single> map_tsdf(map_dim, map_res);
+
+  // Data config
+  se::TSDFDataConfig data_config;
+  data_config.truncation_boundary = 8 * map_res;
+  data_config.max_weight         = 100;
+
+  se::TSDFMap<se::Res::Single> map_tsdf(map_dim, map_res, data_config);
 
   // Setup input images
   Eigen::Vector2i input_img_res(640, 480);
@@ -128,10 +134,6 @@ int main()
     integrator.integrateDepth(processed_depth_img, sensor, T_MS);
     TOCK("integration")
 
-    // Render volume
-    se::Image<Eigen::Vector3f> surface_point_cloud_M(processed_img_res.x(), processed_img_res.y());
-    se::Image<Eigen::Vector3f> surface_normals_M(processed_img_res.x(), processed_img_res.y());
-    se::raycaster::raycastVolume(map_tsdf, surface_point_cloud_M, surface_normals_M, T_MS, sensor);
     const Eigen::Vector3f ambient{ 0.1, 0.1, 0.1};
     se::raycaster::renderVolumeKernel(output_volume_img_data, processed_img_res, se::math::to_translation(T_MS), ambient, surface_point_cloud_M, surface_normals_M);
 

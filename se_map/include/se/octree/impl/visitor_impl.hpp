@@ -303,7 +303,7 @@ bool getData(std::shared_ptr<OctreeT>    octree_ptr,
     const Eigen::Vector3i lower_coord = block_ptr->getCoord();
     const Eigen::Vector3i upper_coord = lower_coord + Eigen::Vector3i::Constant(BlockT::getSize() - 1);
     const int contained = ((voxel_coord.array() >= lower_coord.array()) && (voxel_coord.array() <= upper_coord.array())).all();
-    if(contained)
+    if (contained)
     {
       block_ptr->getData(voxel_coord, data);
       return true;
