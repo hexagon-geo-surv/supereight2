@@ -14,9 +14,11 @@
 
 int main()
 {
+  std::string output_path = "./PATH/TO/out";
+
   // Setup log stream
   std::ofstream log_file_stream;
-  log_file_stream.open("./log.txt");
+  log_file_stream.open(output_path + "/log.txt");
   se::perfstats.setFilestream(&log_file_stream);
 
   // Creating a single-res TSDF map
@@ -26,7 +28,7 @@ int main()
   // Data config
   se::TSDFDataConfig data_config;
   data_config.truncation_boundary = 8 * map_res;
-  data_config.max_weight         = 100;
+  data_config.max_weight          = 100;
 
   se::TSDFMap<se::Res::Single> map_tsdf(map_dim, map_res, data_config);
 
@@ -50,15 +52,15 @@ int main()
 
   // Setup sensor
   se::SensorConfig sensor_config;
-  sensor_config.width  =  input_img_res.x();
-  sensor_config.height =  input_img_res.y();
-  sensor_config.fx     =  481.2;
-  sensor_config.fy     = -480.0;
-  sensor_config.cx     =  319.5;
-  sensor_config.cy     =  239.5;
-  sensor_config.left_hand_frame = sensor_config.fy < 0;
-  sensor_config.near_plane      = 0.4f;
-  sensor_config.far_plane       = 6.f;
+  sensor_config.width           =  input_img_res.x();
+  sensor_config.height          =  input_img_res.y();
+  sensor_config.fx              =  481.2;
+  sensor_config.fy              = -480.0;
+  sensor_config.cx              =  319.5;
+  sensor_config.cy              =  239.5;
+  sensor_config.left_hand_frame =  sensor_config.fy < 0;
+  sensor_config.near_plane      =  0.4f;
+  sensor_config.far_plane       =  6.f;
 
   // Create a pinhole camera and downsample the intrinsics
   const se::PinholeCamera sensor(sensor_config, downsampling_factor);
@@ -69,9 +71,8 @@ int main()
   reader_config.fps               = 24;
   reader_config.drop_frames       = false;
   reader_config.verbose           = 0;
-  reader_config.sequence_path     = "/home/nils/workspace_/projects/supereight_2/se_2/datasets/icl_nuim/traj_2/scene.raw";
-  reader_config.ground_truth_file = "/home/nils/workspace_/projects/supereight_2/se_2/datasets/icl_nuim/traj_2/scene.raw.txt";
-
+  reader_config.sequence_path     = "./PATH/TO/scene.raw";
+  reader_config.ground_truth_file = "./PATH/TO/ground_truth.txt";
 
   // ========= READER INITIALIZATION  =========
   static se::Reader* reader = nullptr;
@@ -90,9 +91,7 @@ int main()
   se::Tracker tracker(map_tsdf, sensor, tracker_config);
 
   // Integrated depth at given pose
-  struct IntegrConfig {};
-  IntegrConfig integr_config;
-  se::MapIntegrator integrator(map_tsdf, integr_config);
+  se::MapIntegrator integrator(map_tsdf);
 
 #define TRACK true
 
@@ -152,15 +151,14 @@ int main()
 
     if (frame == 1 || frame % 100 == 0)
     {
-      map_tsdf.saveMesh(std::to_string(frame));
-      map_tsdf.saveSlice(se::math::to_translation(T_MS), std::to_string(frame));
-      map_tsdf.saveStrucutre(std::to_string(frame));
+      map_tsdf.saveMesh(output_path + "/mesh", std::to_string(frame));
+      map_tsdf.saveSlice(output_path + "/slice", se::math::to_translation(T_MS), std::to_string(frame));
+      map_tsdf.saveStrucutre(output_path + "/struct", std::to_string(frame));
     }
 
     unsigned int final_frame = 800;
     if (frame == final_frame)
     {
-      std::cout << "Reached FRAME = " << final_frame << std::endl;
       break;
     }
     se::perfstats.writeToFilestream();

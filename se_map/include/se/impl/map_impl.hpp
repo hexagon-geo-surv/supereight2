@@ -129,42 +129,53 @@ bool Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::initialiseOctree()
 
 
 template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
-void Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::saveSlice(const Eigen::Vector3f& point_M, const std::string num)
+void Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::saveSlice(const std::string      file_path,
+                                                              const Eigen::Vector3f& point_M,
+                                                              const std::string      num)
 {
   Eigen::Vector3i voxel_coord;
   pointToVoxel(point_M, voxel_coord);
-  se::io::save_3d_slice_vtk(octree_, "./slice_x_" + num + ".vtk", Eigen::Vector3i(voxel_coord.x(), 0, 0), Eigen::Vector3i(voxel_coord.x() + 1, octree_->getSize(), octree_->getSize()));
-  se::io::save_3d_slice_vtk(octree_, "./slice_y_" + num + ".vtk", Eigen::Vector3i(0, voxel_coord.y(), 0), Eigen::Vector3i(octree_->getSize(), voxel_coord.y() + 1, octree_->getSize()));
-  se::io::save_3d_slice_vtk(octree_, "./slice_z_" + num + ".vtk", Eigen::Vector3i(0,0, voxel_coord.z()), Eigen::Vector3i(octree_->getSize(), octree_->getSize(), voxel_coord.z() + 1));
+
+  const std::string file_name_x = (num == std::string("")) ? (file_path + "_x.vtk") : (file_path + "_x_" + num + ".vtk");
+  const std::string file_name_y = (num == std::string("")) ? (file_path + "_y.vtk") : (file_path + "_y_" + num + ".vtk");
+  const std::string file_name_z = (num == std::string("")) ? (file_path + "_z.vtk") : (file_path + "_z_" + num + ".vtk");
+  se::io::save_3d_slice_vtk(octree_, file_name_x, Eigen::Vector3i(voxel_coord.x(), 0, 0), Eigen::Vector3i(voxel_coord.x() + 1, octree_->getSize(), octree_->getSize()));
+  se::io::save_3d_slice_vtk(octree_, file_name_y, Eigen::Vector3i(0, voxel_coord.y(), 0), Eigen::Vector3i(octree_->getSize(), voxel_coord.y() + 1, octree_->getSize()));
+  se::io::save_3d_slice_vtk(octree_, file_name_z, Eigen::Vector3i(0,0, voxel_coord.z()), Eigen::Vector3i(octree_->getSize(), octree_->getSize(), voxel_coord.z() + 1));
 }
 
 
 
 template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
-void Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::saveStrucutre(const std::string num)
+void Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::saveStrucutre(const std::string file_path,
+                                                                  const std::string num)
 {
-  se::io::save_octree_structure_ply(octree_, "./structure_" + num + ".ply");
+  const std::string file_name = (num == std::string("")) ? (file_path + ".ply") : (file_path + "_" + num + ".ply");
+  se::io::save_octree_structure_ply(octree_, file_name);
 }
 
 
 
 
 template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
-void Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::saveMesh(const std::string num)
+void Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::saveMesh(const std::string file_path,
+                                                             const std::string num)
 {
   se::vector<se::Triangle> mesh;
   TICK("meshing")
   se::algorithms::marching_cube(octree_, mesh);
   TOCK("meshing")
 
-  se::io::save_mesh_vtk(mesh, "./mesh_" + num + ".vtk", Eigen::Matrix4f::Identity());
+  const std::string file_name_mesh_primal = (num == std::string("")) ? (file_path + "_primal.vtk") : (file_path + "_primal_" + num + ".vtk");
+  se::io::save_mesh_vtk(mesh, file_name_mesh_primal, Eigen::Matrix4f::Identity());
 
   se::vector<se::Triangle> dual_mesh;
   TICK("dual_meshing")
   se::algorithms::dual_marching_cube(octree_, dual_mesh);
   TOCK("dual_meshing")
 
-  se::io::save_mesh_vtk(dual_mesh, "./dual_mesh_" + num + ".vtk", Eigen::Matrix4f::Identity());
+  const std::string file_name_mesh_dual = (num == std::string("")) ? (file_path + "_dual.vtk") : (file_path + "_dual_" + num + ".vtk");
+  se::io::save_mesh_vtk(dual_mesh, file_name_mesh_dual, Eigen::Matrix4f::Identity());
 }
 
 
