@@ -5,9 +5,9 @@ namespace se {
 
 template <typename DataT,
           Res      ResT,
-          unsigned BlockSizeT
+          int      BlockSizeT
 >
-Octree<DataT, ResT, BlockSizeT>::Octree(const unsigned size) : size_(size)
+Octree<DataT, ResT, BlockSizeT>::Octree(const int size) : size_(size)
 {
   assert(math::is_power_of_two(size)); // Verify that the octree size is a multiple of 2.
   assert(BlockSizeT < size);           // Verify that the block size is smaller than the root.
@@ -19,7 +19,7 @@ Octree<DataT, ResT, BlockSizeT>::Octree(const unsigned size) : size_(size)
 
 template <typename DataT,
           Res      ResT,
-          unsigned BlockSizeT
+          int      BlockSizeT
 >
 OctreeIterator<Octree<DataT, ResT, BlockSizeT>> Octree<DataT, ResT, BlockSizeT>::begin()
 {
@@ -30,7 +30,7 @@ OctreeIterator<Octree<DataT, ResT, BlockSizeT>> Octree<DataT, ResT, BlockSizeT>:
 
 template <typename DataT,
           Res      ResT,
-          unsigned BlockSizeT
+          int      BlockSizeT
 >
 OctreeIterator<Octree<DataT, ResT, BlockSizeT>> Octree<DataT, ResT, BlockSizeT>::end()
 {
@@ -41,7 +41,7 @@ OctreeIterator<Octree<DataT, ResT, BlockSizeT>> Octree<DataT, ResT, BlockSizeT>:
 
 template <typename DataT,
           Res      ResT,
-          unsigned BlockSizeT
+          int      BlockSizeT
 >
 bool Octree<DataT, ResT, BlockSizeT>::contains(const Eigen::Vector3i& voxel_coord)
 {
@@ -54,7 +54,7 @@ bool Octree<DataT, ResT, BlockSizeT>::contains(const Eigen::Vector3i& voxel_coor
 
 template <typename DataT,
           Res      ResT,
-          unsigned BlockSizeT
+          int            BlockSizeT
 >
 bool Octree<DataT, ResT, BlockSizeT>::contains(const Eigen::Vector3i& voxel_coord) const
 {
@@ -67,7 +67,7 @@ bool Octree<DataT, ResT, BlockSizeT>::contains(const Eigen::Vector3i& voxel_coor
 
 template <typename DataT,
           Res      ResT,
-          unsigned BlockSizeT
+          int      BlockSizeT
 >
 bool Octree<DataT, ResT, BlockSizeT>::allocate(NodeType*          parent_ptr,
                                                const unsigned int child_idx)
@@ -79,7 +79,7 @@ bool Octree<DataT, ResT, BlockSizeT>::allocate(NodeType*          parent_ptr,
 
 template <typename DataT,
           Res      ResT,
-          unsigned BlockSizeT
+          int      BlockSizeT
 >
 bool Octree<DataT, ResT, BlockSizeT>::allocate(NodeType*          parent_ptr,
                                                const unsigned int child_idx,

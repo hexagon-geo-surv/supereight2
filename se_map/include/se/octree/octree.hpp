@@ -27,7 +27,7 @@ namespace se {
  */
 template <typename DataT,
           Res      ResT       = Res::Single,
-          unsigned BlockSizeT = 8
+          int      BlockSizeT = 8
 >
 class Octree {
 public:
@@ -50,7 +50,7 @@ public:
    *
    * \param[in] size    The size in [voxel] of the octree
    */
-  Octree(const unsigned size);
+  Octree(const int size);
 
   ~Octree() {};                               ///< TODO:
   Octree(const Octree&) = delete;             ///< Delete copy constructor
@@ -128,7 +128,7 @@ public:
 
 private:
 
-  unsigned int size_;            ///< The size in [voxel] of the octree
+  int size_;                     ///< The size in [voxel] of the octree
   NodeType* root_ptr_ = nullptr; ///< The pointer to the root node of the octree
 
   MemoryPool memory_pool_;       ///< The memory pool pre-allocating memory for nodes and blocks
@@ -138,7 +138,7 @@ private:
 
 template <typename DataT,
           Res      ResT,
-          unsigned BlockSizeT
+          int      BlockSizeT
 >
 constexpr se::scale_t Octree<DataT, ResT, BlockSizeT>::max_block_scale;
 
