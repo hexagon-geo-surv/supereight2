@@ -79,11 +79,82 @@ template <se::Field     FldT = se::Field::TSDF,
 >
 struct Data : public FieldData<FldT>, ColourData<ColB>, SemanticData<SemB>
 {
-public:
-    static constexpr se::Field     fld_ = FldT;
-    static constexpr se::Colour    col_ = ColB;
-    static constexpr se::Semantics sem_ = SemB;
+  static constexpr se::Field     fld_ = FldT;
+  static constexpr se::Colour    col_ = ColB;
+  static constexpr se::Semantics sem_ = SemB;
 };
+
+///////////////////
+/// DATA CONFIG ///
+///////////////////
+
+static const field_t dflt_min_occupancy = -500;
+static const field_t dflt_max_occupancy = -500;
+static const field_t dflt_surface_boundary = 0;
+
+static const float    dflt_truncation_boundary = 0.1;
+static const weight_t dflt_max_weight = 100;
+
+template<se::Field FieldT>
+struct FieldDataConfig
+{
+};
+
+template<>
+struct FieldDataConfig<se::Field::Occupancy>
+{
+    FieldDataConfig()
+      : min_occupancy(dflt_min_occupancy),
+        max_occupancy(dflt_max_occupancy),
+        surface_boundary(dflt_surface_boundary) {}
+    field_t min_occupancy;
+    field_t max_occupancy;
+    field_t surface_boundary;
+};
+
+template<>
+struct FieldDataConfig<se::Field::TSDF>
+{
+    FieldDataConfig() : truncation_boundary(dflt_truncation_boundary), max_weight(dflt_weight) {}
+    float       truncation_boundary;
+    weight_t    max_weight; // TODO: int or float
+};
+
+// Colour data
+template<se::Colour ColB>
+struct ColourDataConfig
+{
+};
+
+template<>
+struct ColourDataConfig<se::Colour::On>
+{
+
+};
+
+// Semantic data
+template<se::Semantics SemB>
+struct SemanticDataConfig
+{
+};
+
+// Semantic data
+template<>
+struct SemanticDataConfig<se::Semantics::On>
+{
+};
+
+template <se::Field     FldT = se::Field::TSDF,
+          se::Colour    ColB = se::Colour::Off,
+          se::Semantics SemB = se::Semantics::Off
+>
+struct DataConfig : public FieldDataConfig<FldT>, ColourDataConfig<ColB>, SemanticDataConfig<SemB>
+{
+  static constexpr se::Field     fld_ = FldT;
+  static constexpr se::Colour    col_ = ColB;
+  static constexpr se::Semantics sem_ = SemB;
+};
+
 
 
 template <se::Field     FldT,
@@ -198,15 +269,26 @@ float is_inside(const Data<se::Field::Occupancy, ColB, SemB>& data) {
 
 // Occupancy data setups
 typedef Data<se::Field::Occupancy, se::Colour::Off, se::Semantics::Off> OccData;
-typedef Data<se::Field::Occupancy, se::Colour::On,  se::Semantics::Off>  OccColData;
+typedef Data<se::Field::Occupancy, se::Colour::On,  se::Semantics::Off> OccColData;
 typedef Data<se::Field::Occupancy, se::Colour::Off, se::Semantics::On>  OccSemData;
-typedef Data<se::Field::Occupancy, se::Colour::On,  se::Semantics::On>   OccColSemData;
+typedef Data<se::Field::Occupancy, se::Colour::On,  se::Semantics::On>  OccColSemData;
+
+// Occupancy data setups
+typedef DataConfig<se::Field::Occupancy, se::Colour::Off, se::Semantics::Off> OccDataConfig;
+typedef DataConfig<se::Field::Occupancy, se::Colour::On,  se::Semantics::Off> OccColDataConfig;
+typedef DataConfig<se::Field::Occupancy, se::Colour::Off, se::Semantics::On>  OccSemDataConfig;
+typedef DataConfig<se::Field::Occupancy, se::Colour::On,  se::Semantics::On>  OccColSemDataConfig;
 
 // TSDF data setups
 typedef Data<se::Field::TSDF, se::Colour::Off, se::Semantics::Off> TSDFData;
-typedef Data<se::Field::TSDF, se::Colour::On,  se::Semantics::Off>  TSDFColData;
+typedef Data<se::Field::TSDF, se::Colour::On,  se::Semantics::Off> TSDFColData;
 typedef Data<se::Field::TSDF, se::Colour::Off, se::Semantics::On>  TSDFSemData;
-typedef Data<se::Field::TSDF, se::Colour::On,  se::Semantics::On>   TSDFColSemData;
+typedef Data<se::Field::TSDF, se::Colour::On,  se::Semantics::On>  TSDFColSemData;
+
+typedef DataConfig<se::Field::TSDF, se::Colour::Off, se::Semantics::Off> TSDFDataConfig;
+typedef DataConfig<se::Field::TSDF, se::Colour::On,  se::Semantics::Off> TSDFColDataConfig;
+typedef DataConfig<se::Field::TSDF, se::Colour::Off, se::Semantics::On>  TSDFSemDataConfig;
+typedef DataConfig<se::Field::TSDF, se::Colour::On,  se::Semantics::On>  TSDFColSemDataConfig;
 
 } // namespace se
 
