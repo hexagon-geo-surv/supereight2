@@ -36,21 +36,21 @@ int main()
 
   // Setup input images
   Eigen::Vector2i input_img_res(640, 480);
-  static se::Image<se::depth_t> input_depth_img(input_img_res.x(), input_img_res.y());
-  static se::Image<uint32_t>    input_rgba_img(input_img_res.x(), input_img_res.y());
+  se::Image<se::depth_t> input_depth_img(input_img_res.x(), input_img_res.y());
+  se::Image<uint32_t>    input_rgba_img(input_img_res.x(), input_img_res.y());
 
   int downsampling_factor = 2;
 
   // Setup processed images
   Eigen::Vector2i processed_img_res = input_img_res / downsampling_factor;
-  static se::Image<se::depth_t> processed_depth_img(processed_img_res.x(), processed_img_res.y());
-  static se::Image<uint32_t>    processed_rgba_img(processed_img_res.x(), processed_img_res.y());
+  se::Image<se::depth_t> processed_depth_img(processed_img_res.x(), processed_img_res.y());
+  se::Image<uint32_t>    processed_rgba_img(processed_img_res.x(), processed_img_res.y());
 
   // Setup output images / renders
-  static uint32_t* output_rgba_img_data     =  new uint32_t[processed_img_res.x() * processed_img_res.y()];
-  static uint32_t* output_depth_img_data    =  new uint32_t[processed_img_res.x() * processed_img_res.y()];
-  static uint32_t* output_tracking_img_data =  new uint32_t[processed_img_res.x() * processed_img_res.y()];
-  static uint32_t* output_volume_img_data   =  new uint32_t[processed_img_res.x() * processed_img_res.y()];
+  uint32_t* output_rgba_img_data     =  new uint32_t[processed_img_res.x() * processed_img_res.y()];
+  uint32_t* output_depth_img_data    =  new uint32_t[processed_img_res.x() * processed_img_res.y()];
+  uint32_t* output_tracking_img_data =  new uint32_t[processed_img_res.x() * processed_img_res.y()];
+  uint32_t* output_volume_img_data   =  new uint32_t[processed_img_res.x() * processed_img_res.y()];
 
   // Setup sensor
   se::SensorConfig sensor_config;
@@ -77,7 +77,7 @@ int main()
   reader_config.ground_truth_file = "./PATH/TO/ground_truth.txt";
 
   // ========= READER INITIALIZATION  =========
-  static se::Reader* reader = nullptr;
+  se::Reader* reader = nullptr;
   reader = se::create_reader(reader_config);
 
   if (reader == nullptr) {
