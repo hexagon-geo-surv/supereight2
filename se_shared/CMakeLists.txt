@@ -18,11 +18,6 @@ target_link_libraries(${LIB_NAME}
     Lode::PNG
     SRL::Projection
 )
-set_target_properties(${LIB_NAME} PROPERTIES
-  CXX_STANDARD 14
-  CXX_STANDARD_REQUIRED ON
-  CXX_EXTENSIONS OFF
-)
 
 # Add an alias so that the library can be used inside the build tree, e.g. when
 # testing

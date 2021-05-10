@@ -36,9 +36,4 @@ endif()
 
 # Allow handling large files in 32-bit systems
 target_compile_definitions(${EXE_NAME} PRIVATE "-D_FILE_OFFSET_BITS=64")
-set_target_properties(${EXE_NAME} PROPERTIES
-  CXX_STANDARD 17
-  CXX_STANDARD_REQUIRED ON
-  CXX_EXTENSIONS OFF
-)
 
