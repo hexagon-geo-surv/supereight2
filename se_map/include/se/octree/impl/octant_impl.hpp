@@ -61,6 +61,8 @@ bool NodeBase<DerivedT>::getChild(const unsigned child_idx, se::OctantBase*& chi
   return child_ptr != nullptr;
 }
 
+
+
 template <typename DerivedT>
 bool NodeBase<DerivedT>::setChild(const unsigned child_idx, se::OctantBase* child_ptr)
 {

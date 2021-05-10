@@ -263,29 +263,14 @@ bool getData(std::shared_ptr<OctreeT>     octree_ptr,
              typename OctreeT::DataType&  data)
 {
 
-  se::OctantBase* octant_ptr = octree_ptr->getRoot();
-  se::OctantBase* octant_tmp_ptr = nullptr;
-  if(!octant_ptr) // Return false if the octree root isn't allocated, this should never be the case.
+  const se::OctantBase* octant_ptr = se::fetcher::block(voxel_coord, octree_ptr, octree_ptr->getRoot());
+
+  if (!octant_ptr)
   {
-    std::cerr << "Re-initalise octree. Root missing" << std::endl;
     return false;
   }
 
-  unsigned int child_size = octree_ptr->getSize() >> 1;
-  for (; child_size >= OctreeT::block_size; child_size = child_size >> 1)
-  {
-    typename OctreeT::NodeType* node_ptr = static_cast<typename OctreeT::NodeType*>(octant_ptr);
-
-    unsigned int child_idx;
-    get_child_idx(voxel_coord, node_ptr, child_idx);
-    if (!node_ptr->getChild(child_idx, octant_tmp_ptr)) // Return false if the voxel is not allocated
-    {
-      return false;
-    }
-    octant_ptr = octant_tmp_ptr;
-  }
-
-  static_cast<typename OctreeT::BlockType*>(octant_ptr)->getData(voxel_coord, data);
+  static_cast<const typename OctreeT::BlockType*>(octant_ptr)->getData(voxel_coord, data);
 
   return true;
 }
@@ -298,16 +283,15 @@ bool getData(std::shared_ptr<OctreeT>    octree_ptr,
              const Eigen::Vector3i&      voxel_coord,
              typename OctreeT::DataType& data)
 {
-  if (block_ptr)
+  assert(block_ptr);
+
+  const Eigen::Vector3i lower_coord = block_ptr->getCoord();
+  const Eigen::Vector3i upper_coord = lower_coord + Eigen::Vector3i::Constant(BlockT::getSize() - 1);
+  const bool is_contained = ((voxel_coord.array() >= lower_coord.array()) && (voxel_coord.array() <= upper_coord.array())).all();
+  if (is_contained)
   {
-    const Eigen::Vector3i lower_coord = block_ptr->getCoord();
-    const Eigen::Vector3i upper_coord = lower_coord + Eigen::Vector3i::Constant(BlockT::getSize() - 1);
-    const int contained = ((voxel_coord.array() >= lower_coord.array()) && (voxel_coord.array() <= upper_coord.array())).all();
-    if (contained)
-    {
-      block_ptr->getData(voxel_coord, data);
-      return true;
-    }
+    block_ptr->getData(voxel_coord, data);
+    return true;
   }
 
   return getData(octree_ptr, voxel_coord, data);
@@ -321,26 +305,11 @@ typename OctreeT::DataType getData(std::shared_ptr<OctreeT>     octree_ptr,
 {
   typename OctreeT::DataType data;
 
-  se::OctantBase* octant_ptr = octree_ptr->getRoot();
-  se::OctantBase* octant_tmp_ptr = nullptr;
-  if(!octant_ptr) // Return false if the octree root isn't allocated, this should never be the case.
+  const se::OctantBase* octant_ptr = se::fetcher::block(voxel_coord, octree_ptr, octree_ptr->getRoot());
+
+  if (!octant_ptr)
   {
-    std::cerr << "Re-initalise octree. Root missing" << std::endl;
     return data;
-  }
-
-  unsigned int child_size = octree_ptr->getSize() >> 1;
-  for (; child_size >= OctreeT::block_size; child_size = child_size >> 1)
-  {
-    typename OctreeT::NodeType* node_ptr = static_cast<typename OctreeT::NodeType*>(octant_ptr);
-
-    unsigned int child_idx;
-    get_child_idx(voxel_coord, node_ptr, child_idx);
-    if (!node_ptr->getChild(child_idx, octant_tmp_ptr)) // Return false if the voxel is not allocated
-    {
-      return data;
-    }
-    octant_ptr = octant_tmp_ptr;
   }
 
   static_cast<typename OctreeT::BlockType*>(octant_ptr)->getData(voxel_coord, data);
@@ -440,20 +409,16 @@ bool gradField(const std::shared_ptr<OctreeT> octree_ptr,
                const Eigen::Vector3f&         voxel_coord_f,
                Eigen::Vector3f&               grad_field_value)
 {
-  Eigen::Vector3f factor   = Eigen::Vector3f::Constant(0);
-  Eigen::Vector3f gradient = Eigen::Vector3f::Constant(0);
-  const int stride = 1;
-  const Eigen::Vector3f scaled_voxel_coord_f = 1.f / stride * voxel_coord_f - Eigen::Vector3f::Constant(0.5f);
-  factor =  se::math::fracf(scaled_voxel_coord_f);
-  const Eigen::Vector3i base_coord = stride * scaled_voxel_coord_f.template cast<int>();
+  const Eigen::Vector3f scaled_voxel_coord_f = voxel_coord_f - se::sample_offset_frac;
+  Eigen::Vector3f factor = se::math::fracf(scaled_voxel_coord_f);
+  const Eigen::Vector3i base_coord = scaled_voxel_coord_f.template cast<int>();
 
-
-  Eigen::Vector3i lower_lower_coord = (base_coord - stride * Eigen::Vector3i::Constant(1)).cwiseMax(Eigen::Vector3i::Constant(0));
+  Eigen::Vector3i lower_lower_coord = (base_coord - Eigen::Vector3i::Constant(1)).cwiseMax(Eigen::Vector3i::Constant(0));
   Eigen::Vector3i lower_upper_coord = base_coord.cwiseMax(Eigen::Vector3i::Constant(0));
 
-  Eigen::Vector3i upper_lower_coord = (base_coord + stride * Eigen::Vector3i::Constant(1)).cwiseMin(
+  Eigen::Vector3i upper_lower_coord = (base_coord + Eigen::Vector3i::Constant(1)).cwiseMin(
           Eigen::Vector3i::Constant(octree_ptr->getSize()) - Eigen::Vector3i::Constant(1));
-  Eigen::Vector3i upper_upper_coord = (base_coord + stride * Eigen::Vector3i::Constant(2)).cwiseMin(
+  Eigen::Vector3i upper_upper_coord = (base_coord + Eigen::Vector3i::Constant(2)).cwiseMin(
           Eigen::Vector3i::Constant(octree_ptr->getSize()) - Eigen::Vector3i::Constant(1));
 
   const typename OctreeT::BlockType* block_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree_ptr, octree_ptr->getRoot()));
@@ -462,7 +427,7 @@ bool gradField(const std::shared_ptr<OctreeT> octree_ptr,
     return false;
   }
 
-  se::vector<Eigen::Vector3i> grad_coords =
+  const Eigen::Vector3i grad_coords[32] =
   {
     Eigen::Vector3i(lower_lower_coord.x(), lower_upper_coord.y(), lower_upper_coord.z()), //< Unique
     Eigen::Vector3i(lower_lower_coord.x(), upper_lower_coord.y(), lower_upper_coord.z()), //< Unique
@@ -503,7 +468,7 @@ bool gradField(const std::shared_ptr<OctreeT> octree_ptr,
 
   se::field_t grad_field_values[32];
 
-  for (unsigned int i = 0; i < grad_coords.size(); i++)
+  for (unsigned int i = 0; i < 32; i++)
   {
     if (!se::visitor::getField(octree_ptr, block_ptr, grad_coords[i], grad_field_values[i]))
     {
@@ -511,54 +476,60 @@ bool gradField(const std::shared_ptr<OctreeT> octree_ptr,
     }
   }
 
+  const float rev_factor_x = (1 - factor.x());
+  const float rev_factor_y = (1 - factor.y());
+  const float rev_factor_z = (1 - factor.z());
+
+  Eigen::Vector3f gradient = Eigen::Vector3f::Constant(0);
+
   gradient.x() = (((grad_field_values[19]
-                  - grad_field_values[0]) * (1 - factor.x())
+                  - grad_field_values[0]) * rev_factor_x
                   +(grad_field_values[28]
-                  - grad_field_values[7]) * factor.x()) * (1 - factor.y())
+                  - grad_field_values[7]) * factor.x()) * rev_factor_y
                 + ((grad_field_values[23]
-                  - grad_field_values[1]) * (1 - factor.x())
+                  - grad_field_values[1]) * rev_factor_x
                   +(grad_field_values[29]
-                  - grad_field_values[11]) * factor.x()) * factor.y()) * (1 - factor.z())
+                  - grad_field_values[11]) * factor.x()) * factor.y()) * rev_factor_z
                + (((grad_field_values[20]
-                  - grad_field_values[2]) * (1 - factor.x())
+                  - grad_field_values[2]) * rev_factor_x
                   +(grad_field_values[30]
-                  - grad_field_values[8]) * factor.x()) * (1 - factor.y())
+                  - grad_field_values[8]) * factor.x()) * rev_factor_y
                 + ((grad_field_values[24]
-                  - grad_field_values[3]) * (1 - factor.x())
+                  - grad_field_values[3]) * rev_factor_x
                   +(grad_field_values[31]
                   - grad_field_values[12]) * factor.x()) * factor.y()) * factor.z();
 
   gradient.y() = (((grad_field_values[11]
-                  - grad_field_values[4]) * (1 - factor.x())
+                  - grad_field_values[4]) * rev_factor_x
                   +(grad_field_values[23]
-                  - grad_field_values[16]) * factor.x()) * (1 - factor.y())
+                  - grad_field_values[16]) * factor.x()) * rev_factor_y
                 + ((grad_field_values[14]
-                  - grad_field_values[7]) * (1 - factor.x())
+                  - grad_field_values[7]) * rev_factor_x
                   +(grad_field_values[26]
-                  - grad_field_values[19]) * factor.x()) * factor.y()) * (1 - factor.z())
+                  - grad_field_values[19]) * factor.x()) * factor.y()) * rev_factor_z
                + (((grad_field_values[12]
-                  - grad_field_values[5]) * (1 - factor.x())
+                  - grad_field_values[5]) * rev_factor_x
                   +(grad_field_values[24]
-                  - grad_field_values[17]) * factor.x()) * (1 - factor.y())
+                  - grad_field_values[17]) * factor.x()) * rev_factor_y
                 + ((grad_field_values[15]
-                  - grad_field_values[8]) * (1 - factor.x())
+                  - grad_field_values[8]) * rev_factor_x
                   +(grad_field_values[27]
                   - grad_field_values[20]) * factor.x()) * factor.y()) * factor.z();
 
   gradient.z() = (((grad_field_values[8]
-                  - grad_field_values[6]) * (1 - factor.x())
+                  - grad_field_values[6]) * rev_factor_x
                   +(grad_field_values[20]
-                  - grad_field_values[18]) * factor.x()) * (1 - factor.y())
+                  - grad_field_values[18]) * factor.x()) * rev_factor_y
                 + ((grad_field_values[12]
-                  - grad_field_values[10]) * (1 - factor.x())
+                  - grad_field_values[10]) * rev_factor_x
                   +(grad_field_values[24]
-                  - grad_field_values[22]) * factor.x()) * factor.y()) * (1 - factor.z())
+                  - grad_field_values[22]) * factor.x()) * factor.y()) * rev_factor_z
                + (((grad_field_values[9]
-                  - grad_field_values[7]) * (1 - factor.x())
+                  - grad_field_values[7]) * rev_factor_x
                   +(grad_field_values[21]
-                  - grad_field_values[19]) * factor.x()) * (1 - factor.y())
+                  - grad_field_values[19]) * factor.x()) * rev_factor_y
                  +((grad_field_values[13]
-                  - grad_field_values[11]) * (1 - factor.x())
+                  - grad_field_values[11]) * rev_factor_x
                   +(grad_field_values[25]
                   - grad_field_values[23]) * factor.x()) * factor.y()) * factor.z();
 

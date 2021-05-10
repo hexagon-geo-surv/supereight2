@@ -9,23 +9,6 @@
 namespace se {
 namespace fetcher {
 
-
-
-/**
- * \brief Fetch the octant for a given key.
- *
- * \tparam OctreeT
- * \param key               The key of the octant to be fetched
- * \param octree_ptr        The pointer to the octree
- * \param base_parent_ptr   The parent pointer to start the fetching process from (e.g. the octrees root)
- *
- * \return The octant pointer is allocated, nullptr otherwise
- */
-template <typename OctreeT>
-se::OctantBase* octant(const se::key_t             key,
-                       std::shared_ptr<OctreeT>    octree_ptr,
-                       typename OctreeT::NodeType* base_parent_ptr);
-
 /**
  * \brief Fetch the node for given coordinates and scale.
  *
@@ -59,8 +42,6 @@ template <typename OctreeT>
 se::OctantBase* block(const Eigen::Vector3i&      block_coord,
                       std::shared_ptr<OctreeT>    octree_ptr,
                       typename OctreeT::NodeType* base_parent_ptr);
-
-
 
 } // namespace fetcher
 } // namespace se
