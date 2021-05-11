@@ -152,6 +152,33 @@ template <Field     FldT,
           Res       ResT,
           unsigned  BlockSize
 >
+template<Safe SafeB>
+inline Eigen::Vector3f Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::gradField(const Eigen::Vector3f& point_M) const
+{
+  Eigen::Vector3f voxel_coord_f;
+
+  if constexpr(SafeB == Safe::Off) // Evaluate at compile time
+  {
+    pointToVoxel<Safe::Off>(point_M, voxel_coord_f);
+  } else
+  {
+    if (!pointToVoxel<Safe::On>(point_M, voxel_coord_f))
+    {
+    return Eigen::Vector3f::Constant(0);
+    }
+  }
+
+  return res_ * se::visitor::gradField(octree_, voxel_coord_f);
+}
+
+
+
+template <Field     FldT,
+          Colour    ColB,
+          Semantics SemB,
+          Res       ResT,
+          unsigned  BlockSize
+>
 bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::initialiseOctree()
 {
   if (octree_ != nullptr)

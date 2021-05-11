@@ -90,6 +90,9 @@ public:
   template<Safe SafeB = Safe::Off>
   bool gradField(const Eigen::Vector3f& point_M, Eigen::Vector3f& field_grad) const;
 
+  template<Safe SafeB = Safe::Off>
+  inline Eigen::Vector3f gradField(const Eigen::Vector3f& point_M) const;
+
   void saveSlice(const std::string      file_path,
                  const Eigen::Vector3f& point_M,
                  const std::string num = "");

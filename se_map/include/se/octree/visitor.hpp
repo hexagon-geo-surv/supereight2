@@ -44,6 +44,11 @@ template <typename OctreeT>
 inline typename OctreeT::DataType getData(std::shared_ptr<OctreeT> octree_ptr,
                                           const Eigen::Vector3i&   voxel_coord);
 
+template <typename OctreeT, typename BlockT>
+inline typename OctreeT::DataType getData(std::shared_ptr<OctreeT> octree_ptr,
+                                          BlockT*                  block_ptr,
+                                          const Eigen::Vector3i&   voxel_coord);
+
 /**
  * \brief Get the field value for a given coordinate.
  *        The function returns false and invalid data if the data is not allocated.
@@ -80,6 +85,11 @@ template <typename OctreeT>
 inline se::field_t getField(std::shared_ptr<OctreeT> octree_ptr,
                             const Eigen::Vector3i&   voxel_coord);
 
+template <typename OctreeT, typename BlockT>
+inline se::field_t getField(std::shared_ptr<OctreeT> octree_ptr,
+                            BlockT*                  block_ptr,
+                            const Eigen::Vector3i&   voxel_coord);
+
 /**
  * \brief Get the interplated field value for a given coordinate [float voxel coordinates].
  *        The function returns false and invalid data if the data is not allocated.
@@ -113,6 +123,23 @@ template <typename OctreeT>
 inline bool gradField(const std::shared_ptr<OctreeT> octree_ptr,
                       const Eigen::Vector3f&         voxel_coord_f,
                       Eigen::Vector3f&               grad_field_value);
+
+/**
+ * \brief Get the field gradient for a given coordinate [float voxel coordinates].
+ *
+ * \warning The function only returns false if the base block is not allocated and might
+ *          compute the gradient from invalid data. TODO
+ *
+ * \tparam OctreeT              The type of the octree used
+ * \param[in] octree_ptr        The pointer to the octree
+ * \param[in] voxel_coord_f     The voxel coordinates to be accessed [float voxel coordiantes]
+ * \param[in] grad_field_value  The field gradient to be accessed
+ *
+ * \return True if base block pointer is allocated, False otherwise
+ */
+template <typename OctreeT>
+inline Eigen::Vector3f gradField(const std::shared_ptr<OctreeT> octree_ptr,
+                                 const Eigen::Vector3f&         voxel_coord_f);
 
 } // namespace visitor
 } // namespace se
