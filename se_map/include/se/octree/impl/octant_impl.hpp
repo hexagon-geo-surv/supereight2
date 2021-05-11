@@ -36,7 +36,7 @@ template <typename DerivedT>
 NodeBase<DerivedT>::NodeBase(const Eigen::Vector3i& coord,
                              const unsigned         size,
                              se::OctantBase*        parent_ptr)
-        : OctantBase(coord, parent_ptr), size_(size)
+        : OctantBase(false, coord, parent_ptr), size_(size)
 {
   children_ptr_.fill(nullptr);
 }
@@ -109,7 +109,7 @@ inline void Node<DataT, ResT>::getData(const DataT& data)
 template <typename DerivedT, unsigned SizeT>
 BlockBase<DerivedT, SizeT>::BlockBase(const Eigen::Vector3i& coord,
                                       se::OctantBase*        parent_ptr)
-        : OctantBase(coord, parent_ptr)
+        : OctantBase(true, coord, parent_ptr)
 {
 }
 

@@ -16,10 +16,11 @@ class OctantBase
 {
 public:
 
-    OctantBase(const Eigen::Vector3i& coord,
+    OctantBase(const bool             is_block,
+               const Eigen::Vector3i& coord,
                OctantBase*            parent_ptr = nullptr);
 
-    virtual bool isBlock() const = 0;
+    inline bool isBlock() const { return is_block_; };
 
     inline Eigen::Vector3i getCoord() const { return coord_; }
 
@@ -38,6 +39,7 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 protected:
+    const bool            is_block_;
     OctantBase*           parent_ptr_;    ///< Every node/block (other than root) needs a parent
     const Eigen::Vector3i coord_;         ///< The coordinates of the block (left, front , bottom corner)
     unsigned int          time_stamp_;    ///< The frame of the last update
@@ -65,8 +67,6 @@ public:
     NodeBase(const Eigen::Vector3i& coord,
              const unsigned         size,
              OctantBase*            parent_ptr = nullptr);
-
-    bool isBlock() const { return false; }
 
     inline unsigned int getSize();
 
@@ -116,8 +116,6 @@ class BlockBase : public OctantBase {
 public:
     BlockBase(const Eigen::Vector3i& coord,
               se::OctantBase*        parent_ptr = nullptr);
-
-    bool isBlock() const { return true; }
 
     static constexpr unsigned int getSize() { return SizeT; }
 
