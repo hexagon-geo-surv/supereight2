@@ -60,17 +60,18 @@ public:
   Map(const MapConfig&                       map_config,
       const se::DataConfig<FldT, ColB, SemB> data_config = se::DataConfig<FldT, ColB, SemB>());
 
-  bool contains(const Eigen::Vector3f& point_M);
+  bool contains(const Eigen::Vector3f& point_M) const;
 
   /**
    * Get the dimensions of the map in [meter] (length x width x height)
    *
    * \return Dimensions of the map
    */
-  const Eigen::Vector3f& getDim() { return dim_; }
-  float getRes() { return res_; }
+  Eigen::Vector3f getDim() const { return dim_; }
 
-  DataConfigType getDataConfig() { return data_config_; }
+  float getRes() const { return res_; }
+
+  DataConfigType getDataConfig() const { return data_config_; }
 
   /**
    * \brief
@@ -81,13 +82,13 @@ public:
    * \return
    */
   template<Safe SafeB = Safe::Off>
-  bool getData(const Eigen::Vector3f& point_M, DataType& data);
+  bool getData (const Eigen::Vector3f& point_M, DataType& data) const;
 
   template<Safe SafeB = Safe::Off>
-  bool interpField(const Eigen::Vector3f& point_M, float& field_value);
+  bool interpField(const Eigen::Vector3f& point_M, float& field_value) const;
 
   template<Safe SafeB = Safe::Off>
-  bool gradField(const Eigen::Vector3f& point_M, Eigen::Vector3f& field_grad);
+  bool gradField(const Eigen::Vector3f& point_M, Eigen::Vector3f& field_grad) const;
 
   void saveSlice(const std::string      file_path,
                  const Eigen::Vector3f& point_M,
@@ -99,7 +100,7 @@ public:
   void saveMesh(const std::string file_path,
                 const std::string num = "");
 
-  void voxelToPoint(const Eigen::Vector3i& voxel_coord, Eigen::Vector3f& point_M);
+  void voxelToPoint(const Eigen::Vector3i& voxel_coord, Eigen::Vector3f& point_M) const;
 
   /**
    *
@@ -112,19 +113,19 @@ public:
    */
   template<se::Safe SafeB = se::Safe::On>
   inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
-  pointToVoxel(const Eigen::Vector3f& point_M, Eigen::Vector3i& voxel_coord);
+  pointToVoxel(const Eigen::Vector3f& point_M, Eigen::Vector3i& voxel_coord) const;
 
   template<se::Safe SafeB>
   typename std::enable_if_t<SafeB == se::Safe::Off, bool>
-  inline pointToVoxel(const Eigen::Vector3f& point_M, Eigen::Vector3i& voxel_coord);
+  inline pointToVoxel(const Eigen::Vector3f& point_M, Eigen::Vector3i& voxel_coord) const;
 
   template<se::Safe SafeB = se::Safe::On>
   inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
-  pointToVoxel(const Eigen::Vector3f& point_M, Eigen::Vector3f& voxel_coord_f);
+  pointToVoxel(const Eigen::Vector3f& point_M, Eigen::Vector3f& voxel_coord_f) const;
 
   template<se::Safe SafeB>
   typename std::enable_if_t<SafeB == se::Safe::Off, bool>
-  inline pointToVoxel(const Eigen::Vector3f& point_M, Eigen::Vector3f& voxel_coord_f);
+  inline pointToVoxel(const Eigen::Vector3f& point_M, Eigen::Vector3f& voxel_coord_f) const;
 
   /**
    *
@@ -138,14 +139,16 @@ public:
   template<se::Safe SafeB = se::Safe::On>
   typename std::enable_if_t<SafeB == se::Safe::On, bool>
   pointsToVoxels(const se::vector<Eigen::Vector3f>& points_M,
-                 se::vector<Eigen::Vector3i>&       voxel_coords);
+                 se::vector<Eigen::Vector3i>&       voxel_coords) const;
 
   template<se::Safe SafeB>
   typename std::enable_if_t<SafeB == se::Safe::Off, bool>
   pointsToVoxels(const se::vector<Eigen::Vector3f>& points_M,
-                 se::vector<Eigen::Vector3i>&       voxel_coords);
+                 se::vector<Eigen::Vector3i>&       voxel_coords) const;
 
   std::shared_ptr< OctreeType > getOctree() { return octree_; };
+
+  std::shared_ptr< OctreeType > getOctree() const { return octree_; };
 
   void setOctree(std::shared_ptr< OctreeType > octree_ptr)
   {

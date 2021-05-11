@@ -46,7 +46,7 @@ inline Eigen::Vector4f raycast(MapT&                  map,
                                const float            largestep);
 
 template<typename MapT, typename SensorT>
-void raycastVolume(MapT&                       map,
+void raycastVolume(const MapT&                 map,
                    se::Image<Eigen::Vector3f>& surface_point_cloud_M,
                    se::Image<Eigen::Vector3f>& surface_normals_M,
                    const Eigen::Matrix4f&      T_MS,

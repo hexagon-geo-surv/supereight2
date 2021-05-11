@@ -19,15 +19,15 @@ namespace visitor {
  * \return True if the data is available, False otherwise
  */
 template <typename OctreeT>
-bool getData(std::shared_ptr<OctreeT>    octree_ptr,
-             const Eigen::Vector3i&      voxel_coord,
-             typename OctreeT::DataType& data);
+inline bool getData(std::shared_ptr<OctreeT>    octree_ptr,
+                    const Eigen::Vector3i&      voxel_coord,
+                    typename OctreeT::DataType& data);
 
 template <typename OctreeT, typename BlockT>
-bool getData(std::shared_ptr<OctreeT>     octree_ptr,
-             BlockT*                      block_ptr,
-             const Eigen::Vector3i&       voxel_coord,
-             typename OctreeT::DataType&  data);
+inline bool getData(std::shared_ptr<OctreeT>     octree_ptr,
+                    BlockT*                      block_ptr,
+                    const Eigen::Vector3i&       voxel_coord,
+                    typename OctreeT::DataType&  data);
 
 /**
  * \brief Get the voxel data for a given coordinate.
@@ -41,8 +41,8 @@ bool getData(std::shared_ptr<OctreeT>     octree_ptr,
  * \return The data in the voxel to be accessed
  */
 template <typename OctreeT>
-typename OctreeT::DataType getData(std::shared_ptr<OctreeT> octree_ptr,
-                                   const Eigen::Vector3i&   voxel_coord);
+inline typename OctreeT::DataType getData(std::shared_ptr<OctreeT> octree_ptr,
+                                          const Eigen::Vector3i&   voxel_coord);
 
 /**
  * \brief Get the field value for a given coordinate.
@@ -56,15 +56,15 @@ typename OctreeT::DataType getData(std::shared_ptr<OctreeT> octree_ptr,
  * \return True if the field value is available, False otherwise
  */
 template <typename OctreeT>
-bool getField(std::shared_ptr<OctreeT> octree_ptr,
-              const Eigen::Vector3i&   voxel_coord,
-              se::field_t&             field_value);
+inline bool getField(std::shared_ptr<OctreeT> octree_ptr,
+                     const Eigen::Vector3i&   voxel_coord,
+                     se::field_t&             field_value);
 
 template <typename OctreeT, typename BlockT>
-bool getField(std::shared_ptr<OctreeT> octree_ptr,
-              BlockT*                  block_ptr,
-              const Eigen::Vector3i&   voxel_coord,
-              se::field_t&             field_value);
+inline bool getField(std::shared_ptr<OctreeT> octree_ptr,
+                     BlockT*                  block_ptr,
+                     const Eigen::Vector3i&   voxel_coord,
+                     se::field_t&             field_value);
 
 /**
  * \brief Get the field value for a given coordinate.
@@ -77,8 +77,8 @@ bool getField(std::shared_ptr<OctreeT> octree_ptr,
  * \return The field value to be accessed
  */
 template <typename OctreeT>
-se::field_t getField(std::shared_ptr<OctreeT> octree_ptr,
-                     const Eigen::Vector3i&   voxel_coord);
+inline se::field_t getField(std::shared_ptr<OctreeT> octree_ptr,
+                            const Eigen::Vector3i&   voxel_coord);
 
 /**
  * \brief Get the interplated field value for a given coordinate [float voxel coordinates].
@@ -92,9 +92,9 @@ se::field_t getField(std::shared_ptr<OctreeT> octree_ptr,
  * \return True if the field value is available, False otherwise
  */
 template <typename OctreeT, typename FieldT>
-bool interpField(const std::shared_ptr<OctreeT> octree_ptr,
-                 const Eigen::Vector3f&         voxel_coord_f,
-                 FieldT&                        interp_field_value);
+inline bool interpField(const std::shared_ptr<OctreeT> octree_ptr,
+                        const Eigen::Vector3f&         voxel_coord_f,
+                        FieldT&                        interp_field_value);
 
 /**
  * \brief Get the field gradient for a given coordinate [float voxel coordinates].
@@ -110,9 +110,9 @@ bool interpField(const std::shared_ptr<OctreeT> octree_ptr,
  * \return True if base block pointer is allocated, False otherwise
  */
 template <typename OctreeT>
-bool gradField(const std::shared_ptr<OctreeT> octree_ptr,
-               const Eigen::Vector3f&         voxel_coord_f,
-               Eigen::Vector3f&               grad_field_value);
+inline bool gradField(const std::shared_ptr<OctreeT> octree_ptr,
+                      const Eigen::Vector3f&         voxel_coord_f,
+                      Eigen::Vector3f&               grad_field_value);
 
 } // namespace visitor
 } // namespace se

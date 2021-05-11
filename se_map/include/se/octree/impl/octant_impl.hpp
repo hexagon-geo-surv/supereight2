@@ -117,33 +117,12 @@ BlockBase<DerivedT, SizeT>::BlockBase(const Eigen::Vector3i& coord,
 
 template <typename DerivedT, typename DataT, unsigned SizeT>
 void BlockSingleRes<DerivedT, DataT, SizeT>::getData(const Eigen::Vector3i& voxel_coord,
-                                                     DataType&              data)
-{
-  Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
-  data = block_data_[voxel_offset.x() +
-                     voxel_offset.y() * this->underlying().size +
-                     voxel_offset.z() * this->underlying().size_qu];
-}
-
-
-
-template <typename DerivedT, typename DataT, unsigned SizeT>
-void BlockSingleRes<DerivedT, DataT, SizeT>::getData(const Eigen::Vector3i& voxel_coord,
                                                      DataType&              data) const
 {
   Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
   data = block_data_[voxel_offset.x() +
                      voxel_offset.y() * this->underlying().size +
                      voxel_offset.z() * this->underlying().size_qu];
-}
-
-
-
-template <typename DerivedT, typename DataT, unsigned SizeT>
-void BlockSingleRes<DerivedT, DataT, SizeT>::getData(const unsigned voxel_idx,
-                                                     DataType&      data)
-{
-  data = block_data_[voxel_idx];
 }
 
 

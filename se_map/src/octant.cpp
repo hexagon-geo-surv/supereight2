@@ -13,14 +13,7 @@ OctantBase::OctantBase(const Eigen::Vector3i& coord,
 
 
 
-const Eigen::Vector3i OctantBase::getCoord()
-{
-  return coord_;
-}
-
-
-
-const Eigen::Vector3i OctantBase::getCoord() const
+Eigen::Vector3i OctantBase::getCoord() const
 {
   return coord_;
 }
@@ -41,19 +34,11 @@ se::OctantBase* OctantBase::getParent() const
 
 
 
-unsigned int OctantBase::getTimeStamp() { return time_stamp_; }
-
-
-
 unsigned int OctantBase::getTimeStamp() const { return time_stamp_; }
 
 
 
 void OctantBase::setTimeStamp(const unsigned int time_stamp) { time_stamp_ = time_stamp; }
-
-
-
-unsigned int OctantBase::getChildrenMask() { return children_mask_; }
 
 
 

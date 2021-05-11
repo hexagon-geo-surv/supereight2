@@ -83,7 +83,7 @@ inline Eigen::Vector4f raycast(MapT&                  map,
 
 
 template<typename MapT, typename SensorT>
-void raycastVolume(MapT&                       map,
+void raycastVolume(const MapT&                 map,
                    se::Image<Eigen::Vector3f>& surface_point_cloud_M,
                    se::Image<Eigen::Vector3f>& surface_normals_M,
                    const Eigen::Matrix4f&      T_MS,
@@ -123,9 +123,6 @@ void raycastVolume(MapT&                       map,
   TOCK("surface-point-cloud")
 
   TICK("surface-normals")
-#ifdef _OPENMP
-  omp_set_num_threads(10);
-#endif
 #pragma omp parallel for
   for (int y = 0; y < surface_point_cloud_M.height(); y++)
   {

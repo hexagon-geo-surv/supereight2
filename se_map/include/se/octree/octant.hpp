@@ -19,23 +19,17 @@ public:
     OctantBase(const Eigen::Vector3i& coord,
                OctantBase*            parent_ptr = nullptr);
 
-    virtual bool isBlock() = 0;
+    virtual bool isBlock() const = 0;
 
-    const Eigen::Vector3i getCoord();
-
-    const Eigen::Vector3i getCoord() const;
+    Eigen::Vector3i getCoord() const;
 
     se::OctantBase* getParent();
 
     se::OctantBase* getParent() const;
 
-    unsigned int getTimeStamp();
-
     unsigned int getTimeStamp() const;
 
     void setTimeStamp(const unsigned int time_stamp);
-
-    unsigned int getChildrenMask();
 
     unsigned int getChildrenMask() const;
 
@@ -71,8 +65,6 @@ public:
     NodeBase(const Eigen::Vector3i& coord,
              const unsigned         size,
              OctantBase*            parent_ptr = nullptr);
-
-    bool isBlock() { return false; }
 
     bool isBlock() const { return false; }
 
@@ -125,8 +117,6 @@ public:
     BlockBase(const Eigen::Vector3i& coord,
               se::OctantBase*        parent_ptr = nullptr);
 
-    bool isBlock() { return true; }
-
     bool isBlock() const { return true; }
 
     static unsigned int getSize() { return SizeT; }
@@ -146,13 +136,7 @@ public:
     typedef DataT DataType;
 
     void getData(const Eigen::Vector3i& voxel_coord,
-                 DataType&              data);
-
-    void getData(const Eigen::Vector3i& voxel_coord,
                  DataType&              data) const;
-
-    void getData(const unsigned voxel_idx,
-                 DataT&         data);
 
     void getData(const unsigned voxel_idx,
                  DataT&         data) const;
@@ -200,11 +184,7 @@ public:
     void setData(const Eigen::Vector3i& voxel_coord,
                  const DataType&        data);
 
-    int getMinScale() { return min_scale_; }
-
     int getMinScale() const { return min_scale_; }
-
-    int getCurrentScale() { return curr_scale_; }
 
     int getCurrentScale() const { return curr_scale_; }
 

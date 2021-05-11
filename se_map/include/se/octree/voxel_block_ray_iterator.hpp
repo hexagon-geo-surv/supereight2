@@ -45,7 +45,7 @@ class VoxelBlockRayIterator {
   typedef typename MapT::OctreeType::BlockType BlockType;
 
 public:
-  VoxelBlockRayIterator(MapT&                  map,
+  VoxelBlockRayIterator(const MapT&            map,
                         const Eigen::Vector3f& ray_origin_M,
                         const Eigen::Vector3f& ray_dir_M,
                         const float            near_plane,
