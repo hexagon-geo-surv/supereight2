@@ -96,6 +96,10 @@ int main()
   se::MapIntegrator integrator(map_tsdf);
 
   unsigned int frame = 0;
+
+  se::Image<Eigen::Vector3f> surface_point_cloud_M(processed_img_res.x(), processed_img_res.y());
+  se::Image<Eigen::Vector3f> surface_normals_M(processed_img_res.x(), processed_img_res.y());
+
   while (read_ok == se::ReaderStatus::ok) {
     se::perfstats.setIter(frame++);
 
@@ -118,9 +122,6 @@ int main()
     se::preprocessor::downsample_rgba(input_rgba_img,  processed_rgba_img);
 
     // Render volume
-    se::Image<Eigen::Vector3f> surface_point_cloud_M(processed_img_res.x(), processed_img_res.y());
-    se::Image<Eigen::Vector3f> surface_normals_M(processed_img_res.x(), processed_img_res.y());
-    se::raycaster::raycastVolume(map_tsdf, surface_point_cloud_M, surface_normals_M, T_MS, sensor);
 
     if (frame > 1)
     {
@@ -133,6 +134,8 @@ int main()
     integrator.integrateDepth(processed_depth_img, sensor, T_MS);
     TOCK("integration")
 
+    se::raycaster::raycastVolume(map_tsdf, surface_point_cloud_M, surface_normals_M, T_MS, sensor);
+    
     const Eigen::Vector3f ambient{ 0.1, 0.1, 0.1};
     se::raycaster::renderVolumeKernel(output_volume_img_data, processed_img_res, se::math::to_translation(T_MS), ambient, surface_point_cloud_M, surface_normals_M);
 
