@@ -13,32 +13,30 @@ OctantBase::OctantBase(const Eigen::Vector3i& coord,
 
 
 
-const Eigen::Vector3i& OctantBase::getCoord()
+const Eigen::Vector3i OctantBase::getCoord()
 {
   return coord_;
 }
 
 
 
-const Eigen::Vector3i& OctantBase::getCoord() const
+const Eigen::Vector3i OctantBase::getCoord() const
 {
   return coord_;
 }
 
 
 
-bool OctantBase::getParent(se::OctantBase*& parent_ptr)
+se::OctantBase* OctantBase::getParent()
 {
-  parent_ptr = parent_ptr_;
-  return parent_ptr_ != nullptr;
+  return parent_ptr_;
 }
 
 
 
-bool OctantBase::getParent(se::OctantBase*& parent_ptr) const
+se::OctantBase* OctantBase::getParent() const
 {
-  parent_ptr = parent_ptr_;
-  return parent_ptr_ != nullptr;
+  return parent_ptr_;
 }
 
 

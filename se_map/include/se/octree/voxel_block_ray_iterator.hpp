@@ -155,7 +155,7 @@ public:
       t_corner_ = pos_.cwiseProduct(t_coef_) - t_bias_;
       tc_max_ = fminf(fminf(t_corner_.x(), t_corner_.y()), t_corner_.z());
 
-      parent_ptr_->getChild(idx_ ^ octant_mask_ ^ 7, child_ptr_);
+      child_ptr_ = parent_ptr_->getChild(idx_ ^ octant_mask_ ^ 7);
 
       if (scale_ == min_scale_ && child_ptr_ != nullptr)
       {

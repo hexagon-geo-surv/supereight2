@@ -21,13 +21,13 @@ public:
 
     virtual bool isBlock() = 0;
 
-    const Eigen::Vector3i& getCoord();
+    const Eigen::Vector3i getCoord();
 
-    const Eigen::Vector3i& getCoord() const;
+    const Eigen::Vector3i getCoord() const;
 
-    bool getParent(OctantBase*& parent_ptr);
+    se::OctantBase* getParent();
 
-    bool getParent(OctantBase*& parent_ptr) const;
+    se::OctantBase* getParent() const;
 
     unsigned int getTimeStamp();
 
@@ -48,6 +48,9 @@ protected:
     const Eigen::Vector3i coord_;         ///< The coordinates of the block (left, front , bottom corner)
     unsigned int          time_stamp_;    ///< The frame of the last update
     unsigned int          children_mask_; ///< The allocated children
+
+    template <typename DerivedT, typename DataT, unsigned SizeT>
+    friend class BlockSingleRes;
 };
 
 
@@ -75,13 +78,13 @@ public:
 
     unsigned int getSize();
 
-    bool getChild(const unsigned child_idx, se::OctantBase*& child_ptr);
+    inline se::OctantBase* getChild(const unsigned child_idx);
 
-    bool setChild(const unsigned child_idx, se::OctantBase* child_ptr);
+    inline se::OctantBase* setChild(const unsigned child_idx, se::OctantBase* child_ptr);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-private:
+protected:
     std::array<se::OctantBase*, 8> children_ptr_; ///< Pointers to the eight children (should be all nullptr at initialisation due to smart pointers)
     const unsigned int             size_;         ///< The size in [voxel] of the node in comparision to the finest voxel
 };
@@ -98,9 +101,9 @@ public:
     Node(Node*              parent_ptr,
          const unsigned int child_idx);
 
-    bool getData(const DataT& data);
+    void getData(const DataT& data);
 
-    bool setData(const DataT& data);
+    void setData(const DataT& data);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -142,22 +145,22 @@ class BlockSingleRes
 public:
     typedef DataT DataType;
 
-    bool getData(const Eigen::Vector3i& voxel_coord,
+    void getData(const Eigen::Vector3i& voxel_coord,
                  DataType&              data);
 
-    bool getData(const Eigen::Vector3i& voxel_coord,
+    void getData(const Eigen::Vector3i& voxel_coord,
                  DataType&              data) const;
 
-    bool getData(const unsigned voxel_idx,
+    void getData(const unsigned voxel_idx,
                  DataT&         data);
 
-    bool getData(const unsigned voxel_idx,
+    void getData(const unsigned voxel_idx,
                  DataT&         data) const;
 
-    bool setData(const Eigen::Vector3i& voxel_coord,
+    void setData(const Eigen::Vector3i& voxel_coord,
                  const DataT&           data);
 
-    bool setData(const unsigned voxel_idx,
+    void setData(const unsigned voxel_idx,
                  const DataT&   data);
 
     static inline int getMinScale() { return min_scale_; }
@@ -187,14 +190,14 @@ public:
 
     BlockMultiRes();
 
-    bool getData(const Eigen::Vector3i& voxel_coord,
+    void getData(const Eigen::Vector3i& voxel_coord,
                  DataType&              data);
 
-    bool getData(const Eigen::Vector3i& voxel_coord,
+    void getData(const Eigen::Vector3i& voxel_coord,
                  const unsigned         scale,
                  DataType&              data);
 
-    bool setData(const Eigen::Vector3i& voxel_coord,
+    void setData(const Eigen::Vector3i& voxel_coord,
                  const DataType&        data);
 
     int getMinScale() { return min_scale_; }

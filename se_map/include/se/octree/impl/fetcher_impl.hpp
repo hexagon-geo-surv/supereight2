@@ -7,7 +7,7 @@ namespace se {
 namespace fetcher {
 
 
-    
+
 template <typename OctreeT>
 se::OctantBase* block(const Eigen::Vector3i&      block_coord,
                       std::shared_ptr<OctreeT>    octree_ptr,
@@ -20,7 +20,8 @@ se::OctantBase* block(const Eigen::Vector3i&      block_coord,
   for (; child_size >= OctreeT::BlockType::getSize(); child_size = child_size >> 1)
   {
     se::idx_t child_idx = ((block_coord.x() & child_size) > 0) + 2 * ((block_coord.y() & child_size) > 0) + 4 * ((block_coord.z() & child_size) > 0);
-    if(!parent_ptr->getChild(child_idx, child_ptr))
+    child_ptr = parent_ptr->getChild(child_idx);
+    if(!child_ptr)
     {
       return nullptr;
     }

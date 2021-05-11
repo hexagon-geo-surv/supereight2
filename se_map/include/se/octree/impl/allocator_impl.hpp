@@ -136,7 +136,7 @@ se::OctantBase* allocate_key(const se::key_t             key,
   for (; child_scale >= min_scale; --child_scale)
   {
     se::idx_t child_idx = se::keyops::code_to_child_idx(code, child_scale);
-    octree_ptr->allocate(parent_ptr, child_idx, child_ptr);
+    child_ptr = octree_ptr->allocate(parent_ptr, child_idx);
     parent_ptr = static_cast<typename OctreeT::NodeType*>(child_ptr);
   }
   return child_ptr;

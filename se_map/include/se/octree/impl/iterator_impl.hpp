@@ -27,8 +27,8 @@ BaseIterator<DerivedT>::BaseIterator(OctreeType* octree_ptr) : octree_ptr_(octre
       // Push the root's children on the stack
       for (unsigned int child_idx = 0; child_idx < 8; ++child_idx)
       {
-        se::OctantBase* child_ptr;
-        if (root->getChild(child_idx, child_ptr))
+        se::OctantBase* child_ptr = root->getChild(child_idx);
+        if (child_ptr)
         {
           octant_stack_.push(child_ptr);
         }
@@ -150,10 +150,9 @@ void BaseIterator<DerivedT>::nextData()
       // Non-leaf Node, push all children to the stack
       for (int child_idx = 0; child_idx < 8; child_idx++)
       {
-        se::OctantBase* child_ptr;
-        if (static_cast<NodeType*>(octant)->getChild(child_idx, child_ptr))
+        se::OctantBase* child_ptr = static_cast<NodeType*>(octant)->getChild(child_idx);
+        if (child_ptr)
         {
-          child_ptr->isBlock();
           octant_stack_.push(child_ptr);
         }
       }

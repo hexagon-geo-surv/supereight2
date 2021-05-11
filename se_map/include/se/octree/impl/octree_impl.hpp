@@ -70,25 +70,14 @@ template <typename DataT,
           int      BlockSizeT
 >
 bool Octree<DataT, ResT, BlockSizeT>::allocate(NodeType*          parent_ptr,
-                                               const unsigned int child_idx)
-{
-  return allocate(parent_ptr, child_idx, nullptr);
-}
-
-
-
-template <typename DataT,
-          Res      ResT,
-          int      BlockSizeT
->
-bool Octree<DataT, ResT, BlockSizeT>::allocate(NodeType*          parent_ptr,
                                                const unsigned int child_idx,
                                                OctantBase*&       child_ptr)
 {
   assert(!parent_ptr->isBlock()); // Verify that the parent is not a block
   assert(parent_ptr);             // Verify that the parent is not a nullptr
 
-  if (parent_ptr->getChild(child_idx, child_ptr))
+  child_ptr = parent_ptr->getChild(child_idx);
+  if (child_ptr)
   {
     return false; // Already allocated
   }
@@ -110,6 +99,40 @@ bool Octree<DataT, ResT, BlockSizeT>::allocate(NodeType*          parent_ptr,
   return true;
 }
 
+
+
+template <typename DataT,
+        Res      ResT,
+        int      BlockSizeT
+>
+OctantBase* Octree<DataT, ResT, BlockSizeT>::allocate(NodeType*          parent_ptr,
+                                                      const unsigned int child_idx)
+{
+  assert(!parent_ptr->isBlock()); // Verify that the parent is not a block
+  assert(parent_ptr);             // Verify that the parent is not a nullptr
+
+  se::OctantBase* child_ptr = parent_ptr->getChild(child_idx);
+  if (child_ptr)
+  {
+    return child_ptr;
+  }
+
+  if (parent_ptr->getSize() == BlockSizeT << 1) // Allocate Block
+  {
+#pragma omp critical
+    {
+      child_ptr = memory_pool_.allocateBlock(parent_ptr, child_idx);
+    }
+  } else                                        // Allocate Node
+  {
+#pragma omp critical
+    {
+      child_ptr = memory_pool_.allocateNode(parent_ptr, child_idx);
+    }
+  }
+  parent_ptr->setChild(child_idx, child_ptr);   // Update parent
+  return child_ptr;
+}
 
 
 } // namespace se

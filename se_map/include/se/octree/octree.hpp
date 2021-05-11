@@ -101,17 +101,6 @@ public:
   /**
    * \brief Allocate a node for a given parent node.
    *
-   * \param[in] parent_ptr  The parent of the node to be allocated
-   * \param[in] child_idx   The child index of the node to be allocated
-   *
-   * \return Ture if the node has been newly allocated, False if it has already been allocated
-   */
-  bool allocate(NodeType*      parent_ptr,
-                const unsigned child_idx);
-
-  /**
-   * \brief Allocate a node for a given parent node.
-   *
    * \warning The returned pointer is of type OctantBase as child might be a node or block.
    *
    * \param[in] parent_ptr  The parent of the node to be allocated
@@ -123,6 +112,9 @@ public:
   bool allocate(NodeType*        parent_ptr,
                 const unsigned   child_idx,
                 se::OctantBase*& child_ptr);     ///< Allocate child
+
+  se::OctantBase* allocate(NodeType*        parent_ptr,
+                           const unsigned   child_idx);     ///< Allocate child
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
