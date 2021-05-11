@@ -72,6 +72,23 @@ inline bool encode_key(const Eigen::Vector3i& coord,
 
 
 
+inline key_t encode_key(const Eigen::Vector3i& coord,
+                        const se::scale_t      scale)
+{
+  assert(scale <= KEY_SCALE_LIMIT);             // Verify scale is within key limits
+  assert(is_valid(coord)); // Verify doesn't surpass max coordinates
+
+  se::code_t code_detailed;
+  se::keyops::encode_code(coord, code_detailed);
+  se::code_t code = code_detailed & CODE_MASK[scale];
+
+  assert(code_detailed == code); // Is details lost due to scale?
+
+  return code << SCALE_OFFSET | scale;
+}
+
+
+
 inline bool encode_key(const se::key_t&  code,
                        const se::scale_t scale,
                        key_t&            key)
@@ -83,6 +100,20 @@ inline bool encode_key(const se::key_t&  code,
   key = code << SCALE_OFFSET | scale;
 
   return (code == code_filtered);
+}
+
+
+
+inline key_t encode_key(const se::key_t&  code,
+                        const se::scale_t scale)
+{
+  assert(scale <= KEY_SCALE_LIMIT);        // Verify scale is within key limits
+
+  se::code_t code_filtered = code & CODE_MASK[scale];
+
+  assert(code == code_filtered);
+
+  return code << SCALE_OFFSET | scale;
 }
 
 

@@ -126,11 +126,11 @@ inline se::key_t compact(uint64_t value);
  * \brief Encodes given coordinates and scale in a key.
  *
  * \note  The key will only hold as much detail as possible at the given scale.
- *        I.e. if the cooridates are at a higher resolution than the scale can represent,
+ *        I.e. if the coordinates are at a higher resolution than the scale can represent,
  *        the details will be lost.
  *
  * \param[in]  coord The coordinates to be encoded
- * \param[in]  scale The scale at which to encode the cooridinates
+ * \param[in]  scale The scale at which to encode the coordinates
  * \param[out] key   The encoded key
  *
  * \return True if no detail is lost, false otherwise
@@ -138,6 +138,21 @@ inline se::key_t compact(uint64_t value);
 inline bool encode_key(const Eigen::Vector3i& coord,
                        const se::scale_t      scale,
                        key_t&                 key);
+
+/**
+ * \brief Encodes given coordinates and scale in a key.
+ *
+ * \note  The key will only hold as much detail as possible at the given scale.
+ *        I.e. if the coordinates are at a higher resolution than the scale can represent,
+ *        the details will be lost.
+ *
+ * \param[in]  coord The coordinates to be encoded
+ * \param[in]  scale The scale at which to encode the coordinates
+ *
+ * \return The encoded key
+ */
+inline key_t encode_key(const Eigen::Vector3i& coord,
+                        const se::scale_t      scale);
 
 /**
  * \brief Encodes given morton code and scale in a key.
@@ -155,6 +170,21 @@ inline bool encode_key(const Eigen::Vector3i& coord,
 inline bool encode_key(const se::key_t&  code,
                        const se::scale_t scale,
                        key_t&            key);
+
+/**
+ * \brief Encodes given morton code and scale in a key.
+ *
+ * \note  The key will only hold as much detail as possible at the given scale.
+ *        I.e. if the code is at a higher resolution than the scale can represent,
+ *        the details will be lost.
+ *
+ * \param[in]  coord The coordinates to be encoded
+ * \param[in]  scale The scale at which to encode the cooridinates
+ *
+ * \return The encoded key
+ */
+inline key_t encode_key(const se::key_t&  code,
+                        const se::scale_t scale);
 
 /**
  * \brief Extracts the 3D coordinates and scale from a given key.
