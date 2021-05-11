@@ -137,7 +137,7 @@ void raycastVolume(const MapT&                 map,
       {
         Eigen::Vector3f surface_normal;
 
-        map.template gradField(surface_intersection_M.head(3), surface_normal);
+        surface_normal = map.template gradField(surface_intersection_M.head(3));
 
         if (surface_normal.norm() == 0.f)
         {
