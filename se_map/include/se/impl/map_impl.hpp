@@ -104,7 +104,11 @@ bool Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::gradField(const Eigen::Vecto
     return false;
     }
   }
-  return se::visitor::gradField(octree_, voxel_coord_f, field_grad);
+
+  const bool is_valid = se::visitor::gradField(octree_, voxel_coord_f, field_grad);
+  field_grad *= res_;
+
+  return is_valid;
 }
 
 

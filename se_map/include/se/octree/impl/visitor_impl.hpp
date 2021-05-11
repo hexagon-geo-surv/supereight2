@@ -533,8 +533,7 @@ bool gradField(const std::shared_ptr<OctreeT> octree_ptr,
                   +(grad_field_values[25]
                   - grad_field_values[23]) * factor.x()) * factor.y()) * factor.z();
 
-  float voxel_dim_ = 0.04f;
-  grad_field_value = (0.5f * voxel_dim_) * gradient;
+  grad_field_value = 0.5f * gradient;
 
   return true;
 }
