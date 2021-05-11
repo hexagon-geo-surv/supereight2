@@ -64,7 +64,7 @@ bool Tracker<MapT, SensorT>::track(const se::Image<float>&     depth_img,
   // half sample the input depth maps into the pyramid levels
   for (unsigned int i = 1; i < config_.iterations.size(); ++i)
   {
-    se::preprocessor::halfSampleRobustImageKernel(scaled_depth_img[i], scaled_depth_img[i - 1], e_delta * 3, 1);
+    se::preprocessor::half_sample_robust_image(scaled_depth_img[i], scaled_depth_img[i - 1], e_delta * 3, 1);
   }
 
   // prepare the 3D information from the input depth maps
@@ -72,14 +72,14 @@ bool Tracker<MapT, SensorT>::track(const se::Image<float>&     depth_img,
   {
     const float scaling_factor = 1 << i;
     const SensorT scaled_sensor(sensor_, scaling_factor);
-    se::preprocessor::depthToPointCloudKernel(input_point_cloud_C[i], scaled_depth_img[i], scaled_sensor);
+    se::preprocessor::depth_to_point_cloud(input_point_cloud_C[i], scaled_depth_img[i], scaled_sensor);
     if(sensor_.left_hand_frame)
     {
-      se::preprocessor::pointCloudToNormalKernel<true>(input_normals_C[i], input_point_cloud_C[i]);
+      se::preprocessor::point_cloud_to_normal<true>(input_normals_C[i], input_point_cloud_C[i]);
     }
     else
     {
-      se::preprocessor::pointCloudToNormalKernel<false>(input_normals_C[i], input_point_cloud_C[i]);
+      se::preprocessor::point_cloud_to_normal<false>(input_normals_C[i], input_point_cloud_C[i]);
     }
   }
 

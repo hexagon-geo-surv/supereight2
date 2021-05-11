@@ -7,7 +7,7 @@ namespace raycaster{
 
 
 
-void pointCloudToNormalKernel(se::Image<Eigen::Vector3f>&       normals,
+void point_cloud_to_normal(se::Image<Eigen::Vector3f>&       normals,
                               const se::Image<Eigen::Vector3f>& point_cloud,
                               const bool                        /* is_lhc */)
 {

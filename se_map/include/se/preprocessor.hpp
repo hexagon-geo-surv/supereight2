@@ -50,17 +50,17 @@ void downsample_depth(se::Image<float>& input_depth_img,
 void downsample_rgba(se::Image<uint32_t>& input_RGBA_img,
                      se::Image<uint32_t>& output_RGBA_img);
 
-void bilateralFilterKernel(se::Image<float>&         out,
-                           const se::Image<float>&   in,
-                           const std::vector<float>& gaussian,
-                           const float               e_d,
-                           const int                 radius);
+void bilateral_filter(se::Image<float>&         out,
+                      const se::Image<float>&   in,
+                      const std::vector<float>& gaussian,
+                      const float               e_d,
+                      const int                 radius);
 
 
 template<typename SensorT>
-void depthToPointCloudKernel(se::Image<Eigen::Vector3f>& point_cloud_C,
-                             const se::Image<float>&     depth_image,
-                             const SensorT&              sensor)
+void depth_to_point_cloud(se::Image<Eigen::Vector3f>& point_cloud_C,
+                          const se::Image<float>&     depth_image,
+                          const SensorT&              sensor)
 {
 #pragma omp parallel for
   for (int y = 0; y < depth_image.height(); y++)
@@ -82,17 +82,17 @@ void depthToPointCloudKernel(se::Image<Eigen::Vector3f>& point_cloud_C,
   }
 }
 
-void pointCloudToDepthKernel(se::Image<float>&                 depth_image,
-                             const se::Image<Eigen::Vector3f>& point_cloud_X,
-                             const Eigen::Matrix4f&            T_CX);
+void point_cloud_to_depth(se::Image<float>&                 depth_image,
+                          const se::Image<Eigen::Vector3f>& point_cloud_X,
+                          const Eigen::Matrix4f&            T_CX);
 
 /**
 * NegY should only be true when reading an ICL-NUIM dataset which has a
 * left-handed coordinate system (the y focal length will be negative).
 */
 template <bool NegY>
-void pointCloudToNormalKernel(se::Image<Eigen::Vector3f>&       out,
-                              const se::Image<Eigen::Vector3f>& in);
+void point_cloud_to_normal(se::Image<Eigen::Vector3f>&       out,
+                           const se::Image<Eigen::Vector3f>& in);
 
 /**
 * Downsample the input depth to match the resolution of the output depth.
@@ -101,14 +101,14 @@ void pointCloudToNormalKernel(se::Image<Eigen::Vector3f>&       out,
 * edges. Depth values of 0 are considered invalid and are ignored when
 * computing the median.
 */
-void downsampleDepthKernel(const float*           input_depth,
-                           const Eigen::Vector2i& input_res,
-                           se::Image<float>&      output_depth);
+void downsample_depth(const float*           input_depth,
+                      const Eigen::Vector2i& input_res,
+                      se::Image<float>&      output_depth);
 
-void halfSampleRobustImageKernel(se::Image<float>&       out,
-                                 const se::Image<float>& in,
-                                 const float             e_d,
-                                 const int               r);
+void half_sample_robust_image(se::Image<float>&       out,
+                              const se::Image<float>& in,
+                              const float             e_d,
+                              const int               r);
 
 /**
 * Downsample an RGBA image and copy into an se::Image class.
@@ -121,9 +121,9 @@ void halfSampleRobustImageKernel(se::Image<float>&       out,
 * data for each pixel is stored in ARGB order, with the alpha channel in the
 * MSB of the uint32_t and the red channel in the LSB of the uint32_t.
 */
-void downsampleImageKernel(const uint32_t*        input_RGBA,
-                           const Eigen::Vector2i& input_res,
-                           se::Image<uint32_t>&   output_RGBA);
+void downsample_image(const uint32_t*        input_RGBA,
+                      const Eigen::Vector2i& input_res,
+                      se::Image<uint32_t>&   output_RGBA);
 
 } // namespace preprocessor
 } // namespace se

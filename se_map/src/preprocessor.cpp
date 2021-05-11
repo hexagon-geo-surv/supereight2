@@ -43,8 +43,10 @@ void downsample_depth(se::Image<float>& input_depth_img,
     {
       std::vector<float> box_values;
       box_values.reserve(ratio * ratio);
-      for (int b = 0; b < ratio; b++) {
-        for (int a = 0; a < ratio; a++) {
+      for (int b = 0; b < ratio; b++)
+      {
+        for (int a = 0; a < ratio; a++)
+        {
           const int y_in = y_out * ratio + b;
           const int x_in = x_out * ratio + a;
           const float depth_value = input_depth_data[x_in + input_depth_img.width() * y_in];
@@ -116,11 +118,11 @@ void downsample_rgba(se::Image<uint32_t>& input_RGBA_img,
   }
 }
 
-void bilateralFilterKernel(se::Image<float>&         output_image,
-                           const se::Image<float>&   input_image,
-                           const std::vector<float>& gaussian,
-                           const float               e_d,
-                           const int                 radius)
+void bilateral_filter(se::Image<float>&         output_image,
+                      const se::Image<float>&   input_image,
+                      const std::vector<float>& gaussian,
+                      const float               e_d,
+                      const int                 radius)
 {
   if ((input_image.width() != output_image.width()) ||
       input_image.height() != output_image.height())
@@ -174,9 +176,9 @@ void bilateralFilterKernel(se::Image<float>&         output_image,
 
 
 
-void pointCloudToDepthKernel(se::Image<float>&            depth_image,
-                             const se::Image<Eigen::Vector3f>& point_cloud_X,
-                             const Eigen::Matrix4f&            T_CX)
+void point_cloud_to_depth(se::Image<float>&            depth_image,
+                          const se::Image<Eigen::Vector3f>& point_cloud_X,
+                          const Eigen::Matrix4f&            T_CX)
 {
 #pragma omp parallel for
   for (int y = 0; y < depth_image.height(); y++)
@@ -191,21 +193,23 @@ void pointCloudToDepthKernel(se::Image<float>&            depth_image,
 
 
 // Explicit template instantiation
-template void pointCloudToNormalKernel<true>(se::Image<Eigen::Vector3f>&       normals,
-                                             const se::Image<Eigen::Vector3f>& point_cloud);
+template void point_cloud_to_normal<true>(se::Image<Eigen::Vector3f>&       normals,
+                                          const se::Image<Eigen::Vector3f>& point_cloud);
 
-template void pointCloudToNormalKernel<false>(se::Image<Eigen::Vector3f>&       normals,
-                                              const se::Image<Eigen::Vector3f>& point_cloud);
+template void point_cloud_to_normal<false>(se::Image<Eigen::Vector3f>&       normals,
+                                           const se::Image<Eigen::Vector3f>& point_cloud);
 
 template <bool NegY>
-void pointCloudToNormalKernel(se::Image<Eigen::Vector3f>&       normals,
-                              const se::Image<Eigen::Vector3f>& point_cloud)
+void point_cloud_to_normal(se::Image<Eigen::Vector3f>&       normals,
+                           const se::Image<Eigen::Vector3f>& point_cloud)
 {
   const int width = point_cloud.width();
   const int height = point_cloud.height();
 #pragma omp parallel for
-  for (int y = 0; y < height; y++) {
-    for (int x = 0; x < width; x++) {
+  for (int y = 0; y < height; y++)
+  {
+    for (int x = 0; x < width; x++)
+    {
       const Eigen::Vector3f point = point_cloud[x + width * y];
       if (point.z() == 0.f) {
         normals[x + y * width].x() = INVALID;
@@ -245,23 +249,26 @@ void pointCloudToNormalKernel(se::Image<Eigen::Vector3f>&       normals,
 
 
 
-void downsampleDepthKernel(const float*           input_depth_data,
-                           const Eigen::Vector2i& input_depth_res,
-                           se::Image<float>&      output_depth)
+void downsample_depth(const float*           input_depth_data,
+                      const Eigen::Vector2i& input_depth_res,
+                      se::Image<float>&      output_depth)
 {
   // Check for unsupported conditions
   if ((input_depth_res.x() < output_depth.width()) ||
-      input_depth_res.y() < output_depth.height()) {
+      input_depth_res.y() < output_depth.height())
+  {
     std::cerr << "Invalid ratio." << std::endl;
     exit(1);
   }
   if ((input_depth_res.x() % output_depth.width() != 0) ||
-      (input_depth_res.y() % output_depth.height() != 0)) {
+      (input_depth_res.y() % output_depth.height() != 0))
+  {
     std::cerr << "Invalid ratio." << std::endl;
     exit(1);
   }
   if ((input_depth_res.x() / output_depth.width() !=
-       input_depth_res.y() / output_depth.height())) {
+       input_depth_res.y() / output_depth.height()))
+  {
     std::cerr << "Invalid ratio." << std::endl;
     exit(1);
   }
@@ -274,8 +281,10 @@ void downsampleDepthKernel(const float*           input_depth_data,
     {
       std::vector<float> box_values;
       box_values.reserve(ratio * ratio);
-      for (int b = 0; b < ratio; b++) {
-        for (int a = 0; a < ratio; a++) {
+      for (int b = 0; b < ratio; b++)
+      {
+        for (int a = 0; a < ratio; a++)
+        {
           const int y_in = y_out * ratio + b;
           const int x_in = x_out * ratio + a;
           const float depth_value = input_depth_data[x_in + input_depth_res.x() * y_in];
@@ -297,10 +306,10 @@ void downsampleDepthKernel(const float*           input_depth_data,
 
 
 
-void halfSampleRobustImageKernel(se::Image<float>&       output_image,
-                                 const se::Image<float>& input_image,
-                                 const float             e_d,
-                                 const int               radius)
+void half_sample_robust_image(se::Image<float>&       output_image,
+                              const se::Image<float>& input_image,
+                              const float             e_d,
+                              const int               radius)
 {
   if ((input_image.width() / output_image.width() != 2) ||
       (input_image.height() / output_image.height() != 2))
@@ -320,8 +329,10 @@ void halfSampleRobustImageKernel(se::Image<float>&       output_image,
       float pixel_count = 0.0f;
       float pixel_value_sum = 0.0f;
       const float in_pixel_value = input_image[in_pixel.x() + in_pixel.y() * input_image.width()];
-      for (int i = -radius + 1; i <= radius; ++i) {
-        for (int j = -radius + 1; j <= radius; ++j) {
+      for (int i = -radius + 1; i <= radius; ++i)
+      {
+        for (int j = -radius + 1; j <= radius; ++j)
+        {
           Eigen::Vector2i in_pixel_tmp = in_pixel + Eigen::Vector2i(j, i);
           se::math::clamp(in_pixel_tmp,
                           Eigen::Vector2i::Zero(),
@@ -340,9 +351,9 @@ void halfSampleRobustImageKernel(se::Image<float>&       output_image,
 
 
 
-void downsampleImageKernel(const uint32_t*        input_RGBA_image_data,
-                           const Eigen::Vector2i& input_RGBA_image_res,
-                           se::Image<uint32_t>&   output_RGBA_image)
+void downsample_image(const uint32_t*        input_RGBA_image_data,
+                      const Eigen::Vector2i& input_RGBA_image_res,
+                      se::Image<uint32_t>&   output_RGBA_image)
 {
   // Check for correct image sizes.
   assert((input_RGBA_image_res.x() >= output_RGBA_image.width())
@@ -360,14 +371,17 @@ void downsampleImageKernel(const uint32_t*        input_RGBA_image_data,
   const int ratio = input_RGBA_image_res.x() / output_RGBA_image.width();
   // Iterate over each output pixel.
 #pragma omp parallel for
-  for (int y_out = 0; y_out < output_RGBA_image.height(); ++y_out) {
-    for (int x_out = 0; x_out < output_RGBA_image.width(); ++x_out) {
-
+  for (int y_out = 0; y_out < output_RGBA_image.height(); ++y_out)
+  {
+    for (int x_out = 0; x_out < output_RGBA_image.width(); ++x_out)
+    {
       // Average the neighboring pixels by iterating over the nearby input
       // pixels.
       uint16_t r = 0, g = 0, b = 0;
-      for (int yy = 0; yy < ratio; ++yy) {
-        for (int xx = 0; xx < ratio; ++xx) {
+      for (int yy = 0; yy < ratio; ++yy)
+      {
+        for (int xx = 0; xx < ratio; ++xx)
+        {
           const int x_in = x_out * ratio + xx;
           const int y_in = y_out * ratio + yy;
           const uint32_t pixel_value
