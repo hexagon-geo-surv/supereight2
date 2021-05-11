@@ -86,6 +86,54 @@ static inline Eigen::Vector3f get_sample_coord(const Eigen::Vector3i &octant_coo
 
 namespace {
 
+
+
+/**
+ * Integration helper struct for partial function specialisation
+ */
+template<se::Field FldT,
+        se::Res ResT
+>
+struct IntegrateDepthImplD
+{
+
+    template<typename SensorT,
+            typename MapT,
+            typename ConfigT
+    >
+    static void integrate(const se::Image<se::depth_t>& depth_img,
+                          const SensorT&                sensor,
+                          const Eigen::Matrix4f&        T_MS,
+                          MapT&                         map,
+                          ConfigT&                      /* config */); // TODO:
+};
+
+
+
+/**
+ * Single-res TSDF integration helper struct for partial function specialisation
+ */
+template <>
+struct IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>
+{
+    template<typename SensorT,
+            typename MapT,
+            typename ConfigT
+    >
+    static void integrate(const se::Image<se::depth_t>& depth_img,
+                          const SensorT&                sensor,
+                          const Eigen::Matrix4f&        T_MS,
+                          MapT&                         map,
+                          ConfigT&                      /* config */);
+};
+
+
+
+template <typename MapT>
+using IntegrateDepthImpl = IntegrateDepthImplD<MapT::fld_, MapT::ress_>;
+
+
+
 template<se::Field FldT,
          se::Res ResT
 >
