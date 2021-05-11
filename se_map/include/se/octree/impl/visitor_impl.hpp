@@ -300,8 +300,8 @@ inline bool getData(std::shared_ptr<OctreeT>    octree_ptr,
 
 
 template <typename OctreeT>
-inline typename OctreeT::DataType getData(std::shared_ptr<OctreeT>     octree_ptr,
-                                          const Eigen::Vector3i&       voxel_coord)
+inline typename OctreeT::DataType getData(std::shared_ptr<OctreeT> octree_ptr,
+                                          const Eigen::Vector3i&   voxel_coord)
 {
   typename OctreeT::DataType data;
 
@@ -309,10 +309,11 @@ inline typename OctreeT::DataType getData(std::shared_ptr<OctreeT>     octree_pt
 
   if (!octant_ptr)
   {
-    return data;
+    return typename OctreeT::DataType();
   }
 
-  static_cast<typename OctreeT::BlockType*>(octant_ptr)->getData(voxel_coord, data);
+  return static_cast<const typename OctreeT::BlockType*>(octant_ptr)->getData(voxel_coord);
+}
 
 
 

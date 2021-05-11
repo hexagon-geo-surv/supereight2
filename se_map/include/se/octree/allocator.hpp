@@ -25,14 +25,14 @@ namespace allocator {
  * \return A block pointer to the allocated block
  */
 template <typename OctreeT>
-typename OctreeT::BlockType* block(const Eigen::Vector3i&      voxel_coord,
-                                   std::shared_ptr<OctreeT>    octree_ptr,
-                                   typename OctreeT::NodeType* base_parent_ptr);
+inline typename OctreeT::BlockType* block(const Eigen::Vector3i&      voxel_coord,
+                                          std::shared_ptr<OctreeT>    octree_ptr,
+                                          typename OctreeT::NodeType* base_parent_ptr);
 
 template <typename OctreeT>
-typename OctreeT::BlockType* block(const se::key_t             voxel_key,
-                                   std::shared_ptr<OctreeT>    octree_ptr,
-                                   typename OctreeT::NodeType* base_parent_ptr);
+inline typename OctreeT::BlockType* block(const se::key_t             voxel_key,
+                                          std::shared_ptr<OctreeT>    octree_ptr,
+                                          typename OctreeT::NodeType* base_parent_ptr);
 
 template <typename OctreeT>
 se::vector<typename OctreeT::BlockType*> blocks(const se::vector<Eigen::Vector3i>& voxel_coord,
@@ -46,9 +46,9 @@ se::vector<typename OctreeT::BlockType*> blocks(se::vector<se::key_t>       voxe
 
 namespace { // anonymous namespace
 template <typename OctreeT>
-se::OctantBase* allocate_key(const se::key_t             key,
-                             std::shared_ptr<OctreeT>    octree_ptr,
-                             typename OctreeT::NodeType* base_parent_ptr);
+inline se::OctantBase* allocate_key(const se::key_t             key,
+                                    std::shared_ptr<OctreeT>    octree_ptr,
+                                    typename OctreeT::NodeType* base_parent_ptr);
 } // anonymous namespace
 
 

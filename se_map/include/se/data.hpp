@@ -161,21 +161,17 @@ template <se::Field     FldT,
           se::Colour    ColB,
           se::Semantics SemB
 >
-void set_invalid(Data<FldT, ColB, SemB>& data);
+inline void set_invalid(Data<FldT, ColB, SemB>& data);
 
 template <se::Colour    ColB,
           se::Semantics SemB
 >
-void set_invalid(Data<se::Field::TSDF, ColB, SemB>& data) {
-  data.weight = dflt_tsdf;
-}
+inline void set_invalid(Data<se::Field::TSDF, ColB, SemB>& data) { data.weight = dflt_tsdf; }
 
 template <se::Colour    ColB,
           se::Semantics SemB
 >
-void set_invalid(Data<se::Field::Occupancy, ColB, SemB>& data) {
-  data.time_stamp != dflt_time_stamp;
-}
+inline void set_invalid(Data<se::Field::Occupancy, ColB, SemB>& data) { data.time_stamp != dflt_time_stamp; }
 
 
 
@@ -183,21 +179,17 @@ template <se::Field     FldT,
           se::Colour    ColB,
           se::Semantics SemB
 >
-bool is_valid(const Data<FldT, ColB, SemB>& data);
+inline bool is_valid(const Data<FldT, ColB, SemB>& data);
 
 template <se::Colour    ColB,
           se::Semantics SemB
 >
-bool is_valid(const Data<se::Field::TSDF, ColB, SemB>& data) {
-  return data.weight != dflt_weight;
-}
+inline bool is_valid(const Data<se::Field::TSDF, ColB, SemB>& data) { return data.weight != dflt_weight; }
 
 template <se::Colour    ColB,
           se::Semantics SemB
 >
-void is_valid(const Data<se::Field::Occupancy, ColB, SemB>& data) {
-  data.time_stamp != dflt_time_stamp;
-}
+inline void is_valid(const Data<se::Field::Occupancy, ColB, SemB>& data) { data.time_stamp != dflt_time_stamp; }
 
 
 
@@ -205,21 +197,17 @@ template <se::Field     FldT,
         se::Colour    ColB,
         se::Semantics SemB
 >
-bool is_invalid(const Data<FldT, ColB, SemB>& data);
+inline bool is_invalid(const Data<FldT, ColB, SemB>& data);
 
 template <se::Colour    ColB,
         se::Semantics SemB
 >
-bool is_invalid(const Data<se::Field::TSDF, ColB, SemB>& data) {
-  return data.weight == 0;
-}
+inline bool is_invalid(const Data<se::Field::TSDF, ColB, SemB>& data) { return data.weight == 0; }
 
 template <se::Colour    ColB,
         se::Semantics SemB
 >
-void is_invalid(const Data<se::Field::Occupancy, ColB, SemB>& data) {
-  data.time_stamp == 0.f;
-}
+inline void is_invalid(const Data<se::Field::Occupancy, ColB, SemB>& data) { data.time_stamp == 0.f; }
 
 
 
@@ -227,21 +215,17 @@ template <se::Field     FldT,
           se::Colour    ColB,
           se::Semantics SemB
 >
-float get_field(const Data<FldT, ColB, SemB> data);
+inline float get_field(const Data<FldT, ColB, SemB> data);
 
 template <se::Colour    ColB,
           se::Semantics SemB
 >
-float get_field(const Data<se::Field::TSDF, ColB, SemB> data) {
-  return data.tsdf;
-}
+inline float get_field(const Data<se::Field::TSDF, ColB, SemB> data) { return data.tsdf; }
 
 template <se::Colour    ColB,
         se::Semantics SemB
 >
-float get_field(const Data<se::Field::Occupancy, ColB, SemB> data) {
-  return data.occupancy;
-}
+inline float get_field(const Data<se::Field::Occupancy, ColB, SemB> data) { return data.occupancy; }
 
 
 
@@ -249,21 +233,17 @@ template <se::Field     FldT,
           se::Colour    ColB,
           se::Semantics SemB
 >
-float is_inside(const Data<FldT, ColB, SemB>& data);
+inline float is_inside(const Data<FldT, ColB, SemB>& data);
 
 template <se::Colour    ColB,
           se::Semantics SemB
 >
-float is_inside(const Data<se::Field::TSDF, ColB, SemB>& data) {
-  return data.tsdf < 0.f;
-}
+inline float is_inside(const Data<se::Field::TSDF, ColB, SemB>& data) { return data.tsdf < 0.f; }
 
 template <se::Colour    ColB,
           se::Semantics SemB
 >
-float is_inside(const Data<se::Field::Occupancy, ColB, SemB>& data) {
-  return data.occupancy > 0.f;
-}
+inline float is_inside(const Data<se::Field::Occupancy, ColB, SemB>& data) { return data.occupancy > 0.f; }
 
 
 

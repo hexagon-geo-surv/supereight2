@@ -23,10 +23,10 @@ namespace fetcher {
  * \return The octant pointer is allocated, nullptr otherwise
  */
 template <typename OctreeT>
-se::OctantBase* node(const Eigen::Vector3i&      node_coord,
-                     const se::scale_t           scale,
-                     std::shared_ptr<OctreeT>    octree_ptr,
-                     typename OctreeT::NodeType* base_parent_ptr);
+inline se::OctantBase* node(const Eigen::Vector3i&      node_coord,
+                            const se::scale_t           scale,
+                            std::shared_ptr<OctreeT>    octree_ptr,
+                            typename OctreeT::NodeType* base_parent_ptr);
 
 /**
  * \brief Fetch the block for given block coordinates.
@@ -39,9 +39,9 @@ se::OctantBase* node(const Eigen::Vector3i&      node_coord,
  * \return The octant pointer is allocated, nullptr otherwise
  */
 template <typename OctreeT>
-se::OctantBase* block(const Eigen::Vector3i&      block_coord,
-                      std::shared_ptr<OctreeT>    octree_ptr,
-                      typename OctreeT::NodeType* base_parent_ptr);
+inline se::OctantBase* block(const Eigen::Vector3i&      block_coord,
+                             std::shared_ptr<OctreeT>    octree_ptr,
+                             typename OctreeT::NodeType* base_parent_ptr);
 
 } // namespace fetcher
 } // namespace se

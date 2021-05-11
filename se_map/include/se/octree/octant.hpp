@@ -21,19 +21,19 @@ public:
 
     virtual bool isBlock() const = 0;
 
-    Eigen::Vector3i getCoord() const;
+    inline Eigen::Vector3i getCoord() const { return coord_; }
 
-    se::OctantBase* getParent();
+    inline se::OctantBase* getParent() { return parent_ptr_; }
 
-    se::OctantBase* getParent() const;
+    inline se::OctantBase* getParent() const { return parent_ptr_; }
 
-    unsigned int getTimeStamp() const;
+    inline unsigned int getTimeStamp() const { return time_stamp_; }
 
-    void setTimeStamp(const unsigned int time_stamp);
+    inline void setTimeStamp(const unsigned int time_stamp) { time_stamp_ = time_stamp; }
 
-    unsigned int getChildrenMask() const;
+    inline unsigned int getChildrenMask() const { return children_mask_; }
 
-    void setChildrenMask(const unsigned int child_idx);
+    inline void setChildrenMask(const unsigned int child_idx) { children_mask_ |= 1 << child_idx; }
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -54,9 +54,9 @@ protected:
 ///////////////////////////
 
 template <typename NodeT>
-bool get_child_idx(const Eigen::Vector3i& voxel_coord,
-                   NodeT*                 node_ptr,
-                   unsigned int&          child_idx);
+inline void get_child_idx(const Eigen::Vector3i& voxel_coord,
+                          NodeT*                 node_ptr,
+                          unsigned int&          child_idx);
 
 template <typename DerivedT>
 class NodeBase : public OctantBase
@@ -68,7 +68,7 @@ public:
 
     bool isBlock() const { return false; }
 
-    unsigned int getSize();
+    inline unsigned int getSize();
 
     inline se::OctantBase* getChild(const unsigned child_idx);
 
@@ -93,9 +93,9 @@ public:
     Node(Node*              parent_ptr,
          const unsigned int child_idx);
 
-    void getData(const DataT& data);
+    inline void getData(const DataT& data);
 
-    void setData(const DataT& data);
+    inline void setData(const DataT& data);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -119,7 +119,7 @@ public:
 
     bool isBlock() const { return true; }
 
-    static unsigned int getSize() { return SizeT; }
+    static constexpr unsigned int getSize() { return SizeT; }
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
@@ -135,17 +135,19 @@ class BlockSingleRes
 public:
     typedef DataT DataType;
 
-    void getData(const Eigen::Vector3i& voxel_coord,
-                 DataType&              data) const;
+    inline void getData(const Eigen::Vector3i& voxel_coord,
+                        DataType&              data) const;
 
-    void getData(const unsigned voxel_idx,
-                 DataT&         data) const;
+    inline DataType getData(const Eigen::Vector3i& voxel_coord) const;
 
-    void setData(const Eigen::Vector3i& voxel_coord,
-                 const DataT&           data);
+    inline void getData(const unsigned voxel_idx,
+                        DataT&         data) const;
 
-    void setData(const unsigned voxel_idx,
-                 const DataT&   data);
+    inline void setData(const Eigen::Vector3i& voxel_coord,
+                        const DataT&           data);
+
+    inline void setData(const unsigned voxel_idx,
+                        const DataT&   data);
 
     static inline int getMinScale() { return min_scale_; }
 
@@ -174,19 +176,19 @@ public:
 
     BlockMultiRes();
 
-    void getData(const Eigen::Vector3i& voxel_coord,
-                 DataType&              data);
+    inline void getData(const Eigen::Vector3i& voxel_coord,
+                        DataType&              data);
 
-    void getData(const Eigen::Vector3i& voxel_coord,
-                 const unsigned         scale,
-                 DataType&              data);
+    inline void getData(const Eigen::Vector3i& voxel_coord,
+                        const unsigned         scale,
+                        DataType&              data);
 
-    void setData(const Eigen::Vector3i& voxel_coord,
-                 const DataType&        data);
+    inline void setData(const Eigen::Vector3i& voxel_coord,
+                        const DataType&        data);
 
-    int getMinScale() const { return min_scale_; }
+    inline int getMinScale() const { return min_scale_; }
 
-    int getCurrentScale() const { return curr_scale_; }
+    inline int getCurrentScale() const { return curr_scale_; }
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 

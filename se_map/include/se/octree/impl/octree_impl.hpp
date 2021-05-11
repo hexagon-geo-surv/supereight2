@@ -43,7 +43,7 @@ template <typename DataT,
           Res      ResT,
           int      BlockSize
 >
-bool Octree<DataT, ResT, BlockSize>::contains(const Eigen::Vector3i& voxel_coord)
+inline bool Octree<DataT, ResT, BlockSize>::contains(const Eigen::Vector3i& voxel_coord)
 {
   return voxel_coord.x() >= 0 && voxel_coord.x() < size_ &&
          voxel_coord.y() >= 0 && voxel_coord.y() < size_ &&
@@ -56,7 +56,7 @@ template <typename DataT,
           Res      ResT,
           int            BlockSize
 >
-bool Octree<DataT, ResT, BlockSize>::contains(const Eigen::Vector3i& voxel_coord) const
+inline bool Octree<DataT, ResT, BlockSize>::contains(const Eigen::Vector3i& voxel_coord) const
 {
   return voxel_coord.x() >=0 && voxel_coord.x() < size_ &&
          voxel_coord.y() >=0 && voxel_coord.y() < size_ &&
@@ -69,9 +69,9 @@ template <typename DataT,
           Res      ResT,
           int      BlockSize
 >
-bool Octree<DataT, ResT, BlockSize>::allocate(NodeType*          parent_ptr,
-                                              const unsigned int child_idx,
-                                              OctantBase*&       child_ptr)
+inline bool Octree<DataT, ResT, BlockSize>::allocate(NodeType*          parent_ptr,
+                                                     const unsigned int child_idx,
+                                                     OctantBase*&       child_ptr)
 {
   assert(!parent_ptr->isBlock()); // Verify that the parent is not a block
   assert(parent_ptr);             // Verify that the parent is not a nullptr
@@ -105,8 +105,8 @@ template <typename DataT,
         Res      ResT,
         int      BlockSize
 >
-OctantBase* Octree<DataT, ResT, BlockSize>::allocate(NodeType*          parent_ptr,
-                                                     const unsigned int child_idx)
+inline OctantBase* Octree<DataT, ResT, BlockSize>::allocate(NodeType*          parent_ptr,
+                                                            const unsigned int child_idx)
 {
   assert(!parent_ptr->isBlock()); // Verify that the parent is not a block
   assert(parent_ptr);             // Verify that the parent is not a nullptr

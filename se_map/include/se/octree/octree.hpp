@@ -66,7 +66,7 @@ public:
    *
    * \return True if contained in the octree, False otherwise
    */
-  bool contains(const Eigen::Vector3i& voxel_coord);
+  inline bool contains(const Eigen::Vector3i& voxel_coord);
 
   /**
    * \brief Verify if the voxel coordinates are contained in the octree.
@@ -75,28 +75,28 @@ public:
    *
    * \return True if contained in the octree, False otherwise
    */
-  bool contains(const Eigen::Vector3i& voxel_coord) const;
+  inline bool contains(const Eigen::Vector3i& voxel_coord) const;
 
   /**
    * \brief Get the node pointer to the root of the octree.
    *
    * \return The pointer to the root of the octree
    */
-  NodeType* getRoot() { return root_ptr_; };
+  inline NodeType* getRoot() { return root_ptr_; };
 
   /**
    * \brief Get the size of the octree in [voxel] units.
    *
    * \return The size of the octree
    */
-  unsigned int getSize() { return size_; }
+  inline unsigned int getSize() { return size_; }
 
   /**
    * \brief Get the maximum scale of the octree. This is equivalent to the scale of the root.
    *
    * \return The max scale of the octree
    */
-  unsigned int getMaxScale() { return se::math::log2_const(size_); }
+  inline unsigned int getMaxScale() { return se::math::log2_const(size_); }
 
   /**
    * \brief Allocate a node for a given parent node.
@@ -109,12 +109,12 @@ public:
    *
    * \return Ture if the node has been newly allocated, False if it has already been allocated
    */
-  bool allocate(NodeType*        parent_ptr,
-                const unsigned   child_idx,
-                se::OctantBase*& child_ptr);     ///< Allocate child
+  inline bool allocate(NodeType*        parent_ptr,
+                       const unsigned   child_idx,
+                       se::OctantBase*& child_ptr);     ///< Allocate child
 
-  se::OctantBase* allocate(NodeType*        parent_ptr,
-                           const unsigned   child_idx);     ///< Allocate child
+  inline se::OctantBase* allocate(NodeType*        parent_ptr,
+                                  const unsigned   child_idx);     ///< Allocate child
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 

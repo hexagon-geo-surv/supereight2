@@ -12,9 +12,9 @@ namespace se {
 
 
 template <typename NodeT>
-void get_child_idx(const Eigen::Vector3i& voxel_coord,
-                   NodeT*                 node_ptr,
-                   unsigned int&          child_idx)
+inline void get_child_idx(const Eigen::Vector3i& voxel_coord,
+                          NodeT*                 node_ptr,
+                          unsigned int&          child_idx)
 {
   const Eigen::Vector3i node_coord = node_ptr->getCoord();
   const int             node_size  = node_ptr->getSize;
@@ -45,7 +45,7 @@ NodeBase<DerivedT>::NodeBase(const Eigen::Vector3i& coord,
 
 
 template <typename DerivedT>
-unsigned int NodeBase<DerivedT>::getSize()
+inline unsigned int NodeBase<DerivedT>::getSize()
 {
   return size_;
 }
@@ -91,7 +91,7 @@ Node<DataT, ResT>::Node(Node*              parent_ptr,
 
 
 template <typename DataT, Res ResT>
-void Node<DataT, ResT>::setData(const DataT& data)
+inline void Node<DataT, ResT>::setData(const DataT& data)
 {
   data_ = data;
 }
@@ -99,7 +99,7 @@ void Node<DataT, ResT>::setData(const DataT& data)
 
 
 template <typename DataT, Res ResT>
-void Node<DataT, ResT>::getData(const DataT& data)
+inline void Node<DataT, ResT>::getData(const DataT& data)
 {
   data = data_;
 }
@@ -116,8 +116,8 @@ BlockBase<DerivedT, SizeT>::BlockBase(const Eigen::Vector3i& coord,
 
 
 template <typename DerivedT, typename DataT, unsigned SizeT>
-void BlockSingleRes<DerivedT, DataT, SizeT>::getData(const Eigen::Vector3i& voxel_coord,
-                                                     DataType&              data) const
+inline void BlockSingleRes<DerivedT, DataT, SizeT>::getData(const Eigen::Vector3i& voxel_coord,
+                                                            DataType&              data) const
 {
   Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
   data = block_data_[voxel_offset.x() +
@@ -128,8 +128,19 @@ void BlockSingleRes<DerivedT, DataT, SizeT>::getData(const Eigen::Vector3i& voxe
 
 
 template <typename DerivedT, typename DataT, unsigned SizeT>
-void BlockSingleRes<DerivedT, DataT, SizeT>::getData(const unsigned voxel_idx,
-                                                     DataType&      data) const
+inline DataT BlockSingleRes<DerivedT, DataT, SizeT>::getData(const Eigen::Vector3i& voxel_coord) const
+{
+  Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
+  return block_data_[voxel_offset.x() +
+                     voxel_offset.y() * this->underlying().size +
+                     voxel_offset.z() * this->underlying().size_qu];
+}
+
+
+
+template <typename DerivedT, typename DataT, unsigned SizeT>
+inline void BlockSingleRes<DerivedT, DataT, SizeT>::getData(const unsigned voxel_idx,
+                                                            DataType&      data) const
 {
   data = block_data_[voxel_idx];
 }
@@ -137,8 +148,8 @@ void BlockSingleRes<DerivedT, DataT, SizeT>::getData(const unsigned voxel_idx,
 
 
 template <typename DerivedT, typename DataT, unsigned SizeT>
-void BlockSingleRes<DerivedT, DataT, SizeT>::setData(const Eigen::Vector3i& voxel_coord,
-                                                     const DataType&        data)
+inline void BlockSingleRes<DerivedT, DataT, SizeT>::setData(const Eigen::Vector3i& voxel_coord,
+                                                            const DataType&        data)
 {
   Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
   block_data_[voxel_offset.x() +
@@ -149,8 +160,8 @@ void BlockSingleRes<DerivedT, DataT, SizeT>::setData(const Eigen::Vector3i& voxe
 
 
 template <typename DerivedT, typename DataT, unsigned SizeT>
-void BlockSingleRes<DerivedT, DataT, SizeT>::setData(const unsigned  voxel_idx,
-                                                     const DataType& data)
+inline void BlockSingleRes<DerivedT, DataT, SizeT>::setData(const unsigned  voxel_idx,
+                                                            const DataType& data)
 {
   block_data_[voxel_idx] = data;
 }
@@ -167,8 +178,8 @@ BlockMultiRes<DerivedT, DataT, SizeT>::BlockMultiRes() {
 
 
 template <typename DerivedT, typename DataT, unsigned SizeT>
-void BlockMultiRes<DerivedT, DataT, SizeT>::getData(const Eigen::Vector3i& voxel_coord,
-                                                    DataType&              data)
+inline void BlockMultiRes<DerivedT, DataT, SizeT>::getData(const Eigen::Vector3i& voxel_coord,
+                                                           DataType&              data)
 {
   Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
   voxel_offset = voxel_offset / (1 << curr_scale_);
@@ -181,9 +192,9 @@ void BlockMultiRes<DerivedT, DataT, SizeT>::getData(const Eigen::Vector3i& voxel
 
 
 template <typename DerivedT, typename DataT, unsigned SizeT>
-void BlockMultiRes<DerivedT, DataT, SizeT>::getData(const Eigen::Vector3i& voxel_coord,
-                                                    const unsigned         scale,
-                                                    DataType&              data)
+inline void BlockMultiRes<DerivedT, DataT, SizeT>::getData(const Eigen::Vector3i& voxel_coord,
+                                                           const unsigned         scale,
+                                                           DataType&              data)
 {
   std::cout << "MultiRes::getData(vc, s, d)" << std::endl;
 }
@@ -191,8 +202,8 @@ void BlockMultiRes<DerivedT, DataT, SizeT>::getData(const Eigen::Vector3i& voxel
 
 
 template <typename DerivedT, typename DataT, unsigned SizeT>
-void BlockMultiRes<DerivedT, DataT, SizeT>::setData(const Eigen::Vector3i& voxel_coord,
-                                                    const DataType&        data)
+inline void BlockMultiRes<DerivedT, DataT, SizeT>::setData(const Eigen::Vector3i& voxel_coord,
+                                                           const DataType&        data)
 {
   std::cout << "MultiRes::setData(vc, d)" << std::endl;
   Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().getCoord();
@@ -208,9 +219,9 @@ void BlockMultiRes<DerivedT, DataT, SizeT>::setData(const Eigen::Vector3i& voxel
 template <typename DataT, Res ResT, unsigned SizeT, typename PolicyT>
 Block<DataT, ResT, SizeT, PolicyT>::Block(se::Node<DataT, ResT>* parent_ptr,
                                           const unsigned         child_id)
-        : BlockBase<Block<DataT, ResT, SizeT>, SizeT>(
-                parent_ptr->getCoord() + SizeT * Eigen::Vector3i((1 & child_id) > 0, (2 & child_id) > 0, (4 & child_id) > 0),
-                parent_ptr)
+    : BlockBase<Block<DataT, ResT, SizeT>, SizeT>(
+            parent_ptr->getCoord() + SizeT * Eigen::Vector3i((1 & child_id) > 0, (2 & child_id) > 0, (4 & child_id) > 0),
+            parent_ptr)
 {
   assert(SizeT == (parent_ptr->getSize() >> 1));
 }

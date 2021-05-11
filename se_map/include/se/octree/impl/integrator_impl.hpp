@@ -5,9 +5,9 @@ namespace se {
 namespace integrator {
 
 template <typename OctreeT>
-bool setData(std::shared_ptr<OctreeT>         octree_ptr,
-             const Eigen::Vector3i&           voxel_coord,
-             const typename OctreeT::DataType data) {
+inline bool setData(std::shared_ptr<OctreeT>         octree_ptr,
+                    const Eigen::Vector3i&           voxel_coord,
+                    const typename OctreeT::DataType data) {
   assert(octree_ptr); // Verify the octree is not a nullptr
 
   se::OctantBase* octant_ptr = octree_ptr->getRoot();

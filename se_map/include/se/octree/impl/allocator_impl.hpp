@@ -12,9 +12,9 @@ namespace se {
 namespace allocator {
 
 template <typename OctreeT>
-typename OctreeT::BlockType* block(const Eigen::Vector3i&      voxel_coord,
-                                   std::shared_ptr<OctreeT>    octree_ptr,
-                                   typename OctreeT::NodeType* base_parent_ptr)
+inline typename OctreeT::BlockType* block(const Eigen::Vector3i&      voxel_coord,
+                                          std::shared_ptr<OctreeT>    octree_ptr,
+                                          typename OctreeT::NodeType* base_parent_ptr)
 {
   se::key_t voxel_key;
   se::keyops::encode_key(voxel_coord, 0, voxel_key); // Allocate up to finest scale
@@ -25,9 +25,9 @@ typename OctreeT::BlockType* block(const Eigen::Vector3i&      voxel_coord,
 
 
 template <typename OctreeT>
-typename OctreeT::BlockType* block(const se::key_t             voxel_key,
-                                   std::shared_ptr<OctreeT>    octree_ptr,
-                                   typename OctreeT::NodeType* base_parent_ptr)
+inline typename OctreeT::BlockType* block(const se::key_t             voxel_key,
+                                          std::shared_ptr<OctreeT>    octree_ptr,
+                                          typename OctreeT::NodeType* base_parent_ptr)
 {
   assert(octree_ptr); // Verify octree ptr
   assert(base_parent_ptr); // Verify parent ptr
@@ -41,9 +41,9 @@ typename OctreeT::BlockType* block(const se::key_t             voxel_key,
 
 
 template <typename OctreeT>
-se::vector<typename OctreeT::BlockType*> blocks(const se::vector<Eigen::Vector3i>& voxel_coords,
-                                                std::shared_ptr<OctreeT>           octree_ptr,
-                                                typename OctreeT::NodeType*        base_parent_ptr)
+inline se::vector<typename OctreeT::BlockType*> blocks(const se::vector<Eigen::Vector3i>& voxel_coords,
+                                                       std::shared_ptr<OctreeT>           octree_ptr,
+                                                       typename OctreeT::NodeType*        base_parent_ptr)
 {
   se::set<se::key_t> voxel_key_set;
 
@@ -68,9 +68,9 @@ se::vector<typename OctreeT::BlockType*> blocks(const se::vector<Eigen::Vector3i
 
 
 template <typename OctreeT>
-se::vector<typename OctreeT::BlockType*> blocks(se::vector<se::key_t>       unique_voxel_keys,
-                                                std::shared_ptr<OctreeT>    octree_ptr,
-                                                typename OctreeT::NodeType* base_parent_ptr)
+inline se::vector<typename OctreeT::BlockType*> blocks(se::vector<se::key_t>       unique_voxel_keys,
+                                                       std::shared_ptr<OctreeT>    octree_ptr,
+                                                       typename OctreeT::NodeType* base_parent_ptr)
 {
   assert(octree_ptr);      // Verify octree ptr
   assert(base_parent_ptr); // Verify parent ptr
@@ -121,9 +121,9 @@ se::vector<typename OctreeT::BlockType*> blocks(se::vector<se::key_t>       uniq
 
 namespace { // anonymous namespace
 template <typename OctreeT>
-se::OctantBase* allocate_key(const se::key_t             key,
-                             std::shared_ptr<OctreeT>    octree_ptr,
-                             typename OctreeT::NodeType* base_parent_ptr)
+inline se::OctantBase* allocate_key(const se::key_t             key,
+                                    std::shared_ptr<OctreeT>    octree_ptr,
+                                    typename OctreeT::NodeType* base_parent_ptr)
 {
   assert(se::keyops::is_valid(key)); // Verify if the key is valid
   typename OctreeT::NodeType* parent_ptr = base_parent_ptr;

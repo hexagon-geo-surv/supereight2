@@ -51,7 +51,7 @@ template <Field     FldT,
           Res       ResT,
           unsigned  BlockSize
 >
-bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::contains(const Eigen::Vector3f& point_M) const
+inline bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::contains(const Eigen::Vector3f& point_M) const
 {
   return (point_M.x() >= lb_.x() && point_M.x() < ub_.x() &&
           point_M.y() >= lb_.y() && point_M.y() < ub_.y() &&
@@ -67,8 +67,8 @@ template <Field     FldT,
           unsigned  BlockSize
 >
 template<Safe SafeB>
-bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getData(const Eigen::Vector3f& point_M,
-                                                           DataType&              data) const
+inline bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getData(const Eigen::Vector3f& point_M,
+                                                                  DataType&              data) const
 {
   Eigen::Vector3i voxel_coord;
 
@@ -95,8 +95,8 @@ template <Field     FldT,
           unsigned  BlockSize
 >
 template<Safe SafeB>
-bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::interpField(const Eigen::Vector3f& point_M,
-                                                               float&                 field_value) const
+inline bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::interpField(const Eigen::Vector3f& point_M,
+                                                                      float&                 field_value) const
 {
   Eigen::Vector3f voxel_coord_f;
 
@@ -122,8 +122,8 @@ template <Field     FldT,
           unsigned  BlockSize
 >
 template<Safe SafeB>
-bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::gradField(const Eigen::Vector3f& point_M,
-                                                             Eigen::Vector3f&       field_grad) const
+inline bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::gradField(const Eigen::Vector3f& point_M,
+                                                                    Eigen::Vector3f&       field_grad) const
 {
   Eigen::Vector3f voxel_coord_f;
 
@@ -272,8 +272,8 @@ template <Field     FldT,
 >
 template<se::Safe SafeB>
 inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
-        Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointToVoxel(const Eigen::Vector3f& point_M,
-                                                                   Eigen::Vector3i&       voxel_coord) const
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointToVoxel(const Eigen::Vector3f& point_M,
+                                                           Eigen::Vector3i&       voxel_coord) const
 {
   if (!contains(point_M))
   {
@@ -311,8 +311,8 @@ template <Field     FldT,
 >
 template<se::Safe SafeB>
 inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
-        Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointToVoxel(const Eigen::Vector3f& point_M,
-                                                                   Eigen::Vector3f&       voxel_coord_f) const
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointToVoxel(const Eigen::Vector3f& point_M,
+                                                           Eigen::Vector3f&       voxel_coord_f) const
 {
   if (!contains(point_M))
   {
@@ -333,8 +333,8 @@ template <Field     FldT,
 >
 template<se::Safe SafeB>
 inline typename std::enable_if_t<SafeB == se::Safe::Off, bool>
-        Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointToVoxel(const Eigen::Vector3f& point_M,
-                                                                   Eigen::Vector3f&       voxel_coord_f) const
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointToVoxel(const Eigen::Vector3f& point_M,
+                                                           Eigen::Vector3f&       voxel_coord_f) const
 {
   voxel_coord_f = ((point_M + origin_M_) / res_);
   return true;
@@ -349,7 +349,7 @@ template <Field     FldT,
           unsigned  BlockSize
 >
 template<se::Safe SafeB>
-typename std::enable_if_t<SafeB == se::Safe::On, bool>
+inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointsToVoxels(const se::vector<Eigen::Vector3f>& points_M,
                                                              se::vector<Eigen::Vector3i>&       voxel_coords) const
 {
@@ -378,7 +378,7 @@ template <Field     FldT,
         unsigned  BlockSize
 >
 template<se::Safe SafeB>
-typename std::enable_if_t<SafeB == se::Safe::Off, bool>
+inline typename std::enable_if_t<SafeB == se::Safe::Off, bool>
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointsToVoxels(const se::vector<Eigen::Vector3f>& points_M,
                                                              se::vector<Eigen::Vector3i>&       voxel_coords) const
 {
@@ -399,8 +399,8 @@ template <Field     FldT,
           Res       ResT,
           unsigned  BlockSize
 >
-void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::voxelToPoint(const Eigen::Vector3i& voxel_coord,
-                                                                Eigen::Vector3f&       point_M) const
+inline void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::voxelToPoint(const Eigen::Vector3i& voxel_coord,
+                                                                       Eigen::Vector3f&       point_M) const
 {
   point_M = ((voxel_coord.cast<float>() + sample_offset_frac) * res_) - origin_M_;
 }
