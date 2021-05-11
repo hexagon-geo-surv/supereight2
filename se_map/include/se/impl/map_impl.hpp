@@ -7,25 +7,35 @@
 
 namespace se {
 
-template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
-Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::Map(const Eigen::Vector3f& dim,
-                                                   const float            res,
-                                                   const se::DataConfig<FldT, ColB, SemB> data_config)
-         : dim_(dim), res_(res), origin_M_(dim / 2),
-           lb_(- origin_M_), ub_(dim - origin_M_),
-           data_config_(data_config)
+template <Field     FldT,
+          Colour    ColB,
+          Semantics SemB,
+          Res       ResT,
+          unsigned  BlockSize
+>
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const Eigen::Vector3f& dim,
+                                                  const float            res,
+                                                  const se::DataConfig<FldT, ColB, SemB> data_config)
+    : dim_(dim), res_(res), origin_M_(dim / 2),
+     lb_(- origin_M_), ub_(dim - origin_M_),
+     data_config_(data_config)
 {
   initialiseOctree();
 }
 
 
 
-template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
-Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::Map(const MapConfig&                       map_config,
-                                                   const se::DataConfig<FldT, ColB, SemB> data_config)
-        : dim_(map_config.dim), res_(map_config.res), origin_M_(map_config.origin),
-          lb_(- origin_M_), ub_(map_config.dim - origin_M_),
-          data_config_(data_config)
+template <Field     FldT,
+          Colour    ColB,
+          Semantics SemB,
+          Res       ResT,
+          unsigned  BlockSize
+>
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const MapConfig&                       map_config,
+                                                  const se::DataConfig<FldT, ColB, SemB> data_config)
+    : dim_(map_config.dim), res_(map_config.res), origin_M_(map_config.origin),
+      lb_(- origin_M_), ub_(map_config.dim - origin_M_),
+      data_config_(data_config)
 {
   if (!contains(origin_M_))
   {
@@ -35,8 +45,13 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::Map(const MapConfig&             
 }
 
 
-template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
-bool Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::contains(const Eigen::Vector3f& point_M)
+template <Field     FldT,
+          Colour    ColB,
+          Semantics SemB,
+          Res       ResT,
+          unsigned  BlockSize
+>
+bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::contains(const Eigen::Vector3f& point_M)
 {
   return (point_M.x() >= lb_.x() && point_M.x() < ub_.x() &&
           point_M.y() >= lb_.y() && point_M.y() < ub_.y() &&
@@ -45,9 +60,16 @@ bool Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::contains(const Eigen::Vector
 
 
 
-template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
+template <Field     FldT,
+          Colour    ColB,
+          Semantics SemB,
+          Res       ResT,
+          unsigned  BlockSize
+>
 template<Safe SafeB>
-bool Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::getData(const Eigen::Vector3f& point_M, DataType& data) {
+bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getData(const Eigen::Vector3f& point_M,
+                                                           DataType&              data)
+{
   Eigen::Vector3i voxel_coord;
 
   if constexpr(SafeB == Safe::Off) // Evaluate at compile time
@@ -66,10 +88,15 @@ bool Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::getData(const Eigen::Vector3
 
 
 
-template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
+template <Field     FldT,
+          Colour    ColB,
+          Semantics SemB,
+          Res       ResT,
+          unsigned  BlockSize
+>
 template<Safe SafeB>
-bool Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::interpField(const Eigen::Vector3f& point_M,
-                                                                float&                 field_value)
+bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::interpField(const Eigen::Vector3f& point_M,
+                                                               float&                 field_value)
 {
   Eigen::Vector3f voxel_coord_f;
 
@@ -88,9 +115,15 @@ bool Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::interpField(const Eigen::Vec
 
 
 
-template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
+template <Field     FldT,
+          Colour    ColB,
+          Semantics SemB,
+          Res       ResT,
+          unsigned  BlockSize
+>
 template<Safe SafeB>
-bool Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::gradField(const Eigen::Vector3f& point_M, Eigen::Vector3f& field_grad)
+bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::gradField(const Eigen::Vector3f& point_M,
+                                                             Eigen::Vector3f&       field_grad)
 {
   Eigen::Vector3f voxel_coord_f;
 
@@ -113,8 +146,13 @@ bool Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::gradField(const Eigen::Vecto
 
 
 
-template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
-bool Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::initialiseOctree()
+template <Field     FldT,
+          Colour    ColB,
+          Semantics SemB,
+          Res       ResT,
+          unsigned  BlockSize
+>
+bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::initialiseOctree()
 {
   if (octree_ != nullptr)
   {
@@ -126,16 +164,21 @@ bool Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::initialiseOctree()
   unsigned max_size = ceil(max_dim / res_);
   unsigned oct_size = math::power_two_up(max_size);
   octree_ =
-          std::shared_ptr<se::Octree<DataType, ResT, BlockSizeT> >(new se::Octree<DataType, ResT, BlockSizeT>(oct_size));
+          std::shared_ptr<se::Octree<DataType, ResT, BlockSize> >(new se::Octree<DataType, ResT, BlockSize>(oct_size));
   return true;
 }
 
 
 
-template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
-void Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::saveSlice(const std::string      file_path,
-                                                              const Eigen::Vector3f& point_M,
-                                                              const std::string      num)
+template <Field     FldT,
+          Colour    ColB,
+          Semantics SemB,
+          Res       ResT,
+          unsigned  BlockSize
+>
+void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveSlice(const std::string      file_path,
+                                                             const Eigen::Vector3f& point_M,
+                                                             const std::string      num)
 {
   Eigen::Vector3i voxel_coord;
   pointToVoxel(point_M, voxel_coord);
@@ -150,9 +193,14 @@ void Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::saveSlice(const std::string 
 
 
 
-template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
-void Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::saveStrucutre(const std::string file_path,
-                                                                  const std::string num)
+template <Field     FldT,
+          Colour    ColB,
+          Semantics SemB,
+          Res       ResT,
+          unsigned  BlockSize
+>
+void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveStrucutre(const std::string file_path,
+                                                                 const std::string num)
 {
   const std::string file_name = (num == std::string("")) ? (file_path + ".ply") : (file_path + "_" + num + ".ply");
   se::io::save_octree_structure_ply(octree_, file_name);
@@ -161,9 +209,14 @@ void Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::saveStrucutre(const std::str
 
 
 
-template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
-void Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::saveMesh(const std::string file_path,
-                                                             const std::string num)
+template <Field     FldT,
+          Colour    ColB,
+          Semantics SemB,
+          Res       ResT,
+          unsigned  BlockSize
+>
+void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMesh(const std::string file_path,
+                                                            const std::string num)
 {
   se::vector<se::Triangle> mesh;
   TICK("meshing")
@@ -184,16 +237,21 @@ void Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::saveMesh(const std::string f
 
 
 
-template <Field FldT, Colour ColB, Semantics SemB, Res ResT, unsigned BlockSizeT>
+template <Field     FldT,
+          Colour    ColB,
+          Semantics SemB,
+          Res       ResT,
+          unsigned  BlockSize
+>
 template<se::Safe SafeB>
 inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
-        Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::pointToVoxel(const Eigen::Vector3f& point_M,
-                                                                    Eigen::Vector3i&       voxel_coord)
+        Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointToVoxel(const Eigen::Vector3f& point_M,
+                                                                   Eigen::Vector3i&       voxel_coord)
 {
   if (!contains(point_M))
   {
-  voxel_coord = Eigen::Vector3i::Constant(-1);
-  return false;
+    voxel_coord = Eigen::Vector3i::Constant(-1);
+    return false;
   }
   voxel_coord = ((point_M + origin_M_) / res_).cast<int>();
   return true;
@@ -201,11 +259,16 @@ inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
 
 
 
-template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
+template <Field     FldT,
+          Colour    ColB,
+          Semantics SemB,
+          Res       ResT,
+          unsigned  BlockSize
+>
 template<se::Safe SafeB>
 inline typename std::enable_if_t<SafeB == se::Safe::Off, bool>
-Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::pointToVoxel(const Eigen::Vector3f& point_M,
-                                                            Eigen::Vector3i&       voxel_coord)
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointToVoxel(const Eigen::Vector3f& point_M,
+                                                           Eigen::Vector3i&       voxel_coord)
 {
   voxel_coord = ((point_M + origin_M_) / res_).cast<int>();
   return true;
@@ -213,11 +276,16 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::pointToVoxel(const Eigen::Vector3
 
 
 
-template <Field FldT, Colour ColB, Semantics SemB, Res ResT, unsigned BlockSizeT>
+template <Field     FldT,
+          Colour    ColB,
+          Semantics SemB,
+          Res       ResT,
+          unsigned  BlockSize
+>
 template<se::Safe SafeB>
 inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
-        Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::pointToVoxel(const Eigen::Vector3f& point_M,
-                                                                    Eigen::Vector3f&       voxel_coord_f)
+        Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointToVoxel(const Eigen::Vector3f& point_M,
+                                                                   Eigen::Vector3f&       voxel_coord_f)
 {
   if (!contains(point_M))
   {
@@ -230,11 +298,16 @@ inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
 
 
 
-template <se::Field FldT, se::Colour ColB, se::Semantics SemB, se::Res ResT, unsigned BlockSizeT>
+template <Field     FldT,
+          Colour    ColB,
+          Semantics SemB,
+          Res       ResT,
+          unsigned  BlockSize
+>
 template<se::Safe SafeB>
 inline typename std::enable_if_t<SafeB == se::Safe::Off, bool>
-        Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::pointToVoxel(const Eigen::Vector3f& point_M,
-                                                                    Eigen::Vector3f&       voxel_coord_f)
+        Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointToVoxel(const Eigen::Vector3f& point_M,
+                                                                   Eigen::Vector3f&       voxel_coord_f)
 {
   voxel_coord_f = ((point_M + origin_M_) / res_);
   return true;
@@ -242,11 +315,16 @@ inline typename std::enable_if_t<SafeB == se::Safe::Off, bool>
 
 
 
-template <Field FldT, Colour ColB, Semantics SemB, Res ResT, unsigned BlockSizeT>
+template <Field     FldT,
+          Colour    ColB,
+          Semantics SemB,
+          Res       ResT,
+          unsigned  BlockSize
+>
 template<se::Safe SafeB>
 typename std::enable_if_t<SafeB == se::Safe::On, bool>
-Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::pointsToVoxels(const se::vector<Eigen::Vector3f>& points_M,
-                                                              se::vector<Eigen::Vector3i>&       voxel_coords)
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointsToVoxels(const se::vector<Eigen::Vector3f>& points_M,
+                                                             se::vector<Eigen::Vector3i>&       voxel_coords)
 {
   bool all_valid = true;
 
@@ -266,11 +344,16 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::pointsToVoxels(const se::vector<E
 
 
 
-template <Field FldT, Colour ColB, Semantics SemB, Res ResT, unsigned BlockSizeT>
+template <Field     FldT,
+        Colour    ColB,
+        Semantics SemB,
+        Res       ResT,
+        unsigned  BlockSize
+>
 template<se::Safe SafeB>
 typename std::enable_if_t<SafeB == se::Safe::Off, bool>
-Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::pointsToVoxels(const se::vector<Eigen::Vector3f>& points_M,
-                                                              se::vector<Eigen::Vector3i>&       voxel_coords)
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointsToVoxels(const se::vector<Eigen::Vector3f>& points_M,
+                                                             se::vector<Eigen::Vector3i>&       voxel_coords)
 {
   for (auto point_M : points_M)
   {
@@ -283,8 +366,14 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::pointsToVoxels(const se::vector<E
 
 
 
-template <Field FldT, Colour ColB, Semantics SemB, Res ResT, unsigned BlockSizeT>
-void Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT>::voxelToPoint(const Eigen::Vector3i& voxel_coord, Eigen::Vector3f& point_M)
+template <Field     FldT,
+          Colour    ColB,
+          Semantics SemB,
+          Res       ResT,
+          unsigned  BlockSize
+>
+void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::voxelToPoint(const Eigen::Vector3i& voxel_coord,
+                                                                Eigen::Vector3f&       point_M)
 {
   point_M = ((voxel_coord.cast<float>() + sample_offset_frac) * res_) - origin_M_;
 }

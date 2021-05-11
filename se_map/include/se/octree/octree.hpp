@@ -22,28 +22,28 @@ namespace se {
  * \tparam DataT        The data struct stored in each voxel (or node for Res::Multi)
  * \tparam ResT         The resolution type (Res::Single, Res::Multi) defining if data can only stored at
  *                      a finest scale or any scale.
- * \tparam BlockSizeT   The size in voxels of a block. BlockSizeT in [1, (octree size) / 2]
+ * \tparam BlockSize    The size in voxels of a block. BlockSize in [1, (octree size) / 2]
  *                      Must be a power of two.
  */
 template <typename DataT,
-          Res      ResT       = Res::Single,
-          int      BlockSizeT = 8
+          Res      ResT      = Res::Single,
+          int      BlockSize = 8
 >
 class Octree {
 public:
-  typedef std::shared_ptr<Octree<DataT, ResT, BlockSizeT> > Ptr;
+  typedef std::shared_ptr<Octree<DataT, ResT, BlockSize> > Ptr;
 
-  typedef DataT                          DataType;
-  typedef Node<DataT, ResT>              NodeType;
-  typedef Block<DataT, ResT, BlockSizeT> BlockType;
+  typedef DataT                         DataType;
+  typedef Node<DataT, ResT>             NodeType;
+  typedef Block<DataT, ResT, BlockSize> BlockType;
 
   typedef se::BoostMemoryPool<NodeType, BlockType> MemoryPool;
 
   // Compile-time constant expressions
   // # of voxels per side in a voxel block
-  static constexpr unsigned int block_size = BlockSizeT;
+  static constexpr unsigned int block_size = BlockSize;
   // The maximum scale of a block
-  static constexpr se::scale_t max_block_scale = math::log2_const(BlockSizeT);
+  static constexpr se::scale_t max_block_scale = math::log2_const(BlockSize);
 
   /**
    * \brief The octree needs to be initialised during the allocation.
@@ -56,8 +56,8 @@ public:
   Octree(const Octree&) = delete;             ///< Delete copy constructor
   Octree & operator=(const Octree&) = delete; ///< Delete copy assignment operator
 
-  OctreeIterator<Octree<DataT, ResT, BlockSizeT>> begin();
-  OctreeIterator<Octree<DataT, ResT, BlockSizeT>> end();
+  OctreeIterator<Octree<DataT, ResT, BlockSize>> begin();
+  OctreeIterator<Octree<DataT, ResT, BlockSize>> end();
 
   /**
    * \brief Verify if the voxel coordinates are contained in the octree.
@@ -130,9 +130,9 @@ private:
 
 template <typename DataT,
           Res      ResT,
-          int      BlockSizeT
+          int      BlockSize
 >
-constexpr se::scale_t Octree<DataT, ResT, BlockSizeT>::max_block_scale;
+constexpr se::scale_t Octree<DataT, ResT, BlockSize>::max_block_scale;
 
 } // namespace se
 

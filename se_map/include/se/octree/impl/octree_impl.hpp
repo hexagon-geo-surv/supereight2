@@ -5,12 +5,12 @@ namespace se {
 
 template <typename DataT,
           Res      ResT,
-          int      BlockSizeT
+          int      BlockSize
 >
-Octree<DataT, ResT, BlockSizeT>::Octree(const int size) : size_(size)
+Octree<DataT, ResT, BlockSize>::Octree(const int size) : size_(size)
 {
   assert(math::is_power_of_two(size)); // Verify that the octree size is a multiple of 2.
-  assert(BlockSizeT < size);           // Verify that the block size is smaller than the root.
+  assert(BlockSize < size);           // Verify that the block size is smaller than the root.
 
   root_ptr_ = memory_pool_.allocateNode(Eigen::Vector3i(0,0,0), size_);
 }
@@ -19,31 +19,31 @@ Octree<DataT, ResT, BlockSizeT>::Octree(const int size) : size_(size)
 
 template <typename DataT,
           Res      ResT,
-          int      BlockSizeT
+          int      BlockSize
 >
-OctreeIterator<Octree<DataT, ResT, BlockSizeT>> Octree<DataT, ResT, BlockSizeT>::begin()
+OctreeIterator<Octree<DataT, ResT, BlockSize>> Octree<DataT, ResT, BlockSize>::begin()
 {
-  return OctreeIterator<Octree<DataT, ResT, BlockSizeT>>(this);
+  return OctreeIterator<Octree<DataT, ResT, BlockSize>>(this);
 }
 
 
 
 template <typename DataT,
           Res      ResT,
-          int      BlockSizeT
+          int      BlockSize
 >
-OctreeIterator<Octree<DataT, ResT, BlockSizeT>> Octree<DataT, ResT, BlockSizeT>::end()
+OctreeIterator<Octree<DataT, ResT, BlockSize>> Octree<DataT, ResT, BlockSize>::end()
 {
-  return OctreeIterator<Octree<DataT, ResT, BlockSizeT>>();
+  return OctreeIterator<Octree<DataT, ResT, BlockSize>>();
 }
 
 
 
 template <typename DataT,
           Res      ResT,
-          int      BlockSizeT
+          int      BlockSize
 >
-bool Octree<DataT, ResT, BlockSizeT>::contains(const Eigen::Vector3i& voxel_coord)
+bool Octree<DataT, ResT, BlockSize>::contains(const Eigen::Vector3i& voxel_coord)
 {
   return voxel_coord.x() >= 0 && voxel_coord.x() < size_ &&
          voxel_coord.y() >= 0 && voxel_coord.y() < size_ &&
@@ -54,9 +54,9 @@ bool Octree<DataT, ResT, BlockSizeT>::contains(const Eigen::Vector3i& voxel_coor
 
 template <typename DataT,
           Res      ResT,
-          int            BlockSizeT
+          int            BlockSize
 >
-bool Octree<DataT, ResT, BlockSizeT>::contains(const Eigen::Vector3i& voxel_coord) const
+bool Octree<DataT, ResT, BlockSize>::contains(const Eigen::Vector3i& voxel_coord) const
 {
   return voxel_coord.x() >=0 && voxel_coord.x() < size_ &&
          voxel_coord.y() >=0 && voxel_coord.y() < size_ &&
@@ -67,11 +67,11 @@ bool Octree<DataT, ResT, BlockSizeT>::contains(const Eigen::Vector3i& voxel_coor
 
 template <typename DataT,
           Res      ResT,
-          int      BlockSizeT
+          int      BlockSize
 >
-bool Octree<DataT, ResT, BlockSizeT>::allocate(NodeType*          parent_ptr,
-                                               const unsigned int child_idx,
-                                               OctantBase*&       child_ptr)
+bool Octree<DataT, ResT, BlockSize>::allocate(NodeType*          parent_ptr,
+                                              const unsigned int child_idx,
+                                              OctantBase*&       child_ptr)
 {
   assert(!parent_ptr->isBlock()); // Verify that the parent is not a block
   assert(parent_ptr);             // Verify that the parent is not a nullptr
@@ -82,7 +82,7 @@ bool Octree<DataT, ResT, BlockSizeT>::allocate(NodeType*          parent_ptr,
     return false; // Already allocated
   }
 
-  if (parent_ptr->getSize() == BlockSizeT << 1) // Allocate Block
+  if (parent_ptr->getSize() == BlockSize << 1) // Allocate Block
   {
 #pragma omp critical
     {
@@ -103,10 +103,10 @@ bool Octree<DataT, ResT, BlockSizeT>::allocate(NodeType*          parent_ptr,
 
 template <typename DataT,
         Res      ResT,
-        int      BlockSizeT
+        int      BlockSize
 >
-OctantBase* Octree<DataT, ResT, BlockSizeT>::allocate(NodeType*          parent_ptr,
-                                                      const unsigned int child_idx)
+OctantBase* Octree<DataT, ResT, BlockSize>::allocate(NodeType*          parent_ptr,
+                                                     const unsigned int child_idx)
 {
   assert(!parent_ptr->isBlock()); // Verify that the parent is not a block
   assert(parent_ptr);             // Verify that the parent is not a nullptr
@@ -117,7 +117,7 @@ OctantBase* Octree<DataT, ResT, BlockSizeT>::allocate(NodeType*          parent_
     return child_ptr;
   }
 
-  if (parent_ptr->getSize() == BlockSizeT << 1) // Allocate Block
+  if (parent_ptr->getSize() == BlockSize << 1) // Allocate Block
   {
 #pragma omp critical
     {

@@ -34,9 +34,9 @@ struct MapConfig
 
 
 // Forward Declaration
-template <typename DataT      = se::Data<Field::TSDF, Colour::Off, Semantics::Off>,
-          Res      ResT       = Res::Single,
-          unsigned BlockSizeT = 8
+template <typename DataT     = se::Data<Field::TSDF, Colour::Off, Semantics::Off>,
+          Res      ResT      = Res::Single,
+          unsigned BlockSize = 8
 > class Map;
 
 
@@ -45,13 +45,13 @@ template <Field     FldT,
           Colour    ColB,
           Semantics SemB,
           Res       ResT,
-          unsigned BlockSizeT
+          unsigned  BlockSize
 >
-class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSizeT> {
+class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
 public:
   typedef Data<FldT, ColB, SemB> DataType;
   typedef DataConfig<FldT, ColB, SemB> DataConfigType;
-  typedef se::Octree<DataType, ResT, BlockSizeT> OctreeType;
+  typedef se::Octree<DataType, ResT, BlockSize> OctreeType;
 
   Map(const Eigen::Vector3f&                 dim,
       const float                            res,
@@ -180,37 +180,37 @@ template <se::Field     FldT      = se::Field::TSDF,
           se::Colour    ColB      = se::Colour::Off,
           se::Semantics SemB      = se::Semantics::Off,
           se::Res       ResT      = se::Res::Single,
-          unsigned BlockSizeT     = 8
+          unsigned      BlockSize = 8
 >
-using MapD = Map<Data<FldT, ColB, SemB>, ResT, BlockSizeT> ;
+using MapD = Map<Data<FldT, ColB, SemB>, ResT, BlockSize> ;
 
 
 // Occupancy map setups
-template <se::Res ResT = se::Res::Single, unsigned BlockSizeT = 8>
-using OccMap = Map<OccData, ResT, BlockSizeT> ;
+template <se::Res ResT = se::Res::Single, unsigned BlockSize = 8>
+using OccMap = Map<OccData, ResT, BlockSize> ;
 
-template <se::Res ResT = se::Res::Single, unsigned BlockSizeT = 8>
-using OccColMap = Map<OccColData, ResT, BlockSizeT> ;
+template <se::Res ResT = se::Res::Single, unsigned BlockSize = 8>
+using OccColMap = Map<OccColData, ResT, BlockSize> ;
 
-template <se::Res ResT = se::Res::Single, unsigned BlockSizeT = 8>
-using OccSemMap = Map<OccSemData, ResT, BlockSizeT> ;
+template <se::Res ResT = se::Res::Single, unsigned BlockSize = 8>
+using OccSemMap = Map<OccSemData, ResT, BlockSize> ;
 
-template <se::Res ResT = se::Res::Single, unsigned BlockSizeT = 8>
-using OccColSemMap = Map<OccColSemData, ResT, BlockSizeT> ;
+template <se::Res ResT = se::Res::Single, unsigned BlockSize = 8>
+using OccColSemMap = Map<OccColSemData, ResT, BlockSize> ;
 
 
 // TSDF map setups
-template <se::Res ResT = se::Res::Single, unsigned BlockSizeT = 8>
-using TSDFMap = Map<TSDFData, ResT, BlockSizeT> ;
+template <se::Res ResT = se::Res::Single, unsigned BlockSize = 8>
+using TSDFMap = Map<TSDFData, ResT, BlockSize> ;
 
-template <se::Res ResT = se::Res::Single, unsigned BlockSizeT = 8>
-using TSDFColMap = Map<TSDFColData, ResT, BlockSizeT> ;
+template <se::Res ResT = se::Res::Single, unsigned BlockSize = 8>
+using TSDFColMap = Map<TSDFColData, ResT, BlockSize> ;
 
-template <se::Res ResT = se::Res::Single, unsigned BlockSizeT = 8>
-using TSDFSemMap = Map<TSDFSemData, ResT, BlockSizeT> ;
+template <se::Res ResT = se::Res::Single, unsigned BlockSize = 8>
+using TSDFSemMap = Map<TSDFSemData, ResT, BlockSize> ;
 
-template <se::Res ResT = se::Res::Single, unsigned BlockSizeT = 8>
-using TSDFColSemMap = Map<TSDFColSemData, ResT, BlockSizeT> ;
+template <se::Res ResT = se::Res::Single, unsigned BlockSize = 8>
+using TSDFColSemMap = Map<TSDFColSemData, ResT, BlockSize> ;
 
 } // namespace se
 
