@@ -62,10 +62,8 @@ public:
     min_scale_  = CAST_STACK_DEPTH - log2(octree_ptr_->getSize() / BlockType::size);
     state_      = INIT;
 
-    for (int i = 0 ; i < CAST_STACK_DEPTH; ++i)
-    {
-      stack_[i] = {0, nullptr, 0.f};
-    }
+	// Zero-initialize the stack
+	memset(stack_, 0, CAST_STACK_DEPTH * sizeof(StackEntry));
 
     // Ensure all elements of ray_dir_M_ are non-zero.
     const float epsilon = exp2f(-log2(octree_ptr_->getSize()));
