@@ -201,12 +201,12 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(const se::
           const float sdf_value = (depth_value - m) / m * point_S.norm();
           if (sdf_value > -truncation_boundary)
           {
-            const float tsdf_value = fminf(1.f, sdf_value / truncation_boundary);
+            const float tsdf_value = std::min(1.f, sdf_value / truncation_boundary);
             typename MapT::DataType data;
             block_ptr->getData(voxel_coord, data);
             data.tsdf = (data.tsdf * data.weight + tsdf_value) / (data.weight + 1.f);
             data.tsdf = se::math::clamp(data.tsdf, -1.f, 1.f);
-            data.weight = fminf(data.weight + 1, max_weight);
+            data.weight = std::min(data.weight + 1, max_weight);
             block_ptr->setData(voxel_coord, data);
           }
 

@@ -110,8 +110,8 @@ public:
     t_min_init_ = (2.0f * t_coef_ - t_bias_).maxCoeff();
     t_max_init_ = (t_coef_ - t_bias_).minCoeff();
     h_ = t_max_init_;
-    t_min_init_ = fmaxf(t_min_init_, near_plane / scaling_); // TODO: [x]
-    t_max_init_ = fminf(t_max_init_, far_plane  / scaling_); // TODO: [x]
+    t_min_init_ = std::max(t_min_init_, near_plane / scaling_); // TODO: [x]
+    t_max_init_ = std::min(t_max_init_, far_plane  / scaling_); // TODO: [x]
     t_min_ = t_min_init_;
     t_max_ = t_max_init_;
 
@@ -153,7 +153,7 @@ public:
     while (scale_ < CAST_STACK_DEPTH)
     {
       t_corner_ = pos_.cwiseProduct(t_coef_) - t_bias_;
-      tc_max_ = fminf(fminf(t_corner_.x(), t_corner_.y()), t_corner_.z());
+      tc_max_ = t_corner_.minCoeff();
 
       child_ptr_ = parent_ptr_->getChild(idx_ ^ octant_mask_ ^ 7);
 
@@ -369,7 +369,7 @@ private:
   /*! \brief Descend the hiararchy and compute the next child position.
    */
   inline void descend() {
-    const float tv_max = fminf(t_max_, tc_max_);
+    const float tv_max = std::min(t_max_, tc_max_);
     const float half = scale_exp2_ * 0.5f;
     const Eigen::Vector3f t_centre = half * t_coef_ + t_corner_;
 

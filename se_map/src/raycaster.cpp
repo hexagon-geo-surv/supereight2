@@ -89,7 +89,7 @@ void renderVolumeKernel(uint32_t*                         volume_RGBA_image_data
       {
         const Eigen::Vector3f diff = (surface_point_M - light_M).normalized();
         const Eigen::Vector3f dir
-                = Eigen::Vector3f::Constant(fmaxf(surface_normal_M.normalized().dot(diff), 0.f));
+                = Eigen::Vector3f::Constant(std::max(surface_normal_M.normalized().dot(diff), 0.f));
         Eigen::Vector3f col = dir + ambient_M;
         se::math::clamp(col, Eigen::Vector3f::Zero(), Eigen::Vector3f::Ones());
         col = col.cwiseProduct(se::raycaster::color_map[se::raycaster::scale_image(x, y)]);

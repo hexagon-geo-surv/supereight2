@@ -64,7 +64,7 @@ inline Eigen::Vector4f raycast(MapT&                  map,
           break;
         } // got it, jump out of inner loop
 
-        stepsize  = fmaxf(f_tt * map.getDataConfig().truncation_boundary, step);
+        stepsize  = std::max(f_tt * map.getDataConfig().truncation_boundary, step);
         position += stepsize * ray_dir_M;
         f_t = f_tt;
       }
