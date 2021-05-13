@@ -13,16 +13,16 @@ namespace se {
 namespace io {
 
 template <typename OctreeT>
-int save_3d_slice_vtk(std::shared_ptr<OctreeT>  octree_ptr,
-                      const std::string         filename,
-                      const Eigen::Vector3i&    lower_coord,
-                      const Eigen::Vector3i&    upper_coord)
+int save_3d_slice_vtk(const OctreeT&         octree,
+                      const std::string      filename,
+                      const Eigen::Vector3i& lower_coord,
+                      const Eigen::Vector3i& upper_coord)
 {
 
   auto get_value = [&](int x, int y, int z)
   {
       typename OctreeT::DataType data;
-      se::visitor::getData(octree_ptr, Eigen::Vector3i(x, y, z), data);
+      se::visitor::getData(octree, Eigen::Vector3i(x, y, z), data);
       return data.tsdf;
   };
 
@@ -94,8 +94,8 @@ int save_3d_slice_vtk(std::shared_ptr<OctreeT>  octree_ptr,
 
 
 template <typename OctreeT>
-int save_octree_structure_ply(std::shared_ptr<OctreeT>  octree_ptr,
-                              const std::string         filename)
+int save_octree_structure_ply(OctreeT&          octree,
+                              const std::string filename)
 {
 
   // Open the file for writing.
@@ -109,7 +109,7 @@ int save_octree_structure_ply(std::shared_ptr<OctreeT>  octree_ptr,
   std::stringstream ss_faces;
   int nodes_corners_count = 0;
   int faces_count  = 0;
-  for (auto octant_ptr_itr = octree_ptr->begin(); octant_ptr_itr != octree_ptr->end(); ++octant_ptr_itr) {
+  for (auto octant_ptr_itr = octree.begin(); octant_ptr_itr != octree.end(); ++octant_ptr_itr) {
     auto octant_ptr = *octant_ptr_itr;
     const Eigen::Vector3i node_coord = octant_ptr->getCoord();
     int node_size;

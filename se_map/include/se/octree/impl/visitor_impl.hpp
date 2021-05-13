@@ -66,9 +66,9 @@ inline void gather_2(const BlockT*           block_ptr,
 
 
 template <typename OctreeT>
-inline bool get_neighbours(const std::shared_ptr<OctreeT> octree_ptr,
-                           const Eigen::Vector3i&         base_coord,
-                           typename OctreeT::DataType     neighbour_data[8])
+inline bool get_neighbours(const OctreeT&             octree,
+                           const Eigen::Vector3i&     base_coord,
+                           typename OctreeT::DataType neighbour_data[8])
 {
   unsigned int stride = 1;
   unsigned int block_size = OctreeT::BlockType::getSize();
@@ -80,7 +80,7 @@ inline bool get_neighbours(const std::shared_ptr<OctreeT> octree_ptr,
   switch(crossmask) {
     case 0: /* all local */
     {
-      const typename OctreeT::BlockType* block_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree_ptr, octree_ptr->getRoot()));
+      const typename OctreeT::BlockType* block_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree, octree.getRoot()));
       if (!block_ptr)
       {
         return false;
@@ -93,13 +93,13 @@ inline bool get_neighbours(const std::shared_ptr<OctreeT> octree_ptr,
       const unsigned int offs1[4] = {0, 1, 2, 3};
       const unsigned int offs2[4] = {4, 5, 6, 7};
 
-      typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree, octree.getRoot()));
       if (!block_1_ptr)
       {
         return false;
       }
 
-      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs2[0]], octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs2[0]], octree, octree.getRoot()));
       if (!block_2_ptr)
       {
         return false;
@@ -114,13 +114,13 @@ inline bool get_neighbours(const std::shared_ptr<OctreeT> octree_ptr,
       const unsigned int offs1[4] = {0, 1, 4, 5};
       const unsigned int offs2[4] = {2, 3, 6, 7};
 
-      typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree, octree.getRoot()));
       if (!block_1_ptr)
       {
         return false;
       }
 
-      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs2[0]], octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs2[0]], octree, octree.getRoot()));
       if (!block_2_ptr)
       {
         return false;
@@ -137,16 +137,16 @@ inline bool get_neighbours(const std::shared_ptr<OctreeT> octree_ptr,
       const unsigned int offs3[2] = {4, 5};
       const unsigned int offs4[2] = {6, 7};
 
-      typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree, octree.getRoot()));
       if (!block_1_ptr) { return false; }
 
-      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs2[0]], octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs2[0]], octree, octree.getRoot()));
       if (!block_2_ptr) { return false; }
 
-      typename OctreeT::BlockType* block_3_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs3[0]], octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_3_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs3[0]], octree, octree.getRoot()));
       if (!block_3_ptr) { return false; }
 
-      typename OctreeT::BlockType* block_4_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs4[0]], octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_4_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs4[0]], octree, octree.getRoot()));
       if (!block_4_ptr) { return false; }
 
       gather_2(block_1_ptr, base_coord,   offs1, neighbour_data);
@@ -160,13 +160,13 @@ inline bool get_neighbours(const std::shared_ptr<OctreeT> octree_ptr,
       const unsigned int offs1[4] = {0, 2, 4, 6};
       const unsigned int offs2[4] = {1, 3, 5, 7};
 
-      typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree, octree.getRoot()));
       if (!block_1_ptr)
       {
         return false;
       }
 
-      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs2[0]], octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs2[0]], octree, octree.getRoot()));
       if (!block_2_ptr)
       {
         return false;
@@ -183,16 +183,16 @@ inline bool get_neighbours(const std::shared_ptr<OctreeT> octree_ptr,
       const unsigned int offs3[2] = {4, 6};
       const unsigned int offs4[2] = {5, 7};
 
-      typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree, octree.getRoot()));
       if (!block_1_ptr) { return false; }
 
-      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs2[0]], octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs2[0]], octree, octree.getRoot()));
       if (!block_2_ptr) { return false; }
 
-      typename OctreeT::BlockType* block_3_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs3[0]], octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_3_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs3[0]], octree, octree.getRoot()));
       if (!block_3_ptr) { return false; }
 
-      typename OctreeT::BlockType* block_4_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs4[0]], octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_4_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs4[0]], octree, octree.getRoot()));
       if (!block_4_ptr) { return false; }
 
       gather_2(block_1_ptr, base_coord,   offs1, neighbour_data);
@@ -208,16 +208,16 @@ inline bool get_neighbours(const std::shared_ptr<OctreeT> octree_ptr,
       const unsigned int offs3[2] = {2, 6};
       const unsigned int offs4[2] = {3, 7};
 
-      typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree, octree.getRoot()));
       if (!block_1_ptr) { return false; }
 
-      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs2[0]], octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs2[0]], octree, octree.getRoot()));
       if (!block_2_ptr) { return false; }
 
-      typename OctreeT::BlockType* block_3_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs3[0]], octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_3_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs3[0]], octree, octree.getRoot()));
       if (!block_3_ptr) { return false; }
 
-      typename OctreeT::BlockType* block_4_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs4[0]], octree_ptr, octree_ptr->getRoot()));
+      typename OctreeT::BlockType* block_4_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs4[0]], octree, octree.getRoot()));
       if (!block_4_ptr) { return false; }
 
       gather_2(block_1_ptr, base_coord, offs1, neighbour_data);
@@ -241,7 +241,7 @@ inline bool get_neighbours(const std::shared_ptr<OctreeT> octree_ptr,
 
       for (int i = 0; i < 8; ++i)
       {
-        typename OctreeT::BlockType* block_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(voxels_coord[i], octree_ptr, octree_ptr->getRoot()));
+        typename OctreeT::BlockType* block_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(voxels_coord[i], octree, octree.getRoot()));
 
         if (!block_ptr) { return false; }
 
@@ -258,12 +258,12 @@ inline bool get_neighbours(const std::shared_ptr<OctreeT> octree_ptr,
 
 
 template <typename OctreeT>
-inline bool getData(std::shared_ptr<OctreeT>     octree_ptr,
+inline bool getData(const OctreeT&               octree,
                     const Eigen::Vector3i&       voxel_coord,
                     typename OctreeT::DataType&  data)
 {
 
-  const se::OctantBase* octant_ptr = se::fetcher::block(voxel_coord, octree_ptr, octree_ptr->getRoot());
+  const se::OctantBase* octant_ptr = se::fetcher::block(voxel_coord, octree, octree.getRoot());
 
   if (!octant_ptr)
   {
@@ -278,7 +278,7 @@ inline bool getData(std::shared_ptr<OctreeT>     octree_ptr,
 
 
 template <typename OctreeT, typename BlockT>
-inline bool getData(std::shared_ptr<OctreeT>    octree_ptr,
+inline bool getData(const OctreeT&              octree,
                     BlockT*                     block_ptr,
                     const Eigen::Vector3i&      voxel_coord,
                     typename OctreeT::DataType& data)
@@ -294,18 +294,18 @@ inline bool getData(std::shared_ptr<OctreeT>    octree_ptr,
     return true;
   }
 
-  return getData(octree_ptr, voxel_coord, data);
+  return getData(octree, voxel_coord, data);
 }
 
 
 
 template <typename OctreeT>
-inline typename OctreeT::DataType getData(std::shared_ptr<OctreeT> octree_ptr,
-                                          const Eigen::Vector3i&   voxel_coord)
+inline typename OctreeT::DataType getData(const OctreeT&         octree,
+                                          const Eigen::Vector3i& voxel_coord)
 {
   typename OctreeT::DataType data;
 
-  const se::OctantBase* octant_ptr = se::fetcher::block(voxel_coord, octree_ptr, octree_ptr->getRoot());
+  const se::OctantBase* octant_ptr = se::fetcher::block(voxel_coord, octree, octree.getRoot());
 
   if (!octant_ptr)
   {
@@ -318,9 +318,9 @@ inline typename OctreeT::DataType getData(std::shared_ptr<OctreeT> octree_ptr,
 
 
 template <typename OctreeT, typename BlockT>
-inline typename OctreeT::DataType getData(std::shared_ptr<OctreeT> octree_ptr,
-                                          BlockT*                  block_ptr,
-                                          const Eigen::Vector3i&   voxel_coord)
+inline typename OctreeT::DataType getData(const OctreeT&         octree,
+                                          BlockT*                block_ptr,
+                                          const Eigen::Vector3i& voxel_coord)
 {
   assert(block_ptr);
 
@@ -332,18 +332,18 @@ inline typename OctreeT::DataType getData(std::shared_ptr<OctreeT> octree_ptr,
     return block_ptr->getData(voxel_coord);
   }
 
-  return se::visitor::getData(octree_ptr, voxel_coord);
+  return se::visitor::getData(octree, voxel_coord);
 }
 
 
 
 template <typename OctreeT>
-inline bool getField(std::shared_ptr<OctreeT> octree_ptr,
-                     const Eigen::Vector3i&   voxel_coord,
-                     se::field_t&             field_value)
+inline bool getField(const OctreeT&         octree,
+                     const Eigen::Vector3i& voxel_coord,
+                     se::field_t&           field_value)
 {
   typename OctreeT::DataType data;
-  bool is_valid = getData(octree_ptr, voxel_coord, data);
+  bool is_valid = getData(octree, voxel_coord, data);
   field_value = get_field(data);
   return is_valid;
 }
@@ -351,13 +351,13 @@ inline bool getField(std::shared_ptr<OctreeT> octree_ptr,
 
 
 template <typename OctreeT, typename BlockT>
-inline bool getField(std::shared_ptr<OctreeT> octree_ptr,
-                     BlockT*                  block_ptr,
-                     const Eigen::Vector3i&   voxel_coord,
-                     se::field_t&             field_value)
+inline bool getField(const OctreeT&         octree,
+                     BlockT*                block_ptr,
+                     const Eigen::Vector3i& voxel_coord,
+                     se::field_t&           field_value)
 {
   typename OctreeT::DataType data;
-  bool is_valid = getData(octree_ptr, block_ptr, voxel_coord, data);
+  bool is_valid = getData(octree, block_ptr, voxel_coord, data);
   field_value = get_field(data);
   return is_valid;
 }
@@ -365,33 +365,33 @@ inline bool getField(std::shared_ptr<OctreeT> octree_ptr,
 
 
 template <typename OctreeT>
-inline se::field_t getField(std::shared_ptr<OctreeT> octree_ptr,
-                            const Eigen::Vector3i&   voxel_coord)
+inline se::field_t getField(const OctreeT&         octree,
+                            const Eigen::Vector3i& voxel_coord)
 {
-  return se::get_field(getData(octree_ptr, voxel_coord));
+  return se::get_field(getData(octree, voxel_coord));
 }
 
 
 
 template <typename OctreeT, typename BlockT>
-inline se::field_t getField(std::shared_ptr<OctreeT> octree_ptr,
-                            BlockT*                  block_ptr,
-                            const Eigen::Vector3i&   voxel_coord)
+inline se::field_t getField(const OctreeT&         octree,
+                            BlockT*                block_ptr,
+                            const Eigen::Vector3i& voxel_coord)
 {
-  return get_field(getData(octree_ptr, block_ptr, voxel_coord));
+  return get_field(getData(octree, block_ptr, voxel_coord));
 }
 
 
 
 template <typename OctreeT, typename FieldT>
-inline bool interpField(const std::shared_ptr<OctreeT> octree_ptr,
-                        const Eigen::Vector3f&         voxel_coord_f,
-                        FieldT&                        interp_field_value)
+inline bool interpField(const OctreeT&         octree,
+                        const Eigen::Vector3f& voxel_coord_f,
+                        FieldT&                interp_field_value)
 {
   typename OctreeT::DataType init_data;
   typename OctreeT::DataType neighbour_data[8] = { init_data };
   
-  const unsigned int octree_size = octree_ptr->getSize();
+  const unsigned int octree_size = octree.getSize();
   
   Eigen::Vector3f factor;
 
@@ -407,7 +407,7 @@ inline bool interpField(const std::shared_ptr<OctreeT> octree_ptr,
     return false;
   }
   
-  get_neighbours(octree_ptr, base_coord, neighbour_data);
+  get_neighbours(octree, base_coord, neighbour_data);
 
   interp_field_value =  (((se::get_field(neighbour_data[0]) * (1 - factor.x())
                          + se::get_field(neighbour_data[1]) * factor.x()) * (1 - factor.y())
@@ -433,9 +433,9 @@ inline bool interpField(const std::shared_ptr<OctreeT> octree_ptr,
 
 
 template <typename OctreeT>
-inline bool gradField(const std::shared_ptr<OctreeT> octree_ptr,
-                      const Eigen::Vector3f&         voxel_coord_f,
-                      Eigen::Vector3f&               grad_field_value)
+inline bool gradField(const OctreeT&         octree,
+                      const Eigen::Vector3f& voxel_coord_f,
+                      Eigen::Vector3f&       grad_field_value)
 {
   const Eigen::Vector3f scaled_voxel_coord_f = voxel_coord_f - se::sample_offset_frac;
   Eigen::Vector3f factor = se::math::fracf(scaled_voxel_coord_f);
@@ -445,11 +445,11 @@ inline bool gradField(const std::shared_ptr<OctreeT> octree_ptr,
   Eigen::Vector3i lower_upper_coord = base_coord.cwiseMax(Eigen::Vector3i::Constant(0));
 
   Eigen::Vector3i upper_lower_coord = (base_coord + Eigen::Vector3i::Constant(1)).cwiseMin(
-          Eigen::Vector3i::Constant(octree_ptr->getSize()) - Eigen::Vector3i::Constant(1));
+          Eigen::Vector3i::Constant(octree.getSize()) - Eigen::Vector3i::Constant(1));
   Eigen::Vector3i upper_upper_coord = (base_coord + Eigen::Vector3i::Constant(2)).cwiseMin(
-          Eigen::Vector3i::Constant(octree_ptr->getSize()) - Eigen::Vector3i::Constant(1));
+          Eigen::Vector3i::Constant(octree.getSize()) - Eigen::Vector3i::Constant(1));
 
-  const typename OctreeT::BlockType* block_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree_ptr, octree_ptr->getRoot()));
+  const typename OctreeT::BlockType* block_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree, octree.getRoot()));
   if (!block_ptr)
   {
     return false;
@@ -498,7 +498,7 @@ inline bool gradField(const std::shared_ptr<OctreeT> octree_ptr,
 
   for (unsigned int i = 0; i < 32; i++)
   {
-    if (!se::visitor::getField(octree_ptr, block_ptr, grad_coords[i], grad_field_values[i]))
+    if (!se::visitor::getField(octree, block_ptr, grad_coords[i], grad_field_values[i]))
     {
       return false;
     }
@@ -569,8 +569,8 @@ inline bool gradField(const std::shared_ptr<OctreeT> octree_ptr,
 
 
 template <typename OctreeT>
-inline Eigen::Vector3f gradField(const std::shared_ptr<OctreeT> octree_ptr,
-                                 const Eigen::Vector3f&         voxel_coord_f)
+inline Eigen::Vector3f gradField(const OctreeT&         octree,
+                                 const Eigen::Vector3f& voxel_coord_f)
 {
   const Eigen::Vector3f scaled_voxel_coord_f = voxel_coord_f - se::sample_offset_frac;
   Eigen::Vector3f factor = se::math::fracf(scaled_voxel_coord_f);
@@ -580,11 +580,11 @@ inline Eigen::Vector3f gradField(const std::shared_ptr<OctreeT> octree_ptr,
   Eigen::Vector3i lower_upper_coord = base_coord.cwiseMax(Eigen::Vector3i::Constant(0));
 
   Eigen::Vector3i upper_lower_coord = (base_coord + Eigen::Vector3i::Constant(1)).cwiseMin(
-          Eigen::Vector3i::Constant(octree_ptr->getSize()) - Eigen::Vector3i::Constant(1));
+          Eigen::Vector3i::Constant(octree.getSize()) - Eigen::Vector3i::Constant(1));
   Eigen::Vector3i upper_upper_coord = (base_coord + Eigen::Vector3i::Constant(2)).cwiseMin(
-          Eigen::Vector3i::Constant(octree_ptr->getSize()) - Eigen::Vector3i::Constant(1));
+          Eigen::Vector3i::Constant(octree.getSize()) - Eigen::Vector3i::Constant(1));
 
-  const typename OctreeT::BlockType* block_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree_ptr, octree_ptr->getRoot()));
+  const typename OctreeT::BlockType* block_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree, octree.getRoot()));
   if (!block_ptr)
   {
     return Eigen::Vector3f::Constant(0);
@@ -592,41 +592,41 @@ inline Eigen::Vector3f gradField(const std::shared_ptr<OctreeT> octree_ptr,
 
   const se::field_t grad_field_values[32] =
   {
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(lower_lower_coord.x(), lower_upper_coord.y(), lower_upper_coord.z())), //< Unique
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(lower_lower_coord.x(), upper_lower_coord.y(), lower_upper_coord.z())), //< Unique
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(lower_lower_coord.x(), lower_upper_coord.y(), upper_lower_coord.z())), //< Unique
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(lower_lower_coord.x(), upper_lower_coord.y(), upper_lower_coord.z())), //< Unique
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(lower_lower_coord.x(), lower_upper_coord.y(), lower_upper_coord.z())), //< Unique
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(lower_lower_coord.x(), upper_lower_coord.y(), lower_upper_coord.z())), //< Unique
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(lower_lower_coord.x(), lower_upper_coord.y(), upper_lower_coord.z())), //< Unique
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(lower_lower_coord.x(), upper_lower_coord.y(), upper_lower_coord.z())), //< Unique
 
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(lower_upper_coord.x(), lower_lower_coord.y(), lower_upper_coord.z())), //< Unique
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(lower_upper_coord.x(), lower_lower_coord.y(), upper_lower_coord.z())), //< Unique
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(lower_upper_coord.x(), lower_upper_coord.y(), lower_lower_coord.z())), //< Unique
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(lower_upper_coord.x(), lower_upper_coord.y(), lower_upper_coord.z())), //< Non-unique 3x
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(lower_upper_coord.x(), lower_upper_coord.y(), upper_lower_coord.z())), //< Non-unique 3x
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(lower_upper_coord.x(), lower_upper_coord.y(), upper_upper_coord.z())), //< Unique
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(lower_upper_coord.x(), upper_lower_coord.y(), lower_lower_coord.z())), //< Unique
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(lower_upper_coord.x(), upper_lower_coord.y(), lower_upper_coord.z())), //< Non-unique 3x
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(lower_upper_coord.x(), upper_lower_coord.y(), upper_lower_coord.z())), //< Non-unique 3x
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(lower_upper_coord.x(), upper_lower_coord.y(), upper_upper_coord.z())), //< Unique
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(lower_upper_coord.x(), upper_upper_coord.y(), lower_upper_coord.z())), //< Unique
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(lower_upper_coord.x(), upper_upper_coord.y(), upper_lower_coord.z())), //< Unique
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(lower_upper_coord.x(), lower_lower_coord.y(), lower_upper_coord.z())), //< Unique
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(lower_upper_coord.x(), lower_lower_coord.y(), upper_lower_coord.z())), //< Unique
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(lower_upper_coord.x(), lower_upper_coord.y(), lower_lower_coord.z())), //< Unique
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(lower_upper_coord.x(), lower_upper_coord.y(), lower_upper_coord.z())), //< Non-unique 3x
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(lower_upper_coord.x(), lower_upper_coord.y(), upper_lower_coord.z())), //< Non-unique 3x
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(lower_upper_coord.x(), lower_upper_coord.y(), upper_upper_coord.z())), //< Unique
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(lower_upper_coord.x(), upper_lower_coord.y(), lower_lower_coord.z())), //< Unique
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(lower_upper_coord.x(), upper_lower_coord.y(), lower_upper_coord.z())), //< Non-unique 3x
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(lower_upper_coord.x(), upper_lower_coord.y(), upper_lower_coord.z())), //< Non-unique 3x
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(lower_upper_coord.x(), upper_lower_coord.y(), upper_upper_coord.z())), //< Unique
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(lower_upper_coord.x(), upper_upper_coord.y(), lower_upper_coord.z())), //< Unique
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(lower_upper_coord.x(), upper_upper_coord.y(), upper_lower_coord.z())), //< Unique
 
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(upper_lower_coord.x(), lower_lower_coord.y(), lower_upper_coord.z())), //< Unique
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(upper_lower_coord.x(), lower_lower_coord.y(), upper_lower_coord.z())), //< Unique
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(upper_lower_coord.x(), lower_upper_coord.y(), lower_lower_coord.z())), //< Unique
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(upper_lower_coord.x(), lower_upper_coord.y(), lower_upper_coord.z())), //< Non-unique 3x
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(upper_lower_coord.x(), lower_upper_coord.y(), upper_lower_coord.z())), //< Non-unique 3x
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(upper_lower_coord.x(), lower_upper_coord.y(), upper_upper_coord.z())), //< Unique
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(upper_lower_coord.x(), upper_lower_coord.y(), lower_lower_coord.z())), //< Unique
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(upper_lower_coord.x(), upper_lower_coord.y(), lower_upper_coord.z())), //< Non-unique 3x
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(upper_lower_coord.x(), upper_lower_coord.y(), upper_lower_coord.z())), //< Non-unique 3x
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(upper_lower_coord.x(), upper_lower_coord.y(), upper_upper_coord.z())), //< Unique
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(upper_lower_coord.x(), upper_upper_coord.y(), lower_upper_coord.z())), //< Unique
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(upper_lower_coord.x(), upper_upper_coord.y(), upper_lower_coord.z())), //< Unique
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(upper_lower_coord.x(), lower_lower_coord.y(), lower_upper_coord.z())), //< Unique
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(upper_lower_coord.x(), lower_lower_coord.y(), upper_lower_coord.z())), //< Unique
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(upper_lower_coord.x(), lower_upper_coord.y(), lower_lower_coord.z())), //< Unique
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(upper_lower_coord.x(), lower_upper_coord.y(), lower_upper_coord.z())), //< Non-unique 3x
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(upper_lower_coord.x(), lower_upper_coord.y(), upper_lower_coord.z())), //< Non-unique 3x
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(upper_lower_coord.x(), lower_upper_coord.y(), upper_upper_coord.z())), //< Unique
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(upper_lower_coord.x(), upper_lower_coord.y(), lower_lower_coord.z())), //< Unique
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(upper_lower_coord.x(), upper_lower_coord.y(), lower_upper_coord.z())), //< Non-unique 3x
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(upper_lower_coord.x(), upper_lower_coord.y(), upper_lower_coord.z())), //< Non-unique 3x
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(upper_lower_coord.x(), upper_lower_coord.y(), upper_upper_coord.z())), //< Unique
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(upper_lower_coord.x(), upper_upper_coord.y(), lower_upper_coord.z())), //< Unique
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(upper_lower_coord.x(), upper_upper_coord.y(), upper_lower_coord.z())), //< Unique
 
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(upper_upper_coord.x(), lower_upper_coord.y(), lower_upper_coord.z())), //< Unique
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(upper_upper_coord.x(), upper_lower_coord.y(), lower_upper_coord.z())), //< Unique
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(upper_upper_coord.x(), lower_upper_coord.y(), upper_lower_coord.z())), //< Unique
-    se::visitor::getField(octree_ptr, block_ptr, Eigen::Vector3i(upper_upper_coord.x(), upper_lower_coord.y(), upper_lower_coord.z()))  //< Unique
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(upper_upper_coord.x(), lower_upper_coord.y(), lower_upper_coord.z())), //< Unique
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(upper_upper_coord.x(), upper_lower_coord.y(), lower_upper_coord.z())), //< Unique
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(upper_upper_coord.x(), lower_upper_coord.y(), upper_lower_coord.z())), //< Unique
+    se::visitor::getField(octree, block_ptr, Eigen::Vector3i(upper_upper_coord.x(), upper_lower_coord.y(), upper_lower_coord.z()))  //< Unique
   };
 
   const float rev_factor_x = (1 - factor.x());

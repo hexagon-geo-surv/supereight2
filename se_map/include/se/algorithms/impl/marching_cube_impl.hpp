@@ -14,18 +14,18 @@ namespace meshing {
 /// Single-res marching cube implementation
 
 template <typename OctreeT>
-inline Eigen::Vector3f compute_intersection(const std::shared_ptr<OctreeT> octree_ptr,
-                                            const Eigen::Vector3i&         source_coord,
-                                            const Eigen::Vector3i&         dest_coord)
+inline Eigen::Vector3f compute_intersection(const OctreeT&         octree,
+                                            const Eigen::Vector3i& source_coord,
+                                            const Eigen::Vector3i& dest_coord)
 {
 
   typename OctreeT::DataType data_0;
-  se::visitor::getData(octree_ptr, source_coord, data_0);
+  se::visitor::getData(octree, source_coord, data_0);
   float value_0 = get_field(data_0);
 
   typename OctreeT::DataType data_1;
 
-  se::visitor::getData(octree_ptr, dest_coord, data_1);
+  se::visitor::getData(octree, dest_coord, data_1);
   float value_1 = get_field(data_1);
 
   Eigen::Vector3f source_point_M = (source_coord.cast<float>() + Eigen::Vector3f::Constant(0.5f));
@@ -35,37 +35,37 @@ inline Eigen::Vector3f compute_intersection(const std::shared_ptr<OctreeT> octre
 }
 
 template <typename OctreeT>
-inline Eigen::Vector3f interp_vertexes(const std::shared_ptr<OctreeT> octree_ptr,
-                                       const unsigned                 x,
-                                       const unsigned                 y,
-                                       const unsigned                 z,
-                                       const int                      edge)
+inline Eigen::Vector3f interp_vertexes(const OctreeT& octree,
+                                       const unsigned x,
+                                       const unsigned y,
+                                       const unsigned z,
+                                       const int      edge)
 {
   switch(edge){
-    case 0:  return compute_intersection(octree_ptr, Eigen::Vector3i(x, y, z),
+    case 0:  return compute_intersection(octree, Eigen::Vector3i(x, y, z),
                                          Eigen::Vector3i(x + 1, y, z));
-    case 1:  return compute_intersection(octree_ptr, Eigen::Vector3i(x + 1, y, z),
+    case 1:  return compute_intersection(octree, Eigen::Vector3i(x + 1, y, z),
                                          Eigen::Vector3i(x + 1, y, z + 1));
-    case 2:  return compute_intersection(octree_ptr, Eigen::Vector3i(x + 1, y, z + 1),
+    case 2:  return compute_intersection(octree, Eigen::Vector3i(x + 1, y, z + 1),
                                          Eigen::Vector3i(x, y, z + 1));
-    case 3:  return compute_intersection(octree_ptr, Eigen::Vector3i(x, y, z),
+    case 3:  return compute_intersection(octree, Eigen::Vector3i(x, y, z),
                                          Eigen::Vector3i(x, y, z + 1));
-    case 4:  return compute_intersection(octree_ptr, Eigen::Vector3i(x, y + 1, z),
+    case 4:  return compute_intersection(octree, Eigen::Vector3i(x, y + 1, z),
                                          Eigen::Vector3i(x + 1, y + 1, z));
-    case 5:  return compute_intersection(octree_ptr, Eigen::Vector3i(x + 1, y + 1, z),
+    case 5:  return compute_intersection(octree, Eigen::Vector3i(x + 1, y + 1, z),
                                          Eigen::Vector3i(x + 1, y + 1, z + 1));
-    case 6:  return compute_intersection(octree_ptr, Eigen::Vector3i(x + 1, y + 1, z + 1),
+    case 6:  return compute_intersection(octree, Eigen::Vector3i(x + 1, y + 1, z + 1),
                                          Eigen::Vector3i(x, y + 1, z + 1));
-    case 7:  return compute_intersection(octree_ptr, Eigen::Vector3i(x, y + 1, z),
+    case 7:  return compute_intersection(octree, Eigen::Vector3i(x, y + 1, z),
                                          Eigen::Vector3i(x, y + 1, z + 1));
 
-    case 8:  return compute_intersection(octree_ptr, Eigen::Vector3i(x, y, z),
+    case 8:  return compute_intersection(octree, Eigen::Vector3i(x, y, z),
                                          Eigen::Vector3i(x, y + 1, z));
-    case 9:  return compute_intersection(octree_ptr, Eigen::Vector3i(x + 1, y, z),
+    case 9:  return compute_intersection(octree, Eigen::Vector3i(x + 1, y, z),
                                          Eigen::Vector3i(x + 1, y + 1, z));
-    case 10: return compute_intersection(octree_ptr, Eigen::Vector3i(x + 1, y, z + 1),
+    case 10: return compute_intersection(octree, Eigen::Vector3i(x + 1, y, z + 1),
                                          Eigen::Vector3i(x + 1, y + 1, z + 1));
-    case 11: return compute_intersection(octree_ptr, Eigen::Vector3i(x, y, z + 1),
+    case 11: return compute_intersection(octree, Eigen::Vector3i(x, y, z + 1),
                                          Eigen::Vector3i(x, y + 1, z + 1));
   }
   return Eigen::Vector3f::Constant(0);
@@ -101,26 +101,26 @@ inline void gather_data(const BlockT*             block_ptr,
 
 
 template <typename OctreeT>
-inline void gather_data(const std::shared_ptr<OctreeT> octree_ptr,
-                        typename OctreeT::DataType     data[8],
-                        const int                      x,
-                        const int                      y,
-                        const int                      z)
+inline void gather_data(const OctreeT&             octree,
+                        typename OctreeT::DataType data[8],
+                        const int                  x,
+                        const int                  y,
+                        const int                  z)
 {
-  se::visitor::getData(octree_ptr, Eigen::Vector3i(x,     y,     z    ), data[0]);
-  se::visitor::getData(octree_ptr, Eigen::Vector3i(x + 1, y,     z    ), data[1]);
-  se::visitor::getData(octree_ptr, Eigen::Vector3i(x + 1, y,     z + 1), data[2]);
-  se::visitor::getData(octree_ptr, Eigen::Vector3i(x ,    y,     z + 1), data[3]);
-  se::visitor::getData(octree_ptr, Eigen::Vector3i(x,     y + 1, z    ), data[4]);
-  se::visitor::getData(octree_ptr, Eigen::Vector3i(x + 1, y + 1, z    ), data[5]);
-  se::visitor::getData(octree_ptr, Eigen::Vector3i(x + 1, y + 1, z + 1), data[6]);
-  se::visitor::getData(octree_ptr, Eigen::Vector3i(x,     y + 1, z + 1), data[7]);
+  se::visitor::getData(octree, Eigen::Vector3i(x,     y,     z    ), data[0]);
+  se::visitor::getData(octree, Eigen::Vector3i(x + 1, y,     z    ), data[1]);
+  se::visitor::getData(octree, Eigen::Vector3i(x + 1, y,     z + 1), data[2]);
+  se::visitor::getData(octree, Eigen::Vector3i(x ,    y,     z + 1), data[3]);
+  se::visitor::getData(octree, Eigen::Vector3i(x,     y + 1, z    ), data[4]);
+  se::visitor::getData(octree, Eigen::Vector3i(x + 1, y + 1, z    ), data[5]);
+  se::visitor::getData(octree, Eigen::Vector3i(x + 1, y + 1, z + 1), data[6]);
+  se::visitor::getData(octree, Eigen::Vector3i(x,     y + 1, z + 1), data[7]);
 }
 
 
 
 template <typename OctreeT>
-uint8_t compute_index(const std::shared_ptr<OctreeT>     octree_ptr,
+uint8_t compute_index(const OctreeT&                     octree,
                       const typename OctreeT::BlockType* block_ptr,
                       const unsigned                     x,
                       const unsigned                     y,
@@ -133,7 +133,7 @@ uint8_t compute_index(const std::shared_ptr<OctreeT>     octree_ptr,
 
   typename OctreeT::DataType data[8];
   if(!local) gather_data(block_ptr, data, x, y, z);
-  else gather_data(octree_ptr, data, x, y, z);
+  else gather_data(octree, data, x, y, z);
 
   uint8_t index = 0;
 
@@ -632,7 +632,7 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
 template <typename  OctreeT,
         typename DataT
 >
-inline void gather_dual_data(const std::shared_ptr<OctreeT>     octree_ptr,
+inline void gather_dual_data(const OctreeT&                     octree,
                              const typename OctreeT::BlockType* block_ptr,
                              const int                          scale,
                              const Eigen::Vector3i&             primal_corner_coord,
@@ -649,11 +649,11 @@ inline void gather_dual_data(const std::shared_ptr<OctreeT>     octree_ptr,
 
   for(const auto& offset_idx: lower_priority_neighbours) {
     Eigen::Vector3i logical_dual_corner_coord = primal_corner_coord + logical_dual_offset[offset_idx];
-    if (!octree_ptr->contains(logical_dual_corner_coord)) {
+    if (!octree.contains(logical_dual_corner_coord)) {
       set_invalid(data_arr[0]);
       return;
     }
-    typename OctreeT::BlockType* block_neighbour_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(logical_dual_corner_coord, octree_ptr, octree_ptr->getRoot()));
+    typename OctreeT::BlockType* block_neighbour_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(logical_dual_corner_coord, octree, octree.getRoot()));
     if (block_neighbour_ptr == nullptr || block_ptr->getCurrentScale() <= scale) {
       set_invalid(data_arr[0]);
       return;
@@ -661,11 +661,11 @@ inline void gather_dual_data(const std::shared_ptr<OctreeT>     octree_ptr,
   }
   for(const auto& offset_idx: higher_priority_neighbours) {
     Eigen::Vector3i logical_dual_corner_coord = primal_corner_coord + logical_dual_offset[offset_idx];
-    if (!octree_ptr->contains(logical_dual_corner_coord)) {
+    if (!octree.contains(logical_dual_corner_coord)) {
       set_invalid(data_arr[0]);
       return;
     }
-    typename OctreeT::BlockType* block_neighbour_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(logical_dual_corner_coord, octree_ptr, octree_ptr->getRoot()));
+    typename OctreeT::BlockType* block_neighbour_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(logical_dual_corner_coord, octree, octree.getRoot()));
     if (block_neighbour_ptr == nullptr || block_ptr->getCurrentScale() < scale) {
       set_invalid(data_arr[0]);
       return;
@@ -682,7 +682,7 @@ inline void gather_dual_data(const std::shared_ptr<OctreeT>     octree_ptr,
   }
   for (size_t neighbour_idx = 1; neighbour_idx < neighbours.size(); ++neighbour_idx) {
     Eigen::Vector3i logical_dual_corner_coord = primal_corner_coord + logical_dual_offset[neighbours[neighbour_idx][0]];
-    typename OctreeT::BlockType* block_neighbour_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(logical_dual_corner_coord, octree_ptr, octree_ptr->getRoot()));
+    typename OctreeT::BlockType* block_neighbour_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(logical_dual_corner_coord, octree, octree.getRoot()));
     int stride = 1 << block_neighbour_ptr->getCurrentScale();
     for(const auto& offset_idx: neighbours[neighbour_idx]) {
       logical_dual_corner_coord = primal_corner_coord + logical_dual_offset[offset_idx];
@@ -699,7 +699,7 @@ inline void gather_dual_data(const std::shared_ptr<OctreeT>     octree_ptr,
 template <typename OctreeT,
           typename DataT
 >
-void compute_dual_index(const std::shared_ptr<OctreeT>     octree_ptr,
+void compute_dual_index(const OctreeT&                     octree,
                         const typename OctreeT::BlockType* block_ptr,
                         const int                          scale,
                         const Eigen::Vector3i&             primal_corner_coord,
@@ -727,7 +727,7 @@ void compute_dual_index(const std::shared_ptr<OctreeT>     octree_ptr,
 
   edge_pattern_idx = 0;
   if(!local) gather_dual_data(block_ptr, scale, primal_corner_coord.cast<float>(), data, dual_corner_coords_f);
-  else gather_dual_data(octree_ptr, block_ptr, scale, primal_corner_coord, data, dual_corner_coords_f);
+  else gather_dual_data(octree, block_ptr, scale, primal_corner_coord, data, dual_corner_coords_f);
 
   // Only compute dual index if all data is valid/observed
   for (int corner_idx = 0; corner_idx < 8; corner_idx++) {
@@ -767,17 +767,17 @@ namespace algorithms {
 
 template <typename OctreeT,
           typename TriangleType>
-void marching_cube(std::shared_ptr<OctreeT>   octree_ptr,
+void marching_cube(OctreeT&                   octree,
                    std::vector<TriangleType>& triangles) {
 
   using namespace meshing;
   typedef typename OctreeT::BlockType BlockType;
 
   const int block_size   = OctreeT::BlockType::getSize();
-  const int octree_size  = octree_ptr->getSize();
+  const int octree_size  = octree.getSize();
 
 //#pragma omp parallel for
-  for (auto block_ptr_itr = se::BlocksIterator<OctreeT>(octree_ptr.get()); block_ptr_itr != se::BlocksIterator<OctreeT>(); ++block_ptr_itr)
+  for (auto block_ptr_itr = se::BlocksIterator<OctreeT>(&octree); block_ptr_itr != se::BlocksIterator<OctreeT>(); ++block_ptr_itr)
   {
     BlockType* block_ptr   = static_cast<BlockType*>(*block_ptr_itr);
 
@@ -792,13 +792,13 @@ void marching_cube(std::shared_ptr<OctreeT>   octree_ptr,
         for (int z = start_coord.z(); z < last_coord.z(); z++)
         {
 
-          const uint8_t edge_pattern_idx = meshing::compute_index(octree_ptr, block_ptr, x, y, z);
+          const uint8_t edge_pattern_idx = meshing::compute_index(octree, block_ptr, x, y, z);
           const int* edges = triTable[edge_pattern_idx];
           for (unsigned int e = 0; edges[e] != -1 && e < 16; e += 3)
           {
-            Eigen::Vector3f vertex_0 = interp_vertexes(octree_ptr, x, y, z, edges[e]);
-            Eigen::Vector3f vertex_1 = interp_vertexes(octree_ptr, x, y, z, edges[e + 1]);
-            Eigen::Vector3f vertex_2 = interp_vertexes(octree_ptr, x, y, z, edges[e + 2]);
+            Eigen::Vector3f vertex_0 = interp_vertexes(octree, x, y, z, edges[e]);
+            Eigen::Vector3f vertex_1 = interp_vertexes(octree, x, y, z, edges[e + 1]);
+            Eigen::Vector3f vertex_2 = interp_vertexes(octree, x, y, z, edges[e + 2]);
 
             if (checkVertex(vertex_0, octree_size) || checkVertex(vertex_1, octree_size) || checkVertex(vertex_2, octree_size))
             {
@@ -822,16 +822,16 @@ void marching_cube(std::shared_ptr<OctreeT>   octree_ptr,
 template <typename OctreeT,
           typename TriangleT
 >
-void dual_marching_cube(std::shared_ptr<OctreeT> octree_ptr,
-                        std::vector<TriangleT>&   triangles)
+void dual_marching_cube(OctreeT&                octree,
+                        std::vector<TriangleT>& triangles)
 {
   using namespace meshing;
   typedef typename OctreeT::BlockType BlockType;
 
   const int block_size   = OctreeT::BlockType::getSize();
-  const int octree_size  = octree_ptr->getSize();
+  const int octree_size  = octree.getSize();
 
-  for (auto block_ptr_itr = se::BlocksIterator<OctreeT>(octree_ptr.get()); block_ptr_itr != se::BlocksIterator<OctreeT>(); ++block_ptr_itr)
+  for (auto block_ptr_itr = se::BlocksIterator<OctreeT>(&octree); block_ptr_itr != se::BlocksIterator<OctreeT>(); ++block_ptr_itr)
   {
     BlockType* block_ptr   = static_cast<BlockType*>(*block_ptr_itr);
     const int voxel_scale  = block_ptr->getCurrentScale();
@@ -847,7 +847,7 @@ void dual_marching_cube(std::shared_ptr<OctreeT> octree_ptr,
 
           if (x == last_coord.x() || y == last_coord.y() || z == last_coord.z())
           {
-            if(!se::fetcher::block(primal_corner_coord, octree_ptr, octree_ptr->getRoot()))
+            if(!se::fetcher::block(primal_corner_coord, octree, octree.getRoot()))
             {
               continue;
             }
@@ -856,7 +856,7 @@ void dual_marching_cube(std::shared_ptr<OctreeT> octree_ptr,
           uint8_t edge_pattern_idx;
           typename OctreeT::DataType data[8];
           std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> dual_corner_coords_f(8, Eigen::Vector3f::Constant(0));
-          meshing::compute_dual_index(octree_ptr, block_ptr, voxel_scale, primal_corner_coord, edge_pattern_idx, data, dual_corner_coords_f);
+          meshing::compute_dual_index(octree, block_ptr, voxel_scale, primal_corner_coord, edge_pattern_idx, data, dual_corner_coords_f);
           const int* edges = triTable[edge_pattern_idx];
           for (unsigned int e = 0; edges[e] != -1 && e < 16; e += 3)
           {

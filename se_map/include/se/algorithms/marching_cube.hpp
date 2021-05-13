@@ -145,16 +145,16 @@ enum status : uint8_t {
 /// Single-res marching cube implementation
 
 template <typename OctreeT>
-inline Eigen::Vector3f compute_intersection(const std::shared_ptr<OctreeT> octree_ptr,
-                                            const Eigen::Vector3i&         source_coord,
-                                            const Eigen::Vector3i&         dest_coord);
+inline Eigen::Vector3f compute_intersection(const OctreeT&         octree,
+                                            const Eigen::Vector3i& source_coord,
+                                            const Eigen::Vector3i& dest_coord);
 
 template <typename OctreeT>
-inline Eigen::Vector3f interp_vertexes(const std::shared_ptr<OctreeT> octree_ptr,
-                                       const unsigned                 x,
-                                       const unsigned                 y,
-                                       const unsigned                 z,
-                                       const int                      edge);
+inline Eigen::Vector3f interp_vertexes(const OctreeT& octree,
+                                       const unsigned x,
+                                       const unsigned y,
+                                       const unsigned z,
+                                       const int      edge);
 
 template <typename BlockT>
 inline void gather_data(const BlockT*             block,
@@ -164,14 +164,14 @@ inline void gather_data(const BlockT*             block,
                         const int                 z);
 
 template <typename OctreeT>
-inline void gather_data(const std::shared_ptr<OctreeT> octree_ptr,
-                        typename OctreeT::DataType     data[8],
-                        const int                      x,
-                        const int                      y,
-                        const int                      z);
+inline void gather_data(const OctreeT&             octree,
+                        typename OctreeT::DataType data[8],
+                        const int                  x,
+                        const int                  y,
+                        const int                  z);
 
 template <typename OctreeT>
-uint8_t compute_index(const std::shared_ptr<OctreeT>     octree_ptr,
+uint8_t compute_index(const OctreeT&                     octree,
                       const typename OctreeT::BlockType* block_ptr,
                       const unsigned                     x,
                       const unsigned                     y,
@@ -208,9 +208,9 @@ template <typename BlockT,
           typename DataT
 >
 inline void gather_dual_data(const BlockT*               block,
-                             const int                                   scale,
-                             const Eigen::Vector3f&                      primal_corner_coord_f,
-                             DataT                                       data[8],
+                             const int                   scale,
+                             const Eigen::Vector3f&      primal_corner_coord_f,
+                             DataT                       data[8],
                              std::vector<Eigen::Vector3f,
                              Eigen::aligned_allocator<Eigen::Vector3f>>& dual_corner_coords_f);
 
@@ -254,7 +254,7 @@ static const Eigen::Vector3i logical_dual_offset[8] =
 template <typename  OctreeT,
           typename DataT
 >
-inline void gather_dual_data(const std::shared_ptr<OctreeT>     octree_ptr,
+inline void gather_dual_data(const OctreeT&                     octree,
                              const typename OctreeT::BlockType* block,
                              const int                          scale,
                              const Eigen::Vector3i&             primal_corner_coord,
@@ -265,7 +265,7 @@ inline void gather_dual_data(const std::shared_ptr<OctreeT>     octree_ptr,
 template <typename OctreeT,
           typename DataT
 >
-void compute_dual_index(const std::shared_ptr<OctreeT>     octree_ptr,
+void compute_dual_index(const OctreeT&                     octree,
                         const typename OctreeT::BlockType* block_ptr,
                         const int                          scale,
                         const Eigen::Vector3i&             primal_corner_coord,
@@ -284,13 +284,13 @@ namespace algorithms {
 
 template <typename OctreeT,
           typename TriangleType>
-void marching_cube(std::shared_ptr<OctreeT>   octree_ptr,
+void marching_cube(OctreeT&   octree,
                    std::vector<TriangleType>& triangles);
 
 template <typename OctreeT,
           typename TriangleT
 >
-void dual_marching_cube(std::shared_ptr<OctreeT> octree,
+void dual_marching_cube(OctreeT& octree,
                         std::vector<TriangleT>&  triangles);
 
 } // namespace algorithms

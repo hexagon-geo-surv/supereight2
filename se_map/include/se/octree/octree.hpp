@@ -85,11 +85,18 @@ public:
   inline NodeType* getRoot() { return root_ptr_; };
 
   /**
+   * \brief Get the node pointer to the root of the octree.
+   *
+   * \return The pointer to the root of the octree
+   */
+  inline NodeType* getRoot() const { return root_ptr_; };
+
+  /**
    * \brief Get the size of the octree in [voxel] units.
    *
    * \return The size of the octree
    */
-  inline unsigned int getSize() { return size_; }
+  inline unsigned int getSize() const { return size_; }
 
   /**
    * \brief Get the maximum scale of the octree. This is equivalent to the scale of the root.

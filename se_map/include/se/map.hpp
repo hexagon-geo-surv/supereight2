@@ -149,14 +149,14 @@ public:
   pointsToVoxels(const se::vector<Eigen::Vector3f>& points_M,
                  se::vector<Eigen::Vector3i>&       voxel_coords) const;
 
-  inline std::shared_ptr< OctreeType > getOctree() { return octree_; };
+  inline std::shared_ptr< OctreeType > getOctree() { return octree_ptr_; };
 
-  inline std::shared_ptr< OctreeType > getOctree() const { return octree_; };
+  inline std::shared_ptr< OctreeType > getOctree() const { return octree_ptr_; };
 
   void setOctree(std::shared_ptr< OctreeType > octree_ptr)
   {
-//    delete octree_; // TODO: Delete old octree when setting a new one.
-    octree_ = octree_ptr;
+//    delete octree_ptr_; // TODO: Delete old octree when setting a new one.
+    octree_ptr_ = octree_ptr;
   };
 
   static constexpr Field     fld_ = FldT;
@@ -176,7 +176,7 @@ protected:
   const Eigen::Vector3f lb_;       ///< The lower map bound
   const Eigen::Vector3f ub_;       ///< The upper map bound
 
-  std::shared_ptr< OctreeType >octree_ = nullptr;
+  std::shared_ptr< OctreeType >octree_ptr_ = nullptr;
 
   DataConfigType data_config_;
 };

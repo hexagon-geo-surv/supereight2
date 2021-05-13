@@ -83,7 +83,7 @@ inline bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getData(const Eigen::V
     }
   }
 
-  return se::visitor::getData(octree_, voxel_coord, data);
+  return se::visitor::getData(*octree_ptr_, voxel_coord, data);
 }
 
 
@@ -110,7 +110,7 @@ inline bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::interpField(const Eige
       return false;
     }
   }
-  return se::visitor::interpField(octree_, voxel_coord_f, field_value);
+  return se::visitor::interpField(*octree_ptr_, voxel_coord_f, field_value);
 }
 
 
@@ -138,7 +138,7 @@ inline bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::gradField(const Eigen:
     }
   }
 
-  const bool is_valid = se::visitor::gradField(octree_, voxel_coord_f, field_grad);
+  const bool is_valid = se::visitor::gradField(*octree_ptr_, voxel_coord_f, field_grad);
   field_grad *= res_;
 
   return is_valid;
@@ -168,7 +168,7 @@ inline Eigen::Vector3f Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::gradField(c
     }
   }
 
-  return res_ * se::visitor::gradField(octree_, voxel_coord_f);
+  return res_ * se::visitor::gradField(*octree_ptr_, voxel_coord_f);
 }
 
 
@@ -181,7 +181,7 @@ template <Field     FldT,
 >
 bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::initialiseOctree()
 {
-  if (octree_ != nullptr)
+  if (octree_ptr_ != nullptr)
   {
     std::cerr << "Octree has already been initialised" << std::endl;
     return false;
@@ -190,7 +190,7 @@ bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::initialiseOctree()
   float    max_dim  = dim_.maxCoeff();
   unsigned max_size = ceil(max_dim / res_);
   unsigned oct_size = math::power_two_up(max_size);
-  octree_ =
+  octree_ptr_ =
           std::shared_ptr<se::Octree<DataType, ResT, BlockSize> >(new se::Octree<DataType, ResT, BlockSize>(oct_size));
   return true;
 }
@@ -213,9 +213,9 @@ void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveSlice(const std::string  
   const std::string file_name_x = (num == std::string("")) ? (file_path + "_x.vtk") : (file_path + "_x_" + num + ".vtk");
   const std::string file_name_y = (num == std::string("")) ? (file_path + "_y.vtk") : (file_path + "_y_" + num + ".vtk");
   const std::string file_name_z = (num == std::string("")) ? (file_path + "_z.vtk") : (file_path + "_z_" + num + ".vtk");
-  se::io::save_3d_slice_vtk(octree_, file_name_x, Eigen::Vector3i(voxel_coord.x(), 0, 0), Eigen::Vector3i(voxel_coord.x() + 1, octree_->getSize(), octree_->getSize()));
-  se::io::save_3d_slice_vtk(octree_, file_name_y, Eigen::Vector3i(0, voxel_coord.y(), 0), Eigen::Vector3i(octree_->getSize(), voxel_coord.y() + 1, octree_->getSize()));
-  se::io::save_3d_slice_vtk(octree_, file_name_z, Eigen::Vector3i(0,0, voxel_coord.z()), Eigen::Vector3i(octree_->getSize(), octree_->getSize(), voxel_coord.z() + 1));
+  se::io::save_3d_slice_vtk(*octree_ptr_, file_name_x, Eigen::Vector3i(voxel_coord.x(), 0, 0), Eigen::Vector3i(voxel_coord.x() + 1, octree_ptr_->getSize(), octree_ptr_->getSize()));
+  se::io::save_3d_slice_vtk(*octree_ptr_, file_name_y, Eigen::Vector3i(0, voxel_coord.y(), 0), Eigen::Vector3i(octree_ptr_->getSize(), voxel_coord.y() + 1, octree_ptr_->getSize()));
+  se::io::save_3d_slice_vtk(*octree_ptr_, file_name_z, Eigen::Vector3i(0,0, voxel_coord.z()), Eigen::Vector3i(octree_ptr_->getSize(), octree_ptr_->getSize(), voxel_coord.z() + 1));
 }
 
 
@@ -230,7 +230,7 @@ void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveStrucutre(const std::stri
                                                                  const std::string num)
 {
   const std::string file_name = (num == std::string("")) ? (file_path + ".ply") : (file_path + "_" + num + ".ply");
-  se::io::save_octree_structure_ply(octree_, file_name);
+  se::io::save_octree_structure_ply(*octree_ptr_, file_name);
 }
 
 
@@ -247,7 +247,7 @@ void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMesh(const std::string fi
 {
   se::vector<se::Triangle> mesh;
   TICK("meshing")
-  se::algorithms::marching_cube(octree_, mesh);
+  se::algorithms::marching_cube(*octree_ptr_, mesh);
   TOCK("meshing")
 
   const std::string file_name_mesh_primal = (num == std::string("")) ? (file_path + "_primal.vtk") : (file_path + "_primal_" + num + ".vtk");
@@ -255,7 +255,7 @@ void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMesh(const std::string fi
 
   se::vector<se::Triangle> dual_mesh;
   TICK("dual_meshing")
-  se::algorithms::dual_marching_cube(octree_, dual_mesh);
+  se::algorithms::dual_marching_cube(*octree_ptr_, dual_mesh);
   TOCK("dual_meshing")
 
   const std::string file_name_mesh_dual = (num == std::string("")) ? (file_path + "_dual.vtk") : (file_path + "_dual_" + num + ".vtk");
