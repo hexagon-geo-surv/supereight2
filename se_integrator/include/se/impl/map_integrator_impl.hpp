@@ -13,7 +13,6 @@ std::vector<typename MapT::OctreeType::BlockType *> frustum(const se::Image<dept
                                                             MapT&                     map,
                                                             const float               band)
 {
-  TICK("build-allocation-list")
   typedef typename MapT::OctreeType::BlockType BlockType;
   auto octree_ptr = map.getOctree();
 
@@ -59,14 +58,11 @@ std::vector<typename MapT::OctreeType::BlockType *> frustum(const se::Image<dept
       }
     }
   }
-  TOCK("build-allocation-list")
 
   se::vector<key_t> voxel_keys(voxel_key_set.begin(), voxel_key_set.end());
 
-  TICK("allocate-frustum")
   se::vector<BlockType *> fetched_block_ptrs = se::allocator::blocks(voxel_keys, octree_ptr,
                                                                      octree_ptr->getRoot());
-  TOCK("allocate-frustum")
 
   return fetched_block_ptrs;
 }
@@ -165,7 +161,6 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(const se::
   std::vector<typename MapT::OctreeType::BlockType *> block_ptrs = se::allocator::frustum(depth_img, sensor, T_MS, map, 2 * truncation_boundary);
 
   // Update
-  TICK("update")
   unsigned int block_size = MapT::OctreeType::block_size;
   const Eigen::Matrix4f T_SM = se::math::to_inverse_transformation(T_MS);
 
@@ -228,7 +223,6 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(const se::
     } // i
 
   }
-  TOCK("update")
 }
 
 

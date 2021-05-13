@@ -76,7 +76,6 @@ inline se::vector<typename OctreeT::BlockType*> blocks(se::vector<se::key_t>    
   assert(base_parent_ptr); // Verify parent ptr
 
   // Allocate nodes up to block_scale
-  TICK("allocate-keys")
   for (scale_t scale = octree_ptr->getMaxScale(); scale > octree_ptr->max_block_scale; scale--)
   {
     se::vector<se::key_t> unique_voxel_keys_at_scale;
@@ -113,13 +112,13 @@ inline se::vector<typename OctreeT::BlockType*> blocks(se::vector<se::key_t>    
     }
   }
 
-  TOCK("allocate-keys")
   return block_ptrs;
 }
 
 
 
 namespace { // anonymous namespace
+
 template <typename OctreeT>
 inline se::OctantBase* allocate_key(const se::key_t             key,
                                     std::shared_ptr<OctreeT>    octree_ptr,

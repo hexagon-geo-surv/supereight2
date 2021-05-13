@@ -103,6 +103,9 @@ int main()
   while (read_ok == se::ReaderStatus::ok) {
     se::perfstats.setIter(frame++);
 
+    TICK("total")
+
+    TICK("read")
     if constexpr (TRACK)
     {
       if (frame == 1)
@@ -116,33 +119,42 @@ int main()
     {
       read_ok = reader->nextData(input_depth_img, input_rgba_img, T_MS);
     }
+    TOCK("read")
 
     // Preprocess depth
+    TICK("ds-depth")
     se::preprocessor::downsample_depth(input_depth_img, processed_depth_img);
+    TOCK("ds-depth")
+    TICK("ds-rgba")
     se::preprocessor::downsample_rgba(input_rgba_img,  processed_rgba_img);
+    TOCK("ds-rgba")
 
     // Render volume
-
+    TICK("tracking")
     if (frame > 1)
     {
-      TICK("tracking")
       tracker.track(processed_depth_img, T_MS, surface_point_cloud_M, surface_normals_M);
-      TOCK("tracking")
     }
+    TOCK("tracking")
 
     TICK("integration")
     integrator.integrateDepth(processed_depth_img, sensor, T_MS);
     TOCK("integration")
 
+    TICK("raycast")
     se::raycaster::raycastVolume(map_tsdf, surface_point_cloud_M, surface_normals_M, T_MS, sensor);
-    
-    const Eigen::Vector3f ambient{ 0.1, 0.1, 0.1};
-    se::raycaster::renderVolumeKernel(output_volume_img_data, processed_img_res, se::math::to_translation(T_MS), ambient, surface_point_cloud_M, surface_normals_M);
+    TOCK("raycast")
 
-    // Visualise imgs
+    const Eigen::Vector3f ambient{ 0.1, 0.1, 0.1};
+
+    TICK("render")
+    se::raycaster::renderVolumeKernel(output_volume_img_data, processed_img_res, se::math::to_translation(T_MS), ambient, surface_point_cloud_M, surface_normals_M);
     convert_to_output_rgba_img(processed_rgba_img, output_rgba_img_data);
     convert_to_output_depth_img(processed_depth_img, output_depth_img_data);
     tracker.renderTrackingResult(output_tracking_img_data);
+    TOCK("render")
+
+
 
     TICK("draw")
     drawthem(output_rgba_img_data,     processed_img_res,
@@ -151,6 +163,7 @@ int main()
              output_volume_img_data,   processed_img_res);
     TOCK("draw")
 
+    TOCK("total")
 
     if (frame == 1 || frame % 100 == 0)
     {

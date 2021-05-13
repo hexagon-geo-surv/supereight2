@@ -246,17 +246,13 @@ void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMesh(const std::string fi
                                                             const std::string num)
 {
   se::vector<se::Triangle> mesh;
-  TICK("meshing")
   se::algorithms::marching_cube(*octree_ptr_, mesh);
-  TOCK("meshing")
 
   const std::string file_name_mesh_primal = (num == std::string("")) ? (file_path + "_primal.vtk") : (file_path + "_primal_" + num + ".vtk");
   se::io::save_mesh_vtk(mesh, file_name_mesh_primal, Eigen::Matrix4f::Identity());
 
   se::vector<se::Triangle> dual_mesh;
-  TICK("dual_meshing")
   se::algorithms::dual_marching_cube(*octree_ptr_, dual_mesh);
-  TOCK("dual_meshing")
 
   const std::string file_name_mesh_dual = (num == std::string("")) ? (file_path + "_dual.vtk") : (file_path + "_dual_" + num + ".vtk");
   se::io::save_mesh_vtk(dual_mesh, file_name_mesh_dual, Eigen::Matrix4f::Identity());

@@ -89,8 +89,6 @@ void raycastVolume(const MapT&                 map,
                    const Eigen::Matrix4f&      T_MS,
                    const SensorT&              sensor)
 {
-  TICK("raycast-volume")
-  TICK("surface-point-cloud")
 #ifdef _OPENMP
   omp_set_num_threads(10);
 #endif
@@ -120,9 +118,7 @@ void raycastVolume(const MapT&                 map,
 
     }
   }
-  TOCK("surface-point-cloud")
 
-  TICK("surface-normals")
 #pragma omp parallel for
   for (int y = 0; y < surface_point_cloud_M.height(); y++)
   {
@@ -155,8 +151,6 @@ void raycastVolume(const MapT&                 map,
       }
     }
   }
-  TOCK("surface-normals")
-  TOCK("raycast-volume")
 }
 
 
