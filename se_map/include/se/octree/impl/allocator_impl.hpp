@@ -47,9 +47,6 @@ inline se::vector<typename OctreeT::BlockType*> blocks(const se::vector<Eigen::V
 {
   se::set<se::key_t> voxel_key_set;
 
-#ifdef _OPENMP
-  omp_set_num_threads(10);
-#endif
 #pragma omp declare reduction (merge : std::set<se::key_t> : omp_out.insert(omp_in.begin(), omp_in.end()))
 #pragma omp parallel for reduction(merge: voxel_key_set)
   for (unsigned int i = 0; i < voxel_coords.size(); i++)
@@ -81,9 +78,6 @@ inline se::vector<typename OctreeT::BlockType*> blocks(se::vector<se::key_t>    
     se::vector<se::key_t> unique_voxel_keys_at_scale;
     se::keyops::unique_at_scale(unique_voxel_keys, scale, unique_voxel_keys_at_scale);
 
-#ifdef _OPENMP
-    omp_set_num_threads(10);
-#endif
 #pragma omp parallel for
     for (unsigned int i = 0; i < unique_voxel_keys_at_scale.size(); i++)
     {
@@ -94,9 +88,6 @@ inline se::vector<typename OctreeT::BlockType*> blocks(se::vector<se::key_t>    
 
   // Allocate blocks and store block pointers
   se::vector<typename OctreeT::BlockType*> block_ptrs;
-#ifdef _OPENMP
-  omp_set_num_threads(10);
-#endif
 #pragma omp parallel for
   for (unsigned int i = 0; i < unique_voxel_keys.size(); i++)
   {

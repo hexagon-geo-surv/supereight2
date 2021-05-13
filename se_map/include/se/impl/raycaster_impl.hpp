@@ -89,9 +89,6 @@ void raycastVolume(const MapT&                 map,
                    const Eigen::Matrix4f&      T_MS,
                    const SensorT&              sensor)
 {
-#ifdef _OPENMP
-  omp_set_num_threads(10);
-#endif
 #pragma omp parallel for
   for (int y = 0; y < surface_point_cloud_M.height(); y++)
   {

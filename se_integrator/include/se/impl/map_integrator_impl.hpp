@@ -23,9 +23,6 @@ std::vector<typename MapT::OctreeType::BlockType *> frustum(const se::Image<dept
 #pragma omp declare reduction (merge : std::set<se::key_t> : omp_out.insert(omp_in.begin(), omp_in.end()))
   se::set<se::key_t> voxel_key_set;
 
-#ifdef _OPENMP
-  omp_set_num_threads(10);
-#endif
 #pragma omp parallel for reduction(merge: voxel_key_set)
   for (int x = 0; x < depth_img.width(); ++x) {
     for (int y = 0; y < depth_img.height(); ++y) {
@@ -166,9 +163,6 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(const se::
 
   auto valid_predicate = [&](float depth_value) { return depth_value >= sensor.near_plane; };
 
-#ifdef _OPENMP
-  omp_set_num_threads(10);
-#endif
 #pragma omp parallel for
   for (unsigned int i = 0; i < block_ptrs.size(); i++)
   {

@@ -14,9 +14,6 @@ void point_cloud_to_normal(se::Image<Eigen::Vector3f>&       normals,
   const int width = point_cloud.width();
   const int height = point_cloud.height();
 
-#ifdef _OPENMP
-  omp_set_num_threads(10);
-#endif
 #pragma omp parallel for
   for (int y = 0; y < height; y++)
   {
@@ -76,9 +73,6 @@ void renderVolumeKernel(uint32_t*                         volume_RGBA_image_data
   const int h = volume_RGBA_image_res.y(); // clang complains if this is inside the for loop
   const int w = volume_RGBA_image_res.x(); // clang complains if this is inside the for loop
 
-#ifdef _OPENMP
-  omp_set_num_threads(10);
-#endif
 #pragma omp parallel for
   for (int y = 0; y < h; y++)
   {
