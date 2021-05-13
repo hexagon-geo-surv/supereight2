@@ -60,29 +60,10 @@ inline void get_child_idx(const Eigen::Vector3i& voxel_coord,
                           NodeT*                 node_ptr,
                           unsigned int&          child_idx);
 
-template <typename DerivedT>
-class NodeBase : public OctantBase
-{
-public:
-    NodeBase(const Eigen::Vector3i& coord,
-             const unsigned         size,
-             OctantBase*            parent_ptr = nullptr);
 
-    inline unsigned int getSize();
-
-    inline se::OctantBase* getChild(const unsigned child_idx);
-
-    inline se::OctantBase* setChild(const unsigned child_idx, se::OctantBase* child_ptr);
-
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
-protected:
-    std::array<se::OctantBase*, 8> children_ptr_; ///< Pointers to the eight children (should be all nullptr at initialisation due to smart pointers)
-    const unsigned int             size_;         ///< The size in [voxel] of the node in comparision to the finest voxel
-};
 
 template <typename DataT, se::Res ResT = se::Res::Single>
-class Node : public NodeBase< Node<DataT, ResT> >
+class Node : public OctantBase
 {
 public:
     typedef DataT DataType;
@@ -93,6 +74,12 @@ public:
     Node(Node*              parent_ptr,
          const unsigned int child_idx);
 
+    inline unsigned int getSize();
+
+    inline se::OctantBase* getChild(const unsigned child_idx);
+
+    inline se::OctantBase* setChild(const unsigned child_idx, se::OctantBase* child_ptr);
+
     inline void getData(const DataT& data);
 
     inline void setData(const DataT& data);
@@ -100,7 +87,9 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 private:
-    DataType data_; ///< The data of the node
+    std::array<se::OctantBase*, 8> children_ptr_; ///< Pointers to the eight children (should be all nullptr at initialisation due to smart pointers)
+    const unsigned int             size_;         ///< The size in [voxel] of the node in comparision to the finest voxel
+    DataType                       data_; ///< The data of the node
     template<typename DT, Res RT, unsigned ST, typename PT>
     friend class Block;
 };
@@ -110,17 +99,6 @@ private:
 ////////////////////////////
 /// BLOCK IMPLEMENTATION ///
 ////////////////////////////
-
-template <typename DerivedT, unsigned SizeT>
-class BlockBase : public OctantBase {
-public:
-    BlockBase(const Eigen::Vector3i& coord,
-              se::OctantBase*        parent_ptr = nullptr);
-
-    static constexpr unsigned int getSize() { return SizeT; }
-
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-};
 
 
 
@@ -212,7 +190,7 @@ template <typename DataT,
 class Block : public std::conditional<ResT == Res::Single,
         BlockSingleRes<Block<DataT, ResT, SizeT>, DataT, SizeT>,
         BlockMultiRes<Block<DataT, ResT, SizeT>, DataT, SizeT>>::type, ///< Conditional CRTP
-        public BlockBase< Block<DataT, ResT, SizeT>, SizeT >           ///< Base CRTP
+        public OctantBase
 {
 public:
     typedef DataT DataType;
@@ -229,6 +207,8 @@ public:
      */
     Block(se::Node<DataT, ResT>* parent_ptr = nullptr,
           const unsigned         child_id   = 0);
+
+    static constexpr unsigned int getSize() { return SizeT; }
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 

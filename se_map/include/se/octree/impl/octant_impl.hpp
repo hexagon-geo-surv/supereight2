@@ -32,49 +32,12 @@ inline void get_child_idx(const Eigen::Vector3i& voxel_coord,
 
 
 
-template <typename DerivedT>
-NodeBase<DerivedT>::NodeBase(const Eigen::Vector3i& coord,
-                             const unsigned         size,
-                             se::OctantBase*        parent_ptr)
-        : OctantBase(false, coord, parent_ptr), size_(size)
-{
-  children_ptr_.fill(nullptr);
-}
-
-
-
-
-template <typename DerivedT>
-inline unsigned int NodeBase<DerivedT>::getSize()
-{
-  return size_;
-}
-
-
-
-template <typename DerivedT>
-inline se::OctantBase* NodeBase<DerivedT>::getChild(const unsigned child_idx)
-{
-  return children_ptr_[child_idx];
-}
-
-
-
-template <typename DerivedT>
-inline se::OctantBase* NodeBase<DerivedT>::setChild(const unsigned child_idx, se::OctantBase* child_ptr)
-{
-  children_mask_ |= 1 << child_idx;
-  std::swap(child_ptr, children_ptr_[child_idx]);
-  return child_ptr;
-}
-
-
-
 template <typename DataT, Res ResT>
 Node<DataT, ResT>::Node(const Eigen::Vector3i&                coord,
                         const unsigned                        size)
-        : NodeBase<Node<DataT, ResT>>(coord, size, nullptr)
+        : OctantBase(false, coord, nullptr), size_(size)
 {
+  children_ptr_.fill(nullptr);
 }
 
 
@@ -82,10 +45,37 @@ Node<DataT, ResT>::Node(const Eigen::Vector3i&                coord,
 template <typename DataT, Res ResT>
 Node<DataT, ResT>::Node(Node*              parent_ptr,
                         const unsigned int child_idx)
-        : NodeBase<Node<DataT, ResT>>(parent_ptr->coord_ + (parent_ptr->size_ >> 1) *
-                                      Eigen::Vector3i((1 & child_idx) > 0, (2 & child_idx) > 0, (4 & child_idx) > 0), (parent_ptr->size_ >> 1),
-                                      parent_ptr)
+    : OctantBase(false,
+                 parent_ptr->coord_ + (parent_ptr->size_ >> 1) * Eigen::Vector3i((1 & child_idx) > 0, (2 & child_idx) > 0, (4 & child_idx) > 0),
+                 parent_ptr), size_(parent_ptr->size_ >> 1)
 {
+  children_ptr_.fill(nullptr);
+}
+
+
+
+template <typename DataT, Res ResT>
+inline unsigned int Node<DataT, ResT>::getSize()
+{
+  return size_;
+}
+
+
+
+template <typename DataT, Res ResT>
+inline se::OctantBase* Node<DataT, ResT>::getChild(const unsigned child_idx)
+{
+  return children_ptr_[child_idx];
+}
+
+
+
+template <typename DataT, Res ResT>
+inline se::OctantBase* Node<DataT, ResT>::setChild(const unsigned child_idx, se::OctantBase* child_ptr)
+{
+  children_mask_ |= 1 << child_idx;
+  std::swap(child_ptr, children_ptr_[child_idx]);
+  return child_ptr;
 }
 
 
@@ -102,15 +92,6 @@ template <typename DataT, Res ResT>
 inline void Node<DataT, ResT>::getData(const DataT& data)
 {
   data = data_;
-}
-
-
-
-template <typename DerivedT, unsigned SizeT>
-BlockBase<DerivedT, SizeT>::BlockBase(const Eigen::Vector3i& coord,
-                                      se::OctantBase*        parent_ptr)
-        : OctantBase(true, coord, parent_ptr)
-{
 }
 
 
@@ -219,9 +200,9 @@ inline void BlockMultiRes<DerivedT, DataT, SizeT>::setData(const Eigen::Vector3i
 template <typename DataT, Res ResT, unsigned SizeT, typename PolicyT>
 Block<DataT, ResT, SizeT, PolicyT>::Block(se::Node<DataT, ResT>* parent_ptr,
                                           const unsigned         child_id)
-    : BlockBase<Block<DataT, ResT, SizeT>, SizeT>(
-            parent_ptr->getCoord() + SizeT * Eigen::Vector3i((1 & child_id) > 0, (2 & child_id) > 0, (4 & child_id) > 0),
-            parent_ptr)
+    : OctantBase(true,
+                 parent_ptr->getCoord() + SizeT * Eigen::Vector3i((1 & child_id) > 0, (2 & child_id) > 0, (4 & child_id) > 0),
+                 parent_ptr)
 {
   assert(SizeT == (parent_ptr->getSize() >> 1));
 }
