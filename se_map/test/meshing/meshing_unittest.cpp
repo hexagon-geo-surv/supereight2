@@ -103,7 +103,7 @@ TEST(MeshingTest, EqualScaleNeighbour) {
   auto select_value = [](const DataType data ){ return data.tsdf; };
   auto is_inside    = [](const DataType& data){ return data.tsdf < 0; };
 //  se::algorithms::dual_marching_cube(octree_ptr, mesh);
-  se::algorithms::marching_cube(octree_ptr, mesh);
+  se::algorithms::marching_cube(*octree_ptr, mesh);
   Eigen::Matrix4f T_MW = Eigen::Matrix4f::Identity();
   se::io::save_mesh_vtk(mesh, filename.c_str(), se::math::to_inverse_transformation(T_MW));
 
