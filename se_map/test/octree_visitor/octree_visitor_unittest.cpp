@@ -58,7 +58,6 @@ TEST(SingleResVisitor, Interpolation)
   Eigen::Vector3i coord_is;
 
   typedef se::TSDFData DataType;
-  typedef se::Node<DataType, se::Res::Single> NodeType;
   
   se::scale_t max_tree_scale = 5;
   unsigned int octree_size = 1 << max_tree_scale;
