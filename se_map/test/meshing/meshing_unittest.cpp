@@ -100,8 +100,6 @@ TEST(MeshingTest, EqualScaleNeighbour) {
   std::cout << "Saving triangle mesh to file :" << filename  << std::endl;
 
   std::vector<se::Triangle> mesh;
-  auto select_value = [](const DataType data ){ return data.tsdf; };
-  auto is_inside    = [](const DataType& data){ return data.tsdf < 0; };
 //  se::algorithms::dual_marching_cube(octree_ptr, mesh);
   se::algorithms::marching_cube(*octree_ptr, mesh);
   Eigen::Matrix4f T_MW = Eigen::Matrix4f::Identity();

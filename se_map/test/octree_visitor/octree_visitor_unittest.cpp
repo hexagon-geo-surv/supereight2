@@ -60,9 +60,6 @@ TEST(SingleResVisitor, Interpolation)
   typedef se::TSDFData DataType;
   typedef se::Node<DataType, se::Res::Single> NodeType;
   
-  const NodeType* node_ptr         = nullptr;
-  const se::OctantBase* octant_ptr = nullptr;
-
   se::scale_t max_tree_scale = 5;
   unsigned int octree_size = 1 << max_tree_scale;
 

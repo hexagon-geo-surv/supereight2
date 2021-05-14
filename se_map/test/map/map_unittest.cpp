@@ -65,9 +65,6 @@ TEST(Map, Interpolation)
   typedef typename se::TSDFMap<se::Res::Single>::OctreeType::NodeType NodeType;
   typedef typename se::TSDFMap<se::Res::Single>::OctreeType::BlockType BlockType;
 
-  const NodeType* node_ptr         = nullptr;
-  const se::OctantBase* octant_ptr = nullptr;
-
   unsigned int octree_size = 32;
 
   int block_size = BlockType::size;
