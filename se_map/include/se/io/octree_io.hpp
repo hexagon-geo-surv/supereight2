@@ -5,14 +5,14 @@ namespace se {
 namespace io {
 
 template <typename OctreeT>
-int save_3d_slice_vtk(std::shared_ptr<OctreeT>  octree_ptr,
-                      const std::string         filename,
-                      const Eigen::Vector3i&    lower_coord,
-                      const Eigen::Vector3i&    upper_coord);
+int save_3d_slice_vtk(const OctreeT&         octree_ptr,
+                      const std::string      filename,
+                      const Eigen::Vector3i& lower_coord,
+                      const Eigen::Vector3i& upper_coord);
 
 template <typename OctreeT>
-int save_octree_structure_ply(std::shared_ptr<OctreeT>  octree_ptr,
-                              const std::string         filename);
+int save_octree_structure_ply(OctreeT&          octree_ptr,
+                              const std::string filename);
 
 }
 
