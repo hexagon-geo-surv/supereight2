@@ -10,7 +10,7 @@ namespace fetcher {
 
 template <typename OctreeT>
 inline se::OctantBase* block(const Eigen::Vector3i&      block_coord,
-                             const OctreeT&              octree,
+                             const OctreeT&              /* octree */,
                              typename OctreeT::NodeType* base_parent_ptr)
 {
   unsigned child_size  = base_parent_ptr->getSize() >> 1;
