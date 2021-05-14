@@ -12,7 +12,12 @@ constexpr bool is_power_of_two(T) { return false; }
 
 
 template<>
-constexpr bool is_power_of_two<unsigned>(const unsigned x) { return (x != 0) && ((x & (x - 1)) == 0); }
+constexpr bool is_power_of_two<unsigned int>(const unsigned int x) { return (x != 0) && ((x & (x - 1)) == 0); }
+
+
+
+template<>
+constexpr bool is_power_of_two<int>(const int x) { return (x != 0) && ((x & (x - 1)) == 0); }
 
 
 
