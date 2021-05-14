@@ -66,15 +66,6 @@ public:
    *
    * \return True if contained in the octree, False otherwise
    */
-  inline bool contains(const Eigen::Vector3i& voxel_coord);
-
-  /**
-   * \brief Verify if the voxel coordinates are contained in the octree.
-   *
-   * \param[in] voxel_coord The voxel coordinates to be verified
-   *
-   * \return True if contained in the octree, False otherwise
-   */
   inline bool contains(const Eigen::Vector3i& voxel_coord) const;
 
   /**
