@@ -6,15 +6,20 @@
 
 namespace str_utils {
 
-  bool begins_with(const std::string& s, const std::string& prefix) {
-    if (s.size() >= prefix.size()) {
+  bool begins_with(const std::string& s,
+                   const std::string& prefix)
+  {
+    if (s.size() >= prefix.size())
+    {
       return (s.compare(0, prefix.length(), prefix) == 0);
     } else {
       return false;
     }
   }
 
-  bool ends_with(const std::string& s, const std::string& suffix) {
+  bool ends_with(const std::string& s,
+                 const std::string& suffix)
+  {
     if (s.size() >= suffix.size()) {
       return (s.compare(s.length() - suffix.length(), suffix.length(), suffix) == 0);
     } else {
@@ -22,17 +27,19 @@ namespace str_utils {
     }
   }
 
-  std::vector <std::string> split_str(
-      const std::string &s,
-      const char delim,
-      const bool ignore_consec) {
+  std::vector <std::string> split_str(const std::string& s,
+                                      const char         delim,
+                                      const bool         ignore_consec)
+  {
 
     std::vector <std::string> elems;
     std::stringstream ss(s);
     std::string item;
-    while (std::getline(ss, item, delim)) {
+    while (std::getline(ss, item, delim))
+    {
       // Empty items result from consecutive occurences of the delimiter.
-      if (!ignore_consec || (ignore_consec && (item.size() > 0))) {
+      if (!ignore_consec || (ignore_consec && (item.size() > 0)))
+      {
         elems.push_back(item);
       }
     }
@@ -40,24 +47,28 @@ namespace str_utils {
   }
 
 
-  void to_lower(std::string& s) {
+  void to_lower(std::string& s)
+  {
     std::transform(s.begin(), s.end(), s.begin(),
         [](unsigned char c){ return std::tolower(c); });
   }
 
 
-  void to_upper(std::string& s) {
+  void to_upper(std::string& s)
+  {
     std::transform(s.begin(), s.end(), s.begin(),
         [](unsigned char c){ return std::toupper(c); });
   }
 
 
-  std::string bool_to_pretty_str(const bool state,
-                                 const std::string state_name,
-                                 const int width) {
+  std::string bool_to_pretty_str(const bool         state,
+                                 const std::string& state_name,
+                                 const int          width)
+  {
     std::string l_side = (state_name != "") ? state_name + ":" : "";
     int padding = (width - 1) - state_name.length();
-    if (padding > 0) {
+    if (padding > 0)
+    {
       l_side.append(padding, ' ');
     }
 
@@ -65,12 +76,14 @@ namespace str_utils {
   }
 
 
-  std::string str_to_pretty_str(const std::string string,
-                                const std::string string_name,
-                                const int width) {
+  std::string str_to_pretty_str(const std::string& string,
+                                const std::string& string_name,
+                                const int width)
+  {
     std::string l_side = (string_name != "") ? string_name + ":" : "";
     int padding = (width - 1) - string_name.length();
-    if (padding > 0) {
+    if (padding > 0)
+    {
       l_side.append(padding, ' ');
     }
 
@@ -78,15 +91,19 @@ namespace str_utils {
   }
 
 
-  std::string header_to_pretty_str(const std::string header_name,
-                                   const int width) {
+  std::string header_to_pretty_str(const std::string& header_name,
+                                   const int          width)
+  {
     int l_width_1;
     float frac = (float) width / header_name.size();
-    if (frac > 2) {
+    if (frac > 2)
+    {
       l_width_1 = round((float) width / 4);
-    } else if (frac > 1) {
+    } else if (frac > 1)
+    {
       l_width_1 = (float) (width - header_name.size()) / 2 - 1;
-    } else {
+    } else
+    {
       return header_name;
     }
     int l_width_2 = round((float) (width - header_name.size()) / 2) - l_width_1;

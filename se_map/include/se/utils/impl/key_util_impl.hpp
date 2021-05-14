@@ -89,7 +89,7 @@ inline key_t encode_key(const Eigen::Vector3i& coord,
 
 
 
-inline bool encode_key(const se::key_t&  code,
+inline bool encode_key(const se::key_t   code,
                        const se::scale_t scale,
                        key_t&            key)
 {
@@ -104,7 +104,7 @@ inline bool encode_key(const se::key_t&  code,
 
 
 
-inline key_t encode_key(const se::key_t&  code,
+inline key_t encode_key(const se::key_t   code,
                         const se::scale_t scale)
 {
   assert(scale <= KEY_SCALE_LIMIT);        // Verify scale is within key limits
@@ -264,7 +264,7 @@ inline bool is_child(const se::key_t parent_key,
 {
   assert(is_valid(child_key));                       // Verify child is valid
   assert(is_valid(parent_key, KEY_SCALE_LIMIT - 1)); // Verify parent is valid
-  
+
   const int parent_scale  = se::keyops::key_to_scale(parent_key);
   const int child_scale = se::keyops::key_to_scale(child_key);
 

@@ -5,9 +5,9 @@ namespace se {
 namespace integrator {
 
 template <typename OctreeT>
-inline bool setData(OctreeT&                         octree,
-                    const Eigen::Vector3i&           voxel_coord,
-                    const typename OctreeT::DataType data) {
+inline bool setData(OctreeT&                          octree,
+                    const Eigen::Vector3i&            voxel_coord,
+                    const typename OctreeT::DataType& data) {
 
   se::OctantBase* octant_ptr = octree.getRoot();
 

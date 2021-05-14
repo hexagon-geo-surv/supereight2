@@ -64,9 +64,9 @@ inline se::vector<se::OctantBase*> blocks(const se::vector<Eigen::Vector3i>& vox
 
 
 template <typename OctreeT>
-inline se::vector<se::OctantBase*> blocks(se::vector<se::key_t> unique_voxel_keys,
-                                          OctreeT&              octree,
-                                          se::OctantBase*       base_parent_ptr)
+inline se::vector<se::OctantBase*> blocks(se::vector<se::key_t>& unique_voxel_keys,
+                                          OctreeT&               octree,
+                                          se::OctantBase*        base_parent_ptr)
 {
   assert(base_parent_ptr); // Verify parent ptr
 

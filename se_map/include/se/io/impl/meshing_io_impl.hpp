@@ -8,9 +8,9 @@
 
 namespace se {
 namespace io {
-    
+
 int save_mesh_vtk(const se::vector<Triangle>& mesh,
-                  const std::string            filename,
+                  const std::string&           filename,
                   const Eigen::Matrix4f&       T_WM,
                   const float*                 point_data,
                   const float*                 cell_data) {
@@ -98,7 +98,7 @@ int save_mesh_vtk(const se::vector<Triangle>& mesh,
 
 
 int save_mesh_ply(const se::vector<Triangle>& mesh,
-                  const std::string            filename,
+                  const std::string&           filename,
                   const Eigen::Matrix4f&       T_WM,
                   const float*                 point_data,
                   const float*                 cell_data) {
@@ -165,7 +165,7 @@ int save_mesh_ply(const se::vector<Triangle>& mesh,
 
 
 int save_mesh_obj(const se::vector<Triangle>& mesh,
-                  const std::string            filename){
+                  const std::string&           filename){
 
   // Open the file for writing.
   std::ofstream file (filename.c_str());

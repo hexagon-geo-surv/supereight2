@@ -32,38 +32,38 @@ namespace str_utils {
   static constexpr int default_width = 33;
 
   template<typename MatrixT>
-  std::string matrix_to_pretty_str(const MatrixT &M,
-                                   std::string M_name = "",
-                                   const int width = default_width);
+  std::string matrix_to_pretty_str(const MatrixT&     M,
+                                   const std::string& M_name = "",
+                                   const int          width = default_width);
 
   template<typename VectorT>
-  std::string vector_to_pretty_str(const VectorT &v,
-                                   const std::string v_name = "",
-                                   const std::vector <std::string> e_names = {},
-                                   const int width = default_width);
+  std::string vector_to_pretty_str(const VectorT&                  v,
+                                   const std::string&              v_name = "",
+                                   const std::vector<std::string>& e_names = {},
+                                   const int                       width = default_width);
 
   template<typename Vector3T>
-  std::string volume_to_pretty_str(const Vector3T &vol,
-                                   const std::string vol_name = "",
-                                   const std::string vol_unit = "",
-                                   const int width = default_width);
+  std::string volume_to_pretty_str(const Vector3T&    vol,
+                                   const std::string& vol_name = "",
+                                   const std::string& vol_unit = "",
+                                   const int          width = default_width);
 
-  std::string bool_to_pretty_str(const bool state,
-                                 const std::string state_name = "",
-                                 const int width = default_width);
+  std::string bool_to_pretty_str(const bool         state,
+                                 const std::string& state_name = "",
+                                 const int          width = default_width);
 
-  std::string str_to_pretty_str(const std::string string,
-                                const std::string string_name = "",
-                                const int width = default_width);
+  std::string str_to_pretty_str(const std::string& string,
+                                const std::string& string_name = "",
+                                const int          width = default_width);
 
   template<typename ValueT>
-  std::string value_to_pretty_str(const ValueT val,
-                                  const std::string val_name = "",
-                                  const std::string val_unit = "",
-                                  const int width = default_width);
+  std::string value_to_pretty_str(const ValueT&      val,
+                                  const std::string& val_name = "",
+                                  const std::string& val_unit = "",
+                                  const int          width = default_width);
 
-  std::string header_to_pretty_str(const std::string header_name,
-                                   const int width = default_width);
+  std::string header_to_pretty_str(const std::string& header_name,
+                                   const int          width = default_width);
 
 
 } // namespace str_utils

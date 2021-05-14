@@ -33,11 +33,11 @@ namespace io {
  * \param[in] cell_data  The scalar values of the cells/faces.
  * \return 0 on success, nonzero on error.
  */
-static int save_mesh_vtk(const se::vector<Triangle> &mesh,
-                         const std::string filename,
-                         const Eigen::Matrix4f &T_WM,
-                         const float *point_data = nullptr,
-                         const float *cell_data = nullptr);
+static int save_mesh_vtk(const se::vector<Triangle>& mesh,
+                         const std::string&          filename,
+                         const Eigen::Matrix4f&      T_WM,
+                         const float*                point_data = nullptr,
+                         const float*                cell_data = nullptr);
 
 /**
  * \brief Save a mesh as a PLY file.
@@ -55,11 +55,11 @@ static int save_mesh_vtk(const se::vector<Triangle> &mesh,
  * \param[in] cell_data  The scalar values of the cells/faces.
  * \return 0 on success, nonzero on error.
  */
-static int save_mesh_ply(const se::vector<Triangle> &mesh,
-                         const std::string filename,
-                         const Eigen::Matrix4f &T_WM,
-                         const float *point_data = nullptr,
-                         const float *cell_data = nullptr);
+static int save_mesh_ply(const se::vector<Triangle>& mesh,
+                         const std::string&          filename,
+                         const Eigen::Matrix4f&      T_WM,
+                         const float*                point_data = nullptr,
+                         const float*                cell_data = nullptr);
 
 /**
  * \brief Save a mesh as a OBJ file.
@@ -68,8 +68,8 @@ static int save_mesh_ply(const se::vector<Triangle> &mesh,
  * \param[in] filename The output filename.
  * \return 0 on success, nonzero on error.
  */
-static int save_mesh_obj(const se::vector<Triangle> &mesh,
-                         const std::string filename);
+static int save_mesh_obj(const se::vector<Triangle>& mesh,
+                         const std::string&          filename);
 
 
 

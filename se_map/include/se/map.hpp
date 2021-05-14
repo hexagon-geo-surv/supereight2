@@ -93,15 +93,15 @@ public:
   template<Safe SafeB = Safe::Off>
   inline Eigen::Vector3f gradField(const Eigen::Vector3f& point_M) const;
 
-  void saveSlice(const std::string      file_path,
+  void saveSlice(const std::string&     file_path,
                  const Eigen::Vector3f& point_M,
-                 const std::string num = "");
+                 const std::string&     num = "");
 
-  void saveStrucutre(const std::string file_path,
-                     const std::string num = "");
+  void saveStrucutre(const std::string& file_path,
+                     const std::string& num = "");
 
-  void saveMesh(const std::string file_path,
-                const std::string num = "");
+  void saveMesh(const std::string& file_path,
+                const std::string& num = "");
 
   inline void voxelToPoint(const Eigen::Vector3i& voxel_coord, Eigen::Vector3f& point_M) const;
 
