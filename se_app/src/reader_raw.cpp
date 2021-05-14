@@ -52,7 +52,7 @@ se::RAWReader::RAWReader(const se::ReaderConfig& c)
     camera_open_ = false;
     return;
   }
-  // Pre-compute depth image sizes.
+  // Pre-compute RGBA image sizes.
   rgba_image_total_ = rgba_image_res_.prod();
   rgba_data_size_ = rgba_pixel_size_ * rgba_image_total_;
   rgba_total_size_ = res_size_ + rgba_data_size_;
@@ -117,14 +117,16 @@ se::ReaderStatus se::RAWReader::nextDepth(se::Image<float>& depth_image) {
   if ((depth_image.width() != size.x()) || (depth_image.height() != size.y())) {
     depth_image = se::Image<float>(size.x(), size.y());
   }
-  // Read the image data pixel-by-pixel.
-  for (size_t p = 0; p < depth_image.size(); ++p) {
-    uint16_t pixel;
-    if (!raw_fs_.read(reinterpret_cast<char*>(&pixel), depth_pixel_size_)) {
-      return se::ReaderStatus::error;
-    }
-    // Scale the data from millimeters to meters.
-    depth_image[p] = pixel / 1000.f;
+  // Read the whole image into a buffer.
+  const size_t image_size = depth_image.size();
+  std::unique_ptr<uint16_t> buffer (new uint16_t[image_size]);
+  if (!raw_fs_.read(reinterpret_cast<char*>(buffer.get()), image_size * sizeof(uint16_t))) {
+    return se::ReaderStatus::error;
+  }
+  // Scale the data from millimetres to metres.
+#pragma omp parallel for
+  for (size_t p = 0; p < image_size; ++p) {
+    depth_image[p] = buffer.get()[p] / 1000.0f;
   }
   return se::ReaderStatus::ok;
 }
@@ -144,22 +146,14 @@ se::ReaderStatus se::RAWReader::nextRGBA(se::Image<uint32_t>& rgba_image) {
   if ((rgba_image.width() != size.x()) || (rgba_image.height() != size.y())) {
     rgba_image = se::Image<uint32_t>(size.x(), size.y());
   }
-  // Read the image data pixel-by-pixel.
-  for (size_t p = 0; p < rgba_image.size(); ++p) {
-    uint8_t r;
-    if (!raw_fs_.read(reinterpret_cast<char*>(&r), sizeof(uint8_t))) {
-      return se::ReaderStatus::error;
-    }
-    uint8_t g;
-    if (!raw_fs_.read(reinterpret_cast<char*>(&g), sizeof(uint8_t))) {
-      return se::ReaderStatus::error;
-    }
-    uint8_t b;
-    if (!raw_fs_.read(reinterpret_cast<char*>(&b), sizeof(uint8_t))) {
-      return se::ReaderStatus::error;
-    }
-    rgba_image[p] = se::pack_rgba(r, g, b, 0xFF);
+  // Read the whole image into a buffer.
+  const size_t image_size = rgba_image.size();
+  std::unique_ptr<uint8_t> buffer (new uint8_t[3 * image_size]);
+  if (!raw_fs_.read(reinterpret_cast<char*>(buffer.get()), image_size * 3 * sizeof(uint8_t))) {
+    return se::ReaderStatus::error;
   }
+  // Convert the RGB image in the buffer to RGBA.
+  rgb_to_rgba(buffer.get(), rgba_image.data(), image_size);
   return se::ReaderStatus::ok;
 }
 
