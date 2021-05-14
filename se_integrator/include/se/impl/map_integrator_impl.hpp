@@ -7,13 +7,12 @@ namespace se {
 namespace allocator {
 
 template<typename SensorT, typename MapT>
-std::vector<typename MapT::OctreeType::BlockType *> frustum(const se::Image<depth_t>& depth_img,
-                                                            SensorT&                  sensor,
-                                                            const Eigen::Matrix4f&    T_MS,
-                                                            MapT&                     map,
-                                                            const float               band)
+se::vector<se::OctantBase*> frustum(const se::Image<depth_t>& depth_img,
+                                    SensorT&                  sensor,
+                                    const Eigen::Matrix4f&    T_MS,
+                                    MapT&                     map,
+                                    const float               band)
 {
-  typedef typename MapT::OctreeType::BlockType BlockType;
   auto octree_ptr = map.getOctree();
 
   const int num_steps = ceil(band / map.getRes());
@@ -58,8 +57,7 @@ std::vector<typename MapT::OctreeType::BlockType *> frustum(const se::Image<dept
 
   se::vector<key_t> voxel_keys(voxel_key_set.begin(), voxel_key_set.end());
 
-  se::vector<BlockType *> fetched_block_ptrs = se::allocator::blocks(voxel_keys, octree_ptr,
-                                                                     octree_ptr->getRoot());
+  se::vector<se::OctantBase*> fetched_block_ptrs = se::allocator::blocks(voxel_keys, *octree_ptr, octree_ptr->getRoot());
 
   return fetched_block_ptrs;
 }
@@ -155,7 +153,7 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(const se::
   const se::weight_t max_weight   = map.getDataConfig().max_weight;
 
   // Allocation
-  std::vector<typename MapT::OctreeType::BlockType *> block_ptrs = se::allocator::frustum(depth_img, sensor, T_MS, map, 2 * truncation_boundary);
+  se::vector<OctantBase*> block_ptrs = se::allocator::frustum(depth_img, sensor, T_MS, map, 2 * truncation_boundary);
 
   // Update
   unsigned int block_size = MapT::OctreeType::block_size;
@@ -166,7 +164,7 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(const se::
 #pragma omp parallel for
   for (unsigned int i = 0; i < block_ptrs.size(); i++)
   {
-    auto block_ptr = block_ptrs[i];
+    typename MapT::OctreeType::BlockType* block_ptr = static_cast<typename MapT::OctreeType::BlockType*>(block_ptrs[i]);
     Eigen::Vector3i block_coord = block_ptr->getCoord();
     Eigen::Vector3f point_base_M;
     map.voxelToPoint(block_coord, point_base_M);

@@ -5,12 +5,11 @@ namespace se {
 namespace integrator {
 
 template <typename OctreeT>
-inline bool setData(std::shared_ptr<OctreeT>         octree_ptr,
+inline bool setData(OctreeT&                         octree,
                     const Eigen::Vector3i&           voxel_coord,
                     const typename OctreeT::DataType data) {
-  assert(octree_ptr); // Verify the octree is not a nullptr
 
-  se::OctantBase* octant_ptr = octree_ptr->getRoot();
+  se::OctantBase* octant_ptr = octree.getRoot();
 
   if(!octant_ptr) // Return false if the octree root isn't allocated
   {
@@ -18,7 +17,7 @@ inline bool setData(std::shared_ptr<OctreeT>         octree_ptr,
     return false;
   }
 
-  unsigned int node_size = octree_ptr->getSize();
+  unsigned int node_size = octree.getSize();
   for (; node_size >= OctreeT::block_size; node_size = node_size >> 1)
   {
     typename OctreeT::NodeType* node_ptr = std::static_pointer_cast<typename OctreeT::NodeType>(octant_ptr);
@@ -27,7 +26,7 @@ inline bool setData(std::shared_ptr<OctreeT>         octree_ptr,
     get_child_idx(voxel_coord, node_ptr, child_idx);
     if (!node_ptr->getChild(child_idx, octant_tmp_ptr))
     {
-      octant_ptr = std::static_pointer_cast<OctantBase>(se::allocator::block(voxel_coord, octree_ptr, node_ptr));
+      octant_ptr = std::static_pointer_cast<OctantBase>(se::allocator::block(voxel_coord, octree, node_ptr));
       break;
     }
     octant_ptr = octant_tmp_ptr;

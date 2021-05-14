@@ -65,7 +65,7 @@ TEST(MeshingTest, EqualScaleNeighbour) {
   }
 
   std::sort(allocation_list.begin(), allocation_list.end());
-  se::allocator::blocks(allocation_list, octree_ptr, octree_ptr->getRoot());
+  se::allocator::blocks(allocation_list, *octree_ptr, octree_ptr->getRoot());
 
   for (auto block_ptr_itr = se::BlocksIterator<OctreeType>(octree_ptr.get());
        block_ptr_itr != se::BlocksIterator<OctreeType>(); ++block_ptr_itr)

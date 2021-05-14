@@ -12,38 +12,37 @@ namespace se {
 namespace allocator {
 
 template <typename OctreeT>
-inline typename OctreeT::BlockType* block(const Eigen::Vector3i&      voxel_coord,
-                                          std::shared_ptr<OctreeT>    octree_ptr,
-                                          typename OctreeT::NodeType* base_parent_ptr)
+inline se::OctantBase* block(const Eigen::Vector3i& voxel_coord,
+                             OctreeT&               octree,
+                             OctantBase*            base_parent_ptr)
 {
   se::key_t voxel_key;
   se::keyops::encode_key(voxel_coord, 0, voxel_key); // Allocate up to finest scale
 
-  return block(voxel_key, octree_ptr, base_parent_ptr);
+  return block(voxel_key, octree, base_parent_ptr);
 }
 
 
 
 template <typename OctreeT>
-inline typename OctreeT::BlockType* block(const se::key_t             voxel_key,
-                                          std::shared_ptr<OctreeT>    octree_ptr,
-                                          typename OctreeT::NodeType* base_parent_ptr)
+inline se::OctantBase* block(const se::key_t voxel_key,
+                             OctreeT&        octree,
+                             OctantBase*     base_parent_ptr)
 {
-  assert(octree_ptr); // Verify octree ptr
   assert(base_parent_ptr); // Verify parent ptr
 //  assert(se::keyops::is_child(base_parent_ptr->getKey(), voxel_key)); // TODO:
-  assert(se::keyops::key_to_scale(voxel_key) <= octree_ptr->max_block_scale); // Verify scale is within block
+  assert(se::keyops::key_to_scale(voxel_key) <= octree.max_block_scale); // Verify scale is within block
 
-  se::OctantBase* child_ptr = se::allocator::allocate_key(voxel_key, octree_ptr, base_parent_ptr);
-  return static_cast<typename OctreeT::BlockType*>(child_ptr);
+  se::OctantBase* child_ptr = se::allocator::allocate_key(voxel_key, octree, base_parent_ptr);
+  return child_ptr;
 }
 
 
 
 template <typename OctreeT>
-inline se::vector<typename OctreeT::BlockType*> blocks(const se::vector<Eigen::Vector3i>& voxel_coords,
-                                                       std::shared_ptr<OctreeT>           octree_ptr,
-                                                       typename OctreeT::NodeType*        base_parent_ptr)
+inline se::vector<se::OctantBase*> blocks(const se::vector<Eigen::Vector3i>& voxel_coords,
+                                          OctreeT&                           octree,
+                                          se::OctantBase*                    base_parent_ptr)
 {
   se::set<se::key_t> voxel_key_set;
 
@@ -53,27 +52,26 @@ inline se::vector<typename OctreeT::BlockType*> blocks(const se::vector<Eigen::V
   {
     const Eigen::Vector3i voxel_coord = voxel_coords[i];
     se::key_t voxel_key;
-    se::keyops::encode_key(voxel_coord, octree_ptr->max_block_scale, voxel_key);
+    se::keyops::encode_key(voxel_coord, octree.max_block_scale, voxel_key);
     voxel_key_set.insert(voxel_key);
   }
 
   se::vector<se::key_t> voxel_keys(voxel_key_set.begin(), voxel_key_set.end());
 
-  return blocks(voxel_keys, octree_ptr, base_parent_ptr);
+  return blocks(voxel_keys, octree, base_parent_ptr);
 }
 
 
 
 template <typename OctreeT>
-inline se::vector<typename OctreeT::BlockType*> blocks(se::vector<se::key_t>       unique_voxel_keys,
-                                                       std::shared_ptr<OctreeT>    octree_ptr,
-                                                       typename OctreeT::NodeType* base_parent_ptr)
+inline se::vector<se::OctantBase*> blocks(se::vector<se::key_t> unique_voxel_keys,
+                                          OctreeT&              octree,
+                                          se::OctantBase*       base_parent_ptr)
 {
-  assert(octree_ptr);      // Verify octree ptr
   assert(base_parent_ptr); // Verify parent ptr
 
   // Allocate nodes up to block_scale
-  for (scale_t scale = octree_ptr->getMaxScale(); scale > octree_ptr->max_block_scale; scale--)
+  for (scale_t scale = octree.getMaxScale(); scale > octree.max_block_scale; scale--)
   {
     se::vector<se::key_t> unique_voxel_keys_at_scale;
     se::keyops::unique_at_scale(unique_voxel_keys, scale, unique_voxel_keys_at_scale);
@@ -82,24 +80,24 @@ inline se::vector<typename OctreeT::BlockType*> blocks(se::vector<se::key_t>    
     for (unsigned int i = 0; i < unique_voxel_keys_at_scale.size(); i++)
     {
       const auto unique_voxel_key_at_scale = unique_voxel_keys_at_scale[i];
-      se::allocator::allocate_key(unique_voxel_key_at_scale, octree_ptr, base_parent_ptr);
+      se::allocator::allocate_key(unique_voxel_key_at_scale, octree, base_parent_ptr);
     }
   }
 
   // Allocate blocks and store block pointers
-  se::vector<typename OctreeT::BlockType*> block_ptrs;
+  se::vector<se::OctantBase*> block_ptrs;
 #pragma omp parallel for
   for (unsigned int i = 0; i < unique_voxel_keys.size(); i++)
   {
 
     const auto unique_voxel_key = unique_voxel_keys[i];
-    assert(se::keyops::key_to_scale(unique_voxel_key) <= octree_ptr->max_block_scale); // Verify scale is within block
+    assert(se::keyops::key_to_scale(unique_voxel_key) <= octree.max_block_scale); // Verify scale is within block
 
-    se::OctantBase* child_ptr = se::allocator::allocate_key(unique_voxel_key, octree_ptr, base_parent_ptr);
+    se::OctantBase* child_ptr = se::allocator::allocate_key(unique_voxel_key, octree, base_parent_ptr);
 
 #pragma omp critical
     {
-      block_ptrs.push_back(static_cast<typename OctreeT::BlockType*>(child_ptr));
+      block_ptrs.push_back(child_ptr);
     }
   }
 
@@ -111,22 +109,22 @@ inline se::vector<typename OctreeT::BlockType*> blocks(se::vector<se::key_t>    
 namespace { // anonymous namespace
 
 template <typename OctreeT>
-inline se::OctantBase* allocate_key(const se::key_t             key,
-                                    std::shared_ptr<OctreeT>    octree_ptr,
-                                    typename OctreeT::NodeType* base_parent_ptr)
+inline se::OctantBase* allocate_key(const se::key_t key,
+                                    OctreeT&        octree,
+                                    se::OctantBase* base_parent_ptr)
 {
   assert(se::keyops::is_valid(key)); // Verify if the key is valid
-  typename OctreeT::NodeType* parent_ptr = base_parent_ptr;
+  typename OctreeT::NodeType* parent_ptr = static_cast<typename OctreeT::NodeType*>(base_parent_ptr);
   se::OctantBase*             child_ptr  = nullptr;
 
   int child_scale = se::math::log2_const(parent_ptr->getSize()) - 1;
   se::code_t code = se::keyops::key_to_code(key);
-  int min_scale   = std::max(se::keyops::key_to_scale(key), octree_ptr->max_block_scale);
+  int min_scale   = std::max(se::keyops::key_to_scale(key), octree.max_block_scale);
 
   for (; child_scale >= min_scale; --child_scale)
   {
     se::idx_t child_idx = se::keyops::code_to_child_idx(code, child_scale);
-    child_ptr = octree_ptr->allocate(parent_ptr, child_idx);
+    child_ptr = octree.allocate(parent_ptr, child_idx);
     parent_ptr = static_cast<typename OctreeT::NodeType*>(child_ptr);
   }
   return child_ptr;

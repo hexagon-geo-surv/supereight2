@@ -9,12 +9,12 @@ namespace fetcher {
 
 
 template <typename OctreeT>
-inline se::OctantBase* block(const Eigen::Vector3i&      block_coord,
-                             const OctreeT&              /* octree */,
-                             typename OctreeT::NodeType* base_parent_ptr)
+inline se::OctantBase* block(const Eigen::Vector3i& block_coord,
+                             const OctreeT&         /* octree */,
+                             se::OctantBase*        base_parent_ptr)
 {
-  unsigned child_size  = base_parent_ptr->getSize() >> 1;
-  typename OctreeT::NodeType* parent_ptr = base_parent_ptr;
+  typename OctreeT::NodeType* parent_ptr = static_cast<typename OctreeT::NodeType*>(base_parent_ptr);
+  unsigned child_size  = parent_ptr->getSize() >> 1;
   se::OctantBase* child_ptr  = nullptr;
 
   for (; child_size >= OctreeT::BlockType::getSize(); child_size = child_size >> 1)

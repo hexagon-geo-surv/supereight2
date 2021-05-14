@@ -21,7 +21,7 @@ BaseIterator<DerivedT>::BaseIterator(OctreeType* octree_ptr) : octree_ptr_(octre
   clear();
   if (octree_ptr_ != nullptr)
   {
-    NodeType* root = (octree_ptr_)->getRoot();
+    NodeType* root = static_cast<NodeType*>((octree_ptr_)->getRoot());
     if (root != nullptr)
     {
       // Push the root's children on the stack

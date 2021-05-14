@@ -21,7 +21,7 @@ namespace integrator {
  * \return True if the data was set, False otherwise
  */
 template <typename OctreeT>
-inline bool setData(std::shared_ptr<OctreeT>         octree_ptr,
+inline bool setData(OctreeT&                         octree,
                     const Eigen::Vector3i&           voxel_coord,
                     const typename OctreeT::DataType data);
 

@@ -82,14 +82,14 @@ public:
    *
    * \return The pointer to the root of the octree
    */
-  inline NodeType* getRoot() { return root_ptr_; };
+  inline se::OctantBase* getRoot() { return root_ptr_; };
 
   /**
    * \brief Get the node pointer to the root of the octree.
    *
    * \return The pointer to the root of the octree
    */
-  inline NodeType* getRoot() const { return root_ptr_; };
+  inline se::OctantBase* getRoot() const { return root_ptr_; };
 
   /**
    * \brief Get the size of the octree in [voxel] units.
@@ -103,7 +103,7 @@ public:
    *
    * \return The max scale of the octree
    */
-  inline unsigned int getMaxScale() { return se::math::log2_const(size_); }
+  inline unsigned int getMaxScale() const { return se::math::log2_const(size_); }
 
   /**
    * \brief Allocate a node for a given parent node.
@@ -128,7 +128,7 @@ public:
 private:
 
   int size_;                     ///< The size in [voxel] of the octree
-  NodeType* root_ptr_ = nullptr; ///< The pointer to the root node of the octree
+  se::OctantBase* root_ptr_ = nullptr; ///< The pointer to the root node of the octree
 
   MemoryPool memory_pool_;       ///< The memory pool pre-allocating memory for nodes and blocks
 };

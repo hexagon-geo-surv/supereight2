@@ -19,36 +19,36 @@ namespace allocator {
  *
  * \tparam OctreeT              The Octree template
  * \param[in] voxel_coord       The 3D coordinates of a voxel within the block
- * \param[in] octree_ptr        The octree to allocate the block in
+ * \param[in] octree        The octree to allocate the block in
  * \param[in] base_parent_ptr   The starting node pointer (default nullptr will be replaced with octree root)
  *
  * \return A block pointer to the allocated block
  */
 template <typename OctreeT>
-inline typename OctreeT::BlockType* block(const Eigen::Vector3i&      voxel_coord,
-                                          std::shared_ptr<OctreeT>    octree_ptr,
-                                          typename OctreeT::NodeType* base_parent_ptr);
+inline se::OctantBase* block(const Eigen::Vector3i& voxel_coord,
+                             OctreeT&               octree,
+                             se::OctantBase*        base_parent_ptr);
 
 template <typename OctreeT>
-inline typename OctreeT::BlockType* block(const se::key_t             voxel_key,
-                                          std::shared_ptr<OctreeT>    octree_ptr,
-                                          typename OctreeT::NodeType* base_parent_ptr);
+inline se::OctantBase* block(const se::key_t voxel_key,
+                             OctreeT&        octree,
+                             se::OctantBase* base_parent_ptr);
 
 template <typename OctreeT>
-se::vector<typename OctreeT::BlockType*> blocks(const se::vector<Eigen::Vector3i>& voxel_coord,
-                                                std::shared_ptr<OctreeT>           octree_ptr,
-                                                typename OctreeT::NodeType*        base_parent_ptr);
+se::vector<se::OctantBase*> blocks(const se::vector<Eigen::Vector3i>& voxel_coord,
+                                   OctreeT&                           octree,
+                                   se::OctantBase*                    base_parent_ptr);
 
 template <typename OctreeT>
-se::vector<typename OctreeT::BlockType*> blocks(se::vector<se::key_t>       voxel_keys,
-                                                std::shared_ptr<OctreeT>    octree_ptr,
-                                                typename OctreeT::NodeType* base_parent_ptr);
+se::vector<se::OctantBase*> blocks(se::vector<se::key_t> voxel_keys,
+                                   OctreeT&              octree,
+                                   se::OctantBase*       base_parent_ptr);
 
 namespace { // anonymous namespace
 template <typename OctreeT>
-inline se::OctantBase* allocate_key(const se::key_t             key,
-                                    std::shared_ptr<OctreeT>    octree_ptr,
-                                    typename OctreeT::NodeType* base_parent_ptr);
+inline se::OctantBase* allocate_key(const se::key_t key,
+                                    OctreeT&        octree,
+                                    se::OctantBase* base_parent_ptr);
 } // anonymous namespace
 
 

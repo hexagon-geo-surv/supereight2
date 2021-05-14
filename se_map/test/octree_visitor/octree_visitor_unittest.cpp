@@ -91,7 +91,7 @@ TEST(SingleResVisitor, Interpolation)
     coord_ought = adapt_to_scale(block_coord, octree_ptr_0->max_block_scale);
     se::key_t voxel_key;
     se::keyops::encode_key(block_coord, 0, voxel_key);
-    block_ptr_0 = static_cast<BlockType0*>(se::allocator::block(voxel_key, octree_ptr_0, octree_ptr_0->getRoot()));
+    block_ptr_0 = static_cast<BlockType0*>(se::allocator::block(voxel_key, *octree_ptr_0, octree_ptr_0->getRoot()));
     coord_is = block_ptr_0->getCoord();
     EXPECT_EQ(coord_ought, coord_is);
     for (size_t voxel_idx = 0; voxel_idx < block_ptr_0->size_cu; voxel_idx++)

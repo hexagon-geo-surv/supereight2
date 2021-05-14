@@ -55,7 +55,7 @@ public:
 
     pos_        = Eigen::Vector3f::Ones();
     idx_        = 0;
-    parent_ptr_ = octree_ptr_->getRoot();
+    parent_ptr_ = static_cast<NodeType*>(octree_ptr_->getRoot());
     child_ptr_  = nullptr;
     scale_exp2_ = 0.5f;
     scale_      = CAST_STACK_DEPTH - 1;

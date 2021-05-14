@@ -88,7 +88,7 @@ TEST(SingleResAllocation, BlockKey)
     coord_ought = adapt_to_scale(voxel_coord, octree_ptr_0->max_block_scale);
     se::key_t voxel_key;
     se::keyops::encode_key(voxel_coord, 0, voxel_key);
-    block_ptr_0 = se::allocator::block(voxel_key, octree_ptr_0, octree_ptr_0->getRoot());
+    block_ptr_0 = static_cast<BlockType0*>(se::allocator::block(voxel_key, *octree_ptr_0, octree_ptr_0->getRoot()));
     coord_is = block_ptr_0->getCoord();
     EXPECT_EQ(coord_ought, coord_is);
 
@@ -123,7 +123,7 @@ TEST(SingleResAllocation, BlockKey)
     coord_ought = adapt_to_scale(voxel_coord, octree_ptr_1->max_block_scale);
     se::key_t voxel_key;
     se::keyops::encode_key(voxel_coord, 0, voxel_key);
-    block_ptr_1 = se::allocator::block(voxel_key, octree_ptr_1, octree_ptr_1->getRoot());
+    block_ptr_1 = static_cast<BlockType1*>(se::allocator::block(voxel_key, *octree_ptr_1, octree_ptr_1->getRoot()));
     coord_is = block_ptr_1->getCoord();
     EXPECT_EQ(coord_ought, coord_is);
 
@@ -158,7 +158,7 @@ TEST(SingleResAllocation, BlockKey)
     coord_ought = adapt_to_scale(voxel_coord, octree_ptr_2->max_block_scale);
     se::key_t voxel_key;
     se::keyops::encode_key(voxel_coord, 0, voxel_key);
-    block_ptr_2 = se::allocator::block(voxel_key, octree_ptr_2, octree_ptr_2->getRoot());
+    block_ptr_2 = static_cast<BlockType2*>(se::allocator::block(voxel_key, *octree_ptr_2, octree_ptr_2->getRoot()));
     coord_is = block_ptr_2->getCoord();
     EXPECT_EQ(coord_ought, coord_is);
 
@@ -193,7 +193,7 @@ TEST(SingleResAllocation, BlockKey)
     coord_ought = adapt_to_scale(voxel_coord, octree_ptr_3->max_block_scale);
     se::key_t voxel_key;
     se::keyops::encode_key(voxel_coord, 0, voxel_key);
-    block_ptr_3 = se::allocator::block(voxel_key, octree_ptr_3, octree_ptr_3->getRoot());
+    block_ptr_3 = static_cast<BlockType3*>(se::allocator::block(voxel_key, *octree_ptr_3, octree_ptr_3->getRoot()));
     coord_is = block_ptr_3->getCoord();
     EXPECT_EQ(coord_ought, coord_is);
 
@@ -228,7 +228,7 @@ TEST(SingleResAllocation, BlockKey)
     coord_ought = adapt_to_scale(voxel_coord, octree_ptr_4->max_block_scale);
     se::key_t voxel_key;
     se::keyops::encode_key(voxel_coord, 0, voxel_key);
-    block_ptr_4 = se::allocator::block(voxel_key, octree_ptr_4, octree_ptr_4->getRoot());
+    block_ptr_4 = static_cast<BlockType4*>(se::allocator::block(voxel_key, *octree_ptr_4, octree_ptr_4->getRoot()));
     coord_is = block_ptr_4->getCoord();
     EXPECT_EQ(coord_ought, coord_is);
 
@@ -278,7 +278,7 @@ TEST(SingleResAllocation, BlockCoord)
   for (const auto voxel_coord : voxel_coords)
   {
     coord_ought = adapt_to_scale(voxel_coord, octree_ptr->max_block_scale);
-    block_ptr = se::allocator::block(voxel_coord, octree_ptr, octree_ptr->getRoot());
+    block_ptr = static_cast<BlockType*>(se::allocator::block(voxel_coord, *octree_ptr, octree_ptr->getRoot()));
     coord_is = block_ptr->getCoord();
     EXPECT_EQ(coord_ought, coord_is);
 
@@ -333,7 +333,7 @@ TEST(SingleResAllocation, BlockKeys)
 
   se::keyops::sort_keys(voxel_keys);
 
-  se::vector<BlockType*> block_ptrs = se::allocator::blocks(voxel_keys, octree_ptr, octree_ptr->getRoot());
+  se::vector<se::OctantBase*> block_ptrs = se::allocator::blocks(voxel_keys, *octree_ptr, octree_ptr->getRoot());
 
   for (se::idx_t i = 0; i < block_ptrs.size(); ++i)
   {
@@ -341,7 +341,7 @@ TEST(SingleResAllocation, BlockKeys)
     se::scale_t     voxel_scale;
     se::keyops::decode_key(voxel_keys[i], voxel_coord, voxel_scale);
     coord_ought = adapt_to_scale(voxel_coord, octree_ptr->max_block_scale);
-    auto block_ptr   = block_ptrs[i];
+    auto block_ptr   = static_cast<BlockType*>(block_ptrs[i]);
     coord_is = block_ptr->getCoord();
     EXPECT_EQ(coord_ought, coord_is);
 
@@ -394,7 +394,7 @@ TEST(SingleResAllocation, BlockCoords)
     voxel_keys.push_back(voxel_key);
   }
 
-  se::vector<BlockType*> block_ptrs = se::allocator::blocks(voxel_coords, octree_ptr, octree_ptr->getRoot());
+  se::vector<se::OctantBase*> block_ptrs = se::allocator::blocks(voxel_coords, *octree_ptr, octree_ptr->getRoot());
 
   se::keyops::sort_keys(voxel_keys);
   se::octantops::sort_blocks<BlockType>(block_ptrs);
