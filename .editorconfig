@@ -1,0 +1,30 @@
+# SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London
+# SPDX-FileCopyrightText: 2021 Sotiris Papatheodorou, Imperial College London
+# SPDX-License-Identifier: CC0-1.0
+
+# EditorConfig documentation:
+# https://EditorConfig.org
+
+root = true
+
+[*]
+end_of_line = lf
+charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{c,h,cpp,hpp}]
+indent_size = 2
+max_line_length = 100
+indent_style = space
+
+[*.{md,py}]
+indent_size = 4
+max_line_length = 80
+indent_style = space
+
+[*.{sh,bash}]
+indent_size = 4
+max_line_length = 80
+indent_style = tab
+
