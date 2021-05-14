@@ -95,7 +95,7 @@ TEST(Map, Interpolation)
     EXPECT_EQ(coord_ought, coord_is);
     for (int voxel_idx = 0; voxel_idx < block_ptr->size_cu; voxel_idx++)
     {
-      BlockType::DataType data;
+      DataType data;
       data.tsdf = i;
       data.weight = 1;
       block_ptr->setData(voxel_idx, data);
