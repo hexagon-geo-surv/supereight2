@@ -453,7 +453,7 @@ TEST(KeyOps, UniqueAllocation) {
   {
     for (se::idx_t j = 0; j < keys_ought.size(); ++j) // iterate unique_keys
     {
-      if (keys_ought[i] = unique_keys[j]) {
+      if (keys_ought[i] == unique_keys[j]) {
         contains = true;
         break;
       }
@@ -525,7 +525,7 @@ TEST(KeyOps, UniqueAtScale) {
   {
     for (se::idx_t j = 0; j < keys_ought.size(); ++j) // iterate unique_keys
     {
-      if (keys_ought[i] = unique_keys[j]) {
+      if (keys_ought[i] == unique_keys[j]) {
         contains = true;
         break;
       }
@@ -569,7 +569,7 @@ TEST(KeyOps, UniqueAtScale) {
   {
     for (se::idx_t j = 0; j < keys_ought.size(); ++j) // iterate unique_keys
     {
-      if (keys_ought[i] = unique_keys[j]) {
+      if (keys_ought[i] == unique_keys[j]) {
         contains = true;
         break;
       }
