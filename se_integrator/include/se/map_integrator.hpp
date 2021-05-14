@@ -79,9 +79,10 @@ public:
    * \param[in] T_MS        The transformation from sensor to map frame
    */
   template <typename SensorT>
-  void integrateDepth(const se::Image<se::depth_t>&      depth_img,
-                      const SensorT&                     sensor,
-                      const Eigen::Matrix4f&             T_MS);
+  void integrateDepth(const se::Image<se::depth_t>& depth_img,
+                      const SensorT&                sensor,
+                      const Eigen::Matrix4f&        T_MS,
+                      const unsigned int            frame);
 
 private:
   MapT&            map_;

@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <vector>
 #include <set>
+#include <unordered_set>
 #include <array>
 #include <Eigen/Dense>
 #include <Eigen/StdVector>
@@ -87,9 +88,63 @@ struct set_impl<Eigen::Vector3f>
 template <typename T>
 using set = typename set_impl<T>::type;
 
+template<typename T>
+struct unordered_set_impl
+{
+    typedef std::unordered_set<T> type;
+};
+
+template<>
+struct unordered_set_impl<Eigen::Vector3i>
+{
+    typedef std::unordered_set<Eigen::Vector3i, std::less<Eigen::Vector3i>, Eigen::aligned_allocator<Eigen::Vector3i>> type;
+};
+
+template<>
+struct unordered_set_impl<Eigen::Vector3f>
+{
+    typedef std::unordered_set<Eigen::Vector3f, std::less<Eigen::Vector3f>, Eigen::aligned_allocator<Eigen::Vector3f>> type;
+};
+
+// Define dynamic alias template
+template <typename T>
+using unordered_set = typename unordered_set_impl<T>::type;
+
 // Define static alias template
 template <typename T, size_t N>
 using array = typename std::array<T, N>;
+
+
+
+template <typename T>
+inline se::set<T> vectorToSet(se::vector<T>& v)
+{
+  se::set<T> s;
+
+  for (T& x : v)
+  {
+    s.insert(x);
+  }
+
+  return s;
+}
+
+
+
+template <typename T>
+inline se::unordered_set<T> vectorToUnorderedSet(se::vector<T>& v)
+{
+  se::unordered_set<T> s;
+
+  for (T& x : v)
+  {
+    s.insert(x);
+  }
+
+  return s;
+}
+
+
 
 } // namespace se
 

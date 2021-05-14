@@ -28,7 +28,7 @@ public:
 
     inline se::OctantBase* getParent() const { return parent_ptr_; }
 
-    inline unsigned int getTimeStamp() const { return time_stamp_; }
+    inline int getTimeStamp() const { return time_stamp_; }
 
     inline void setTimeStamp(const unsigned int time_stamp) { time_stamp_ = time_stamp; }
 
@@ -42,7 +42,7 @@ protected:
     const bool            is_block_;
     OctantBase*           parent_ptr_;    ///< Every node/block (other than root) needs a parent
     const Eigen::Vector3i coord_;         ///< The coordinates of the block (left, front , bottom corner)
-    unsigned int          time_stamp_;    ///< The frame of the last update
+    int                   time_stamp_;    ///< The frame of the last update
     unsigned int          children_mask_; ///< The allocated children
 
     template <typename DerivedT, typename DataT, unsigned SizeT>

@@ -160,7 +160,7 @@ public:
 
     static constexpr bool has_ignore_condition = true;
 
-    bool isNext(se::OctantBase* octant_ptr) { return    octant_ptr->getChildrenMask() == 0
+    bool isNext(se::OctantBase* octant_ptr) { return    octant_ptr->isBlock()
                                                      && octant_ptr->getTimeStamp() >= time_stamp_; }
 
     bool doIgnore(se::OctantBase* octant_ptr) { return octant_ptr->getTimeStamp() < time_stamp_; }

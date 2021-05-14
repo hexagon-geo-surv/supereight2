@@ -96,6 +96,8 @@ public:
    */
   inline unsigned int getMaxScale() const { return se::math::log2_const(size_); }
 
+  inline unsigned int getBlockDepth() const { return se::math::log2_const(size_) - se::math::log2_const(BlockSize); }
+
   /**
    * \brief Allocate a node for a given parent node.
    *

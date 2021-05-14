@@ -283,15 +283,30 @@ inline bool checkVertex(const Eigen::Vector3f& vertex_M, const float dim);
 namespace algorithms {
 
 template <typename OctreeT,
-          typename TriangleType>
-void marching_cube(OctreeT&   octree,
-                   std::vector<TriangleType>& triangles);
+          typename TriangleT
+>
+void marching_cube(OctreeT&               octree,
+                   se::vector<TriangleT>& triangles);
 
 template <typename OctreeT,
           typename TriangleT
 >
-void dual_marching_cube(OctreeT& octree,
-                        std::vector<TriangleT>&  triangles);
+void marching_cube(OctreeT&                octree,
+                   std::vector<TriangleT>& triangles,
+                   const int               time_stamp);
+
+template <typename OctreeT,
+          typename TriangleT
+>
+void dual_marching_cube(OctreeT&               octree,
+                        se::vector<TriangleT>& triangles);
+
+template <typename OctreeT,
+          typename TriangleT
+>
+void dual_marching_cube(OctreeT&                octree,
+                        std::vector<TriangleT>& triangles,
+                        const int               frame);
 
 } // namespace algorithms
 } // namespace se

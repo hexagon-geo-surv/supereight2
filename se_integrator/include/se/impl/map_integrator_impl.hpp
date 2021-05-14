@@ -3,6 +3,10 @@
 
 
 
+#include "se/octree/propagator.hpp"
+
+
+
 namespace se {
 namespace allocator {
 
@@ -95,6 +99,7 @@ struct IntegrateDepthImplD
     static void integrate(const se::Image<se::depth_t>& depth_img,
                           const SensorT&                sensor,
                           const Eigen::Matrix4f&        T_MS,
+                          const unsigned int            frame,
                           MapT&                         map,
                           ConfigT&                      /* config */); // TODO:
 };
@@ -114,6 +119,7 @@ struct IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>
     static void integrate(const se::Image<se::depth_t>& depth_img,
                           const SensorT&                sensor,
                           const Eigen::Matrix4f&        T_MS,
+                          const unsigned int            frame,
                           MapT&                         map,
                           ConfigT&                      /* config */);
 };
@@ -135,6 +141,7 @@ template<typename SensorT,
 void IntegrateDepthImplD<FldT, ResT>::integrate(const se::Image<se::depth_t>& depth_img,
                                                 const SensorT&                sensor,
                                                 const Eigen::Matrix4f&        T_MS,
+                                                const unsigned int            frame,
                                                 MapT&                         map,
                                                 ConfigT&                      config)
 {
@@ -146,6 +153,7 @@ template<typename SensorT, typename MapT, typename ConfigT>
 void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(const se::Image<se::depth_t>& depth_img,
                                                                       const SensorT&                sensor,
                                                                       const Eigen::Matrix4f&        T_MS,
+                                                                      const unsigned int            frame,
                                                                       MapT&                         map,
                                                                       ConfigT&                      /* config */)
 {
@@ -165,6 +173,7 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(const se::
   for (unsigned int i = 0; i < block_ptrs.size(); i++)
   {
     typename MapT::OctreeType::BlockType* block_ptr = static_cast<typename MapT::OctreeType::BlockType*>(block_ptrs[i]);
+    block_ptr->setTimeStamp(frame);
     Eigen::Vector3i block_coord = block_ptr->getCoord();
     Eigen::Vector3f point_base_M;
     map.voxelToPoint(block_coord, point_base_M);
@@ -215,6 +224,8 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(const se::
     } // i
 
   }
+
+  se::propagator::propagateTimeStampToRoot(block_ptrs);
 }
 
 
@@ -236,9 +247,10 @@ template<typename MapT>
 template<typename SensorT>
 void MapIntegrator<MapT>::integrateDepth(const se::Image<se::depth_t>& depth_img,
                                          const SensorT&                sensor,
-                                         const Eigen::Matrix4f&        T_MS)
+                                         const Eigen::Matrix4f&        T_MS,
+                                         const unsigned int            frame)
 {
-  IntegrateDepthImpl<MapT>::integrate(depth_img, sensor, T_MS, map_, config_);
+  IntegrateDepthImpl<MapT>::integrate(depth_img, sensor, T_MS, frame, map_, config_);
 }
 
 

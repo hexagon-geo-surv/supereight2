@@ -138,7 +138,7 @@ int main(int argc, char** argv)
     TOCK("tracking")
 
     TICK("integration")
-    integrator.integrateDepth(processed_depth_img, sensor, T_MS);
+    integrator.integrateDepth(processed_depth_img, sensor, T_MS, frame);
     TOCK("integration")
 
     TICK("raycast")
