@@ -35,7 +35,7 @@ template <typename crtpType, typename T>
 struct crtp
 {
     T& underlying() { return static_cast<T&>(*this); }
-    T const& underlying() const { return static_cast<T const&>(*this); }
+    const T& underlying() const { return static_cast<const T&>(*this); }
 private:
     crtp(){}              ///< private-constructor-and-friend technique
     friend crtpType;

@@ -62,7 +62,7 @@ public:
 private:
 
     DerivedT& underlying() { return static_cast<DerivedT&>(*this); }
-    DerivedT const& underlying() const { return static_cast<DerivedT const&>(*this); }
+    const DerivedT& underlying() const { return static_cast<const DerivedT&>(*this); }
 
     // Find the next Volume with valid data.
     void nextData();

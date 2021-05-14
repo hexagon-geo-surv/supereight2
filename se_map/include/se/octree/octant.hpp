@@ -137,7 +137,7 @@ private:
     static constexpr int curr_scale_ = 0;
 
     DerivedT& underlying() { return static_cast<DerivedT&>(*this); }
-    DerivedT const& underlying() const { return static_cast<DerivedT const&>(*this); }
+    const DerivedT& underlying() const { return static_cast<const DerivedT&>(*this); }
 };
 
 
@@ -175,7 +175,7 @@ private:
     int curr_scale_;
 
     DerivedT& underlying() { return static_cast<DerivedT&>(*this); }
-    DerivedT const& underlying() const { return static_cast<DerivedT const&>(*this); }
+    const DerivedT& underlying() const { return static_cast<const DerivedT&>(*this); }
 };
 
 /**
