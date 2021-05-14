@@ -55,7 +55,7 @@ Node<DataT, ResT>::Node(Node*              parent_ptr,
 
 
 template <typename DataT, Res ResT>
-inline unsigned int Node<DataT, ResT>::getSize()
+inline unsigned int Node<DataT, ResT>::getSize() const
 {
   return size_;
 }

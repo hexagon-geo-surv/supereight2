@@ -95,13 +95,13 @@ public:
 
   void saveSlice(const std::string&     file_path,
                  const Eigen::Vector3f& point_M,
-                 const std::string&     num = "");
+                 const std::string&     num = "") const;
 
   void saveStrucutre(const std::string& file_path,
-                     const std::string& num = "");
+                     const std::string& num = "") const;
 
   void saveMesh(const std::string& file_path,
-                const std::string& num = "");
+                const std::string& num = "") const;
 
   inline void voxelToPoint(const Eigen::Vector3i& voxel_coord, Eigen::Vector3f& point_M) const;
 

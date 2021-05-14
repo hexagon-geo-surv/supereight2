@@ -74,7 +74,7 @@ public:
     Node(Node*              parent_ptr,
          const unsigned int child_idx);
 
-    inline unsigned int getSize();
+    inline unsigned int getSize() const;
 
     inline se::OctantBase* getChild(const unsigned child_idx);
 

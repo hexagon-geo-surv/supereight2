@@ -205,7 +205,7 @@ template <Field     FldT,
 >
 void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveSlice(const std::string&     file_path,
                                                              const Eigen::Vector3f& point_M,
-                                                             const std::string&     num)
+                                                             const std::string&     num) const
 {
   Eigen::Vector3i voxel_coord;
   pointToVoxel(point_M, voxel_coord);
@@ -227,7 +227,7 @@ template <Field     FldT,
           unsigned  BlockSize
 >
 void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveStrucutre(const std::string& file_path,
-                                                                 const std::string& num)
+                                                                 const std::string& num) const
 {
   const std::string file_name = (num == std::string("")) ? (file_path + ".ply") : (file_path + "_" + num + ".ply");
   se::io::save_octree_structure_ply(*octree_ptr_, file_name);
@@ -243,7 +243,7 @@ template <Field     FldT,
           unsigned  BlockSize
 >
 void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMesh(const std::string& file_path,
-                                                            const std::string& num)
+                                                            const std::string& num) const
 {
   se::vector<se::Triangle> mesh;
   se::algorithms::marching_cube(*octree_ptr_, mesh);
