@@ -78,6 +78,8 @@ public:
 
     inline se::OctantBase* getChild(const unsigned child_idx);
 
+    inline const se::OctantBase* getChild(const unsigned child_idx) const;
+
     inline se::OctantBase* setChild(const unsigned child_idx, se::OctantBase* child_ptr);
 
     inline void getData(const DataT& data);

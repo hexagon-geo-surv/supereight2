@@ -71,6 +71,14 @@ inline se::OctantBase* Node<DataT, ResT>::getChild(const unsigned child_idx)
 
 
 template <typename DataT, Res ResT>
+inline const se::OctantBase* Node<DataT, ResT>::getChild(const unsigned child_idx) const
+{
+  return children_ptr_[child_idx];
+}
+
+
+
+template <typename DataT, Res ResT>
 inline se::OctantBase* Node<DataT, ResT>::setChild(const unsigned child_idx, se::OctantBase* child_ptr)
 {
   children_mask_ |= 1 << child_idx;
