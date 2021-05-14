@@ -13,7 +13,7 @@ inline se::OctantBase* block(const Eigen::Vector3i&      block_coord,
                              const OctreeT&              octree,
                              typename OctreeT::NodeType* base_parent_ptr)
 {
-  int child_size  = base_parent_ptr->getSize() >> 1;
+  unsigned child_size  = base_parent_ptr->getSize() >> 1;
   typename OctreeT::NodeType* parent_ptr = base_parent_ptr;
   se::OctantBase* child_ptr  = nullptr;
 

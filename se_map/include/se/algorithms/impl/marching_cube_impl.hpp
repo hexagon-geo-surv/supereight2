@@ -784,7 +784,7 @@ void marching_cube(OctreeT&                   octree,
   }
 
 #pragma omp parallel for
-  for (int block_idx = 0; block_idx < block_ptrs.size(); block_idx++)
+  for (size_t block_idx = 0; block_idx < block_ptrs.size(); block_idx++)
   {
     const BlockType* block_ptr   = block_ptrs[block_idx];
 
@@ -850,7 +850,7 @@ void dual_marching_cube(OctreeT&                octree,
   }
 
 #pragma omp parallel for
-  for (int block_idx = 0; block_idx < block_ptrs.size(); block_idx++)
+  for (size_t block_idx = 0; block_idx < block_ptrs.size(); block_idx++)
   {
     const BlockType* block_ptr   = block_ptrs[block_idx];
     const int voxel_scale  = block_ptr->getCurrentScale();

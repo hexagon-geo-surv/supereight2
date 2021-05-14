@@ -85,7 +85,7 @@ TEST(SingleResVisitor, Interpolation)
 
   BlockType0* block_ptr_0 = nullptr;
   
-  for (int i = 0; i < block_coords.size(); i++)
+  for (size_t i = 0; i < block_coords.size(); i++)
   {
     const Eigen::Vector3i block_coord = block_coords[i];
     coord_ought = adapt_to_scale(block_coord, octree_ptr_0->max_block_scale);
@@ -94,7 +94,7 @@ TEST(SingleResVisitor, Interpolation)
     block_ptr_0 = static_cast<BlockType0*>(se::allocator::block(voxel_key, octree_ptr_0, octree_ptr_0->getRoot()));
     coord_is = block_ptr_0->getCoord();
     EXPECT_EQ(coord_ought, coord_is);
-    for (int voxel_idx = 0; voxel_idx < block_ptr_0->size_cu; voxel_idx++)
+    for (size_t voxel_idx = 0; voxel_idx < block_ptr_0->size_cu; voxel_idx++)
     {
       BlockType0::DataType data;
       data.tsdf = i;

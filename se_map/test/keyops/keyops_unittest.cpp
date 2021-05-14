@@ -332,7 +332,7 @@ TEST(KeyOps, UniqueKeys) {
   se::vector<se::key_t> unique_keys;
   se::keyops::unique_keys(keys, unique_keys);
 
-  EXPECT_EQ(8, unique_keys.size());
+  EXPECT_EQ(8u, unique_keys.size());
   for (se::idx_t i = 1; i < unique_keys.size(); ++i)
   {
     EXPECT_TRUE(unique_keys[i - 1] != unique_keys[i]);
@@ -373,7 +373,7 @@ TEST(KeyOps, UniqueCodes) {
   se::vector<se::key_t> unique_keys;
   se::keyops::unique_codes(keys, unique_keys);
 
-  EXPECT_EQ(7, unique_keys.size());
+  EXPECT_EQ(7u, unique_keys.size());
   for (se::idx_t i = 1; i < unique_keys.size(); ++i)
   {
     EXPECT_TRUE(unique_keys[i - 1] != unique_keys[i]);
