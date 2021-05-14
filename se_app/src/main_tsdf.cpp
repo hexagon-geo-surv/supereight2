@@ -14,7 +14,7 @@
 
 #define TRACK true //< Use ICP tracking or ground truth
 
-int main()
+int main(int argc, char** argv)
 {
   std::string output_path = "./PATH/TO/out";
 
@@ -73,8 +73,8 @@ int main()
   reader_config.fps               = 24;
   reader_config.drop_frames       = false;
   reader_config.verbose           = 0;
-  reader_config.sequence_path     = "./PATH/TO/scene.raw";
-  reader_config.ground_truth_file = "./PATH/TO/ground_truth.txt";
+  reader_config.sequence_path     = (argc >= 2) ? argv[1] : "./PATH/TO/scene.raw";
+  reader_config.ground_truth_file = (argc >= 3) ? argv[2] : "./PATH/TO/ground_truth.txt";
 
   // ========= READER INITIALIZATION  =========
   se::Reader* reader = nullptr;
