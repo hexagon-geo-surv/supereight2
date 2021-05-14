@@ -50,23 +50,23 @@ public:
                         const Eigen::Vector3f& ray_dir_M,
                         const float            near_plane,
                         const float            far_plane)
-          : map_(map), octree_ptr_(map_.getOctree()), scaling_((octree_ptr_->getSize() * map_.getRes()))
+          : map_(map), octree_(*(map_.getOctree())), scaling_((octree_.getSize() * map_.getRes()))
   {
 
     pos_        = Eigen::Vector3f::Ones();
     idx_        = 0;
-    parent_ptr_ = static_cast<NodeType*>(octree_ptr_->getRoot());
+    parent_ptr_ = static_cast<NodeType*>(octree_.getRoot());
     child_ptr_  = nullptr;
     scale_exp2_ = 0.5f;
     scale_      = CAST_STACK_DEPTH - 1;
-    min_scale_  = CAST_STACK_DEPTH - log2(octree_ptr_->getSize() / BlockType::size);
+    min_scale_  = CAST_STACK_DEPTH - log2(octree_.getSize() / BlockType::size);
     state_      = INIT;
 
 	// Zero-initialize the stack
 	memset(stack_, 0, CAST_STACK_DEPTH * sizeof(StackEntry));
 
     // Ensure all elements of ray_dir_M_ are non-zero.
-    const float epsilon = exp2f(-log2(octree_ptr_->getSize()));
+    const float epsilon = exp2f(-log2(octree_.getSize()));
     ray_dir_M_.x() = fabsf(ray_dir_M.x()) < epsilon ?
                      copysignf(epsilon, ray_dir_M.x()) : ray_dir_M.x();
     ray_dir_M_.y() = fabsf(ray_dir_M.y()) < epsilon ?
@@ -77,7 +77,7 @@ public:
     // Scale the origin to be in the interval [1, 2].
     Eigen::Vector3f ray_origin;
     map_.template pointToVoxel<Safe::Off>(ray_origin_M, ray_origin);
-    ray_origin = ray_origin / octree_ptr_->getSize() + Eigen::Vector3f::Ones();
+    ray_origin = ray_origin / octree_.getSize() + Eigen::Vector3f::Ones();
 
     // Precompute the ray coefficients.
     t_coef_ = -1.f * ray_dir_M_.cwiseAbs().cwiseInverse();
@@ -248,7 +248,7 @@ private:
 
 
   MapT&  map_;
-  const std::shared_ptr<typename MapT::OctreeType> octree_ptr_;
+  const typename MapT::OctreeType& octree_;
   Eigen::Vector3f ray_origin_M_;
   Eigen::Vector3f ray_dir_M_;
   Eigen::Vector3f pos_;
