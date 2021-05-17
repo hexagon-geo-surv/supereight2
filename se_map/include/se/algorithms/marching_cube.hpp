@@ -285,8 +285,8 @@ namespace algorithms {
 template <typename OctreeT,
           typename TriangleT
 >
-void marching_cube(OctreeT&               octree,
-                   se::vector<TriangleT>& triangles);
+void marching_cube(OctreeT&                octree,
+                   std::vector<TriangleT>& triangles);
 
 template <typename OctreeT,
           typename TriangleT
@@ -298,8 +298,8 @@ void marching_cube(OctreeT&                octree,
 template <typename OctreeT,
           typename TriangleT
 >
-void dual_marching_cube(OctreeT&               octree,
-                        se::vector<TriangleT>& triangles);
+void dual_marching_cube(OctreeT&                octree,
+                        std::vector<TriangleT>& triangles);
 
 template <typename OctreeT,
           typename TriangleT

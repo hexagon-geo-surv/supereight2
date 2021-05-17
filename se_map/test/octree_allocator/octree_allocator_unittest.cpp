@@ -62,7 +62,7 @@ TEST(SingleResAllocation, BlockKey)
   const NodeType* node_ptr = nullptr;
   se::OctantBase* octant_ptr = nullptr;
 
-  se::vector<Eigen::Vector3i> voxel_coords =
+  std::vector<Eigen::Vector3i> voxel_coords =
   {
     Eigen::Vector3i(253,  74, 135),
     Eigen::Vector3i(114, 244,  65),
@@ -268,7 +268,7 @@ TEST(SingleResAllocation, BlockCoord)
   const NodeType*  node_ptr = nullptr;
   se::OctantBase* octant_ptr = nullptr;
 
-  se::vector<Eigen::Vector3i> voxel_coords =
+  std::vector<Eigen::Vector3i> voxel_coords =
   {
     Eigen::Vector3i(233,  44, 255),
     Eigen::Vector3i(113, 144, 155),
@@ -316,14 +316,14 @@ TEST(SingleResAllocation, BlockKeys)
   const NodeType* node_ptr = nullptr;
   se::OctantBase* octant_ptr = nullptr;
 
-  se::vector<Eigen::Vector3i> voxel_coords =
+  std::vector<Eigen::Vector3i> voxel_coords =
   {
     Eigen::Vector3i(233,  44, 255),
     Eigen::Vector3i(113, 144, 155),
     Eigen::Vector3i( 33, 104,  55)
   };
 
-  se::vector<se::key_t> voxel_keys;
+  std::vector<se::key_t> voxel_keys;
   for (const auto voxel_coord : voxel_coords)
   {
     se::key_t voxel_key;
@@ -333,7 +333,7 @@ TEST(SingleResAllocation, BlockKeys)
 
   se::keyops::sort_keys(voxel_keys);
 
-  se::vector<se::OctantBase*> block_ptrs = se::allocator::blocks(voxel_keys, *octree_ptr, octree_ptr->getRoot());
+  std::vector<se::OctantBase*> block_ptrs = se::allocator::blocks(voxel_keys, *octree_ptr, octree_ptr->getRoot());
 
   for (se::idx_t i = 0; i < block_ptrs.size(); ++i)
   {
@@ -379,14 +379,14 @@ TEST(SingleResAllocation, BlockCoords)
   const NodeType* node_ptr = nullptr;
   se::OctantBase* octant_ptr = nullptr;
 
-  se::vector<Eigen::Vector3i> voxel_coords =
+  std::vector<Eigen::Vector3i> voxel_coords =
   {
     Eigen::Vector3i(233,  44, 255),
     Eigen::Vector3i(113, 144, 155),
     Eigen::Vector3i( 33, 104,  55)
   };
 
-  se::vector<se::key_t> voxel_keys;
+  std::vector<se::key_t> voxel_keys;
   for (const auto voxel_coord : voxel_coords)
   {
     se::key_t voxel_key;
@@ -394,7 +394,7 @@ TEST(SingleResAllocation, BlockCoords)
     voxel_keys.push_back(voxel_key);
   }
 
-  se::vector<se::OctantBase*> block_ptrs = se::allocator::blocks(voxel_coords, *octree_ptr, octree_ptr->getRoot());
+  std::vector<se::OctantBase*> block_ptrs = se::allocator::blocks(voxel_coords, *octree_ptr, octree_ptr->getRoot());
 
   se::keyops::sort_keys(voxel_keys);
   se::octantops::sort_blocks<BlockType>(block_ptrs);

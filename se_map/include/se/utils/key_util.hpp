@@ -356,7 +356,7 @@ inline bool is_siblings(const se::key_t sibling_1_key,
  * \brief Sorting template. Default small to larger key sorting.
  */
 template <Sort = Sort::SmallToLarge>
-inline void sort_keys(se::vector<se::key_t>& keys);
+inline void sort_keys(std::vector<se::key_t>& keys);
 
 /**
  * \brief Sorts the keys from smallest to largest.
@@ -366,7 +366,7 @@ inline void sort_keys(se::vector<se::key_t>& keys);
  * \param[in/out] keys The keys to be sorted
  */
 template <>
-inline void sort_keys<Sort::SmallToLarge>(se::vector<se::key_t>& keys);
+inline void sort_keys<Sort::SmallToLarge>(std::vector<se::key_t>& keys);
 
 /**
  * \brief Sorts the keys from largest to smallest.
@@ -376,7 +376,7 @@ inline void sort_keys<Sort::SmallToLarge>(se::vector<se::key_t>& keys);
  * \param[in/out] keys
  */
 template <>
-inline void sort_keys<Sort::LargeToSmall>(se::vector<se::key_t>& keys);
+inline void sort_keys<Sort::LargeToSmall>(std::vector<se::key_t>& keys);
 
 /**
  * \brief Filter keys based on the whole key (i.e. code and scale).
@@ -385,8 +385,8 @@ inline void sort_keys<Sort::LargeToSmall>(se::vector<se::key_t>& keys);
  * \param[out] unique_keys   The filtered unique keys
  */
 template <se::Safe SafeB>
-inline void unique_keys(const se::vector<se::key_t>& keys,
-                        se::vector<se::key_t>&       unique_keys);
+inline void unique_keys(const std::vector<se::key_t>& keys,
+                        std::vector<se::key_t>&       unique_keys);
 
 /**
  * \brief Filter keys based on their code and keep the key with the smallest scale.
@@ -395,8 +395,8 @@ inline void unique_keys(const se::vector<se::key_t>& keys,
  * \param[out] unique_keys   The filtered unique keys
  */
 template <se::Safe SafeB>
-inline void unique_codes(const se::vector<se::key_t>& keys,
-                         se::vector<se::key_t>&       unique_keys);
+inline void unique_codes(const std::vector<se::key_t>& keys,
+                         std::vector<se::key_t>&       unique_keys);
 
 /**
  * \brief Filter keys based on unique allocation.
@@ -407,9 +407,9 @@ inline void unique_codes(const se::vector<se::key_t>& keys,
  * \param[out] unique_keys   The filtered unique keys
  */
 template <se::Safe SafeB>
-inline void unique_allocation(const se::vector<se::key_t>& keys,
-                              const scale_t                max_block_scale,
-                              se::vector<se::key_t>&       unique_keys);
+inline void unique_allocation(const std::vector<se::key_t>& keys,
+                              const scale_t                 max_block_scale,
+                              std::vector<se::key_t>&       unique_keys);
 
 /**
  * \brief Filter keys at a given scale.
@@ -421,9 +421,9 @@ inline void unique_allocation(const se::vector<se::key_t>& keys,
  * \param[out] unique_keys   The filtered unique keys
  */
 template <se::Safe SafeB>
-inline void unique_at_scale(const se::vector<se::key_t>& keys,
-                            const se::scale_t            scale,
-                            se::vector<se::key_t>&       unique_keys);
+inline void unique_at_scale(const std::vector<se::key_t>& keys,
+                            const se::scale_t             scale,
+                            std::vector<se::key_t>&       unique_keys);
 
 /**
  * TODO: 6-connectivity + centre

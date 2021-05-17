@@ -9,23 +9,23 @@ namespace propagator {
 
 
 template <typename PropagateF>
-void propagateToRoot(se::vector<se::unordered_set<se::OctantBase*>> octant_ptrs,
-                     PropagateF&                                    propagate_funct);
+void propagateToRoot(std::vector<std::unordered_set<se::OctantBase*>> octant_ptrs,
+                     PropagateF&                                     propagate_funct);
 
 /**
  * \brief Propage all newly integrated values from the voxel block depth up to the root of the octree
  */
 template <typename PropagateF>
-void propagateToRoot(se::vector<se::OctantBase*>& octant_ptrs,
-                     PropagateF&                  propagate_funct);
+void propagateToRoot(std::vector<se::OctantBase*>& octant_ptrs,
+                     PropagateF&                   propagate_funct);
 
-void propagateTimeStampToRoot(se::vector<se::set<se::OctantBase*>> octant_ptrs);
+void propagateTimeStampToRoot(std::vector<std::set<se::OctantBase*>> octant_ptrs);
 
 void propagateTimeStampToRoot(std::unordered_set<se::OctantBase*>& octant_ptrs);
 
-void propagateTimeStampToRoot(se::set<se::OctantBase*>& octant_ptrs);
+void propagateTimeStampToRoot(std::set<se::OctantBase*>& octant_ptrs);
 
-void propagateTimeStampToRoot(se::vector<se::OctantBase*>& octant_ptrs);
+void propagateTimeStampToRoot(std::vector<se::OctantBase*>& octant_ptrs);
 
 
 

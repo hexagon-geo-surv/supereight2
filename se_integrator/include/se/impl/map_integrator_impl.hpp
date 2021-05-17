@@ -11,11 +11,11 @@ namespace se {
 namespace allocator {
 
 template<typename SensorT, typename MapT>
-se::vector<se::OctantBase*> frustum(const se::Image<depth_t>& depth_img,
-                                    SensorT&                  sensor,
-                                    const Eigen::Matrix4f&    T_MS,
-                                    MapT&                     map,
-                                    const float               band)
+std::vector<se::OctantBase*> frustum(const se::Image<depth_t>& depth_img,
+                                    SensorT&                   sensor,
+                                    const Eigen::Matrix4f&     T_MS,
+                                    MapT&                      map,
+                                    const float                band)
 {
   auto octree_ptr = map.getOctree();
 
@@ -24,7 +24,7 @@ se::vector<se::OctantBase*> frustum(const se::Image<depth_t>& depth_img,
   const Eigen::Vector3f t_MS = T_MS.topRightCorner<3, 1>();
 
 #pragma omp declare reduction (merge : std::set<se::key_t> : omp_out.insert(omp_in.begin(), omp_in.end()))
-  se::set<se::key_t> voxel_key_set;
+  std::set<se::key_t> voxel_key_set;
 
 #pragma omp parallel for reduction(merge: voxel_key_set)
   for (int x = 0; x < depth_img.width(); ++x) {
@@ -59,9 +59,9 @@ se::vector<se::OctantBase*> frustum(const se::Image<depth_t>& depth_img,
     }
   }
 
-  se::vector<key_t> voxel_keys(voxel_key_set.begin(), voxel_key_set.end());
+  std::vector<key_t> voxel_keys(voxel_key_set.begin(), voxel_key_set.end());
 
-  se::vector<se::OctantBase*> fetched_block_ptrs = se::allocator::blocks(voxel_keys, *octree_ptr, octree_ptr->getRoot());
+  std::vector<se::OctantBase*> fetched_block_ptrs = se::allocator::blocks(voxel_keys, *octree_ptr, octree_ptr->getRoot());
 
   return fetched_block_ptrs;
 }
@@ -161,7 +161,7 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(const se::
   const se::weight_t max_weight   = map.getDataConfig().max_weight;
 
   // Allocation
-  se::vector<OctantBase*> block_ptrs = se::allocator::frustum(depth_img, sensor, T_MS, map, 2 * truncation_boundary);
+  std::vector<OctantBase*> block_ptrs = se::allocator::frustum(depth_img, sensor, T_MS, map, 2 * truncation_boundary);
 
   // Update
   unsigned int block_size = MapT::OctreeType::block_size;

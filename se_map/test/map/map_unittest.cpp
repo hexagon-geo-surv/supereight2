@@ -68,7 +68,7 @@ TEST(Map, Interpolation)
 
   int block_size = BlockType::size;
 
-  se::vector<Eigen::Vector3i> block_coords =
+  std::vector<Eigen::Vector3i> block_coords =
   {
     Eigen::Vector3i(         0,          0,          0),
     Eigen::Vector3i(block_size,          0,          0),

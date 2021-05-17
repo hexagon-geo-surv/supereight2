@@ -51,9 +51,9 @@ TEST(MeshingTest, EqualScaleNeighbour) {
   const int octree_size = blocks_per_side * block_size;
   typedef se::Octree<DataType, se::Res::Single, block_size> OctreeType;
   typename OctreeType::Ptr octree_ptr = std::shared_ptr<OctreeType >(new OctreeType(octree_size));;
-  se::vector<se::key_t> allocation_list;
+  std::vector<se::key_t> allocation_list;
   allocation_list.reserve(blocks_per_side * blocks_per_side);
-  se::vector<Eigen::Vector3i> block_coords;
+  std::vector<Eigen::Vector3i> block_coords;
   for (unsigned y = 0; y < octree_size; y += block_size) {
     for (unsigned z = 0; z < octree_size; z += block_size) {
       Eigen::Vector3i block_coord = Eigen::Vector3i(block_size, y, z);

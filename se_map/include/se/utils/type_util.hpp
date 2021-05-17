@@ -9,6 +9,18 @@
 #include <Eigen/Dense>
 #include <Eigen/StdVector>
 
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector2f)
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector3f)
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector2d)
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector3d)
+
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Matrix2f)
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Matrix3f)
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Matrix4f)
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Matrix2d)
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Matrix3d)
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Matrix4d)
+
 namespace se {
 
 /**
@@ -35,114 +47,6 @@ typedef unsigned int idx_t;   ///< Child or voxel index type
 typedef float depth_t;        ///< The type of the processed depth measurements
 
 typedef float field_t;        ///< The type of the stored field (e.g. TSDF, ESDF or occupancy)
-
-
-/**
- *
- * Define se containers with appropriate allocators for Eigen types.
- *
- */
-
-template<typename T>
-struct vector_impl
-{
-    typedef std::vector<T> type;
-};
-
-template<>
-struct vector_impl<Eigen::Vector3i>
-{
-    typedef std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> type;
-};
-
-template<>
-struct vector_impl<Eigen::Vector3f>
-{
-    typedef std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> type;
-};
-
-// Define dynamic alias template
-template <typename T>
-using vector = typename vector_impl<T>::type;
-
-
-template<typename T>
-struct set_impl
-{
-    typedef std::set<T> type;
-};
-
-template<>
-struct set_impl<Eigen::Vector3i>
-{
-    typedef std::set<Eigen::Vector3i, std::less<Eigen::Vector3i>, Eigen::aligned_allocator<Eigen::Vector3i>> type;
-};
-
-template<>
-struct set_impl<Eigen::Vector3f>
-{
-    typedef std::set<Eigen::Vector3f, std::less<Eigen::Vector3f>, Eigen::aligned_allocator<Eigen::Vector3f>> type;
-};
-
-// Define dynamic alias template
-template <typename T>
-using set = typename set_impl<T>::type;
-
-template<typename T>
-struct unordered_set_impl
-{
-    typedef std::unordered_set<T> type;
-};
-
-template<>
-struct unordered_set_impl<Eigen::Vector3i>
-{
-    typedef std::unordered_set<Eigen::Vector3i, std::less<Eigen::Vector3i>, Eigen::aligned_allocator<Eigen::Vector3i>> type;
-};
-
-template<>
-struct unordered_set_impl<Eigen::Vector3f>
-{
-    typedef std::unordered_set<Eigen::Vector3f, std::less<Eigen::Vector3f>, Eigen::aligned_allocator<Eigen::Vector3f>> type;
-};
-
-// Define dynamic alias template
-template <typename T>
-using unordered_set = typename unordered_set_impl<T>::type;
-
-// Define static alias template
-template <typename T, size_t N>
-using array = typename std::array<T, N>;
-
-
-
-template <typename T>
-inline se::set<T> vectorToSet(se::vector<T>& v)
-{
-  se::set<T> s;
-
-  for (T& x : v)
-  {
-    s.insert(x);
-  }
-
-  return s;
-}
-
-
-
-template <typename T>
-inline se::unordered_set<T> vectorToUnorderedSet(se::vector<T>& v)
-{
-  se::unordered_set<T> s;
-
-  for (T& x : v)
-  {
-    s.insert(x);
-  }
-
-  return s;
-}
 
 
 

@@ -69,7 +69,7 @@ TEST(SingleResVisitor, Interpolation)
   typedef se::Octree<DataType, se::Res::Single, block_size_3> OctreeType0;
   typedef OctreeType0::BlockType BlockType0;
 
-  se::vector<Eigen::Vector3i> block_coords =
+  std::vector<Eigen::Vector3i> block_coords =
   {
     Eigen::Vector3i(           0,            0,            0),
     Eigen::Vector3i(block_size_3,            0,            0),

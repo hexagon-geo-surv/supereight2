@@ -299,9 +299,9 @@ TEST(KeyOps, IsSibling) {
 }
 
 TEST(KeyOps, UniqueKeys) {
-  se::vector<se::key_t> keys;
+  std::vector<se::key_t> keys;
   keys.reserve(10);
-  const se::vector<Eigen::Vector3i> coords =
+  const std::vector<Eigen::Vector3i> coords =
   {
     {56, 12, 12}, {56, 12, 12},
     {128, 128, 128},
@@ -311,7 +311,7 @@ TEST(KeyOps, UniqueKeys) {
     {436, 18,  436},
     {128, 241, 136}, {128, 241, 136}
   };
-  const se::vector<se::scale_t> scales =
+  const std::vector<se::scale_t> scales =
   {
     0, 0, // duplicate
     1,
@@ -329,7 +329,7 @@ TEST(KeyOps, UniqueKeys) {
   }
 
   se::keyops::sort_keys(keys);
-  se::vector<se::key_t> unique_keys;
+  std::vector<se::key_t> unique_keys;
   se::keyops::unique_keys(keys, unique_keys);
 
   EXPECT_EQ(8u, unique_keys.size());
@@ -340,9 +340,9 @@ TEST(KeyOps, UniqueKeys) {
 }
 
 TEST(KeyOps, UniqueCodes) {
-  se::vector<se::key_t> keys;
+  std::vector<se::key_t> keys;
   keys.reserve(10);
-  const se::vector<Eigen::Vector3i> coords =
+  const std::vector<Eigen::Vector3i> coords =
   {
     {56, 12, 12}, {56, 12, 12},
     {128, 128, 128},
@@ -352,7 +352,7 @@ TEST(KeyOps, UniqueCodes) {
     {436, 18,  436},
     {128, 241, 136}, {128, 241, 136}
   };
-  const se::vector<se::scale_t> scales =
+  const std::vector<se::scale_t> scales =
   {
     0, 0, // duplicate
     1,
@@ -370,7 +370,7 @@ TEST(KeyOps, UniqueCodes) {
   }
 
   se::keyops::sort_keys(keys);
-  se::vector<se::key_t> unique_keys;
+  std::vector<se::key_t> unique_keys;
   se::keyops::unique_codes(keys, unique_keys);
 
   EXPECT_EQ(7u, unique_keys.size());
@@ -395,16 +395,16 @@ TEST(KeyOps, UniqueCodes) {
 TEST(KeyOps, UniqueAllocation) {
   const se::scale_t max_block_scale = 2;
 
-  se::vector<se::key_t> keys;
+  std::vector<se::key_t> keys;
   keys.reserve(10);
-  const se::vector<Eigen::Vector3i> coords =
+  const std::vector<Eigen::Vector3i> coords =
   { // 0  1  2  3   4  5  6   7   8
     // 1  2  4  8  16 32 64 128 256
     {0, 0, 0},        {32, 16, 32},      {40, 24, 32},
     {128, 128, 128},  {144, 128, 160},   {144, 132,  164},
     {512, 512, 1024}, {512, 544,  1056}, {512, 545, 1056}, {512, 544, 1056}
   };
-  const se::vector<se::scale_t> scales =
+  const std::vector<se::scale_t> scales =
   {
     6, 5, 3,
     7, 4, 2,
@@ -418,11 +418,11 @@ TEST(KeyOps, UniqueAllocation) {
   }
 
   se::keyops::sort_keys(keys);
-  se::vector<se::key_t> unique_keys;
+  std::vector<se::key_t> unique_keys;
 
   se::keyops::unique_allocation(keys, max_block_scale, unique_keys);
 
-  se::vector<Eigen::Vector3i> coords_ought =
+  std::vector<Eigen::Vector3i> coords_ought =
   {
     {40, 24, 32},
     {144, 132,  164},
@@ -430,9 +430,9 @@ TEST(KeyOps, UniqueAllocation) {
     {512, 544, 1056}
   };
 
-  se::vector<se::scale_t> scales_ought = {3, 2, 1, 1};
+  std::vector<se::scale_t> scales_ought = {3, 2, 1, 1};
 
-  se::vector<se::key_t> keys_ought;
+  std::vector<se::key_t> keys_ought;
   keys_ought.reserve(4);
   for (se::idx_t i = 0; i < coords_ought.size(); ++i)
   {
@@ -466,16 +466,16 @@ TEST(KeyOps, UniqueAllocation) {
 }
 
 TEST(KeyOps, UniqueAtScale) {
-  se::vector<se::key_t> keys;
+  std::vector<se::key_t> keys;
   keys.reserve(10);
-  const se::vector<Eigen::Vector3i> coords =
+  const std::vector<Eigen::Vector3i> coords =
   { // 0  1  2  3   4  5  6   7   8
     // 1  2  4  8  16 32 64 128 256
     {0, 0, 0},        {32, 16, 32},      {40, 24, 32},
     {128, 128, 128},  {144, 128, 160},   {144, 132,  164},
     {512, 512, 1024}, {512, 544,  1056}, {512, 545, 1056}, {513, 545, 1056}
   };
-  const se::vector<se::scale_t> scales =
+  const std::vector<se::scale_t> scales =
   {
     6, 5, 3,
     6, 4, 2,
@@ -494,17 +494,17 @@ TEST(KeyOps, UniqueAtScale) {
   // EVALUATE FOR SCALE 5
 
   se::scale_t scale_ought = 5;
-  se::vector<se::key_t> unique_keys;
+  std::vector<se::key_t> unique_keys;
   se::keyops::unique_at_scale(keys, scale_ought, unique_keys);
 
-  se::vector<Eigen::Vector3i> coords_ought =
+  std::vector<Eigen::Vector3i> coords_ought =
   {
     {0, 0, 0},
     {128, 128,  128},
     {512, 512, 1024},
   };
 
-  se::vector<se::key_t> keys_ought;
+  std::vector<se::key_t> keys_ought;
   keys_ought.reserve(3);
   for (se::idx_t i = 0; i < coords_ought.size(); ++i)
   {

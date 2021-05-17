@@ -245,13 +245,13 @@ template <Field     FldT,
 void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMesh(const std::string& file_path,
                                                             const std::string& num) const
 {
-  se::vector<se::Triangle> mesh;
+  std::vector<se::Triangle> mesh;
   se::algorithms::marching_cube(*octree_ptr_, mesh);
 
   const std::string file_name_mesh_primal = (num == std::string("")) ? (file_path + "_primal.vtk") : (file_path + "_primal_" + num + ".vtk");
   se::io::save_mesh_vtk(mesh, file_name_mesh_primal, Eigen::Matrix4f::Identity());
 
-  se::vector<se::Triangle> dual_mesh;
+  std::vector<se::Triangle> dual_mesh;
   se::algorithms::dual_marching_cube(*octree_ptr_, dual_mesh);
 
   const std::string file_name_mesh_dual = (num == std::string("")) ? (file_path + "_dual.vtk") : (file_path + "_dual_" + num + ".vtk");
@@ -346,8 +346,8 @@ template <Field     FldT,
 >
 template<se::Safe SafeB>
 inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
-Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointsToVoxels(const se::vector<Eigen::Vector3f>& points_M,
-                                                             se::vector<Eigen::Vector3i>&       voxel_coords) const
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointsToVoxels(const std::vector<Eigen::Vector3f>& points_M,
+                                                             std::vector<Eigen::Vector3i>&       voxel_coords) const
 {
   bool all_valid = true;
 
@@ -375,8 +375,8 @@ template <Field     FldT,
 >
 template<se::Safe SafeB>
 inline typename std::enable_if_t<SafeB == se::Safe::Off, bool>
-Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointsToVoxels(const se::vector<Eigen::Vector3f>& points_M,
-                                                             se::vector<Eigen::Vector3i>&       voxel_coords) const
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointsToVoxels(const std::vector<Eigen::Vector3f>& points_M,
+                                                             std::vector<Eigen::Vector3i>&       voxel_coords) const
 {
   for (auto point_M : points_M)
   {

@@ -12,13 +12,13 @@ namespace propagator
 {
 
 template <typename PropagateF>
-void propagateToRoot(se::vector<se::unordered_set<se::OctantBase*>> octant_ptrs,
-                     PropagateF&                          propagate_funct)
+void propagateToRoot(std::vector<std::unordered_set<se::OctantBase*>> octant_ptrs,
+                     PropagateF&                                     propagate_funct)
 {
   for (int d = octant_ptrs.size() - 1; d > 0; d--)
   {
-    se::unordered_set<se::OctantBase*> child_ptrs_at_depth = octant_ptrs[d];
-    se::unordered_set<se::OctantBase*>::iterator child_ptr_itr;
+    std::unordered_set<se::OctantBase*> child_ptrs_at_depth = octant_ptrs[d];
+    std::unordered_set<se::OctantBase*>::iterator child_ptr_itr;
 
     for (child_ptr_itr = child_ptrs_at_depth.begin(); child_ptr_itr != child_ptrs_at_depth.end(); ++child_ptr_itr)
     {
@@ -40,13 +40,13 @@ void propagateToRoot(se::vector<se::unordered_set<se::OctantBase*>> octant_ptrs,
  * \brief Propage all newly integrated values from the voxel block depth up to the root of the octree
  */
 template <typename PropagateF>
-void propagateToRoot(se::vector<se::OctantBase*>& octant_ptrs,
-                     PropagateF&                  propagate_funct)
+void propagateToRoot(std::vector<se::OctantBase*>& octant_ptrs,
+                     PropagateF&                   propagate_funct)
 {
   TICK("propagate-nodes-vector")
 
-  se::unordered_set<se::OctantBase*> child_ptrs;
-  se::unordered_set<se::OctantBase*> parent_ptrs;
+  std::unordered_set<se::OctantBase*> child_ptrs;
+  std::unordered_set<se::OctantBase*> parent_ptrs;
 
   for (const auto& child_ptr : octant_ptrs)
   {
@@ -62,7 +62,7 @@ void propagateToRoot(se::vector<se::OctantBase*>& octant_ptrs,
 
   while (!parent_ptrs.empty())
   {
-    se::unordered_set<se::OctantBase*>::iterator child_ptr_itr;
+    std::unordered_set<se::OctantBase*>::iterator child_ptr_itr;
 
     for (child_ptr_itr = child_ptrs.begin(); child_ptr_itr != child_ptrs.end(); ++child_ptr_itr)
     {
@@ -86,7 +86,7 @@ void propagateToRoot(se::vector<se::OctantBase*>& octant_ptrs,
 
 
 
-void propagateTimeStampToRoot(se::vector<se::unordered_set<se::OctantBase*>> octant_ptrs)
+void propagateTimeStampToRoot(std::vector<std::unordered_set<se::OctantBase*>> octant_ptrs)
 {
   auto time_step_prop = [](se::OctantBase* octant_ptr, se::OctantBase* parent_ptr)
   {
@@ -101,7 +101,7 @@ void propagateTimeStampToRoot(se::vector<se::unordered_set<se::OctantBase*>> oct
 
 
 
-void propagateTimeStampToRoot(se::vector<se::OctantBase*>& octant_ptrs)
+void propagateTimeStampToRoot(std::vector<se::OctantBase*>& octant_ptrs)
 {
   auto time_step_prop = [](se::OctantBase* child_ptr, se::OctantBase* parent_ptr)
   {

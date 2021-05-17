@@ -141,13 +141,13 @@ public:
    */
   template<se::Safe SafeB = se::Safe::On>
   inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
-  pointsToVoxels(const se::vector<Eigen::Vector3f>& points_M,
-                 se::vector<Eigen::Vector3i>&       voxel_coords) const;
+  pointsToVoxels(const std::vector<Eigen::Vector3f>& points_M,
+                 std::vector<Eigen::Vector3i>&       voxel_coords) const;
 
   template<se::Safe SafeB>
   inline typename std::enable_if_t<SafeB == se::Safe::Off, bool>
-  pointsToVoxels(const se::vector<Eigen::Vector3f>& points_M,
-                 se::vector<Eigen::Vector3i>&       voxel_coords) const;
+  pointsToVoxels(const std::vector<Eigen::Vector3f>& points_M,
+                 std::vector<Eigen::Vector3i>&       voxel_coords) const;
 
   inline std::shared_ptr< OctreeType > getOctree() { return octree_ptr_; };
 

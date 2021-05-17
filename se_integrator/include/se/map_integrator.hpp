@@ -28,11 +28,11 @@ namespace allocator {
  * \return The allocated and fetched notes in the band around the surface measurements
  */
 template<typename SensorT, typename MapT>
-se::vector<se::OctantBase*> frustum(const se::Image<depth_t>& depth_img,
-                                    SensorT&                  sensor,
-                                    const Eigen::Matrix4f&    T_MS,
-                                    MapT&                     map,
-                                    const float               band);
+std::vector<se::OctantBase*> frustum(const se::Image<depth_t>& depth_img,
+                                    SensorT&                   sensor,
+                                    const Eigen::Matrix4f&     T_MS,
+                                    MapT&                      map,
+                                    const float                band);
 
 } // namespace allocator
 

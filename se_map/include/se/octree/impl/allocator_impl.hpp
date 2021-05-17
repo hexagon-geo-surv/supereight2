@@ -40,11 +40,11 @@ inline se::OctantBase* block(const se::key_t voxel_key,
 
 
 template <typename OctreeT>
-inline se::vector<se::OctantBase*> blocks(const se::vector<Eigen::Vector3i>& voxel_coords,
-                                          OctreeT&                           octree,
-                                          se::OctantBase*                    base_parent_ptr)
+inline std::vector<se::OctantBase*> blocks(const std::vector<Eigen::Vector3i>& voxel_coords,
+                                           OctreeT&                            octree,
+                                           se::OctantBase*                     base_parent_ptr)
 {
-  se::set<se::key_t> voxel_key_set;
+  std::set<se::key_t> voxel_key_set;
 
 #pragma omp declare reduction (merge : std::set<se::key_t> : omp_out.insert(omp_in.begin(), omp_in.end()))
 #pragma omp parallel for reduction(merge: voxel_key_set)
@@ -56,7 +56,7 @@ inline se::vector<se::OctantBase*> blocks(const se::vector<Eigen::Vector3i>& vox
     voxel_key_set.insert(voxel_key);
   }
 
-  se::vector<se::key_t> voxel_keys(voxel_key_set.begin(), voxel_key_set.end());
+  std::vector<se::key_t> voxel_keys(voxel_key_set.begin(), voxel_key_set.end());
 
   return blocks(voxel_keys, octree, base_parent_ptr);
 }
@@ -64,16 +64,16 @@ inline se::vector<se::OctantBase*> blocks(const se::vector<Eigen::Vector3i>& vox
 
 
 template <typename OctreeT>
-inline se::vector<se::OctantBase*> blocks(se::vector<se::key_t>& unique_voxel_keys,
-                                          OctreeT&               octree,
-                                          se::OctantBase*        base_parent_ptr)
+inline std::vector<se::OctantBase*> blocks(std::vector<se::key_t>& unique_voxel_keys,
+                                           OctreeT&                octree,
+                                           se::OctantBase*         base_parent_ptr)
 {
   assert(base_parent_ptr); // Verify parent ptr
 
   // Allocate nodes up to block_scale
   for (scale_t scale = octree.getMaxScale(); scale > octree.max_block_scale; scale--)
   {
-    se::vector<se::key_t> unique_voxel_keys_at_scale;
+    std::vector<se::key_t> unique_voxel_keys_at_scale;
     se::keyops::unique_at_scale(unique_voxel_keys, scale, unique_voxel_keys_at_scale);
 
 #pragma omp parallel for
@@ -85,7 +85,7 @@ inline se::vector<se::OctantBase*> blocks(se::vector<se::key_t>& unique_voxel_ke
   }
 
   // Allocate blocks and store block pointers
-  se::vector<se::OctantBase*> block_ptrs;
+  std::vector<se::OctantBase*> block_ptrs;
 #pragma omp parallel for
   for (unsigned int i = 0; i < unique_voxel_keys.size(); i++)
   {

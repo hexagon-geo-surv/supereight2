@@ -305,22 +305,22 @@ inline bool is_siblings(const se::key_t sibling_1_key,
 
 
 template <>
-inline void sort_keys<Sort::SmallToLarge>(se::vector<se::key_t>& keys) {
+inline void sort_keys<Sort::SmallToLarge>(std::vector<se::key_t>& keys) {
   std::sort(keys.begin(), keys.end(), [](se::key_t i, se::key_t j) { return (i < j); });
 }
 
 
 
 template <>
-inline void sort_keys<Sort::LargeToSmall>(se::vector<se::key_t>& keys) {
+inline void sort_keys<Sort::LargeToSmall>(std::vector<se::key_t>& keys) {
   std::sort(keys.begin(), keys.end(), [](se::key_t i, se::key_t j) { return (i > j); });
 }
 
 
 
 template <se::Safe SafeB = se::Safe::On>
-inline void unique_keys(se::vector<se::key_t>& keys,
-                        se::vector<se::key_t>& unique_keys)
+inline void unique_keys(std::vector<se::key_t>& keys,
+                        std::vector<se::key_t>& unique_keys)
 {
   if (keys.size() == 0)
   {
@@ -350,8 +350,8 @@ inline void unique_keys(se::vector<se::key_t>& keys,
 
 
 template <se::Safe SafeB = se::Safe::On>
-inline void unique_codes(se::vector<se::key_t>& keys,
-                         se::vector<se::key_t>& unique_keys)
+inline void unique_codes(std::vector<se::key_t>& keys,
+                         std::vector<se::key_t>& unique_keys)
 {
   if (keys.size() == 0)
   {
@@ -384,9 +384,9 @@ inline void unique_codes(se::vector<se::key_t>& keys,
 
 
 template <se::Safe SafeB = se::Safe::On>
-inline void unique_allocation(se::vector<se::key_t>& keys,
-                              const scale_t          max_block_scale,
-                              se::vector<se::key_t>& unique_keys)
+inline void unique_allocation(std::vector<se::key_t>& keys,
+                              const scale_t           max_block_scale,
+                              std::vector<se::key_t>& unique_keys)
 {
   if (keys.size() == 0)
   {
@@ -422,9 +422,9 @@ inline void unique_allocation(se::vector<se::key_t>& keys,
 
 
 template <se::Safe SafeB = se::Safe::On>
-inline void unique_at_scale(se::vector<se::key_t>& keys,
-                            const se::scale_t      scale,
-                            se::vector<se::key_t>& unique_keys)
+inline void unique_at_scale(std::vector<se::key_t>& keys,
+                            const se::scale_t       scale,
+                            std::vector<se::key_t>& unique_keys)
 {
   if (keys.size() == 0)
   {

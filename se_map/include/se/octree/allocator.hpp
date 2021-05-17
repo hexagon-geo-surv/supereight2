@@ -35,14 +35,14 @@ inline se::OctantBase* block(const se::key_t voxel_key,
                              se::OctantBase* base_parent_ptr);
 
 template <typename OctreeT>
-se::vector<se::OctantBase*> blocks(const se::vector<Eigen::Vector3i>& voxel_coord,
-                                   OctreeT&                           octree,
-                                   se::OctantBase*                    base_parent_ptr);
+std::vector<se::OctantBase*> blocks(const std::vector<Eigen::Vector3i>& voxel_coord,
+                                    OctreeT&                            octree,
+                                    se::OctantBase*                     base_parent_ptr);
 
 template <typename OctreeT>
-se::vector<se::OctantBase*> blocks(se::vector<se::key_t>& voxel_keys,
-                                   OctreeT&               octree,
-                                   se::OctantBase*        base_parent_ptr);
+std::vector<se::OctantBase*> blocks(std::vector<se::key_t>& voxel_keys,
+                                    OctreeT&                octree,
+                                    se::OctantBase*         base_parent_ptr);
 
 namespace { // anonymous namespace
 template <typename OctreeT>
