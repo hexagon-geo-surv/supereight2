@@ -32,7 +32,9 @@ inline void get_child_idx(const Eigen::Vector3i& voxel_coord,
 
 
 
-template <typename DataT, Res ResT>
+template <typename DataT,
+          Res      ResT
+>
 Node<DataT, ResT>::Node(const Eigen::Vector3i&                coord,
                         const unsigned                        size)
         : OctantBase(false, coord, nullptr), size_(size)
@@ -42,7 +44,9 @@ Node<DataT, ResT>::Node(const Eigen::Vector3i&                coord,
 
 
 
-template <typename DataT, Res ResT>
+template <typename DataT,
+          Res      ResT
+>
 Node<DataT, ResT>::Node(Node*              parent_ptr,
                         const unsigned int child_idx)
     : OctantBase(false,
@@ -54,7 +58,9 @@ Node<DataT, ResT>::Node(Node*              parent_ptr,
 
 
 
-template <typename DataT, Res ResT>
+template <typename DataT,
+          Res      ResT
+>
 inline unsigned int Node<DataT, ResT>::getSize() const
 {
   return size_;
@@ -62,7 +68,9 @@ inline unsigned int Node<DataT, ResT>::getSize() const
 
 
 
-template <typename DataT, Res ResT>
+template <typename DataT,
+          Res      ResT
+>
 inline se::OctantBase* Node<DataT, ResT>::getChild(const unsigned child_idx)
 {
   return children_ptr_[child_idx];
@@ -70,7 +78,9 @@ inline se::OctantBase* Node<DataT, ResT>::getChild(const unsigned child_idx)
 
 
 
-template <typename DataT, Res ResT>
+template <typename DataT,
+          Res      ResT
+>
 inline const se::OctantBase* Node<DataT, ResT>::getChild(const unsigned child_idx) const
 {
   return children_ptr_[child_idx];
@@ -78,7 +88,9 @@ inline const se::OctantBase* Node<DataT, ResT>::getChild(const unsigned child_id
 
 
 
-template <typename DataT, Res ResT>
+template <typename DataT,
+          Res      ResT
+>
 inline se::OctantBase* Node<DataT, ResT>::setChild(const unsigned child_idx, se::OctantBase* child_ptr)
 {
   children_mask_ |= 1 << child_idx;
@@ -88,7 +100,9 @@ inline se::OctantBase* Node<DataT, ResT>::setChild(const unsigned child_idx, se:
 
 
 
-template <typename DataT, Res ResT>
+template <typename DataT,
+          Res      ResT
+>
 inline void Node<DataT, ResT>::setData(const DataT& data)
 {
   data_ = data;
@@ -96,7 +110,9 @@ inline void Node<DataT, ResT>::setData(const DataT& data)
 
 
 
-template <typename DataT, Res ResT>
+template <typename DataT,
+          Res ResT
+>
 inline void Node<DataT, ResT>::getData(const DataT& data)
 {
   data = data_;
@@ -104,9 +120,12 @@ inline void Node<DataT, ResT>::getData(const DataT& data)
 
 
 
-template <typename DerivedT, typename DataT, unsigned SizeT>
-inline void BlockSingleRes<DerivedT, DataT, SizeT>::getData(const Eigen::Vector3i& voxel_coord,
-                                                            DataType&              data) const
+template <typename DerivedT,
+          typename DataT,
+          int      BlockSize
+>
+inline void BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const Eigen::Vector3i& voxel_coord,
+                                                                DataType&              data) const
 {
   Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
   data = block_data_[voxel_offset.x() +
@@ -116,8 +135,11 @@ inline void BlockSingleRes<DerivedT, DataT, SizeT>::getData(const Eigen::Vector3
 
 
 
-template <typename DerivedT, typename DataT, unsigned SizeT>
-inline DataT BlockSingleRes<DerivedT, DataT, SizeT>::getData(const Eigen::Vector3i& voxel_coord) const
+template <typename DerivedT,
+          typename DataT,
+          int      BlockSize
+>
+inline DataT BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const Eigen::Vector3i& voxel_coord) const
 {
   Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
   return block_data_[voxel_offset.x() +
@@ -127,18 +149,24 @@ inline DataT BlockSingleRes<DerivedT, DataT, SizeT>::getData(const Eigen::Vector
 
 
 
-template <typename DerivedT, typename DataT, unsigned SizeT>
-inline void BlockSingleRes<DerivedT, DataT, SizeT>::getData(const unsigned voxel_idx,
-                                                            DataType&      data) const
+template <typename DerivedT,
+          typename DataT,
+          int      BlockSize
+>
+inline void BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const unsigned voxel_idx,
+                                                                DataType&      data) const
 {
   data = block_data_[voxel_idx];
 }
 
 
 
-template <typename DerivedT, typename DataT, unsigned SizeT>
-inline void BlockSingleRes<DerivedT, DataT, SizeT>::setData(const Eigen::Vector3i& voxel_coord,
-                                                            const DataType&        data)
+template <typename DerivedT,
+          typename DataT,
+          int      BlockSize
+>
+inline void BlockSingleRes<DerivedT, DataT, BlockSize>::setData(const Eigen::Vector3i& voxel_coord,
+                                                                const DataType&        data)
 {
   Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
   block_data_[voxel_offset.x() +
@@ -148,27 +176,42 @@ inline void BlockSingleRes<DerivedT, DataT, SizeT>::setData(const Eigen::Vector3
 
 
 
-template <typename DerivedT, typename DataT, unsigned SizeT>
-inline void BlockSingleRes<DerivedT, DataT, SizeT>::setData(const unsigned  voxel_idx,
-                                                            const DataType& data)
+template <typename DerivedT,
+          typename DataT,
+          int      BlockSize
+>
+inline void BlockSingleRes<DerivedT, DataT, BlockSize>::setData(const unsigned  voxel_idx,
+                                                                const DataType& data)
 {
   block_data_[voxel_idx] = data;
 }
 
 
 
-template <typename DerivedT, typename DataT, unsigned SizeT>
-BlockMultiRes<DerivedT, DataT, SizeT>::BlockMultiRes() {
-  curr_scale_ = max_scale_;
-  min_scale_  = max_scale_;
-  block_data_.push_back(std::unique_ptr<DataT[]>(new DataType[1]));
+template <typename DerivedT,
+          typename DataT,
+          int      BlockSize
+>
+BlockMultiRes<DerivedT, DataT, BlockSize>::BlockMultiRes() {
+  curr_scale_ = 0;
+  min_scale_  = 0;
+
+  for (int scale = max_scale_; scale >= 0; scale--)
+  {
+    const int size_at_scale = BlockSize / (1 << scale);
+    const int size_at_scale_cu = size_at_scale * size_at_scale * size_at_scale;
+    block_data_.push_back(new DataType[size_at_scale_cu]);
+  }
 }
 
 
 
-template <typename DerivedT, typename DataT, unsigned SizeT>
-inline void BlockMultiRes<DerivedT, DataT, SizeT>::getData(const Eigen::Vector3i& voxel_coord,
-                                                           DataType&              data)
+template <typename DerivedT,
+          typename DataT,
+          int      BlockSize
+>
+inline void BlockMultiRes<DerivedT, DataT, BlockSize>::getData(const Eigen::Vector3i& voxel_coord,
+                                                               DataType&              data)
 {
   Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
   voxel_offset = voxel_offset / (1 << curr_scale_);
@@ -180,21 +223,31 @@ inline void BlockMultiRes<DerivedT, DataT, SizeT>::getData(const Eigen::Vector3i
 
 
 
-template <typename DerivedT, typename DataT, unsigned SizeT>
-inline void BlockMultiRes<DerivedT, DataT, SizeT>::getData(const Eigen::Vector3i& voxel_coord,
-                                                           const unsigned         scale,
-                                                           DataType&              data)
+template <typename DerivedT,
+          typename DataT,
+          int      BlockSize
+>
+inline void BlockMultiRes<DerivedT, DataT, BlockSize>::getData(const Eigen::Vector3i& voxel_coord,
+                                                               const int              scale,
+                                                               DataType&              data)
 {
-  std::cout << "MultiRes::getData(vc, s, d)" << std::endl;
+  Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
+  voxel_offset = voxel_offset / (1 << scale);
+  const int size_at_scale = this->underlying().size >> scale;
+  data = block_data_[max_scale_ - scale][voxel_offset.x() +
+                                         voxel_offset.y() * size_at_scale +
+                                         voxel_offset.z() * size_at_scale * size_at_scale];
 }
 
 
 
-template <typename DerivedT, typename DataT, unsigned SizeT>
-inline void BlockMultiRes<DerivedT, DataT, SizeT>::setData(const Eigen::Vector3i& voxel_coord,
-                                                           const DataType&        data)
+template <typename DerivedT,
+          typename DataT,
+          int      BlockSize
+>
+inline void BlockMultiRes<DerivedT, DataT, BlockSize>::setData(const Eigen::Vector3i& voxel_coord,
+                                                               const DataType&        data)
 {
-  std::cout << "MultiRes::setData(vc, d)" << std::endl;
   Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().getCoord();
   voxel_offset = voxel_offset / (1 << curr_scale_);
   const int size_at_scale = this->underlying().size >> curr_scale_;
@@ -205,15 +258,21 @@ inline void BlockMultiRes<DerivedT, DataT, SizeT>::setData(const Eigen::Vector3i
 
 
 
-template <typename DataT, Res ResT, unsigned SizeT, typename PolicyT>
-Block<DataT, ResT, SizeT, PolicyT>::Block(se::Node<DataT, ResT>* parent_ptr,
-                                          const unsigned         child_id)
+template <typename DataT,
+          Res      ResT,
+          int      BlockSize,
+          typename PolicyT
+>
+Block<DataT, ResT, BlockSize, PolicyT>::Block(se::Node<DataT, ResT>* parent_ptr,
+                                              const unsigned         child_id)
     : OctantBase(true,
-                 parent_ptr->getCoord() + SizeT * Eigen::Vector3i((1 & child_id) > 0, (2 & child_id) > 0, (4 & child_id) > 0),
+                 parent_ptr->getCoord() + BlockSize * Eigen::Vector3i((1 & child_id) > 0, (2 & child_id) > 0, (4 & child_id) > 0),
                  parent_ptr)
 {
-  assert(SizeT == (parent_ptr->getSize() >> 1));
+  assert(BlockSize == (parent_ptr->getSize() >> 1));
 }
+
+
 
 } // namespace se
 
