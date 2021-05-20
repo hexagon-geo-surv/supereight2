@@ -78,24 +78,14 @@ inline void gather_data(const BlockT*             block_ptr,
                         const int                 y,
                         const int                 z)
 {
-  typename BlockT::DataType data;
-
-  block_ptr->getData(Eigen::Vector3i(x,     y,     z    ), data);
-  data_arr[0] = data;
-  block_ptr->getData(Eigen::Vector3i(x + 1, y,     z    ), data);
-  data_arr[1] = data;
-  block_ptr->getData(Eigen::Vector3i(x + 1, y,     z + 1), data);
-  data_arr[2] = data;
-  block_ptr->getData(Eigen::Vector3i(x,     y,     z + 1), data);
-  data_arr[3] = data;
-  block_ptr->getData(Eigen::Vector3i(x,     y + 1, z    ), data);
-  data_arr[4] = data;
-  block_ptr->getData(Eigen::Vector3i(x + 1, y + 1, z    ), data);
-  data_arr[5] = data;
-  block_ptr->getData(Eigen::Vector3i(x + 1, y + 1, z + 1), data);
-  data_arr[6] = data;
-  block_ptr->getData(Eigen::Vector3i(x,     y + 1, z + 1), data);
-  data_arr[7] = data;
+  data_arr[0] = block_ptr->getData(Eigen::Vector3i(x,     y,     z    ));
+  data_arr[1] = block_ptr->getData(Eigen::Vector3i(x + 1, y,     z    ));
+  data_arr[2] = block_ptr->getData(Eigen::Vector3i(x + 1, y,     z + 1));
+  data_arr[3] = block_ptr->getData(Eigen::Vector3i(x,     y,     z + 1));
+  data_arr[4] = block_ptr->getData(Eigen::Vector3i(x,     y + 1, z    ));
+  data_arr[5] = block_ptr->getData(Eigen::Vector3i(x + 1, y + 1, z    ));
+  data_arr[6] = block_ptr->getData(Eigen::Vector3i(x + 1, y + 1, z + 1));
+  data_arr[7] = block_ptr->getData(Eigen::Vector3i(x,     y + 1, z + 1));
 }
 
 
@@ -228,9 +218,7 @@ inline void gather_dual_data(const BlockT*                block_ptr,
   for (int corner_idx = 0; corner_idx < 8; corner_idx++) {
     dual_corner_coords_f[corner_idx] = primal_corner_coord_f +
                                        actual_dual_scaling * norm_dual_offset_f[corner_idx];
-    typename BlockT::DataType data;
-    block_ptr->getData(dual_corner_coords_f[corner_idx].cast<int>(), data); /// <- TODO: Should take data from current scale
-    data_arr[corner_idx] = data;
+    data_arr[corner_idx] = block_ptr->getData(dual_corner_coords_f[corner_idx].cast<int>()); /// <- TODO: Should take data from current scale
   }
 }
 
@@ -676,9 +664,7 @@ inline void gather_dual_data(const OctreeT&                     octree,
   for(const auto& offset_idx: neighbours[0]) {
     Eigen::Vector3i logical_dual_corner_coord = primal_corner_coord + logical_dual_offset[offset_idx];
     dual_corner_coords_f[offset_idx] = ((logical_dual_corner_coord / stride) * stride).cast<float>() + stride * Eigen::Vector3f::Constant(0.5f); // TODO:  OctreeT<FieldType>::sample_offset_frac_
-    typename OctreeT::DataType data;
-    block_ptr->getData(dual_corner_coords_f[offset_idx].cast<int>(), data); /// <- TODO: Should take data from current scale
-    data_arr[offset_idx] = data;
+    data_arr[offset_idx] = block_ptr->getData(dual_corner_coords_f[offset_idx].cast<int>()); /// <- TODO: Should take data from current scale
   }
   for (size_t neighbour_idx = 1; neighbour_idx < neighbours.size(); ++neighbour_idx) {
     Eigen::Vector3i logical_dual_corner_coord = primal_corner_coord + logical_dual_offset[neighbours[neighbour_idx][0]];
@@ -687,9 +673,7 @@ inline void gather_dual_data(const OctreeT&                     octree,
     for(const auto& offset_idx: neighbours[neighbour_idx]) {
       logical_dual_corner_coord = primal_corner_coord + logical_dual_offset[offset_idx];
       dual_corner_coords_f[offset_idx] = ((logical_dual_corner_coord / stride) * stride).cast<float>() + stride * Eigen::Vector3f::Constant(0.5f); // TODO: OctreeT<FieldType>::sample_offset_frac_
-      typename OctreeT::DataType data;
-      block_neighbour_ptr->getData(dual_corner_coords_f[offset_idx].cast<int>(), data); /// <- TODO: Should take data from current scale
-      data_arr[offset_idx] = data;
+      data_arr[offset_idx] = block_neighbour_ptr->getData(dual_corner_coords_f[offset_idx].cast<int>()); /// <- TODO: Should take data from current scale
     }
   }
 }

@@ -116,6 +116,9 @@ public:
   inline se::OctantBase* allocate(NodeType*        parent_ptr,
                                   const unsigned   child_idx);     ///< Allocate child
 
+  static constexpr Res       res_ = ResT;
+
+
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 private:

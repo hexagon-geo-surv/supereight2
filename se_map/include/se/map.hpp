@@ -47,7 +47,8 @@ template <Field     FldT,
           Res       ResT,
           unsigned  BlockSize
 >
-class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
+class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize>
+{
 public:
   typedef Data<FldT, ColB, SemB> DataType;
   typedef DataConfig<FldT, ColB, SemB> DataConfigType;
@@ -67,9 +68,9 @@ public:
    *
    * \return Dimensions of the map
    */
-  inline Eigen::Vector3f getDim() const { return dim_; }
+  inline Eigen::Vector3f getDim() const { return dimension_; }
 
-  inline float getRes() const { return res_; }
+  inline float getRes() const { return resolution_; }
 
   inline DataConfigType getDataConfig() const { return data_config_; }
 
@@ -103,7 +104,13 @@ public:
   void saveMesh(const std::string& file_path,
                 const std::string& num = "") const;
 
-  inline void voxelToPoint(const Eigen::Vector3i& voxel_coord, Eigen::Vector3f& point_M) const;
+  inline void voxelToPoint(const Eigen::Vector3i& voxel_coord,
+                           Eigen::Vector3f&       point_M) const;
+
+  inline typename std::enable_if_t<true, void>
+  voxelToPoint(const Eigen::Vector3i& voxel_coord,
+               const int              scale,
+               Eigen::Vector3f&       point_M) const;
 
   /**
    *
@@ -163,14 +170,14 @@ public:
   static constexpr Colour    col_ = ColB;
   static constexpr Semantics sem_ = SemB;
 
-  static constexpr Res       ress_ = ResT;
+  static constexpr Res       res_ = ResT;
 
 protected:
 
   bool initialiseOctree();
 
-  const Eigen::Vector3f dim_;      ///< The dimensions of the map
-  const float           res_;      ///< The resolution of the map
+  const Eigen::Vector3f dimension_;      ///< The dimensions of the map
+  const float           resolution_;      ///< The resolution of the map
   const Eigen::Vector3f origin_M_; ///< The origin of the map frame
 
   const Eigen::Vector3f lb_;       ///< The lower map bound

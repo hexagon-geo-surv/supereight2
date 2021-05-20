@@ -16,7 +16,7 @@ template <Field     FldT,
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const Eigen::Vector3f& dim,
                                                   const float            res,
                                                   const se::DataConfig<FldT, ColB, SemB> data_config)
-    : dim_(dim), res_(res), origin_M_(dim / 2),
+    : dimension_(dim), resolution_(res), origin_M_(dim / 2),
      lb_(- origin_M_), ub_(dim - origin_M_),
      data_config_(data_config)
 {
@@ -33,7 +33,7 @@ template <Field     FldT,
 >
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const MapConfig&                       map_config,
                                                   const se::DataConfig<FldT, ColB, SemB> data_config)
-    : dim_(map_config.dim), res_(map_config.res), origin_M_(map_config.origin),
+    : dimension_(map_config.dim), resolution_(map_config.res), origin_M_(map_config.origin),
       lb_(- origin_M_), ub_(map_config.dim - origin_M_),
       data_config_(data_config)
 {
@@ -139,7 +139,7 @@ inline bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::gradField(const Eigen:
   }
 
   const bool is_valid = se::visitor::gradField(*octree_ptr_, voxel_coord_f, field_grad);
-  field_grad *= res_;
+  field_grad *= resolution_;
 
   return is_valid;
 }
@@ -168,7 +168,7 @@ inline Eigen::Vector3f Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::gradField(c
     }
   }
 
-  return res_ * se::visitor::gradField(*octree_ptr_, voxel_coord_f);
+  return resolution_ * se::visitor::gradField(*octree_ptr_, voxel_coord_f);
 }
 
 
@@ -187,8 +187,8 @@ bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::initialiseOctree()
     return false;
   }
 
-  float    max_dim  = dim_.maxCoeff();
-  unsigned max_size = ceil(max_dim / res_);
+  float    max_dim  = dimension_.maxCoeff();
+  unsigned max_size = ceil(max_dim / resolution_);
   unsigned oct_size = math::power_two_up(max_size);
   octree_ptr_ =
           std::shared_ptr<se::Octree<DataType, ResT, BlockSize> >(new se::Octree<DataType, ResT, BlockSize>(oct_size));
@@ -276,7 +276,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointToVoxel(const Eigen::Vector3f
     voxel_coord = Eigen::Vector3i::Constant(-1);
     return false;
   }
-  voxel_coord = ((point_M + origin_M_) / res_).cast<int>();
+  voxel_coord = ((point_M + origin_M_) / resolution_).cast<int>();
   return true;
 }
 
@@ -293,7 +293,7 @@ inline typename std::enable_if_t<SafeB == se::Safe::Off, bool>
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointToVoxel(const Eigen::Vector3f& point_M,
                                                            Eigen::Vector3i&       voxel_coord) const
 {
-  voxel_coord = ((point_M + origin_M_) / res_).cast<int>();
+  voxel_coord = ((point_M + origin_M_) / resolution_).cast<int>();
   return true;
 }
 
@@ -315,7 +315,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointToVoxel(const Eigen::Vector3f
     voxel_coord_f = Eigen::Vector3f::Constant(-1);
     return false;
   }
-  voxel_coord_f = ((point_M + origin_M_) / res_);
+  voxel_coord_f = ((point_M + origin_M_) / resolution_);
   return true;
 }
 
@@ -332,7 +332,7 @@ inline typename std::enable_if_t<SafeB == se::Safe::Off, bool>
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointToVoxel(const Eigen::Vector3f& point_M,
                                                            Eigen::Vector3f&       voxel_coord_f) const
 {
-  voxel_coord_f = ((point_M + origin_M_) / res_);
+  voxel_coord_f = ((point_M + origin_M_) / resolution_);
   return true;
 }
 
@@ -398,8 +398,11 @@ template <Field     FldT,
 inline void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::voxelToPoint(const Eigen::Vector3i& voxel_coord,
                                                                        Eigen::Vector3f&       point_M) const
 {
-  point_M = ((voxel_coord.cast<float>() + sample_offset_frac) * res_) - origin_M_;
+  point_M = ((voxel_coord.cast<float>() + sample_offset_frac) * resolution_) - origin_M_;
 }
+}
+
+
 
 } // namespace se
 

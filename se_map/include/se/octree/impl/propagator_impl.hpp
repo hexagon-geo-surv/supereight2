@@ -13,7 +13,7 @@ namespace propagator
 
 template <typename PropagateF>
 void propagateToRoot(std::vector<std::unordered_set<se::OctantBase*>> octant_ptrs,
-                     PropagateF&                                     propagate_funct)
+                     PropagateF&                                      propagate_funct)
 {
   for (int d = octant_ptrs.size() - 1; d > 0; d--)
   {

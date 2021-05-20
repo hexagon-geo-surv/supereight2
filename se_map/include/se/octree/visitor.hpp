@@ -102,9 +102,17 @@ inline se::field_t getField(const OctreeT&         octree,
  * \return True if the field value is available, False otherwise
  */
 template <typename OctreeT, typename FieldT>
-inline bool interpField(const OctreeT&         octree,
-                        const Eigen::Vector3f& voxel_coord_f,
-                        FieldT&                interp_field_value);
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, bool>
+interpField(const OctreeT&         octree,
+            const Eigen::Vector3f& voxel_coord_f,
+            FieldT&                interp_field_value);
+
+template <typename OctreeT, typename FieldT>
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, bool>
+interpField(const OctreeT&         octree,
+            const Eigen::Vector3f& voxel_coord_f,
+            FieldT&                interp_field_value,
+            int&                   interp_scale);
 
 /**
  * \brief Get the field gradient for a given coordinate [float voxel coordinates].
@@ -120,9 +128,29 @@ inline bool interpField(const OctreeT&         octree,
  * \return True if base block pointer is allocated, False otherwise
  */
 template <typename OctreeT>
-inline bool gradField(const OctreeT&         octree_ptr,
-                      const Eigen::Vector3f& voxel_coord_f,
-                      Eigen::Vector3f&       grad_field_value);
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, bool>
+gradField(const OctreeT&         octree_ptr,
+          const Eigen::Vector3f& voxel_coord_f,
+          Eigen::Vector3f&       grad_field_value);
+
+/**
+ * \brief Get the field gradient for a given coordinate [float voxel coordinates].
+ *
+ * \warning The function only returns false if the base block is not allocated and might
+ *          compute the gradient from invalid data. TODO
+ *
+ * \tparam OctreeT              The type of the octree used
+ * \param[in] octree_ptr        The pointer to the octree
+ * \param[in] voxel_coord_f     The voxel coordinates to be accessed [float voxel coordiantes]
+ * \param[in] grad_field_value  The field gradient to be accessed
+ *
+ * \return True if base block pointer is allocated, False otherwise
+ */
+template <typename OctreeT>
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, Eigen::Vector3f>
+gradField(const OctreeT&         octree_ptr,
+          const Eigen::Vector3f& voxel_coord_f);
+
 
 /**
  * \brief Get the field gradient for a given coordinate [float voxel coordinates].

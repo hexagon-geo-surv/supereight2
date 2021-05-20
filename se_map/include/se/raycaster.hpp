@@ -32,8 +32,8 @@ color_map =
 };
 
 void point_cloud_to_normal(se::Image<Eigen::Vector3f>&       normals,
-                              const se::Image<Eigen::Vector3f>& point_cloud,
-                              const bool                        is_lhc = false);
+                           const se::Image<Eigen::Vector3f>& point_cloud,
+                           const bool                        is_lhc = false);
 
 template <typename MapT>
 inline Eigen::Vector4f raycast(MapT&                  map,

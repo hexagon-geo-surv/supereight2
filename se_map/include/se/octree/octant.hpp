@@ -118,19 +118,20 @@ class BlockSingleRes
 public:
   typedef DataT DataType;
 
-  inline void getData(const Eigen::Vector3i& voxel_coord,
-                      DataType&              data) const;
+  inline const DataType& getData(const int voxel_idx) const;
 
-  inline DataType getData(const Eigen::Vector3i& voxel_coord) const;
+  inline       DataType& getData(const int voxel_idx);
 
-  inline void getData(const unsigned voxel_idx,
-                      DataT&         data) const;
+  inline const DataType& getData(const Eigen::Vector3i& voxel_coord) const;
+
+  inline       DataType& getData(const Eigen::Vector3i& voxel_coord);
+
+  inline void setData(const unsigned voxel_idx,
+                      const DataT&   data);
 
   inline void setData(const Eigen::Vector3i& voxel_coord,
                       const DataT&           data);
 
-  inline void setData(const unsigned voxel_idx,
-                      const DataT&   data);
 
   static inline int getMinScale() { return min_scale_; }
 

@@ -120,17 +120,15 @@ inline void Node<DataT, ResT>::getData(const DataT& data)
 
 
 
+/// Single-res Block ///
+
 template <typename DerivedT,
           typename DataT,
           int      BlockSize
 >
-inline void BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const Eigen::Vector3i& voxel_coord,
-                                                                DataType&              data) const
+inline const typename BlockSingleRes<DerivedT, DataT, BlockSize>::DataType& BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const int voxel_idx) const
 {
-  Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
-  data = block_data_[voxel_offset.x() +
-                     voxel_offset.y() * this->underlying().size +
-                     voxel_offset.z() * this->underlying().size_qu];
+  return block_data_[voxel_idx];
 }
 
 
@@ -139,7 +137,18 @@ template <typename DerivedT,
           typename DataT,
           int      BlockSize
 >
-inline DataT BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const Eigen::Vector3i& voxel_coord) const
+inline typename BlockSingleRes<DerivedT, DataT, BlockSize>::DataType& BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const int voxel_idx)
+{
+  return block_data_[voxel_idx];
+}
+
+
+
+template <typename DerivedT,
+          typename DataT,
+          int      BlockSize
+>
+inline const typename BlockSingleRes<DerivedT, DataT, BlockSize>::DataType& BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const Eigen::Vector3i& voxel_coord) const
 {
   Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
   return block_data_[voxel_offset.x() +
@@ -153,10 +162,12 @@ template <typename DerivedT,
           typename DataT,
           int      BlockSize
 >
-inline void BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const unsigned voxel_idx,
-                                                                DataType&      data) const
+inline typename BlockSingleRes<DerivedT, DataT, BlockSize>::DataType& BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const Eigen::Vector3i& voxel_coord)
 {
-  data = block_data_[voxel_idx];
+  Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
+  return block_data_[voxel_offset.x() +
+                     voxel_offset.y() * this->underlying().size +
+                     voxel_offset.z() * this->underlying().size_qu];
 }
 
 

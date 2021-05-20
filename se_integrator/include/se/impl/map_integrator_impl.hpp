@@ -87,7 +87,7 @@ namespace {
  * Integration helper struct for partial function specialisation
  */
 template<se::Field FldT,
-        se::Res ResT
+         se::Res ResT
 >
 struct IntegrateDepthImplD
 {
@@ -211,8 +211,7 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(const se::
           if (sdf_value > -truncation_boundary)
           {
             const float tsdf_value = std::min(1.f, sdf_value / truncation_boundary);
-            typename MapT::DataType data;
-            block_ptr->getData(voxel_coord, data);
+            typename MapT::DataType data = block_ptr->getData(voxel_coord);
             data.tsdf = (data.tsdf * data.weight + tsdf_value) / (data.weight + 1.f);
             data.tsdf = se::math::clamp(data.tsdf, -1.f, 1.f);
             data.weight = std::min(data.weight + 1, max_weight);
