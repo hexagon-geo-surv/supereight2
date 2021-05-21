@@ -5,6 +5,71 @@
 
 #include <cassert>
 
+#include "se/yaml.hpp"
+
+
+
+se::SensorConfig::SensorConfig()
+  : width(0), height(0), near_plane(0.0f), far_plane(INFINITY), left_hand_frame(false),
+    fx(nan("")), fy(nan("")), cx(nan("")), cy(nan(""))
+{
+}
+
+
+
+se::SensorConfig::SensorConfig(const std::string& yaml_file)
+  : se::SensorConfig::SensorConfig()
+{
+  // Open the file for reading.
+  cv::FileStorage fs;
+  try {
+    if (!fs.open(yaml_file, cv::FileStorage::READ | cv::FileStorage::FORMAT_YAML)) {
+      std::cerr << "Error: couldn't read configuration file " << yaml_file << "\n";
+      return;
+    }
+  } catch (const cv::Exception& e) {
+    // OpenCV throws if the file contains non-YAML data.
+    std::cerr << "Error: invalid YAML in configuration file " << yaml_file << "\n";
+    return;
+  }
+
+  // Get the node containing the sensor configuration.
+  const cv::FileNode node = fs["sensor"];
+  if (node.type() != cv::FileNode::MAP) {
+    std::cerr << "Warning: using default sensor configuration, no \"sensor\" section found in "
+      << yaml_file << "\n";
+    return;
+  }
+
+  // Read the config parameters.
+  se::yaml::subnode_as_int(node, "width", width);
+  se::yaml::subnode_as_int(node, "height", height);
+  se::yaml::subnode_as_float(node, "near_plane", near_plane);
+  se::yaml::subnode_as_float(node, "far_plane", far_plane);
+  se::yaml::subnode_as_float(node, "fx", fx);
+  se::yaml::subnode_as_float(node, "fy", fy);
+  se::yaml::subnode_as_float(node, "cx", cx);
+  se::yaml::subnode_as_float(node, "cy", cy);
+  left_hand_frame = fy < 0;
+}
+
+
+
+std::ostream& se::operator<<(std::ostream& os, const se::SensorConfig& c)
+{
+  os << "width:            " << c.width << " px\n";
+  os << "height:           " << c.height << " px\n";
+  os << "near_plane:       " << c.near_plane << " m\n";
+  os << "far_plane:        " << c.far_plane << " m\n";
+  os << "left_hand_frame:  " << (c.left_hand_frame ? "yes" : "no") << "\n";
+  os << "fx:               " << c.fx << " px\n";
+  os << "fy:               " << c.fy << " px\n";
+  os << "cx:               " << c.cx << " px\n";
+  os << "cy:               " << c.cy << " px\n";
+  return os;
+}
+
+
 
 // Explicit template class instantiation
 template class srl::projection::PinholeCamera<srl::projection::NoDistortion>;

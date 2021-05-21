@@ -4,7 +4,7 @@ find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 
 # Create library #
 set(LIB_NAME "se-map")
-add_library(${LIB_NAME} STATIC src/octant.cpp src/preprocessor.cpp src/raycaster.cpp)
+add_library(${LIB_NAME} STATIC src/data.cpp src/octant.cpp src/preprocessor.cpp src/raycaster.cpp src/map.cpp)
 target_include_directories(${LIB_NAME}
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

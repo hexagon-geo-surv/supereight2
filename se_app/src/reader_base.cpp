@@ -15,7 +15,9 @@
 #include <sstream>
 #include <thread>
 
+#include "filesystem.hpp"
 #include "se/utils/str_utils.hpp"
+#include "se/yaml.hpp"
 
 
 
@@ -51,6 +53,80 @@ std::string se::reader_type_to_string(se::ReaderType t)
   } else {
     return "unknown";
   }
+}
+
+
+
+se::ReaderConfig::ReaderConfig()
+  : reader_type(se::ReaderType::RAW), sequence_path(""), ground_truth_file(""), fps(30),
+    drop_frames(false), verbose(0)
+{
+}
+
+
+
+se::ReaderConfig::ReaderConfig(const std::string& yaml_file)
+  : se::ReaderConfig::ReaderConfig()
+{
+  // Open the file for reading.
+  cv::FileStorage fs;
+  try {
+    if (!fs.open(yaml_file, cv::FileStorage::READ | cv::FileStorage::FORMAT_YAML)) {
+      std::cerr << "Error: couldn't read configuration file " << yaml_file << "\n";
+      return;
+    }
+  } catch (const cv::Exception& e) {
+    // OpenCV throws if the file contains non-YAML data.
+    std::cerr << "Error: invalid YAML in configuration file " << yaml_file << "\n";
+    return;
+  }
+
+  // Get the node containing the reader configuration.
+  const cv::FileNode node = fs["reader"];
+  if (node.type() != cv::FileNode::MAP) {
+    std::cerr << "Warning: using default reader configuration, no \"reader\" section found in "
+      << yaml_file << "\n";
+    return;
+  }
+
+  // Read the config parameters.
+  std::string reader_type_str;
+  se::yaml::subnode_as_string(node, "reader_type", reader_type_str);
+  reader_type = string_to_reader_type(reader_type_str);
+  se::yaml::subnode_as_float(node, "fps", fps);
+  se::yaml::subnode_as_bool(node, "drop_frames", drop_frames);
+  se::yaml::subnode_as_int(node, "verbose", verbose);
+  se::yaml::subnode_as_string(node, "sequence_path", sequence_path);
+  se::yaml::subnode_as_string(node, "ground_truth_file", ground_truth_file);
+
+  // Expand ~ in the paths.
+  sequence_path = str_utils::expand_user(sequence_path);
+  ground_truth_file = str_utils::expand_user(ground_truth_file);
+
+  // If the sequence_path or ground_truth_file contain relative paths, interpret them as relative
+  // to the directory where filename is located.
+  const stdfs::path dataset_dir = stdfs::path(yaml_file).parent_path();
+  const stdfs::path sequence_path_p (sequence_path);
+  if (sequence_path_p.is_relative()) {
+    sequence_path = dataset_dir / sequence_path_p;
+  }
+  const stdfs::path ground_truth_file_p (ground_truth_file);
+  if (ground_truth_file_p.is_relative()) {
+    ground_truth_file = dataset_dir / ground_truth_file_p;
+  }
+}
+
+
+
+std::ostream& se::operator<<(std::ostream& os, const se::ReaderConfig& c)
+{
+  os << "reader_type:        " << se::reader_type_to_string(c.reader_type) << "\n";
+  os << "sequence_path:      " << c.sequence_path << "\n";
+  os << "ground_truth_file:  " << c.ground_truth_file << "\n";
+  os << "fps:                " << c.fps << "\n";
+  os << "drop_frames:        " << (c.drop_frames ? "yes" : "no") << "\n";
+  os << "verbose:            " << c.verbose << "\n";
+  return os;
 }
 
 

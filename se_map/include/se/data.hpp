@@ -143,13 +143,6 @@ struct DeltaData : public FieldDeltaData<FldT>, ColourDeltaData<ColB>
 /// DATA CONFIG ///
 ///////////////////
 
-static const field_t dflt_min_occupancy = -500;
-static const field_t dflt_max_occupancy = -500;
-static const field_t dflt_surface_boundary = 0;
-
-static const float    dflt_truncation_boundary = 0.1;
-static const weight_t dflt_max_weight = 100;
-
 template<se::Field FieldT>
 struct FieldDataConfig
 {
@@ -158,46 +151,104 @@ struct FieldDataConfig
 template<>
 struct FieldDataConfig<se::Field::Occupancy>
 {
-    FieldDataConfig()
-      : min_occupancy(dflt_min_occupancy),
-        max_occupancy(dflt_max_occupancy),
-        surface_boundary(dflt_surface_boundary) {}
     field_t min_occupancy;
     field_t max_occupancy;
     field_t surface_boundary;
+
+    /** Initializes the config to some sensible defaults.
+     */
+    FieldDataConfig();
+
+    /** Initializes the config from a YAML file. Data not present in the YAML file will be
+     * initialized as in FieldDataConfig<se::Field::Occupancy>::FieldDataConfig().
+     */
+    FieldDataConfig(const std::string& yaml_file);
 };
+
+std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::Occupancy>& c);
 
 template<>
 struct FieldDataConfig<se::Field::TSDF>
 {
-    FieldDataConfig() : truncation_boundary(dflt_truncation_boundary), max_weight(dflt_weight) {}
     float       truncation_boundary;
     weight_t    max_weight; // TODO: int or float
+
+    /** Initializes the config to some sensible defaults.
+     */
+    FieldDataConfig();
+
+    /** Initializes the config from a YAML file. Data not present in the YAML file will be
+     * initialized as in FieldDataConfig<se::Field::TSDF>::FieldDataConfig().
+     */
+    FieldDataConfig(const std::string& yaml_file);
 };
+
+std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::TSDF>& c);
+
+
 
 // Colour data
 template<se::Colour ColB>
 struct ColourDataConfig
 {
+  ColourDataConfig() {}
+  ColourDataConfig(const std::string& /* yaml_file */) {}
 };
+
+template<se::Colour ColB>
+std::ostream& operator<<(std::ostream& os, const ColourDataConfig<ColB>& /* c */)
+{
+  return os;
+}
 
 template<>
 struct ColourDataConfig<se::Colour::On>
 {
+  /** Initializes the config to some sensible defaults.
+   */
+  ColourDataConfig();
 
+  /** Initializes the config from a YAML file. Data not present in the YAML file will be
+   * initialized as in ColourDataConfig<se::Colour::On>::ColourDataConfig().
+   */
+  ColourDataConfig(const std::string& yaml_file);
 };
+
+std::ostream& operator<<(std::ostream& os, const ColourDataConfig<se::Colour::On>& c);
+
+
 
 // Semantic data
 template<se::Semantics SemB>
 struct SemanticDataConfig
 {
+  SemanticDataConfig() {}
+  SemanticDataConfig(const std::string& /* yaml_file */) {}
 };
+
+template<se::Semantics SemB>
+std::ostream& operator<<(std::ostream& os, const SemanticDataConfig<SemB>& /* c */)
+{
+  return os;
+}
 
 // Semantic data
 template<>
 struct SemanticDataConfig<se::Semantics::On>
 {
+  /** Initializes the config to some sensible defaults.
+   */
+  SemanticDataConfig();
+
+  /** Initializes the config from a YAML file. Data not present in the YAML file will be
+   * initialized as in SemanticDataConfig<se::Semantics::On>SemanticDataConfig().
+   */
+  SemanticDataConfig(const std::string& yaml_file);
 };
+
+std::ostream& operator<<(std::ostream& os, const SemanticDataConfig<se::Semantics::On>& c);
+
+
 
 template <se::Field     FldT = se::Field::TSDF,
           se::Colour    ColB = se::Colour::Off,
@@ -208,7 +259,35 @@ struct DataConfig : public FieldDataConfig<FldT>, ColourDataConfig<ColB>, Semant
   static constexpr se::Field     fld_ = FldT;
   static constexpr se::Colour    col_ = ColB;
   static constexpr se::Semantics sem_ = SemB;
+
+  /** Initializes all sub-configs to their sensible defaults.
+   */
+  DataConfig()
+  {
+  }
+
+  /** Initializes the config from a YAML file. Data not present in the YAML file will be
+   * initialized as in DataConfig::DataConfig().
+   */
+  DataConfig(const std::string& yaml_file)
+    : FieldDataConfig<FldT>(yaml_file), ColourDataConfig<ColB>(yaml_file),
+      SemanticDataConfig<SemB>(yaml_file)
+  {
+  }
 };
+
+template <se::Field     FldT,
+          se::Colour    ColB,
+          se::Semantics SemB
+>
+std::ostream& operator<<(std::ostream& os, const DataConfig<FldT, ColB, SemB>& c)
+{
+  // Call the operator<< of the base classes.
+  os << *static_cast<const FieldDataConfig<FldT>*>(&c);
+  os << *static_cast<const ColourDataConfig<ColB>*>(&c);
+  os << *static_cast<const SemanticDataConfig<SemB>*>(&c);
+  return os;
+}
 
 
 

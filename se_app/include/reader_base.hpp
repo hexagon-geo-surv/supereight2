@@ -29,31 +29,24 @@ namespace se {
 
   std::string reader_type_to_string(ReaderType t);
 
-  static const float dflt_fps = 24;
-  static const bool  dflt_drop_frame = false;
-  static const int   dflt_verbose = 0;
-
   struct ReaderConfig
   {
-    ReaderConfig()
-        : reader_type(se::ReaderType::RAW),
-          fps(dflt_fps),
-          drop_frames(dflt_drop_frame),
-          verbose(dflt_verbose),
-          sequence_path(""),
-          ground_truth_file("")
-    {
-    }
-
     ReaderType  reader_type;
+    std::string sequence_path;
+    std::string ground_truth_file;
     float       fps;
     bool        drop_frames;
     int         verbose;
-    std::string sequence_path;
-    std::string ground_truth_file;
 
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    ReaderConfig();
+
+    /** Initializes the config from a YAML file. Data not present in the YAML file will be initialized
+     * as in ReaderConfig::ReaderConfig().
+     */
+    ReaderConfig(const std::string& yaml_file);
   };
+
+  std::ostream& operator<<(std::ostream& os, const ReaderConfig& c);
 
 
 

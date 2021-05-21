@@ -3,8 +3,6 @@
 
 #include "se/timings.hpp"
 
-
-
 namespace se {
 
 template <Field     FldT,

@@ -47,21 +47,25 @@ constexpr float e_delta = 0.1f;
 
 struct TrackerConfig
 {
-  TrackerConfig() :
-    dist_threshold(0.1f),
-    normal_threshold(0.8f),
-    track_threshold(0.15f),
-    icp_threshold(1e-5)
-  {
-
-  }
-
   std::vector<int> iterations;
   float            dist_threshold;
   float            normal_threshold;
   float            track_threshold;
   float            icp_threshold;
+
+  /** Initializes the config to some valid values.
+   */
+  TrackerConfig();
+
+  /** Initializes the config from a YAML file. Data not present in the YAML file will be initialized
+   * as in TrackerConfig::TrackerConfig().
+   */
+  TrackerConfig(const std::string& yaml_file);
 };
+
+std::ostream& operator<<(std::ostream& os, const TrackerConfig& c);
+
+
 
 struct TrackData {
   int result;

@@ -17,19 +17,31 @@ namespace se {
 
   struct SensorConfig {
     // General
-    int width = 0;
-    int height = 0;
-    bool left_hand_frame = false;
-    float near_plane = 0.f;
-    float far_plane = INFINITY;
-    // Pinhole camera
-    float fx = nan("");
-    float fy = nan("");
-    float cx = nan("");
-    float cy = nan("");
+    int width;
+    int height;
+    float near_plane;
+    float far_plane;
+    bool left_hand_frame;
+
+    // PinholeCamera
+    float fx;
+    float fy;
+    float cx;
+    float cy;
+
+    /** Initializes the config to an invalid sensor model with 0 and NaN parameters.
+     */
+    SensorConfig();
+
+    /** Initializes the config from a YAML file. Data not present in the YAML file will be initialized
+     * as in SensorConfig::SensorConfig().
+     */
+    SensorConfig(const std::string& yaml_file);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
+
+  std::ostream& operator<<(std::ostream& os, const SensorConfig& c);
 
 
 

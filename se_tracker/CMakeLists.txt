@@ -2,14 +2,14 @@ cmake_minimum_required(VERSION 3.5...3.16)
 
 # Create library ##############################################################
 set(LIB_NAME "se-tracker")
-add_library(${LIB_NAME} INTERFACE)
+add_library(${LIB_NAME} STATIC src/tracker.cpp)
 target_include_directories(${LIB_NAME}
-  INTERFACE
+  PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
 target_link_libraries(${LIB_NAME}
-  INTERFACE
+  PUBLIC
     SE::Integrator
 )
 

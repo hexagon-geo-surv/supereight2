@@ -2,8 +2,6 @@
 #define SE_TRACKER_IMPL_HPP
 
 namespace se {
-
-
 /**
  * \brief Track the current pose using ICP.
  *

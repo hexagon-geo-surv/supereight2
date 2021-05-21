@@ -2,6 +2,8 @@
 #define SE_MAP_HPP
 
 #include <memory>
+#include <ostream>
+
 #include <Eigen/Dense>
 
 #include "se/utils/math_util.hpp"
@@ -19,17 +21,26 @@
 
 namespace se {
 
-// Default values
-static const Eigen::Vector3f dflt_map_dim    = Eigen::Vector3f(10, 10, 3); ///< 10m x 10m x 3m
-static const float           dflt_map_res    = 0.1;                        ///< 10cm
-static const Eigen::Vector3f dflt_map_origin = dflt_map_dim / 2;
-
 struct MapConfig
 {
-  Eigen::Vector3f dim    = dflt_map_dim;
-  float           res    = dflt_map_res;
-  Eigen::Vector3f origin = dflt_map_origin;
+  Eigen::Vector3f dim;
+  float           res;
+  Eigen::Vector3f origin;
+
+  /** Initializes the config to a 10m x 10m x 3m map with a 10cm resolution and the origin at the
+   * centre of the volume.
+   */
+  MapConfig();
+
+  /** Initializes the config from a YAML file. Data not present in the YAML file will be initialized
+   * as in MapConfig::MapConfig().
+   */
+  MapConfig(const std::string& yaml_file);
+
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
+
+std::ostream& operator<<(std::ostream& os, const MapConfig& c);
 
 
 
