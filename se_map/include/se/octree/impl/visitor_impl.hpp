@@ -192,7 +192,7 @@ inline bool get_neighbours(const OctreeT&             octree,
       typename OctreeT::BlockType* block_4_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs4[0]], octree, octree.getRoot()));
       if (!block_4_ptr) { return false; }
 
-      gather_2(block_1_ptr, base_coord,   offs1, neighbour_data);
+      gather_2(block_1_ptr, base_coord, offs1, neighbour_data);
       gather_2(block_2_ptr, base_coord, offs2, neighbour_data);
       gather_2(block_3_ptr, base_coord, offs3, neighbour_data);
       gather_2(block_4_ptr, base_coord, offs4, neighbour_data);
@@ -631,7 +631,7 @@ getFieldInterp(const OctreeT&         octree,
                const Eigen::Vector3f& voxel_coord_f)
 {
   typename OctreeT::DataType init_data;
-  typename OctreeT::DataType neighbour_data[8] = { init_data };
+  typename OctreeT::DataType neighbour_data[8] = {};
 
   const unsigned int octree_size = octree.getSize();
 
@@ -678,7 +678,7 @@ getFieldInterp(const OctreeT&         octree,
                int&                   scale_returned)
 {
   typename OctreeT::DataType init_data;
-  typename OctreeT::DataType neighbour_data[8];
+  typename OctreeT::DataType neighbour_data[8] = {};
 
   const unsigned int octree_size = octree.getSize();
 
@@ -694,7 +694,8 @@ getFieldInterp(const OctreeT&         octree,
 
   for (int scale = init_scale; scale <= BlockType::getMaxScale(); scale++)
   {
-    neighbour_data[8] = { init_data }; // Re-set neighbours
+    // Reset the neighbours. Assigning {} only works during initialization
+    std::fill(std::begin(neighbour_data), std::end(neighbour_data), init_data);
     scale_returned = scale;
 
     Eigen::Vector3f factor;
