@@ -88,6 +88,13 @@ public:
   template<Safe SafeB = Safe::Off>
   inline std::optional<se::field_t> getFieldInterp(const Eigen::Vector3f& point_M) const;
 
+  template<Safe SafeB    = Safe::Off,
+           Res ResTDummy = ResT
+  >
+  inline typename std::enable_if_t<ResTDummy == Res::Multi, std::optional<se::field_t>>
+  getFieldInterp(const Eigen::Vector3f& point_M,
+                 int&                   returned_scale) const;
+
   template<Safe SafeB = Safe::Off>
   inline std::optional<se::field_vec_t> getFieldGrad(const Eigen::Vector3f& point_M) const;
 

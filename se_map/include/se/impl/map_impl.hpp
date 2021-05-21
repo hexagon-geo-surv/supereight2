@@ -121,6 +121,37 @@ template <Field     FldT,
           Res       ResT,
           int       BlockSize
 >
+template<Safe SafeB,
+         Res ResTDummy = ResT
+>
+inline typename std::enable_if_t<ResTDummy == Res::Multi, std::optional<se::field_t>>
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getFieldInterp(const Eigen::Vector3f& point_M,
+                                                             int&                   returned_scale) const
+{
+  Eigen::Vector3f voxel_coord_f;
+
+  if constexpr(SafeB == Safe::Off) // Evaluate at compile time
+  {
+    pointToVoxel<Safe::Off>(point_M, voxel_coord_f);
+  } else
+  {
+    if (!pointToVoxel<Safe::On>(point_M, voxel_coord_f))
+    {
+      return {};
+    }
+  }
+
+  return se::visitor::getFieldInterp(*octree_ptr_, voxel_coord_f, returned_scale);
+}
+
+
+
+template <Field     FldT,
+          Colour    ColB,
+          Semantics SemB,
+          Res       ResT,
+          int       BlockSize
+>
 template<Safe SafeB>
 inline std::optional<se::field_vec_t> Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getFieldGrad(const Eigen::Vector3f& point_M) const
 {

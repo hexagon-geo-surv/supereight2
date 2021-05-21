@@ -9,11 +9,11 @@ namespace raycaster {
 
 
 template <typename MapT>
-inline Eigen::Vector4f raycast(MapT&                  map,
-                               const Eigen::Vector3f& ray_origin_M,
-                               const Eigen::Vector3f& ray_dir_M,
-                               const float            t_near,
-                               const float            t_far)
+inline std::optional<Eigen::Vector4f> raycast(MapT&                  map,
+                                              const Eigen::Vector3f& ray_origin_M,
+                                              const Eigen::Vector3f& ray_dir_M,
+                                              const float            t_near,
+                                              const float            t_far)
 {
 
   se::VoxelBlockRayIterator<MapT> ray(map, ray_origin_M, ray_dir_M, t_near, t_far);
@@ -24,7 +24,7 @@ inline Eigen::Vector4f raycast(MapT&                  map,
 
   const float t_min = ray.tcmin(); /* Get distance to the first intersected block */
   if (t_min <= 0.f) {
-    return Eigen::Vector4f::Zero();
+    return {};
   }
   const float t_max = ray.tmax();
 
@@ -37,6 +37,7 @@ inline Eigen::Vector4f raycast(MapT&                  map,
     typename MapT::DataType data = map.template getData<se::Safe::On>(position);
     float f_t = data.tsdf;
     float f_tt = 0;
+    int scale_tt = 0;
     if (f_t >= 0)
     { // ups, if we were already in it, then don't render anything here
       for (; t < t_far; t += stepsize)
@@ -52,7 +53,9 @@ inline Eigen::Vector4f raycast(MapT&                  map,
         f_tt = data.tsdf;
         if(f_tt <= 0.1 && f_tt >= -0.5f)
         {
-          auto field_value = map.template getFieldInterp(position);
+          std::optional<se::field_t> field_value =
+                  [&]()->std::optional<se::field_t>{ if constexpr (MapT::res_ == se::Res::Single) { return map.template getFieldInterp(position); }
+                                                     else                                         { return map.template getFieldInterp(position, scale_tt); }}();
           if (field_value)
           {
             f_tt = *field_value;
@@ -71,13 +74,13 @@ inline Eigen::Vector4f raycast(MapT&                  map,
       if (f_tt < 0)
       {           // got it, calculate accurate intersection
         t = t + stepsize * f_tt / (f_t - f_tt);
-        Eigen::Vector4f res = (ray_origin_M + ray_dir_M * t).homogeneous();
-        res.w() = 0;
-        return res;
+        Eigen::Vector4f intersection_M = (ray_origin_M + ray_dir_M * t).homogeneous();
+        intersection_M.w() = scale_tt;
+        return intersection_M;
       }
     }
   }
-  return Eigen::Vector4f::Constant(-1);
+  return {};
 }
 
 
@@ -86,6 +89,7 @@ template<typename MapT, typename SensorT>
 void raycastVolume(const MapT&                 map,
                    se::Image<Eigen::Vector3f>& surface_point_cloud_M,
                    se::Image<Eigen::Vector3f>& surface_normals_M,
+                   se::Image<int8_t>&          surface_scale,
                    const Eigen::Matrix4f&      T_MS,
                    const SensorT&              sensor)
 {
@@ -95,19 +99,18 @@ void raycastVolume(const MapT&                 map,
 #pragma omp simd
     for (int x = 0; x < surface_point_cloud_M.width(); x++)
     {
-      Eigen::Vector4f surface_intersection_M;
-
       const Eigen::Vector2i pixel(x, y);
       const Eigen::Vector2f pixel_f = pixel.cast<float>();
       Eigen::Vector3f ray_dir_C;
       sensor.model.backProject(pixel_f, &ray_dir_C);
       const Eigen::Vector3f ray_dir_M = (se::math::to_rotation(T_MS) * ray_dir_C.normalized()).head(3);
       const Eigen::Vector3f t_MS = se::math::to_translation(T_MS);
-      surface_intersection_M = raycast(map, t_MS, ray_dir_M, sensor.nearDist(ray_dir_C), sensor.farDist(ray_dir_C));
+      std::optional<Eigen::Vector4f> surface_intersection_M = raycast(map, t_MS, ray_dir_M, sensor.nearDist(ray_dir_C), sensor.farDist(ray_dir_C));
 
-      if (surface_intersection_M.w() >= 0.f)
+      if (surface_intersection_M)
       {
-        surface_point_cloud_M[x + y * surface_point_cloud_M.width()] = surface_intersection_M.head<3>();
+        surface_scale(x, y) = static_cast<int>((*surface_intersection_M).w());
+        surface_point_cloud_M[x + y * surface_point_cloud_M.width()] = (*surface_intersection_M).head<3>();
       } else
       {
         surface_point_cloud_M[pixel.x() + pixel.y() * surface_point_cloud_M.width()] = Eigen::Vector3f::Zero();

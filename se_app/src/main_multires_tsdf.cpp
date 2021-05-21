@@ -99,6 +99,7 @@ int main(int argc, char** argv)
 
   se::Image<Eigen::Vector3f> surface_point_cloud_M(processed_img_res.x(), processed_img_res.y());
   se::Image<Eigen::Vector3f> surface_normals_M(processed_img_res.x(), processed_img_res.y());
+  se::Image<int8_t>          surface_scale(processed_img_res.x(), processed_img_res.y());
 
   while (read_ok == se::ReaderStatus::ok) {
     se::perfstats.setIter(frame++);
@@ -142,13 +143,13 @@ int main(int argc, char** argv)
     TOCK("integration")
 
     TICK("raycast")
-    se::raycaster::raycastVolume(map_multires_tsdf, surface_point_cloud_M, surface_normals_M, T_MS, sensor);
+    se::raycaster::raycastVolume(map_multires_tsdf, surface_point_cloud_M, surface_normals_M, surface_scale, T_MS, sensor);
     TOCK("raycast")
 
     const Eigen::Vector3f ambient{ 0.1, 0.1, 0.1};
 
     TICK("render")
-    se::raycaster::renderVolumeKernel(output_volume_img_data, processed_img_res, se::math::to_translation(T_MS), ambient, surface_point_cloud_M, surface_normals_M);
+    se::raycaster::renderVolumeKernel(output_volume_img_data, processed_img_res, se::math::to_translation(T_MS), ambient, surface_point_cloud_M, surface_normals_M, surface_scale);
     convert_to_output_rgba_img(processed_rgba_img, output_rgba_img_data);
     convert_to_output_depth_img(processed_depth_img, output_depth_img_data);
     tracker.renderTrackingResult(output_tracking_img_data);
