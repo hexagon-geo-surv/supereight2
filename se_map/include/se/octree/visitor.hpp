@@ -52,8 +52,8 @@ template <typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, typename OctreeT::DataType&>
 getData(const OctreeT&              octree,
         const Eigen::Vector3i&      voxel_coord,
-        const int                   scale_in,
-        int&                        scale_out);
+        const int                   scale_desired,
+        int&                        scale_returned);
 
 template <typename OctreeT,
           typename BlockT
@@ -62,8 +62,8 @@ inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, typename Octre
 getData(const OctreeT&              octree,
         BlockT*                     block_ptr,
         const Eigen::Vector3i&      voxel_coord,
-        const int                   scale_in,
-        int&                        scale_out);
+        const int                   scale_desired,
+        int&                        scale_returned);
 
 
 
@@ -119,16 +119,16 @@ template <typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
 getField(const OctreeT&         octree,
          const Eigen::Vector3i& voxel_coord,
-         const int              scale_in,
-         int&                   scale_out);
+         const int              scale_desired,
+         int&                   scale_returned);
 
 template <typename OctreeT, typename BlockT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
 getField(const OctreeT&         octree,
          BlockT*                block_ptr,
          const Eigen::Vector3i& voxel_coord,
-         const int              scale_in,
-         int&                   scale_out);
+         const int              scale_desired,
+         int&                   scale_returned);
 
 /**
  * \brief Get the interplated field value for a given coordinate [float voxel coordinates].
@@ -143,27 +143,27 @@ getField(const OctreeT&         octree,
  */
 template <typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, std::optional<se::field_t>>
-interpField(const OctreeT&         octree,
-            const Eigen::Vector3f& voxel_coord_f);
+getFieldInterp(const OctreeT&         octree,
+               const Eigen::Vector3f& voxel_coord_f);
 
 template <typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
-interpField(const OctreeT&         octree,
-            const Eigen::Vector3f& voxel_coord_f,
-            const int              scale_in,
-            int&                   scale_out);
+getFieldInterp(const OctreeT&         octree,
+               const Eigen::Vector3f& voxel_coord_f,
+               const int              scale_desired,
+               int&                   scale_returned);
 
 
 template <typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
-interpField(const OctreeT&         octree,
-            const Eigen::Vector3f& voxel_coord_f,
-            int&                   scale_out);
+getFieldInterp(const OctreeT&         octree,
+               const Eigen::Vector3f& voxel_coord_f,
+               int&                   scale_returned);
 
 template <typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
-interpField(const OctreeT&         octree,
-            const Eigen::Vector3f& voxel_coord_f);
+getFieldInterp(const OctreeT&         octree,
+               const Eigen::Vector3f& voxel_coord_f);
 
 
 
@@ -182,8 +182,8 @@ interpField(const OctreeT&         octree,
  */
 template <typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, std::optional<se::field_vec_t>>
-gradField(const OctreeT&         octree_ptr,
-          const Eigen::Vector3f& voxel_coord_f);
+getFieldGrad(const OctreeT&         octree_ptr,
+             const Eigen::Vector3f& voxel_coord_f);
 
 /**
  * \brief Get the field gradient for a given coordinate [float voxel coordinates].
@@ -200,8 +200,8 @@ gradField(const OctreeT&         octree_ptr,
  */
 template <typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_vec_t>>
-gradField(const OctreeT&         octree_ptr,
-          const Eigen::Vector3f& voxel_coord_f);
+getFieldGrad(const OctreeT&         octree_ptr,
+             const Eigen::Vector3f& voxel_coord_f);
 
 /**
  * \brief Get the field gradient for a given coordinate [float voxel coordinates].
@@ -218,10 +218,10 @@ gradField(const OctreeT&         octree_ptr,
  */
 template <typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_vec_t>>
-gradField(const OctreeT&         octree,
-          const Eigen::Vector3f& voxel_coord_f,
-          const int              scale_in,
-          int&                   scale_out);
+getFieldGrad(const OctreeT&         octree,
+             const Eigen::Vector3f& voxel_coord_f,
+             const int              scale_desired,
+             int&                   scale_returned);
 
 } // namespace visitor
 } // namespace se

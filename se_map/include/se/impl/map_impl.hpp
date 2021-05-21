@@ -95,7 +95,7 @@ template <Field     FldT,
           int       BlockSize
 >
 template<Safe SafeB>
-inline std::optional<se::field_t> Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::interpField(const Eigen::Vector3f& point_M) const
+inline std::optional<se::field_t> Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getFieldInterp(const Eigen::Vector3f& point_M) const
 {
   Eigen::Vector3f voxel_coord_f;
 
@@ -110,7 +110,7 @@ inline std::optional<se::field_t> Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::
     }
   }
 
-  return se::visitor::interpField(*octree_ptr_, voxel_coord_f);
+  return se::visitor::getFieldInterp(*octree_ptr_, voxel_coord_f);
 }
 
 
@@ -122,7 +122,7 @@ template <Field     FldT,
           int       BlockSize
 >
 template<Safe SafeB>
-inline std::optional<se::field_vec_t> Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::gradField(const Eigen::Vector3f& point_M) const
+inline std::optional<se::field_vec_t> Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getFieldGrad(const Eigen::Vector3f& point_M) const
 {
   Eigen::Vector3f voxel_coord_f;
 
@@ -137,7 +137,7 @@ inline std::optional<se::field_vec_t> Map<Data<FldT, ColB, SemB>, ResT, BlockSiz
     }
   }
 
-  auto field_grad = se::visitor::gradField(*octree_ptr_, voxel_coord_f);
+  auto field_grad = se::visitor::getFieldGrad(*octree_ptr_, voxel_coord_f);
   if (field_grad)
   {
     *field_grad *= resolution_;

@@ -52,7 +52,7 @@ inline Eigen::Vector4f raycast(MapT&                  map,
         f_tt = data.tsdf;
         if(f_tt <= 0.1 && f_tt >= -0.5f)
         {
-          auto field_value = map.template interpField(position);
+          auto field_value = map.template getFieldInterp(position);
           if (field_value)
           {
             f_tt = *field_value;
@@ -128,7 +128,7 @@ void raycastVolume(const MapT&                 map,
 
       if (surface_intersection_M != Eigen::Vector3f::Zero())
       {
-        auto surface_normal = map.template gradField(surface_intersection_M.head(3));
+        auto surface_normal = map.template getFieldGrad(surface_intersection_M.head(3));
         if (!surface_normal)
         {
           surface_normals_M[pixel.x() + pixel.y() * surface_normals_M.width()] = Eigen::Vector3f(INVALID, 0.f, 0.f);

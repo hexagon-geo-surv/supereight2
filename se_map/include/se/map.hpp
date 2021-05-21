@@ -86,10 +86,10 @@ public:
   inline const DataType getData (const Eigen::Vector3f& point_M) const;
 
   template<Safe SafeB = Safe::Off>
-  inline std::optional<se::field_t> interpField(const Eigen::Vector3f& point_M) const;
+  inline std::optional<se::field_t> getFieldInterp(const Eigen::Vector3f& point_M) const;
 
   template<Safe SafeB = Safe::Off>
-  inline std::optional<se::field_vec_t> gradField(const Eigen::Vector3f& point_M) const;
+  inline std::optional<se::field_vec_t> getFieldGrad(const Eigen::Vector3f& point_M) const;
 
   void saveSlice(const std::string&     file_path,
                  const Eigen::Vector3f& point_M,

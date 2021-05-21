@@ -627,8 +627,8 @@ getField(const OctreeT&         octree,
 
 template <typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, std::optional<se::field_t>>
-interpField(const OctreeT&         octree,
-            const Eigen::Vector3f& voxel_coord_f)
+getFieldInterp(const OctreeT&         octree,
+               const Eigen::Vector3f& voxel_coord_f)
 {
   typename OctreeT::DataType init_data;
   typename OctreeT::DataType neighbour_data[8] = { init_data };
@@ -672,10 +672,10 @@ interpField(const OctreeT&         octree,
 
 template <typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
-interpField(const OctreeT&         octree,
-            const Eigen::Vector3f& voxel_coord_f,
-            const int              scale_in,
-            int&                   scale_out)
+getFieldInterp(const OctreeT&         octree,
+               const Eigen::Vector3f& voxel_coord_f,
+               const int              scale_desired,
+               int&                   scale_returned)
 {
   typename OctreeT::DataType init_data;
   typename OctreeT::DataType neighbour_data[8];
@@ -690,12 +690,12 @@ interpField(const OctreeT&         octree,
 
   typedef typename OctreeT::BlockType BlockType;
   BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
-  const int init_scale = std::max(block_ptr->getCurrentScale(), scale_in);
+  const int init_scale = std::max(block_ptr->getCurrentScale(), scale_desired);
 
   for (int scale = init_scale; scale <= BlockType::getMaxScale(); scale++)
   {
     neighbour_data[8] = { init_data }; // Re-set neighbours
-    scale_out = scale;
+    scale_returned = scale;
 
     Eigen::Vector3f factor;
     const int stride = 1 << scale; // Multi-res
@@ -738,30 +738,30 @@ interpField(const OctreeT&         octree,
 
 template <typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
-interpField(const OctreeT&         octree,
-            const Eigen::Vector3f& voxel_coord_f,
-            int&                   scale_out)
+getFieldInterp(const OctreeT&         octree,
+               const Eigen::Vector3f& voxel_coord_f,
+               int&                   scale_returned)
 {
-  return interpField(octree, voxel_coord_f, 0, scale_out);
+  return getFieldInterp(octree, voxel_coord_f, 0, scale_returned);
 }
 
 
 
 template <typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
-interpField(const OctreeT&         octree,
-            const Eigen::Vector3f& voxel_coord_f)
+getFieldInterp(const OctreeT&         octree,
+               const Eigen::Vector3f& voxel_coord_f)
 {
-  int scale_out;
-  return interpField(octree, voxel_coord_f, 0, scale_out);
+  int scale_dummy;
+  return getFieldInterp(octree, voxel_coord_f, 0, scale_dummy);
 }
 
 
 
 template <typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, std::optional<se::field_vec_t>>
-gradField(const OctreeT&         octree,
-          const Eigen::Vector3f& voxel_coord_f)
+getFieldGrad(const OctreeT&         octree,
+             const Eigen::Vector3f& voxel_coord_f)
 {
   const Eigen::Vector3f scaled_voxel_coord_f = voxel_coord_f - se::sample_offset_frac;
   Eigen::Vector3f factor = se::math::fracf(scaled_voxel_coord_f);
@@ -896,8 +896,8 @@ gradField(const OctreeT&         octree,
 
 template <typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_vec_t>>
-gradField(const OctreeT&         octree,
-          const Eigen::Vector3f& voxel_coord_f)
+getFieldGrad(const OctreeT&         octree,
+             const Eigen::Vector3f& voxel_coord_f)
 {
   typedef typename OctreeT::BlockType BlockType;
 
