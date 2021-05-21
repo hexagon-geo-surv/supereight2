@@ -65,6 +65,11 @@ namespace str_utils {
   std::string header_to_pretty_str(const std::string& header_name,
                                    const int          width = default_width);
 
+  /** Return the result of expanding a leading ~ in path.
+   * \note Also expands environment variables since it uses wordexp(3) internally.
+   * \note Currently only implemented for POSIX systems.
+   */
+  std::string expand_user(const std::string& path);
 
 } // namespace str_utils
 

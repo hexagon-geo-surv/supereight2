@@ -2,6 +2,10 @@
 
 #include <algorithm>
 
+// POSIX systems must have the unistd.h header.
+#if __has_include(<unistd.h>)
+#include <wordexp.h>
+#endif
 
 
 namespace str_utils {
@@ -121,6 +125,25 @@ namespace str_utils {
     return l_side + header_name + r_side;
   }
 
+
+
+  std::string expand_user(const std::string& path)
+  {
+    // Return the path unchanged on errors or non-POSIX systems.
+    std::string expanded_path (path);
+
+    // POSIX systems must have the unistd.h header.
+#if __has_include(<unistd.h>)
+    wordexp_t expansion;
+    if (wordexp(path.c_str(), &expansion, WRDE_NOCMD) == 0) {
+      if (expansion.we_wordc >= 1) {
+        expanded_path = expansion.we_wordv[0];
+      }
+    }
+    wordfree(&expansion);
+#endif
+    return expanded_path;
+  }
 } // namespace str_utils
 
 
