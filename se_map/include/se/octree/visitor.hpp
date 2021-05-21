@@ -33,13 +33,39 @@ getData(const OctreeT&              octree,
         BlockT*                     block_ptr,
         const Eigen::Vector3i&      voxel_coord);
 
-                    typename OctreeT::DataType& data);
+/// Multi-res get data functions
 
-template <typename OctreeT, typename BlockT>
-inline bool getData(const OctreeT&              octree,
-                    BlockT*                     block_ptr,
-                    const Eigen::Vector3i&      voxel_coord,
-                    typename OctreeT::DataType& data);
+template <typename OctreeT>
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, typename OctreeT::DataType>
+getData(const OctreeT&         octree,
+        const Eigen::Vector3i& voxel_coord);
+
+template <typename OctreeT,
+          typename BlockT
+>
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, typename OctreeT::DataType>
+getData(const OctreeT&              octree,
+        BlockT*                     block_ptr,
+        const Eigen::Vector3i&      voxel_coord);
+
+template <typename OctreeT>
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, typename OctreeT::DataType&>
+getData(const OctreeT&              octree,
+        const Eigen::Vector3i&      voxel_coord,
+        const int                   scale_in,
+        int&                        scale_out);
+
+template <typename OctreeT,
+          typename BlockT
+>
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, typename OctreeT::DataType&>
+getData(const OctreeT&              octree,
+        BlockT*                     block_ptr,
+        const Eigen::Vector3i&      voxel_coord,
+        const int                   scale_in,
+        int&                        scale_out);
+
+
 
 /// Single-res get field functions
 
@@ -64,27 +90,9 @@ getField(const OctreeT&         octree,
          BlockT*                block_ptr,
          const Eigen::Vector3i& voxel_coord);
 
-/**
- * \brief Get the field value for a given coordinate.
- *        The function returns false and invalid data if the data is not allocated.
- *
- * \tparam OctreeT         The type of the octree used
- * \param[in] octree_ptr   The pointer to the octree
- * \param[in] voxel_coord  The voxel coordinates to be accessed
- * \param[in] field_value  The field value to be accessed
- *
- * \return True if the field value is available, False otherwise
- */
-template <typename OctreeT>
-inline bool getField(const OctreeT&         octree,
-                     const Eigen::Vector3i& voxel_coord,
-                     se::field_t&           field_value);
 
-template <typename OctreeT, typename BlockT>
-inline bool getField(const OctreeT&         octree,
-                     BlockT*                block_ptr,
-                     const Eigen::Vector3i& voxel_coord,
-                     se::field_t&           field_value);
+
+/// Multi-res get field functions
 
 /**
  * \brief Get the field value for a given coordinate.
@@ -97,13 +105,30 @@ inline bool getField(const OctreeT&         octree,
  * \return The field value to be accessed
  */
 template <typename OctreeT>
-inline se::field_t getField(const OctreeT&         octree,
-                            const Eigen::Vector3i& voxel_coord);
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
+getField(const OctreeT&         octree,
+         const Eigen::Vector3i& voxel_coord);
 
 template <typename OctreeT, typename BlockT>
-inline se::field_t getField(const OctreeT&         octree,
-                            BlockT*                block_ptr,
-                            const Eigen::Vector3i& voxel_coord);
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
+getField(const OctreeT&         octree,
+         BlockT*                block_ptr,
+         const Eigen::Vector3i& voxel_coord);
+
+template <typename OctreeT>
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
+getField(const OctreeT&         octree,
+         const Eigen::Vector3i& voxel_coord,
+         const int              scale_in,
+         int&                   scale_out);
+
+template <typename OctreeT, typename BlockT>
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
+getField(const OctreeT&         octree,
+         BlockT*                block_ptr,
+         const Eigen::Vector3i& voxel_coord,
+         const int              scale_in,
+         int&                   scale_out);
 
 /**
  * \brief Get the interplated field value for a given coordinate [float voxel coordinates].
@@ -121,16 +146,26 @@ inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, std::optional
 interpField(const OctreeT&         octree,
             const Eigen::Vector3f& voxel_coord_f);
 
+template <typename OctreeT>
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
 interpField(const OctreeT&         octree,
             const Eigen::Vector3f& voxel_coord_f,
-            FieldT&                interp_field_value);
+            const int              scale_in,
+            int&                   scale_out);
 
-template <typename OctreeT, typename FieldT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, bool>
+
+template <typename OctreeT>
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
 interpField(const OctreeT&         octree,
             const Eigen::Vector3f& voxel_coord_f,
-            FieldT&                interp_field_value,
-            int&                   interp_scale);
+            int&                   scale_out);
+
+template <typename OctreeT>
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
+interpField(const OctreeT&         octree,
+            const Eigen::Vector3f& voxel_coord_f);
+
+
 
 /**
  * \brief Get the field gradient for a given coordinate [float voxel coordinates].
@@ -164,10 +199,9 @@ gradField(const OctreeT&         octree_ptr,
  * \return True if base block pointer is allocated, False otherwise
  */
 template <typename OctreeT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, Eigen::Vector3f>
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_vec_t>>
 gradField(const OctreeT&         octree_ptr,
           const Eigen::Vector3f& voxel_coord_f);
-
 
 /**
  * \brief Get the field gradient for a given coordinate [float voxel coordinates].
@@ -183,8 +217,11 @@ gradField(const OctreeT&         octree_ptr,
  * \return True if base block pointer is allocated, False otherwise
  */
 template <typename OctreeT>
-inline Eigen::Vector3f gradField(const OctreeT&         octree_ptr,
-                                 const Eigen::Vector3f& voxel_coord_f);
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_vec_t>>
+gradField(const OctreeT&         octree,
+          const Eigen::Vector3f& voxel_coord_f,
+          const int              scale_in,
+          int&                   scale_out);
 
 } // namespace visitor
 } // namespace se

@@ -25,14 +25,14 @@ int main(int argc, char** argv)
 
   // Creating a single-res TSDF map
   const Eigen::Vector3f map_dim(10.f, 10.f, 10.f);
-  const float           map_res(0.02f);
+  const float           map_res(0.01f);
 
   // Data config
   se::TSDFDataConfig data_config;
-  data_config.truncation_boundary = 4 * map_res;
+  data_config.truncation_boundary = 16 * map_res;
   data_config.max_weight          = 100;
 
-  se::TSDFMap<se::Res::Single> map_tsdf(map_dim, map_res, data_config);
+  se::TSDFMap<se::Res::Multi> map_multires_tsdf(map_dim, map_res, data_config);
 
   // Setup input images
   Eigen::Vector2i input_img_res(640, 480);
@@ -90,10 +90,10 @@ int main(int argc, char** argv)
 
   se::TrackerConfig tracker_config;
   tracker_config.iterations = {10, 5, 4};
-  se::Tracker tracker(map_tsdf, sensor, tracker_config);
+  se::Tracker tracker(map_multires_tsdf, sensor, tracker_config);
 
   // Integrated depth at given pose
-  se::MapIntegrator integrator(map_tsdf);
+  se::MapIntegrator integrator(map_multires_tsdf);
 
   unsigned int frame = 0;
 
@@ -142,7 +142,7 @@ int main(int argc, char** argv)
     TOCK("integration")
 
     TICK("raycast")
-    se::raycaster::raycastVolume(map_tsdf, surface_point_cloud_M, surface_normals_M, T_MS, sensor);
+    se::raycaster::raycastVolume(map_multires_tsdf, surface_point_cloud_M, surface_normals_M, T_MS, sensor);
     TOCK("raycast")
 
     const Eigen::Vector3f ambient{ 0.1, 0.1, 0.1};
@@ -167,9 +167,9 @@ int main(int argc, char** argv)
 
     if (frame == 1 || frame % 100 == 0)
     {
-      map_tsdf.saveMesh(output_path + "/mesh", std::to_string(frame));
-//      map_tsdf.saveSlice(output_path + "/slice", se::math::to_translation(T_MS), std::to_string(frame));
-//      map_tsdf.saveStrucutre(output_path + "/struct", std::to_string(frame));
+      map_multires_tsdf.saveMesh(output_path + "/mesh", std::to_string(frame));
+//      map_multires_tsdf.saveSlice(output_path + "/slice", se::math::to_translation(T_MS), std::to_string(frame));
+//      map_multires_tsdf.saveStrucutre(output_path + "/struct", std::to_string(frame));
     }
 
     se::perfstats.writeToFilestream();

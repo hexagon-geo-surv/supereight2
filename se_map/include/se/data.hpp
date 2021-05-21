@@ -3,6 +3,7 @@
 
 #include <cstdint>
 
+#include "utils/type_util.hpp"
 #include "utils/setup_util.hpp"
 
 namespace se {
@@ -83,6 +84,60 @@ struct Data : public FieldData<FldT>, ColourData<ColB>, SemanticData<SemB>
   static constexpr se::Colour    col_ = ColB;
   static constexpr se::Semantics sem_ = SemB;
 };
+
+
+
+///////////////////
+/// DELTA DATA  ///
+///////////////////
+
+template<se::Field FieldT>
+struct FieldDeltaData
+{
+};
+
+template<>
+struct FieldDeltaData<se::Field::Occupancy>
+{
+    FieldDeltaData() : delta_occupancy(0) {}
+    se::field_t  delta_occupancy;
+};
+
+template<>
+struct FieldDeltaData<se::Field::TSDF>
+{
+    FieldDeltaData() : delta_tsdf(0), delta_weight(0) {}
+    se::field_t delta_tsdf;
+    weight_t    delta_weight; // TODO: int or float
+};
+
+// Colour data
+template<se::Colour ColB>
+struct ColourDeltaData
+{
+};
+
+template<>
+struct ColourDeltaData<se::Colour::On>
+{
+    ColourDeltaData() : delta_rgba(0) {}
+    rgba_t delta_rgba;
+};
+
+
+
+template <se::Field     FldT = se::Field::TSDF,
+        se::Colour    ColB = se::Colour::Off,
+        se::Semantics SemB = se::Semantics::Off
+>
+struct DeltaData : public FieldDeltaData<FldT>, ColourDeltaData<ColB>
+{
+    static constexpr se::Field     fld_ = FldT;
+    static constexpr se::Colour    col_ = ColB;
+    static constexpr se::Semantics sem_ = SemB;
+};
+
+
 
 ///////////////////
 /// DATA CONFIG ///

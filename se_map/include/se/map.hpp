@@ -104,10 +104,9 @@ public:
   inline void voxelToPoint(const Eigen::Vector3i& voxel_coord,
                            Eigen::Vector3f&       point_M) const;
 
-  inline typename std::enable_if_t<true, void>
-  voxelToPoint(const Eigen::Vector3i& voxel_coord,
-               const int              scale,
-               Eigen::Vector3f&       point_M) const;
+  inline void voxelToPoint(const Eigen::Vector3i& voxel_coord,
+                           const int              stride,
+                           Eigen::Vector3f&       point_M) const;
 
   /**
    *

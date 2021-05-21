@@ -103,42 +103,39 @@ TEST(Map, Interpolation)
   }
 
   map_tsdf.setOctree(octree_ptr);
+  
+  auto interp_field_value = map_tsdf.getFieldInterp(Eigen::Vector3f(-12, -12, -12));
+  EXPECT_TRUE(interp_field_value);
+  EXPECT_EQ(0, *interp_field_value);
 
-  float field_value;
-  bool valid_interp = false;
-  valid_interp = map_tsdf.interpField(Eigen::Vector3f(-12, -12, -12), field_value);
-  EXPECT_EQ(true, valid_interp);
-  EXPECT_EQ(0, field_value);
+  interp_field_value = map_tsdf.getFieldInterp(Eigen::Vector3f(-8, -12, -12));
+  EXPECT_TRUE(interp_field_value);
+  EXPECT_EQ(0.5, *interp_field_value);
 
-  valid_interp = map_tsdf.interpField(Eigen::Vector3f(-8, -12, -12), field_value);
-  EXPECT_EQ(true, valid_interp);
-  EXPECT_EQ(0.5, field_value);
+  interp_field_value = map_tsdf.getFieldInterp(Eigen::Vector3f(-12, -8, -12));
+  EXPECT_TRUE(interp_field_value);
+  EXPECT_EQ(1, *interp_field_value);
 
-  valid_interp = map_tsdf.interpField(Eigen::Vector3f(-12, -8, -12), field_value);
-  EXPECT_EQ(true, valid_interp);
-  EXPECT_EQ(1, field_value);
+  interp_field_value = map_tsdf.getFieldInterp(Eigen::Vector3f(-8, -8, -12));
+  EXPECT_TRUE(interp_field_value);
+  EXPECT_EQ(1.5, *interp_field_value);
 
-  valid_interp = map_tsdf.interpField(Eigen::Vector3f(-8, -8, -12), field_value);
-  EXPECT_EQ(true, valid_interp);
-  EXPECT_EQ(1.5, field_value);
+  interp_field_value = map_tsdf.getFieldInterp(Eigen::Vector3f(-12, -12, -8));
+  EXPECT_TRUE(interp_field_value);
+  EXPECT_EQ(2, *interp_field_value);
 
-  valid_interp = map_tsdf.interpField(Eigen::Vector3f(-12, -12, -8), field_value);
-  EXPECT_EQ(true, valid_interp);
-  EXPECT_EQ(2, field_value);
+  interp_field_value = map_tsdf.getFieldInterp(Eigen::Vector3f(-8, -12, -8));
+  EXPECT_TRUE(interp_field_value);
+  EXPECT_EQ(2.5, *interp_field_value);
 
-  valid_interp = map_tsdf.interpField(Eigen::Vector3f(-8, -12, -8), field_value);
-  EXPECT_EQ(true, valid_interp);
-  EXPECT_EQ(2.5, field_value);
+  interp_field_value = map_tsdf.getFieldInterp(Eigen::Vector3f(-12, -8, -8));
+  EXPECT_TRUE(interp_field_value);
+  EXPECT_EQ(3, *interp_field_value);
 
-  valid_interp = map_tsdf.interpField(Eigen::Vector3f(-12, -8, -8), field_value);
-  EXPECT_EQ(true, valid_interp);
-  EXPECT_EQ(3, field_value);
+  interp_field_value = map_tsdf.getFieldInterp(Eigen::Vector3f(-8, -8, -8));
+  EXPECT_TRUE(interp_field_value);
+  EXPECT_EQ(3.5, *interp_field_value);
 
-  valid_interp = map_tsdf.interpField(Eigen::Vector3f(-8, -8, -8), field_value);
-  EXPECT_EQ(true, valid_interp);
-  EXPECT_EQ(3.5, field_value);
-
-  valid_interp = map_tsdf.interpField(Eigen::Vector3f(+2, +2, +2), field_value);
-  EXPECT_EQ(false, valid_interp);
-  EXPECT_EQ(0.f, field_value);
+  interp_field_value = map_tsdf.getFieldInterp(Eigen::Vector3f(+2, +2, +2));
+  EXPECT_FALSE(interp_field_value);
 }

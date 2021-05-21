@@ -375,6 +375,20 @@ inline void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::voxelToPoint(const Eig
 {
   point_M = ((voxel_coord.cast<float>() + sample_offset_frac) * resolution_) - origin_M_;
 }
+
+
+
+template <Field     FldT,
+          Colour    ColB,
+          Semantics SemB,
+          Res       ResT,
+          int  BlockSize
+>
+inline void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::voxelToPoint(const Eigen::Vector3i& voxel_coord,
+                                                                       const int              stride,
+                                                                       Eigen::Vector3f&       point_M) const
+{
+  point_M = ((voxel_coord.cast<float>() + stride * sample_offset_frac) * resolution_) - origin_M_;
 }
 
 
