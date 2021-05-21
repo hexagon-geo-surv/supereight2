@@ -19,6 +19,42 @@
 
 
 
+se::ReaderType se::string_to_reader_type(const std::string& s)
+{
+  std::string s_lowered (s);
+  str_utils::to_lower(s_lowered);
+  if (s_lowered == "openni") {
+    return se::ReaderType::OPENNI;
+  } else if (s_lowered == "iclnuim") {
+    return se::ReaderType::ICLNUIM;
+  } else if (s_lowered == "raw") {
+    return se::ReaderType::RAW;
+  } else if (s_lowered == "newercollege") {
+    return se::ReaderType::NEWERCOLLEGE;
+  } else {
+    return se::ReaderType::UNKNOWN;
+  }
+}
+
+
+
+std::string se::reader_type_to_string(se::ReaderType t)
+{
+  if (t == se::ReaderType::OPENNI) {
+    return "OpenNI";
+  } else if (t == se::ReaderType::ICLNUIM) {
+    return "ICLNUIM";
+  } else if (t == se::ReaderType::RAW) {
+    return "raw";
+  } else if (t == se::ReaderType::NEWERCOLLEGE) {
+    return "NewerCollege";
+  } else {
+    return "unknown";
+  }
+}
+
+
+
 se::Reader::Reader(const se::ReaderConfig& c)
     : camera_active_(true),
       camera_open_(true),

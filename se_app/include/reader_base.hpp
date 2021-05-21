@@ -23,33 +23,37 @@
 
 namespace se {
 
-enum class ReaderType { OPENNI, ICLNUIM, RAW, NEWERCOLLEGE };
+  enum class ReaderType { OPENNI, ICLNUIM, RAW, NEWERCOLLEGE, UNKNOWN };
 
-static const float dflt_fps = 24;
-static const bool  dflt_drop_frame = false;
-static const int   dflt_verbose = 0;
+  ReaderType string_to_reader_type(const std::string& s);
 
-struct ReaderConfig
-{
-  ReaderConfig()
-      : reader_type(se::ReaderType::RAW),
-        fps(dflt_fps),
-        drop_frames(dflt_drop_frame),
-        verbose(dflt_verbose),
-        sequence_path(""),
-        ground_truth_file("")
+  std::string reader_type_to_string(ReaderType t);
+
+  static const float dflt_fps = 24;
+  static const bool  dflt_drop_frame = false;
+  static const int   dflt_verbose = 0;
+
+  struct ReaderConfig
   {
-  }
+    ReaderConfig()
+        : reader_type(se::ReaderType::RAW),
+          fps(dflt_fps),
+          drop_frames(dflt_drop_frame),
+          verbose(dflt_verbose),
+          sequence_path(""),
+          ground_truth_file("")
+    {
+    }
 
-  ReaderType  reader_type;
-  float       fps;
-  bool        drop_frames;
-  int         verbose;
-  std::string sequence_path;
-  std::string ground_truth_file;
+    ReaderType  reader_type;
+    float       fps;
+    bool        drop_frames;
+    int         verbose;
+    std::string sequence_path;
+    std::string ground_truth_file;
 
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-};
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  };
 
 
 
