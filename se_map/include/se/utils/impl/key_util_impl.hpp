@@ -110,7 +110,7 @@ inline key_t encode_key(const se::key_t   code,
   assert(scale <= KEY_SCALE_LIMIT);        // Verify scale is within key limits
 
   // Ensure the code is the same as the filtered code.
-  assert(code == code & CODE_MASK[scale]);
+  assert(code == (code & CODE_MASK[scale]));
 
   return code << SCALE_OFFSET | scale;
 }
