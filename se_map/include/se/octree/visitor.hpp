@@ -7,6 +7,8 @@
 namespace se {
 namespace visitor {
 
+/// Single-res get data functions
+
 /**
  * \brief Get the voxel data for a given coordinate.
  *        The function returns false and invalid data if the data is not allocated.
@@ -14,13 +16,23 @@ namespace visitor {
  * \tparam OctreeT          The type of the octree used
  * \param[in]  octree_ptr   The pointer to the octree
  * \param[in]  voxel_coord  The voxel coordinates to be accessed
- * \param[out] data         The data in the voxel to be accessed
  *
- * \return True if the data is available, False otherwise
+ * \return The data in the voxel to be accessed
+ *         Returns init data if block is not allocated
  */
 template <typename OctreeT>
-inline bool getData(const OctreeT&              octree,
-                    const Eigen::Vector3i&      voxel_coord,
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, typename OctreeT::DataType>
+getData(const OctreeT&         octree,
+        const Eigen::Vector3i& voxel_coord);
+
+template <typename OctreeT,
+          typename BlockT
+>
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, typename OctreeT::DataType>
+getData(const OctreeT&              octree,
+        BlockT*                     block_ptr,
+        const Eigen::Vector3i&      voxel_coord);
+
                     typename OctreeT::DataType& data);
 
 template <typename OctreeT, typename BlockT>
@@ -29,25 +41,28 @@ inline bool getData(const OctreeT&              octree,
                     const Eigen::Vector3i&      voxel_coord,
                     typename OctreeT::DataType& data);
 
+/// Single-res get field functions
+
 /**
- * \brief Get the voxel data for a given coordinate.
- *
- * \warning The data might be invalid.
+ * \brief Get the field value for a given coordinate.
+ *        The function returns false and invalid data if the data is not allocated.
  *
  * \tparam OctreeT         The type of the octree used
  * \param[in] octree_ptr   The pointer to the octree
  * \param[in] voxel_coord  The voxel coordinates to be accessed
  *
- * \return The data in the voxel to be accessed
+ * \return The field value to be accessed
  */
 template <typename OctreeT>
-inline typename OctreeT::DataType getData(const OctreeT&         octree,
-                                          const Eigen::Vector3i& voxel_coord);
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, std::optional<se::field_t>>
+getField(const OctreeT&         octree,
+         const Eigen::Vector3i& voxel_coord);
 
 template <typename OctreeT, typename BlockT>
-inline typename OctreeT::DataType getData(const OctreeT&         octree,
-                                          BlockT*                block_ptr,
-                                          const Eigen::Vector3i& voxel_coord);
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, std::optional<se::field_t>>
+getField(const OctreeT&         octree,
+         BlockT*                block_ptr,
+         const Eigen::Vector3i& voxel_coord);
 
 /**
  * \brief Get the field value for a given coordinate.
@@ -101,8 +116,11 @@ inline se::field_t getField(const OctreeT&         octree,
  *
  * \return True if the field value is available, False otherwise
  */
-template <typename OctreeT, typename FieldT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, bool>
+template <typename OctreeT>
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, std::optional<se::field_t>>
+interpField(const OctreeT&         octree,
+            const Eigen::Vector3f& voxel_coord_f);
+
 interpField(const OctreeT&         octree,
             const Eigen::Vector3f& voxel_coord_f,
             FieldT&                interp_field_value);
@@ -128,10 +146,9 @@ interpField(const OctreeT&         octree,
  * \return True if base block pointer is allocated, False otherwise
  */
 template <typename OctreeT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, bool>
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, std::optional<se::field_vec_t>>
 gradField(const OctreeT&         octree_ptr,
-          const Eigen::Vector3f& voxel_coord_f,
-          Eigen::Vector3f&       grad_field_value);
+          const Eigen::Vector3f& voxel_coord_f);
 
 /**
  * \brief Get the field gradient for a given coordinate [float voxel coordinates].

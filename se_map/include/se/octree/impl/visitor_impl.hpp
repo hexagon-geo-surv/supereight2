@@ -261,30 +261,29 @@ inline bool get_neighbours(const OctreeT&             octree,
 
 
 template <typename OctreeT>
-inline bool getData(const OctreeT&               octree,
-                    const Eigen::Vector3i&       voxel_coord,
-                    typename OctreeT::DataType&  data)
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, typename OctreeT::DataType>
+getData(const OctreeT&         octree,
+        const Eigen::Vector3i& voxel_coord)
 {
+  typename OctreeT::DataType data;
 
   const se::OctantBase* octant_ptr = se::fetcher::block(voxel_coord, octree, octree.getRoot());
 
   if (!octant_ptr)
   {
-    return false;
+    return typename OctreeT::DataType(); // return init data
   }
 
-  data = static_cast<const typename OctreeT::BlockType*>(octant_ptr)->getData(voxel_coord);
-
-  return true;
+  return static_cast<const typename OctreeT::BlockType*>(octant_ptr)->getData(voxel_coord);
 }
 
 
 
 template <typename OctreeT, typename BlockT>
-inline bool getData(const OctreeT&              octree,
-                    BlockT*                     block_ptr,
-                    const Eigen::Vector3i&      voxel_coord,
-                    typename OctreeT::DataType& data)
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, typename OctreeT::DataType>
+getData(const OctreeT&         octree,
+        BlockT*                block_ptr,
+        const Eigen::Vector3i& voxel_coord)
 {
   assert(block_ptr);
 
@@ -293,13 +292,10 @@ inline bool getData(const OctreeT&              octree,
   const bool is_contained = ((voxel_coord.array() >= lower_coord.array()) && (voxel_coord.array() <= upper_coord.array())).all();
   if (is_contained)
   {
-    data = block_ptr->getData(voxel_coord);
-    return true;
+    return block_ptr->getData(voxel_coord);
   }
 
-  data = getData(octree, voxel_coord);
-  return true; // TODO:
-}
+  return se::visitor::getData(octree, voxel_coord);
 }
 
 
@@ -343,28 +339,34 @@ inline typename OctreeT::DataType getData(const OctreeT&         octree,
 
 
 template <typename OctreeT>
-inline bool getField(const OctreeT&         octree,
-                     const Eigen::Vector3i& voxel_coord,
-                     se::field_t&           field_value)
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, std::optional<se::field_t>>
+getField(const OctreeT&         octree,
+         const Eigen::Vector3i& voxel_coord)
 {
-  typename OctreeT::DataType data;
-  bool is_valid = getData(octree, voxel_coord, data);
-  field_value = get_field(data);
-  return is_valid;
+  typename OctreeT::DataType data = getData(octree, voxel_coord);
+  if (se::is_valid(data))
+  {
+    return se::get_field(data);
+  }
+
+  return {};
 }
 
 
 
 template <typename OctreeT, typename BlockT>
-inline bool getField(const OctreeT&         octree,
-                     BlockT*                block_ptr,
-                     const Eigen::Vector3i& voxel_coord,
-                     se::field_t&           field_value)
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, std::optional<se::field_t>>
+getField(const OctreeT&         octree,
+         BlockT*                block_ptr,
+         const Eigen::Vector3i& voxel_coord)
 {
-  typename OctreeT::DataType data;
-  bool is_valid = getData(octree, block_ptr, voxel_coord, data);
-  field_value = get_field(data);
-  return is_valid;
+  typename OctreeT::DataType data = getData(octree, block_ptr, voxel_coord);
+  if (se::is_valid(data))
+  {
+    return se::get_field(data);
+  }
+
+  return {};
 }
 
 
@@ -388,11 +390,11 @@ inline se::field_t getField(const OctreeT&         octree,
 
 
 
-template <typename OctreeT, typename FieldT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, bool>
+
+template <typename OctreeT>
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, std::optional<se::field_t>>
 interpField(const OctreeT&         octree,
-            const Eigen::Vector3f& voxel_coord_f,
-            FieldT&                interp_field_value)
+            const Eigen::Vector3f& voxel_coord_f)
 {
   typename OctreeT::DataType init_data;
   typename OctreeT::DataType neighbour_data[8] = { init_data };
@@ -409,20 +411,28 @@ interpField(const OctreeT&         octree,
   if ((base_coord.array() < 0).any() ||
       ((base_coord + Eigen::Vector3i::Constant(stride)).array() >= octree_size).any())
   {
-    interp_field_value = se::get_field(init_data);
-    return false;
+    return {};
   }
   
   get_neighbours(octree, base_coord, neighbour_data);
 
-  interp_field_value =  (((se::get_field(neighbour_data[0]) * (1 - factor.x())
-                         + se::get_field(neighbour_data[1]) * factor.x()) * (1 - factor.y())
-                        + (se::get_field(neighbour_data[2]) * (1 - factor.x())
-                         + se::get_field(neighbour_data[3]) * factor.x()) * factor.y()) * (1 - factor.z())
-                       + ((se::get_field(neighbour_data[4]) * (1 - factor.x())
-                         + se::get_field(neighbour_data[5]) * factor.x()) * (1 - factor.y())
-                        + (se::get_field(neighbour_data[6]) * (1 - factor.x())
-                         + se::get_field(neighbour_data[7]) * factor.x()) * factor.y()) * factor.z());
+  for (int n = 0; n < 8; n++) //< 8 neighbours
+  {
+    if (se::is_invalid(neighbour_data[n]))
+    {
+      return {};
+    }
+  }
+
+  return (((se::get_field(neighbour_data[0]) * (1 - factor.x())
+          + se::get_field(neighbour_data[1]) * factor.x()) * (1 - factor.y())
+         + (se::get_field(neighbour_data[2]) * (1 - factor.x())
+          + se::get_field(neighbour_data[3]) * factor.x()) * factor.y()) * (1 - factor.z())
+        + ((se::get_field(neighbour_data[4]) * (1 - factor.x())
+          + se::get_field(neighbour_data[5]) * factor.x()) * (1 - factor.y())
+         + (se::get_field(neighbour_data[6]) * (1 - factor.x())
+          + se::get_field(neighbour_data[7]) * factor.x()) * factor.y()) * factor.z());
+}
 
   for (int n = 0; n < 8; n++) //< 8 neighbours
   {
@@ -457,10 +467,9 @@ interpField(const OctreeT&         octree,
 
 
 template <typename OctreeT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, bool>
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, std::optional<se::field_vec_t>>
 gradField(const OctreeT&         octree,
-          const Eigen::Vector3f& voxel_coord_f,
-          Eigen::Vector3f&       grad_field_value)
+          const Eigen::Vector3f& voxel_coord_f)
 {
   const Eigen::Vector3f scaled_voxel_coord_f = voxel_coord_f - se::sample_offset_frac;
   Eigen::Vector3f factor = se::math::fracf(scaled_voxel_coord_f);
@@ -477,7 +486,7 @@ gradField(const OctreeT&         octree,
   const typename OctreeT::BlockType* block_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree, octree.getRoot()));
   if (!block_ptr)
   {
-    return false;
+    return {};
   }
 
   const Eigen::Vector3i grad_coords[32] =
@@ -523,17 +532,19 @@ gradField(const OctreeT&         octree,
 
   for (unsigned int i = 0; i < 32; i++)
   {
-    if (!se::visitor::getField(octree, block_ptr, grad_coords[i], grad_field_values[i]))
+    auto grad_field_value = se::visitor::getField(octree, block_ptr, grad_coords[i]);
+    if (!grad_field_value)
     {
-      return false;
+      return {};
     }
+    grad_field_values[i] = *grad_field_value;
   }
 
   const float rev_factor_x = (1 - factor.x());
   const float rev_factor_y = (1 - factor.y());
   const float rev_factor_z = (1 - factor.z());
 
-  Eigen::Vector3f gradient = Eigen::Vector3f::Constant(0);
+  se::field_vec_t gradient = Eigen::Vector3f::Constant(0);
 
   gradient.x() = (((grad_field_values[19]
                   - grad_field_values[0]) * rev_factor_x
@@ -586,9 +597,7 @@ gradField(const OctreeT&         octree,
                   +(grad_field_values[25]
                   - grad_field_values[23]) * factor.x()) * factor.y()) * factor.z();
 
-  grad_field_value = 0.5f * gradient;
-
-  return true;
+  return 0.5f * gradient;
 }
 
 

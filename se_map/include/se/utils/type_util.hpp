@@ -48,7 +48,7 @@ typedef float depth_t;        ///< The type of the processed depth measurements
 
 typedef float field_t;        ///< The type of the stored field (e.g. TSDF, ESDF or occupancy)
 
-
+typedef Eigen::Matrix<field_t, 3, 1> field_vec_t;
 
 } // namespace se
 

@@ -67,8 +67,8 @@ template <Field     FldT,
           int       BlockSize
 >
 template<Safe SafeB>
-inline bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getData(const Eigen::Vector3f& point_M,
-                                                                  DataType&              data) const
+inline const typename Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::DataType
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getData(const Eigen::Vector3f& point_M) const
 {
   Eigen::Vector3i voxel_coord;
 
@@ -79,11 +79,11 @@ inline bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getData(const Eigen::V
   {
     if (!pointToVoxel<Safe::On>(point_M, voxel_coord))
     {
-      return false;
+      return DataType();
     }
   }
 
-  return se::visitor::getData(*octree_ptr_, voxel_coord, data);
+  return se::visitor::getData(*octree_ptr_, voxel_coord);
 }
 
 
@@ -95,8 +95,7 @@ template <Field     FldT,
           int       BlockSize
 >
 template<Safe SafeB>
-inline bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::interpField(const Eigen::Vector3f& point_M,
-                                                                      float&                 field_value) const
+inline std::optional<se::field_t> Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::interpField(const Eigen::Vector3f& point_M) const
 {
   Eigen::Vector3f voxel_coord_f;
 
@@ -107,10 +106,11 @@ inline bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::interpField(const Eige
   {
     if (!pointToVoxel<Safe::On>(point_M, voxel_coord_f))
     {
-      return false;
+      return {};
     }
   }
-  return se::visitor::interpField(*octree_ptr_, voxel_coord_f, field_value);
+
+  return se::visitor::interpField(*octree_ptr_, voxel_coord_f);
 }
 
 
@@ -122,8 +122,7 @@ template <Field     FldT,
           int       BlockSize
 >
 template<Safe SafeB>
-inline bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::gradField(const Eigen::Vector3f& point_M,
-                                                                    Eigen::Vector3f&       field_grad) const
+inline std::optional<se::field_vec_t> Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::gradField(const Eigen::Vector3f& point_M) const
 {
   Eigen::Vector3f voxel_coord_f;
 
@@ -134,41 +133,17 @@ inline bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::gradField(const Eigen:
   {
     if (!pointToVoxel<Safe::On>(point_M, voxel_coord_f))
     {
-    return false;
+    return {};
     }
   }
 
-  const bool is_valid = se::visitor::gradField(*octree_ptr_, voxel_coord_f, field_grad);
-  field_grad *= resolution_;
-
-  return is_valid;
-}
-
-
-
-template <Field     FldT,
-          Colour    ColB,
-          Semantics SemB,
-          Res       ResT,
-          unsigned  BlockSize
->
-template<Safe SafeB>
-inline Eigen::Vector3f Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::gradField(const Eigen::Vector3f& point_M) const
-{
-  Eigen::Vector3f voxel_coord_f;
-
-  if constexpr(SafeB == Safe::Off) // Evaluate at compile time
+  auto field_grad = se::visitor::gradField(*octree_ptr_, voxel_coord_f);
+  if (field_grad)
   {
-    pointToVoxel<Safe::Off>(point_M, voxel_coord_f);
-  } else
-  {
-    if (!pointToVoxel<Safe::On>(point_M, voxel_coord_f))
-    {
-    return Eigen::Vector3f::Constant(0);
-    }
+    *field_grad *= resolution_;
   }
 
-  return resolution_ * se::visitor::gradField(*octree_ptr_, voxel_coord_f);
+  return field_grad;
 }
 
 

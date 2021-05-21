@@ -83,16 +83,13 @@ public:
    * \return
    */
   template<Safe SafeB = Safe::Off>
-  inline bool getData (const Eigen::Vector3f& point_M, DataType& data) const;
+  inline const DataType getData (const Eigen::Vector3f& point_M) const;
 
   template<Safe SafeB = Safe::Off>
-  inline bool interpField(const Eigen::Vector3f& point_M, float& field_value) const;
+  inline std::optional<se::field_t> interpField(const Eigen::Vector3f& point_M) const;
 
   template<Safe SafeB = Safe::Off>
-  inline bool gradField(const Eigen::Vector3f& point_M, Eigen::Vector3f& field_grad) const;
-
-  template<Safe SafeB = Safe::Off>
-  inline Eigen::Vector3f gradField(const Eigen::Vector3f& point_M) const;
+  inline std::optional<se::field_vec_t> gradField(const Eigen::Vector3f& point_M) const;
 
   void saveSlice(const std::string&     file_path,
                  const Eigen::Vector3f& point_M,

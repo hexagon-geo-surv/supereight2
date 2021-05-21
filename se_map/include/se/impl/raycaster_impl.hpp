@@ -34,16 +34,15 @@ inline Eigen::Vector4f raycast(MapT&                  map,
     // first walk with largesteps until we found a hit
     float stepsize = largestep;
     Eigen::Vector3f position = ray_origin_M + ray_dir_M * t;
-    typename MapT::DataType data;
-    float field_value;
-    map.template getData<se::Safe::On>(position, data);
+    typename MapT::DataType data = map.template getData<se::Safe::On>(position);
     float f_t = data.tsdf;
     float f_tt = 0;
     if (f_t >= 0)
     { // ups, if we were already in it, then don't render anything here
       for (; t < t_far; t += stepsize)
       {
-        if (!map.template getData<se::Safe::On>(position, data))
+        data = map.template getData<se::Safe::On>(position);
+        if (se::is_invalid(data))
         {
           stepsize = largestep;
           position += stepsize * ray_dir_M;
@@ -53,9 +52,10 @@ inline Eigen::Vector4f raycast(MapT&                  map,
         f_tt = data.tsdf;
         if(f_tt <= 0.1 && f_tt >= -0.5f)
         {
-          if (map.template interpField(position, field_value))
+          auto field_value = map.template interpField(position);
+          if (field_value)
           {
-            f_tt = field_value;
+            f_tt = *field_value;
           }
         }
 
@@ -128,19 +128,16 @@ void raycastVolume(const MapT&                 map,
 
       if (surface_intersection_M != Eigen::Vector3f::Zero())
       {
-        Eigen::Vector3f surface_normal;
-
-        bool is_valid = map.template gradField(surface_intersection_M.head(3), surface_normal);
-
-        if (!is_valid)
+        auto surface_normal = map.template gradField(surface_intersection_M.head(3));
+        if (!surface_normal)
         {
           surface_normals_M[pixel.x() + pixel.y() * surface_normals_M.width()] = Eigen::Vector3f(INVALID, 0.f, 0.f);
         } else
         {
           // Invert surface normals for TSDF representations.
           surface_normals_M[pixel.x() + pixel.y() * surface_normals_M.width()] = (true)
-                                                                                 ? (-1.f * surface_normal).normalized()
-                                                                                 : surface_normal.normalized();
+                                                                                 ? (-1.f * (*surface_normal)).normalized()
+                                                                                 : (*surface_normal).normalized();
         }
       } else
       {

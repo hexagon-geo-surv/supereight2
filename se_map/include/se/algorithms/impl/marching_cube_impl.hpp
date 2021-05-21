@@ -19,13 +19,10 @@ inline Eigen::Vector3f compute_intersection(const OctreeT&         octree,
                                             const Eigen::Vector3i& dest_coord)
 {
 
-  typename OctreeT::DataType data_0;
-  se::visitor::getData(octree, source_coord, data_0);
+  typename OctreeT::DataType data_0 = se::visitor::getData(octree, source_coord);
   float value_0 = get_field(data_0);
 
-  typename OctreeT::DataType data_1;
-
-  se::visitor::getData(octree, dest_coord, data_1);
+  typename OctreeT::DataType data_1 = se::visitor::getData(octree, dest_coord);
   float value_1 = get_field(data_1);
 
   Eigen::Vector3f source_point_M = (source_coord.cast<float>() + Eigen::Vector3f::Constant(0.5f));
@@ -97,14 +94,14 @@ inline void gather_data(const OctreeT&             octree,
                         const int                  y,
                         const int                  z)
 {
-  se::visitor::getData(octree, Eigen::Vector3i(x,     y,     z    ), data[0]);
-  se::visitor::getData(octree, Eigen::Vector3i(x + 1, y,     z    ), data[1]);
-  se::visitor::getData(octree, Eigen::Vector3i(x + 1, y,     z + 1), data[2]);
-  se::visitor::getData(octree, Eigen::Vector3i(x ,    y,     z + 1), data[3]);
-  se::visitor::getData(octree, Eigen::Vector3i(x,     y + 1, z    ), data[4]);
-  se::visitor::getData(octree, Eigen::Vector3i(x + 1, y + 1, z    ), data[5]);
-  se::visitor::getData(octree, Eigen::Vector3i(x + 1, y + 1, z + 1), data[6]);
-  se::visitor::getData(octree, Eigen::Vector3i(x,     y + 1, z + 1), data[7]);
+  data[0] = se::visitor::getData(octree, Eigen::Vector3i(x,     y,     z    ));
+  data[1] = se::visitor::getData(octree, Eigen::Vector3i(x + 1, y,     z    ));
+  data[2] = se::visitor::getData(octree, Eigen::Vector3i(x + 1, y,     z + 1));
+  data[3] = se::visitor::getData(octree, Eigen::Vector3i(x ,    y,     z + 1));
+  data[4] = se::visitor::getData(octree, Eigen::Vector3i(x,     y + 1, z    ));
+  data[5] = se::visitor::getData(octree, Eigen::Vector3i(x + 1, y + 1, z    ));
+  data[6] = se::visitor::getData(octree, Eigen::Vector3i(x + 1, y + 1, z + 1));
+  data[7] = se::visitor::getData(octree, Eigen::Vector3i(x,     y + 1, z + 1));
 }
 
 
