@@ -11,7 +11,7 @@ template <Field     FldT,
           Colour    ColB,
           Semantics SemB,
           Res       ResT,
-          unsigned  BlockSize
+          int       BlockSize
 >
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const Eigen::Vector3f& dim,
                                                   const float            res,
@@ -29,7 +29,7 @@ template <Field     FldT,
           Colour    ColB,
           Semantics SemB,
           Res       ResT,
-          unsigned  BlockSize
+          int       BlockSize
 >
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const MapConfig&                       map_config,
                                                   const se::DataConfig<FldT, ColB, SemB> data_config)
@@ -49,7 +49,7 @@ template <Field     FldT,
           Colour    ColB,
           Semantics SemB,
           Res       ResT,
-          unsigned  BlockSize
+          int       BlockSize
 >
 inline bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::contains(const Eigen::Vector3f& point_M) const
 {
@@ -64,7 +64,7 @@ template <Field     FldT,
           Colour    ColB,
           Semantics SemB,
           Res       ResT,
-          unsigned  BlockSize
+          int       BlockSize
 >
 template<Safe SafeB>
 inline bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getData(const Eigen::Vector3f& point_M,
@@ -92,7 +92,7 @@ template <Field     FldT,
           Colour    ColB,
           Semantics SemB,
           Res       ResT,
-          unsigned  BlockSize
+          int       BlockSize
 >
 template<Safe SafeB>
 inline bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::interpField(const Eigen::Vector3f& point_M,
@@ -119,7 +119,7 @@ template <Field     FldT,
           Colour    ColB,
           Semantics SemB,
           Res       ResT,
-          unsigned  BlockSize
+          int       BlockSize
 >
 template<Safe SafeB>
 inline bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::gradField(const Eigen::Vector3f& point_M,
@@ -177,7 +177,7 @@ template <Field     FldT,
           Colour    ColB,
           Semantics SemB,
           Res       ResT,
-          unsigned  BlockSize
+          int       BlockSize
 >
 bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::initialiseOctree()
 {
@@ -201,7 +201,7 @@ template <Field     FldT,
           Colour    ColB,
           Semantics SemB,
           Res       ResT,
-          unsigned  BlockSize
+          int       BlockSize
 >
 void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveSlice(const std::string&     file_path,
                                                              const Eigen::Vector3f& point_M,
@@ -224,7 +224,7 @@ template <Field     FldT,
           Colour    ColB,
           Semantics SemB,
           Res       ResT,
-          unsigned  BlockSize
+          int       BlockSize
 >
 void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveStrucutre(const std::string& file_path,
                                                                  const std::string& num) const
@@ -240,7 +240,7 @@ template <Field     FldT,
           Colour    ColB,
           Semantics SemB,
           Res       ResT,
-          unsigned  BlockSize
+          int       BlockSize
 >
 void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMesh(const std::string& file_path,
                                                             const std::string& num) const
@@ -264,7 +264,7 @@ template <Field     FldT,
           Colour    ColB,
           Semantics SemB,
           Res       ResT,
-          unsigned  BlockSize
+          int       BlockSize
 >
 template<se::Safe SafeB>
 inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
@@ -286,7 +286,7 @@ template <Field     FldT,
           Colour    ColB,
           Semantics SemB,
           Res       ResT,
-          unsigned  BlockSize
+          int       BlockSize
 >
 template<se::Safe SafeB>
 inline typename std::enable_if_t<SafeB == se::Safe::Off, bool>
@@ -303,7 +303,7 @@ template <Field     FldT,
           Colour    ColB,
           Semantics SemB,
           Res       ResT,
-          unsigned  BlockSize
+          int       BlockSize
 >
 template<se::Safe SafeB>
 inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
@@ -325,7 +325,7 @@ template <Field     FldT,
           Colour    ColB,
           Semantics SemB,
           Res       ResT,
-          unsigned  BlockSize
+          int       BlockSize
 >
 template<se::Safe SafeB>
 inline typename std::enable_if_t<SafeB == se::Safe::Off, bool>
@@ -342,7 +342,7 @@ template <Field     FldT,
           Colour    ColB,
           Semantics SemB,
           Res       ResT,
-          unsigned  BlockSize
+          int       BlockSize
 >
 template<se::Safe SafeB>
 inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
@@ -368,10 +368,10 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointsToVoxels(const std::vector<E
 
 
 template <Field     FldT,
-        Colour    ColB,
-        Semantics SemB,
-        Res       ResT,
-        unsigned  BlockSize
+          Colour    ColB,
+          Semantics SemB,
+          Res       ResT,
+          int       BlockSize
 >
 template<se::Safe SafeB>
 inline typename std::enable_if_t<SafeB == se::Safe::Off, bool>
@@ -393,7 +393,7 @@ template <Field     FldT,
           Colour    ColB,
           Semantics SemB,
           Res       ResT,
-          unsigned  BlockSize
+          int       BlockSize
 >
 inline void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::voxelToPoint(const Eigen::Vector3i& voxel_coord,
                                                                        Eigen::Vector3f&       point_M) const
