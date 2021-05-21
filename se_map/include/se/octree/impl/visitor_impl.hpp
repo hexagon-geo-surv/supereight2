@@ -632,22 +632,22 @@ getFieldInterp(const OctreeT&         octree,
 {
   typename OctreeT::DataType init_data;
   typename OctreeT::DataType neighbour_data[8] = { init_data };
-  
+
   const unsigned int octree_size = octree.getSize();
-  
+
   Eigen::Vector3f factor;
 
   const int stride = 1; // Single-res
   const Eigen::Vector3f scaled_voxel_coord_f = 1.f / stride * voxel_coord_f - se::sample_offset_frac;
   factor = math::fracf(scaled_voxel_coord_f);
   const Eigen::Vector3i base_coord = stride * scaled_voxel_coord_f.template cast<int>();
-  
+
   if ((base_coord.array() < 0).any() ||
       ((base_coord + Eigen::Vector3i::Constant(stride)).array() >= octree_size).any())
   {
     return {};
   }
-  
+
   get_neighbours(octree, base_coord, neighbour_data);
 
   for (int n = 0; n < 8; n++) //< 8 neighbours
@@ -685,7 +685,7 @@ getFieldInterp(const OctreeT&         octree,
   se::OctantBase* octant_ptr = se::fetcher::block(voxel_coord_f.cast<int>(), octree, octree.getRoot());
   if (!octant_ptr)
   {
-    return false;
+    return {};
   }
 
   typedef typename OctreeT::BlockType BlockType;
