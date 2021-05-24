@@ -9,7 +9,6 @@
 #ifndef __READER_HPP
 #define __READER_HPP
 
-#include "se/config.h"
 #include "reader_base.hpp"
 
 
