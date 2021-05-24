@@ -9,44 +9,44 @@
 #include "se/perfstats.hpp"
 #include "se/timings.hpp"
 
+#include "config.hpp"
 #include "draw.h"
+#include "filesystem.hpp"
 #include "reader.hpp"
 
 #ifndef SE_RES
 #define SE_RES se::Res::Single
 #endif
 
-#define TRACK true //< Use ICP tracking or ground truth
-
 int main(int argc, char** argv)
 {
-  std::string output_path = "/home/nils/workspace_/projects/supereight-2-srl/out";
+  // Read the configuration
+  const std::string config_filename = (argc >= 2) ? argv[1] : "/home/nils/workspace_/projects/supereight-2-srl/datasets/icl_nuim/traj_2/config.yaml";
+  const se::Config<se::TSDFDataConfig> config (config_filename);
+  std::cout << config;
+
+  // Create the mesh output directory
+  if (config.app.enable_meshing) {
+    if (!config.app.mesh_output_dir.empty()) {
+      stdfs::create_directories(config.app.mesh_output_dir);
+    }
+  }
 
   // Setup log stream
   std::ofstream log_file_stream;
-  log_file_stream.open(output_path + "/log.txt");
+  log_file_stream.open(config.app.log_file);
   se::perfstats.setFilestream(&log_file_stream);
 
-  // Creating a single-res TSDF map
-  const Eigen::Vector3f map_dim(10.f, 10.f, 10.f);
-  const float           map_res(0.02f);
-
-  // Data config
-  se::TSDFDataConfig data_config;
-  data_config.truncation_boundary = 4 * map_res;
-  data_config.max_weight          = 100;
-
-  se::TSDFMap<SE_RES> map(map_dim, map_res, data_config);
+  // Setup the map
+  se::TSDFMap<SE_RES> map(config.map, config.data);
 
   // Setup input images
-  Eigen::Vector2i input_img_res(640, 480);
+  const Eigen::Vector2i input_img_res(config.sensor.width, config.sensor.height);
   se::Image<se::depth_t> input_depth_img(input_img_res.x(), input_img_res.y());
   se::Image<uint32_t>    input_rgba_img(input_img_res.x(), input_img_res.y());
 
-  int downsampling_factor = 2;
-
   // Setup processed images
-  Eigen::Vector2i processed_img_res = input_img_res / downsampling_factor;
+  const Eigen::Vector2i processed_img_res = input_img_res / config.app.sensor_downsampling_factor;
   se::Image<se::depth_t> processed_depth_img(processed_img_res.x(), processed_img_res.y());
   se::Image<uint32_t>    processed_rgba_img(processed_img_res.x(), processed_img_res.y());
 
@@ -56,33 +56,12 @@ int main(int argc, char** argv)
   uint32_t* output_tracking_img_data =  new uint32_t[processed_img_res.x() * processed_img_res.y()];
   uint32_t* output_volume_img_data   =  new uint32_t[processed_img_res.x() * processed_img_res.y()];
 
-  // Setup sensor
-  se::SensorConfig sensor_config;
-  sensor_config.width           =  input_img_res.x();
-  sensor_config.height          =  input_img_res.y();
-  sensor_config.fx              =  481.2;
-  sensor_config.fy              = -480.0;
-  sensor_config.cx              =  319.5;
-  sensor_config.cy              =  239.5;
-  sensor_config.left_hand_frame =  sensor_config.fy < 0;
-  sensor_config.near_plane      =  0.4f;
-  sensor_config.far_plane       =  6.f;
-
   // Create a pinhole camera and downsample the intrinsics
-  const se::PinholeCamera sensor(sensor_config, downsampling_factor);
-
-  // Create the reader configuration from the general configuration
-  se::ReaderConfig reader_config;
-  reader_config.reader_type       = se::ReaderType::RAW;
-  reader_config.fps               = 24;
-  reader_config.drop_frames       = false;
-  reader_config.verbose           = 0;
-  reader_config.sequence_path     = (argc >= 2) ? argv[1] : "/home/nils/workspace_/projects/supereight-2-srl/datasets/icl_nuim/traj_2/scene.raw";
-  reader_config.ground_truth_file = (argc >= 3) ? argv[2] : "/home/nils/workspace_/projects/supereight-2-srl/datasets/icl_nuim/traj_2/scene.raw.txt";;
+  const se::PinholeCamera sensor(config.sensor, config.app.sensor_downsampling_factor);
 
   // ========= READER INITIALIZATION  =========
   se::Reader* reader = nullptr;
-  reader = se::create_reader(reader_config);
+  reader = se::create_reader(config.reader);
 
   if (reader == nullptr) {
     exit(EXIT_FAILURE);
@@ -92,14 +71,12 @@ int main(int argc, char** argv)
   se::ReaderStatus read_ok = se::ReaderStatus::ok;
   Eigen::Matrix4f T_MS;
 
-  se::TrackerConfig tracker_config;
-  tracker_config.iterations = {10, 5, 4};
-  se::Tracker tracker(map, sensor, tracker_config);
+  se::Tracker tracker(map, sensor, config.tracker);
 
   // Integrated depth at given pose
   se::MapIntegrator integrator(map);
 
-  unsigned int frame = 0;
+  int frame = 0;
 
   se::Image<Eigen::Vector3f> surface_point_cloud_M(processed_img_res.x(), processed_img_res.y());
   se::Image<Eigen::Vector3f> surface_normals_M(processed_img_res.x(), processed_img_res.y());
@@ -111,18 +88,14 @@ int main(int argc, char** argv)
     TICK("total")
 
     TICK("read")
-    if constexpr (TRACK)
-    {
-      if (frame == 1)
-      {
+    if (config.app.enable_ground_truth) {
+      read_ok = reader->nextData(input_depth_img, input_rgba_img, T_MS);
+    } else {
+      if (frame == 1) {
         read_ok = reader->nextData(input_depth_img, input_rgba_img, T_MS);
-      } else
-      {
+      } else {
         read_ok = reader->nextData(input_depth_img, input_rgba_img);
       }
-    } else
-    {
-      read_ok = reader->nextData(input_depth_img, input_rgba_img, T_MS);
     }
     TOCK("read")
 
@@ -136,52 +109,57 @@ int main(int argc, char** argv)
 
     // Render volume
     TICK("tracking")
-    if (frame > 1)
-    {
+    if (!config.app.enable_ground_truth && frame > 1 && (frame % config.app.tracking_rate == 0)) {
       tracker.track(processed_depth_img, T_MS, surface_point_cloud_M, surface_normals_M);
     }
     TOCK("tracking")
 
     TICK("integration")
-    integrator.integrateDepth(processed_depth_img, sensor, T_MS, frame);
+    if (frame % config.app.integration_rate == 0) {
+      integrator.integrateDepth(processed_depth_img, sensor, T_MS, frame);
+    }
     TOCK("integration")
 
     TICK("raycast")
     se::raycaster::raycastVolume(map, surface_point_cloud_M, surface_normals_M, surface_scale, T_MS, sensor);
     TOCK("raycast")
 
-    const Eigen::Vector3f ambient{ 0.1, 0.1, 0.1};
-
     TICK("render")
-    se::raycaster::renderVolumeKernel(output_volume_img_data, processed_img_res, se::math::to_translation(T_MS), ambient, surface_point_cloud_M, surface_normals_M, surface_scale);
-    convert_to_output_rgba_img(processed_rgba_img, output_rgba_img_data);
-    convert_to_output_depth_img(processed_depth_img, output_depth_img_data);
-    tracker.renderTrackingResult(output_tracking_img_data);
+    if (config.app.enable_rendering) {
+      const Eigen::Vector3f ambient{0.1, 0.1, 0.1};
+      convert_to_output_rgba_img(processed_rgba_img, output_rgba_img_data);
+      convert_to_output_depth_img(processed_depth_img, output_depth_img_data);
+      tracker.renderTrackingResult(output_tracking_img_data);
+      if (frame % config.app.rendering_rate == 0) {
+        se::raycaster::renderVolumeKernel(output_volume_img_data, processed_img_res, se::math::to_translation(T_MS), ambient, surface_point_cloud_M, surface_normals_M, surface_scale);
+      }
+    }
     TOCK("render")
 
-
-
     TICK("draw")
-    drawthem(output_rgba_img_data,     processed_img_res,
-             output_depth_img_data,    processed_img_res,
-             output_tracking_img_data, processed_img_res,
-             output_volume_img_data,   processed_img_res);
+    if (config.app.enable_gui) {
+      drawthem(output_rgba_img_data,     processed_img_res,
+               output_depth_img_data,    processed_img_res,
+               output_tracking_img_data, processed_img_res,
+               output_volume_img_data,   processed_img_res);
+    }
     TOCK("draw")
 
     TOCK("total")
 
-    if (frame == 1 || frame % 100 == 0)
-    {
-      map.saveMesh(output_path + "/mesh", std::to_string(frame));
-//      map.saveSlice(output_path + "/slice", se::math::to_translation(T_MS), std::to_string(frame));
-//      map.saveStrucutre(output_path + "/struct", std::to_string(frame));
+    if (config.app.enable_meshing && (frame % config.app.meshing_rate == 0)) {
+      map.saveMesh(config.app.mesh_output_dir + "/mesh", std::to_string(frame));
+      if (config.app.enable_slice_meshing) {
+        //map.saveSlice(config.app.mesh_output_dir + "/slice", se::math::to_translation(T_MS), std::to_string(frame));
+      }
+      if (config.app.enable_structure_meshing) {
+        map.saveStrucutre(config.app.mesh_output_dir + "/struct", std::to_string(frame));
+      }
     }
 
     se::perfstats.writeToFilestream();
 
-    unsigned int final_frame = 800;
-    if (frame == final_frame)
-    {
+    if (frame == config.app.max_frames) {
       break;
     }
   }
