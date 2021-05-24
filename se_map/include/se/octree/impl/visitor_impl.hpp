@@ -336,7 +336,7 @@ inline bool get_neighbours(const OctreeT&             octree,
       typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree, octree.getRoot()));
       if (!block_1_ptr || block_1_ptr->getCurrentScale() > scale) { return false; }
 
-      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs2[0]], octree, octree.getRoot()));
+      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + stride * interp_offsets[offs2[0]], octree, octree.getRoot()));
       if (!block_2_ptr || block_2_ptr->getCurrentScale() > scale) { return false; }
 
       gather_4(block_1_ptr, base_coord, offs1, scale, neighbour_data);
@@ -351,7 +351,7 @@ inline bool get_neighbours(const OctreeT&             octree,
       typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree, octree.getRoot()));
       if (!block_1_ptr || block_1_ptr->getCurrentScale() > scale) { return false; }
 
-      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs2[0]], octree, octree.getRoot()));
+      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + stride * interp_offsets[offs2[0]], octree, octree.getRoot()));
       if (!block_2_ptr || block_2_ptr->getCurrentScale() > scale) { return false; }
 
       gather_4(block_1_ptr, base_coord, offs1, scale, neighbour_data);
@@ -368,13 +368,13 @@ inline bool get_neighbours(const OctreeT&             octree,
       typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree, octree.getRoot()));
       if (!block_1_ptr || block_1_ptr->getCurrentScale() > scale) { return false; }
 
-      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs2[0]], octree, octree.getRoot()));
+      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + stride * interp_offsets[offs2[0]], octree, octree.getRoot()));
       if (!block_2_ptr || block_2_ptr->getCurrentScale() > scale) { return false; }
 
-      typename OctreeT::BlockType* block_3_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs3[0]], octree, octree.getRoot()));
+      typename OctreeT::BlockType* block_3_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + stride * interp_offsets[offs3[0]], octree, octree.getRoot()));
       if (!block_3_ptr || block_3_ptr->getCurrentScale() > scale) { return false; }
 
-      typename OctreeT::BlockType* block_4_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs4[0]], octree, octree.getRoot()));
+      typename OctreeT::BlockType* block_4_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + stride * interp_offsets[offs4[0]], octree, octree.getRoot()));
       if (!block_4_ptr || block_4_ptr->getCurrentScale() > scale) { return false; }
 
       gather_2(block_1_ptr, base_coord, offs1, scale, neighbour_data);
@@ -391,7 +391,7 @@ inline bool get_neighbours(const OctreeT&             octree,
       typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree, octree.getRoot()));
       if (!block_1_ptr || block_1_ptr->getCurrentScale() > scale) { return false; }
 
-      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs2[0]], octree, octree.getRoot()));
+      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + stride * interp_offsets[offs2[0]], octree, octree.getRoot()));
       if (!block_2_ptr || block_2_ptr->getCurrentScale() > scale) { return false; }
 
       gather_4(block_1_ptr, base_coord, offs1, scale, neighbour_data);
@@ -408,13 +408,13 @@ inline bool get_neighbours(const OctreeT&             octree,
       typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree, octree.getRoot()));
       if (!block_1_ptr || block_1_ptr->getCurrentScale() > scale) { return false; }
 
-      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs2[0]], octree, octree.getRoot()));
+      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + stride * interp_offsets[offs2[0]], octree, octree.getRoot()));
       if (!block_2_ptr || block_2_ptr->getCurrentScale() > scale) { return false; }
 
-      typename OctreeT::BlockType* block_3_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs3[0]], octree, octree.getRoot()));
+      typename OctreeT::BlockType* block_3_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + stride * interp_offsets[offs3[0]], octree, octree.getRoot()));
       if (!block_3_ptr || block_3_ptr->getCurrentScale() > scale) { return false; }
 
-      typename OctreeT::BlockType* block_4_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs4[0]], octree, octree.getRoot()));
+      typename OctreeT::BlockType* block_4_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + stride * interp_offsets[offs4[0]], octree, octree.getRoot()));
       if (!block_4_ptr || block_4_ptr->getCurrentScale() > scale) { return false; }
 
       gather_2(block_1_ptr, base_coord, offs1, scale, neighbour_data);
@@ -433,13 +433,13 @@ inline bool get_neighbours(const OctreeT&             octree,
       typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord, octree, octree.getRoot()));
       if (!block_1_ptr || block_1_ptr->getCurrentScale() > scale) { return false; }
 
-      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs2[0]], octree, octree.getRoot()));
+      typename OctreeT::BlockType* block_2_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + stride * interp_offsets[offs2[0]], octree, octree.getRoot()));
       if (!block_2_ptr || block_2_ptr->getCurrentScale() > scale) { return false; }
 
-      typename OctreeT::BlockType* block_3_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs3[0]], octree, octree.getRoot()));
+      typename OctreeT::BlockType* block_3_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + stride * interp_offsets[offs3[0]], octree, octree.getRoot()));
       if (!block_3_ptr || block_3_ptr->getCurrentScale() > scale) { return false; }
 
-      typename OctreeT::BlockType* block_4_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + interp_offsets[offs4[0]], octree, octree.getRoot()));
+      typename OctreeT::BlockType* block_4_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(base_coord + stride * interp_offsets[offs4[0]], octree, octree.getRoot()));
       if (!block_4_ptr || block_4_ptr->getCurrentScale() > scale) { return false; }
 
       gather_2(block_1_ptr, base_coord, offs1, scale, neighbour_data);
@@ -452,14 +452,14 @@ inline bool get_neighbours(const OctreeT&             octree,
     case 7: /* x, y, z cross */
     {
       Eigen::Vector3i voxels_coord[8];
-      voxels_coord[0] = base_coord + interp_offsets[0];
-      voxels_coord[1] = base_coord + interp_offsets[1];
-      voxels_coord[2] = base_coord + interp_offsets[2];
-      voxels_coord[3] = base_coord + interp_offsets[3];
-      voxels_coord[4] = base_coord + interp_offsets[4];
-      voxels_coord[5] = base_coord + interp_offsets[5];
-      voxels_coord[6] = base_coord + interp_offsets[6];
-      voxels_coord[7] = base_coord + interp_offsets[7];
+      voxels_coord[0] = base_coord + stride * interp_offsets[0];
+      voxels_coord[1] = base_coord + stride * interp_offsets[1];
+      voxels_coord[2] = base_coord + stride * interp_offsets[2];
+      voxels_coord[3] = base_coord + stride * interp_offsets[3];
+      voxels_coord[4] = base_coord + stride * interp_offsets[4];
+      voxels_coord[5] = base_coord + stride * interp_offsets[5];
+      voxels_coord[6] = base_coord + stride * interp_offsets[6];
+      voxels_coord[7] = base_coord + stride * interp_offsets[7];
 
       for (int i = 0; i < 8; ++i)
       {
