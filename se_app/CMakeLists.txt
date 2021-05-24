@@ -9,7 +9,8 @@ set(READER_SRC
     src/reader_newercollege.cpp
     src/reader_openni.cpp
     src/reader_raw.cpp
-    src/reader.cpp)
+    src/reader.cpp
+    src/config.cpp)
 
 # Compile the TSDF pipelines.
 set(SE_TSDF_RES "Single" "Multi")
