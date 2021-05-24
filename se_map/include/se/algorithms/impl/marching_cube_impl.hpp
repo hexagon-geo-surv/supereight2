@@ -18,15 +18,14 @@ inline Eigen::Vector3f compute_intersection(const OctreeT&         octree,
                                             const Eigen::Vector3i& source_coord,
                                             const Eigen::Vector3i& dest_coord)
 {
-
   typename OctreeT::DataType data_0 = se::visitor::getData(octree, source_coord);
-  float value_0 = get_field(data_0);
+  const float value_0 = get_field(data_0);
 
   typename OctreeT::DataType data_1 = se::visitor::getData(octree, dest_coord);
-  float value_1 = get_field(data_1);
+  const float value_1 = get_field(data_1);
 
-  Eigen::Vector3f source_point_M = (source_coord.cast<float>() + Eigen::Vector3f::Constant(0.5f));
-  Eigen::Vector3f dest_point_M   = (dest_coord.cast<float>() + Eigen::Vector3f::Constant(0.5f));
+  Eigen::Vector3f source_point_M = (source_coord.cast<float>() + se::sample_offset_frac);
+  Eigen::Vector3f dest_point_M   = (dest_coord.cast<float>()   + se::sample_offset_frac);
 
   return source_point_M + (0.0 - value_0) * (dest_point_M - source_point_M) / (value_1 - value_0);
 }
@@ -38,7 +37,8 @@ inline Eigen::Vector3f interp_vertexes(const OctreeT& octree,
                                        const unsigned z,
                                        const int      edge)
 {
-  switch(edge){
+  switch(edge)
+  {
     case 0:  return compute_intersection(octree, Eigen::Vector3i(x, y, z),
                                          Eigen::Vector3i(x + 1, y, z));
     case 1:  return compute_intersection(octree, Eigen::Vector3i(x + 1, y, z),
@@ -154,7 +154,8 @@ inline Eigen::Vector3f compute_dual_intersection(const float            value_0,
                                                  const float            value_1,
                                                  const Eigen::Vector3f& dual_corner_coord_0,
                                                  const Eigen::Vector3f& dual_corner_coord_1,
-                                                 const int              /* edge_case */) {
+                                                 const int              /* edge_case */)
+{
   Eigen::Vector3f dual_point_0_M = dual_corner_coord_0;
   Eigen::Vector3f dual_point_1_M = dual_corner_coord_1;
   float iso_value = 0.f;
@@ -167,8 +168,10 @@ template <typename DataT>
 inline Eigen::Vector3f interp_dual_vertexes(const int                                   edge,
                                             const DataT                                 data[8],
                                             const std::vector<Eigen::Vector3f,
-                                            Eigen::aligned_allocator<Eigen::Vector3f>>& dual_corner_coords_f) {
-  switch(edge){
+                                            Eigen::aligned_allocator<Eigen::Vector3f>>& dual_corner_coords_f)
+{
+  switch(edge)
+  {
     case 0:  return compute_dual_intersection(get_field(data[0]), get_field(data[1]),
                                               dual_corner_coords_f[0], dual_corner_coords_f[1], 0);
     case 1:  return compute_dual_intersection(get_field(data[1]), get_field(data[2]),
@@ -212,7 +215,8 @@ inline void gather_dual_data(const BlockT*                block_ptr,
   // In the local case:        actual_dual_offset = actual_dual_scaling * norm_dual_offset_f and
   // dual_corner_coords_f = primal_corner_coord_f + actual_dual_scaling * norm_dual_offset_f
   const float actual_dual_scaling = (float) (1 << scale) / 2;
-  for (int corner_idx = 0; corner_idx < 8; corner_idx++) {
+  for (int corner_idx = 0; corner_idx < 8; corner_idx++)
+  {
     dual_corner_coords_f[corner_idx] = primal_corner_coord_f +
                                        actual_dual_scaling * norm_dual_offset_f[corner_idx];
     data_arr[corner_idx] = block_ptr->getData(dual_corner_coords_f[corner_idx].cast<int>()); /// <- TODO: Should take data from current scale
@@ -263,9 +267,11 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
                            ((primal_corner_coord_rel.y() == 0) << 1) |
                            ( primal_corner_coord_rel.z() == 0);
 
-  switch(crossmask) {
+  switch(crossmask)
+  {
     // 6 Faces
-    case 1: /* CASE 1 = crosses lower z */ {
+    case 1: /* CASE 1 = crosses lower z */
+    {
       // Inside
       // (c3;v1)-{-1, -1, +1} and (c7;v3)-{-1, +1, +1} and (c2;v5)-{+1, -1, +1} and (c6;v7)-{+1, +1, +1}
       // Lower priority
@@ -277,7 +283,8 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
       neighbours = {{2,3,6,7}, {0,1,4,5}};
     }
       break;
-    case 2: /* CASE 2 = crosses lower y */ {
+    case 2: /* CASE 2 = crosses lower y */
+    {
       // Inside
       // (c4;v2)-{-1, +1, -1} and (c7;v3)-{-1, +1, +1} and (c5;v6)-{+1, +1, -1} and (c6;v7)-{+1, +1, +1}
       // Lower priority
@@ -289,7 +296,8 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
       neighbours = {{4,5,6,7}, {0,1,2,3}};
     }
       break;
-    case 4: /* CASE 3 = crosses lower x */ {
+    case 4: /* CASE 3 = crosses lower x */
+    {
       // Inside
       // (c1;v4)-{+1, -1, -1} and (c2;v5)-{+1, -1, +1} and (c5;v6)-{+1, +1, -1} and (c6;v7)-{+1, +1, +1}
       // Lower priority
@@ -301,7 +309,8 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
       neighbours = {{1,2,5,6}, {0,3,4,7}};
     }
       break;
-    case 8: /* CASE 4 = crosses upper z */ {
+    case 8: /* CASE 4 = crosses upper z */
+    {
       // Inside
       // (c0;v0)-{-1, -1, -1} and (c4;v2)-{-1, +1, -1} and (c1;v4)-{+1, -1, -1} and (c5;v6)-{+1, +1, -1}
       // Lower priority
@@ -313,7 +322,8 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
       neighbours = {{0,1,4,5}, {2,3,6,7}};
     }
       break;
-    case 16: /* CASE 5 = crosses upper y */ {
+    case 16: /* CASE 5 = crosses upper y */
+    {
       // Inside
       // (c0;v0)-{-1, -1, -1} and (c3;v1)-{-1, -1, +1} and (c1;v4)-{+1, -1, -1} and (c2;v5)-{+1, -1, +1}
       // Lower priority
@@ -325,7 +335,8 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
       neighbours = {{0,1,2,3}, {4,5,6,7}};
     }
       break;
-    case 32: /* CASE 6 = crosses upper x */ {
+    case 32: /* CASE 6 = crosses upper x */
+    {
       // Inside
       // (c0;v0)-{-1, -1, -1} and (c3;v1)-{-1, -1, +1} and (c4;v2)-{-1, +1, -1} and (c7;v3)-{-1, +1, +1}
       // Lower priority
@@ -340,7 +351,8 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
 
 
       // 8 Corners
-    case 7: /* CASE 7 = crosses lower x(4), y(2), z(1) */ {
+    case 7: /* CASE 7 = crosses lower x(4), y(2), z(1) */
+    {
       // Inside
       // (c6;v7)-{+1, +1, +1}
       // Lower priority
@@ -353,7 +365,8 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
       neighbours = {{6}, {0}, {1}, {2}, {3}, {4}, {5}, {7}};
     }
       break;
-    case 14: /* CASE 8 = crosses lower x(4), y(2) and upper z(8) */ {
+    case 14: /* CASE 8 = crosses lower x(4), y(2) and upper z(8) */
+    {
       // Inside
       // (c5;v6)-{+1, +1, -1}
       // Lower priority
@@ -366,7 +379,8 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
       neighbours = {{5}, {0}, {1}, {2}, {3}, {4}, {6}, {7}};
     }
       break;
-    case 21: /* CASE 9 = crosses lower x(4), upper y(16) and lower z(1) */ {
+    case 21: /* CASE 9 = crosses lower x(4), upper y(16) and lower z(1) */
+    {
       // Inside
       // (c2;v5)-{+1, -1, +1}
       // Lower priority
@@ -379,7 +393,8 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
       neighbours = {{2}, {0}, {1}, {3}, {4}, {5}, {6}, {7}};
     }
       break;
-    case 28: /* CASE 10 = crosses lower x(4) and upper y(16), z(8) */ {
+    case 28: /* CASE 10 = crosses lower x(4) and upper y(16), z(8) */
+    {
       // Inside
       // (c1;v4)-{+1, -1, -1}
       // Lower priority
@@ -392,7 +407,8 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
       neighbours = {{1}, {0}, {2}, {3}, {4}, {5}, {6}, {7}};
     }
       break;
-    case 35: /* CASE 11 = crosses upper x(32) and lower y(2), z(1) */ {
+    case 35: /* CASE 11 = crosses upper x(32) and lower y(2), z(1) */
+    {
       // Inside
       // (c7;v3)-{-1, +1, +1}
       // Lower priority
@@ -404,7 +420,8 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
       neighbours = {{7}, {0}, {1}, {2}, {3}, {4}, {5}, {6}};
     }
       break;
-    case 42: /* CASE 12 = crosses upper x(32), lower y(2) and upper z(8) */ {
+    case 42: /* CASE 12 = crosses upper x(32), lower y(2) and upper z(8) */
+    {
       // Inside
       // (c4;v2)-{-1, +1, -1}
       // Lower priority
@@ -417,7 +434,8 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
       neighbours = {{4}, {0}, {1}, {2}, {3}, {5}, {6}, {7}};
     }
       break;
-    case 49: /* CASE 13 = crosses upper x(32), y(16) and lower z(1) */ {
+    case 49: /* CASE 13 = crosses upper x(32), y(16) and lower z(1) */
+    {
       // Inside
       // (c3;v1)-{-1, -1, +1}
       // Lower priority
@@ -430,7 +448,8 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
       neighbours = {{3}, {0}, {1}, {2}, {4}, {5}, {6}, {7}};
     }
       break;
-    case 56: /* CASE 14 = crosses upper x(32), y(16), z(8) */ {
+    case 56: /* CASE 14 = crosses upper x(32), y(16), z(8) */
+    {
       // Inside
       // (c0;v0)-{-1, -1, -1}
       // Lower priority
@@ -446,7 +465,8 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
 
 
       // 12 Edges
-    case 3: /* CASE 15 = crosses lower y(2), z(1) */ {
+    case 3: /* CASE 15 = crosses lower y(2), z(1) */
+    {
       // Inside
       // (c7;v3)-{-1, +1, +1} and (c6;v7)-{+1, +1, +1}
       // Lower priority
@@ -460,7 +480,8 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
       neighbours = {{6,7}, {0,1}, {2,3}, {4,5}};
     }
       break;
-    case 5: /* CASE 16 = crosses lower x(4), z(1) */ {
+    case 5: /* CASE 16 = crosses lower x(4), z(1) */
+    {
       // Inside
       // (c2;v5)-{+1, -1, +1} and (c6;v7)-{+1, +1, +1}
       // Lower priority
@@ -474,7 +495,8 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
       neighbours = {{2,6}, {0,4}, {3,7}, {1,5}};
     }
       break;
-    case 6: /* CASE 17 = crosses lower x(4), y(2) */ {
+    case 6: /* CASE 17 = crosses lower x(4), y(2) */
+    {
       // Inside
       // (c5;v6)-{+1, +1, -1} and (c6;v7)-{+1, +1, +1}
       // Lower priority
@@ -488,7 +510,8 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
       neighbours = {{5,6}, {0,3}, {4,7}, {1,2}};
     }
       break;
-    case 10: /* CASE 18 = crosses lower y(2) and upper z(8) */ {
+    case 10: /* CASE 18 = crosses lower y(2) and upper z(8) */
+    {
       // Inside
       // (c4;v2)-{-1, +1, -1} and (c5;v6)-{+1, +1, -1}
       // Lower priority
@@ -502,7 +525,8 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
       neighbours = {{4,5}, {0,1}, {2,3}, {6,7}};
     }
       break;
-    case 12: /* CASE 19 = crosses lower x(4) and upper z(8) */ {
+    case 12: /* CASE 19 = crosses lower x(4) and upper z(8) */
+    {
       // Inside
       // (c1;v4)-{+1, -1, -1} and (c5;v6)-{+1, +1, -1}
       // Lower priority
@@ -515,7 +539,8 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
       neighbours = {{1,5}, {0,4}, {3,7}, {2,6}};
     }
       break;
-    case 17: /* CASE 20 = crosses upper y(16) and lower z(1) */ {
+    case 17: /* CASE 20 = crosses upper y(16) and lower z(1) */
+    {
       // Inside
       // (c3;v1)-{-1, -1, +1} and (c2;v5)-{+1, -1, +1}
       // Lower priority
@@ -528,7 +553,8 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
       neighbours = {{2,3}, {0,1}, {4,5}, {6,7}};
     }
       break;
-    case 20: /* CASE 21 = crosses lower x(4) and upper y(16)*/ {
+    case 20: /* CASE 21 = crosses lower x(4) and upper y(16)*/
+    {
       // Inside
       // (c1;v4)-{+1, -1, -1} and (c2;v5)-{+1, -1, +1}
       // Lower priority
@@ -541,7 +567,8 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
       neighbours = {{1,2}, {0,3}, {4,7}, {5,6}};
     }
       break;
-    case 24: /* CASE 22 = crosses upper y(16), z(8)*/ {
+    case 24: /* CASE 22 = crosses upper y(16), z(8)*/
+    {
       // Inside
       // (c0;v0)-{-1, -1, -1} and (c1;v4)-{+1, -1, -1}
       // Lower priority
@@ -556,7 +583,8 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
       neighbours = {{0,1}, {2,3}, {4,5}, {6,7}};
     }
       break;
-    case 33: /* CASE 23 = crosses upper x(32) and lower z(1) */ {
+    case 33: /* CASE 23 = crosses upper x(32) and lower z(1) */
+    {
       // Inside
       // (c3;v1)-{-1, -1, +1} and (c7;v3)-{-1, +1, +1}
       // Lower priority
@@ -569,7 +597,8 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
       neighbours = {{3,7}, {0,4}, {1,5}, {2,6}};
     }
       break;
-    case 34: /* CASE 24 = crosses upper x(32) and lower y(2) */ {
+    case 34: /* CASE 24 = crosses upper x(32) and lower y(2) */
+    {
       // Inside
       // (c4;v2)-{-1, +1, -1} and (c7;v3)-{-1, +1, +1}
       // Lower priority
@@ -582,7 +611,8 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i&         primal_corner_c
       neighbours = {{4,7}, {0,3}, {1,2}, {5,6}};
     }
       break;
-    case 40: /* CASE 25 = crosses upper x(32), z(8) */ {
+    case 40: /* CASE 25 = crosses upper x(32), z(8) */
+    {
       // Inside
       // (c0;v0)-{-1, -1, -1} and (c4;v2)-{-1, +1, -1}
       // Lower priority
@@ -632,44 +662,53 @@ inline void gather_dual_data(const OctreeT&                     octree,
   norm_dual_corner_idxs(primal_corner_coord_rel, block_ptr->getSize(),
                         lower_priority_neighbours, higher_priority_neighbours, neighbours);
 
-  for(const auto& offset_idx: lower_priority_neighbours) {
+  for (const auto& offset_idx: lower_priority_neighbours)
+  {
     Eigen::Vector3i logical_dual_corner_coord = primal_corner_coord + logical_dual_offset[offset_idx];
-    if (!octree.contains(logical_dual_corner_coord)) {
+    if (!octree.contains(logical_dual_corner_coord))
+    {
       set_invalid(data_arr[0]);
       return;
     }
     typename OctreeT::BlockType* block_neighbour_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(logical_dual_corner_coord, octree, octree.getRoot()));
-    if (block_neighbour_ptr == nullptr || block_ptr->getCurrentScale() <= scale) {
+    if (block_neighbour_ptr == nullptr || block_ptr->getCurrentScale() <= scale)
+    {
       set_invalid(data_arr[0]);
       return;
     }
   }
-  for(const auto& offset_idx: higher_priority_neighbours) {
+  for(const auto& offset_idx: higher_priority_neighbours)
+  {
     Eigen::Vector3i logical_dual_corner_coord = primal_corner_coord + logical_dual_offset[offset_idx];
-    if (!octree.contains(logical_dual_corner_coord)) {
+    if (!octree.contains(logical_dual_corner_coord))
+    {
       set_invalid(data_arr[0]);
       return;
     }
     typename OctreeT::BlockType* block_neighbour_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(logical_dual_corner_coord, octree, octree.getRoot()));
-    if (block_neighbour_ptr == nullptr || block_ptr->getCurrentScale() < scale) {
+    if (block_neighbour_ptr == nullptr || block_ptr->getCurrentScale() < scale)
+    {
       set_invalid(data_arr[0]);
       return;
     }
   }
 
-  int stride = 1 << block_ptr->getCurrentScale();
-  for(const auto& offset_idx: neighbours[0]) {
+  const int stride = 1 << block_ptr->getCurrentScale();
+  for (const auto& offset_idx: neighbours[0])
+  {
     Eigen::Vector3i logical_dual_corner_coord = primal_corner_coord + logical_dual_offset[offset_idx];
-    dual_corner_coords_f[offset_idx] = ((logical_dual_corner_coord / stride) * stride).cast<float>() + stride * Eigen::Vector3f::Constant(0.5f); // TODO:  OctreeT<FieldType>::sample_offset_frac_
+    dual_corner_coords_f[offset_idx] = ((logical_dual_corner_coord / stride) * stride).cast<float>() + stride * se::sample_offset_frac; // TODO:  OctreeT<FieldType>::sample_offset_frac_
     data_arr[offset_idx] = block_ptr->getData(dual_corner_coords_f[offset_idx].cast<int>()); /// <- TODO: Should take data from current scale
   }
-  for (size_t neighbour_idx = 1; neighbour_idx < neighbours.size(); ++neighbour_idx) {
+  for (size_t neighbour_idx = 1; neighbour_idx < neighbours.size(); ++neighbour_idx)
+  {
     Eigen::Vector3i logical_dual_corner_coord = primal_corner_coord + logical_dual_offset[neighbours[neighbour_idx][0]];
     typename OctreeT::BlockType* block_neighbour_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(logical_dual_corner_coord, octree, octree.getRoot()));
-    int stride = 1 << block_neighbour_ptr->getCurrentScale();
-    for(const auto& offset_idx: neighbours[neighbour_idx]) {
+    const int neighbour_stride = 1 << block_neighbour_ptr->getCurrentScale();
+    for (const auto& offset_idx: neighbours[neighbour_idx])
+    {
       logical_dual_corner_coord = primal_corner_coord + logical_dual_offset[offset_idx];
-      dual_corner_coords_f[offset_idx] = ((logical_dual_corner_coord / stride) * stride).cast<float>() + stride * Eigen::Vector3f::Constant(0.5f); // TODO: OctreeT<FieldType>::sample_offset_frac_
+      dual_corner_coords_f[offset_idx] = ((logical_dual_corner_coord / neighbour_stride) * neighbour_stride).cast<float>() + neighbour_stride * se::sample_offset_frac; // TODO: OctreeT<FieldType>::sample_offset_frac_
       data_arr[offset_idx] = block_neighbour_ptr->getData(dual_corner_coords_f[offset_idx].cast<int>()); /// <- TODO: Should take data from current scale
     }
   }
@@ -707,12 +746,21 @@ void compute_dual_index(const OctreeT&                     octree,
                              ( primal_corner_coord.z() % block_size == 0);
 
   edge_pattern_idx = 0;
-  if(!local) gather_dual_data(block_ptr, scale, primal_corner_coord.cast<float>(), data, dual_corner_coords_f);
-  else gather_dual_data(octree, block_ptr, scale, primal_corner_coord, data, dual_corner_coords_f);
+  if (!local)
+  {
+    gather_dual_data(block_ptr, scale, primal_corner_coord.cast<float>(), data, dual_corner_coords_f);
+  } else
+  {
+    gather_dual_data(octree, block_ptr, scale, primal_corner_coord, data, dual_corner_coords_f);
+  }
 
   // Only compute dual index if all data is valid/observed
-  for (int corner_idx = 0; corner_idx < 8; corner_idx++) {
-    if(!is_valid(data[corner_idx])) return;
+  for (int corner_idx = 0; corner_idx < 8; corner_idx++)
+  {
+    if (!is_valid(data[corner_idx]))
+    {
+      return;
+    }
   }
 
   // if(inside(data[0])) edge_pattern_idx |= 1;
@@ -723,8 +771,12 @@ void compute_dual_index(const OctreeT&                     octree,
   // if(inside(data[5])) edge_pattern_idx |= 32;
   // if(inside(data[6])) edge_pattern_idx |= 64;
   // if(inside(data[7])) edge_pattern_idx |= 128;
-  for (int corner_idx = 0; corner_idx < 8; corner_idx++) {
-    if(is_inside(data[corner_idx])) edge_pattern_idx |= (1 << corner_idx);
+  for (int corner_idx = 0; corner_idx < 8; corner_idx++)
+  {
+    if (is_inside(data[corner_idx]))
+    {
+      edge_pattern_idx |= (1 << corner_idx);
+    }
   }
   // std::cerr << std::endl << std::endl;
 
@@ -832,9 +884,12 @@ void dual_marching_cube_kernel(OctreeT&                                   octree
     const Eigen::Vector3i last_coord =
             (start_coord + Eigen::Vector3i::Constant(block_size)).cwiseMin(
                     Eigen::Vector3i::Constant(octree_size - 1));
-    for (int x = start_coord.x() + 1; x <= last_coord.x(); x += voxel_stride) {
-      for (int y = start_coord.y() + 1; y <= last_coord.y(); y += voxel_stride) {
-        for (int z = start_coord.z() + 1; z <= last_coord.z(); z += voxel_stride) {
+    for (int x = start_coord.x(); x <= last_coord.x(); x += voxel_stride)
+    {
+      for (int y = start_coord.y(); y <= last_coord.y(); y += voxel_stride)
+      {
+        for (int z = start_coord.z(); z <= last_coord.z(); z += voxel_stride)
+        {
           const Eigen::Vector3i primal_corner_coord = Eigen::Vector3i(x, y, z);
 
           if (x == last_coord.x() || y == last_coord.y() || z == last_coord.z())
@@ -852,7 +907,7 @@ void dual_marching_cube_kernel(OctreeT&                                   octree
           const int* edges = triTable[edge_pattern_idx];
           for (unsigned int e = 0; edges[e] != -1 && e < 16; e += 3)
           {
-            Eigen::Vector3f vertex_0 = interp_dual_vertexes(edges[e], data, dual_corner_coords_f);
+            Eigen::Vector3f vertex_0 = interp_dual_vertexes(edges[e],     data, dual_corner_coords_f);
             Eigen::Vector3f vertex_1 = interp_dual_vertexes(edges[e + 1], data, dual_corner_coords_f);
             Eigen::Vector3f vertex_2 = interp_dual_vertexes(edges[e + 2], data, dual_corner_coords_f);
 
