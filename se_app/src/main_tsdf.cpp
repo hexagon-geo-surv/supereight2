@@ -12,6 +12,10 @@
 #include "draw.h"
 #include "reader.hpp"
 
+#ifndef SE_RES
+#define SE_RES se::Res::Single
+#endif
+
 #define TRACK true //< Use ICP tracking or ground truth
 
 int main(int argc, char** argv)
@@ -32,7 +36,7 @@ int main(int argc, char** argv)
   data_config.truncation_boundary = 4 * map_res;
   data_config.max_weight          = 100;
 
-  se::TSDFMap<se::Res::Single> map_tsdf(map_dim, map_res, data_config);
+  se::TSDFMap<SE_RES> map(map_dim, map_res, data_config);
 
   // Setup input images
   Eigen::Vector2i input_img_res(640, 480);
@@ -90,10 +94,10 @@ int main(int argc, char** argv)
 
   se::TrackerConfig tracker_config;
   tracker_config.iterations = {10, 5, 4};
-  se::Tracker tracker(map_tsdf, sensor, tracker_config);
+  se::Tracker tracker(map, sensor, tracker_config);
 
   // Integrated depth at given pose
-  se::MapIntegrator integrator(map_tsdf);
+  se::MapIntegrator integrator(map);
 
   unsigned int frame = 0;
 
@@ -143,7 +147,7 @@ int main(int argc, char** argv)
     TOCK("integration")
 
     TICK("raycast")
-    se::raycaster::raycastVolume(map_tsdf, surface_point_cloud_M, surface_normals_M, surface_scale, T_MS, sensor);
+    se::raycaster::raycastVolume(map, surface_point_cloud_M, surface_normals_M, surface_scale, T_MS, sensor);
     TOCK("raycast")
 
     const Eigen::Vector3f ambient{ 0.1, 0.1, 0.1};
@@ -168,9 +172,9 @@ int main(int argc, char** argv)
 
     if (frame == 1 || frame % 100 == 0)
     {
-      map_tsdf.saveMesh(output_path + "/mesh", std::to_string(frame));
-//      map_tsdf.saveSlice(output_path + "/slice", se::math::to_translation(T_MS), std::to_string(frame));
-//      map_tsdf.saveStrucutre(output_path + "/struct", std::to_string(frame));
+      map.saveMesh(output_path + "/mesh", std::to_string(frame));
+//      map.saveSlice(output_path + "/slice", se::math::to_translation(T_MS), std::to_string(frame));
+//      map.saveStrucutre(output_path + "/struct", std::to_string(frame));
     }
 
     se::perfstats.writeToFilestream();
