@@ -49,8 +49,7 @@ std::vector<se::OctantBase*> frustum(const se::Image<depth_t>& depth_img,
  * \return The octant sample coordinates
  */
 static inline Eigen::Vector3f get_sample_coord(const Eigen::Vector3i& octant_coord,
-                                               const int              octant_size,
-                                               const Eigen::Vector3f& sample_offset_frac);
+                                               const int              octant_size);
 
 /**
  * TODO:
