@@ -34,21 +34,50 @@ inline se::OctantBase* block(const se::key_t voxel_key,
                              OctreeT&        octree,
                              se::OctantBase* base_parent_ptr);
 
+/**
+ * \brief Allocate Blocks at the provided voxel coordinates.
+ *
+ * \tparam OctreeT            The Octree template.
+ * \param[in] voxel_coord     The 3D coordinates of a voxel within each block.
+ * \param[in] octree          The octree to allocate the blocks in.
+ * \param[in] base_parent_ptr The starting node pointer. A nullptr will be replaced with the octree
+ *                            root.
+ * \param[in] only_allocated  Return pointers only for the newly allocated Blocks instead of all the
+ *                            Blocks corresponding to the coordinates in voxel_coord.
+ *
+ * \return Pointers to the allocated Octants.
+ */
 template <typename OctreeT>
 std::vector<se::OctantBase*> blocks(const std::vector<Eigen::Vector3i>& voxel_coord,
                                     OctreeT&                            octree,
-                                    se::OctantBase*                     base_parent_ptr);
+                                    se::OctantBase*                     base_parent_ptr,
+                                    const bool                          only_allocated = false);
 
+/**
+ * \brief Allocate Blocks at the provided voxel Morton codes.
+ *
+ * \tparam OctreeT            The Octree template.
+ * \param[in] voxel_keys      The Morton code of a voxel within each block.
+ * \param[in] octree          The octree to allocate the blocks in.
+ * \param[in] base_parent_ptr The starting node pointer. A nullptr will be replaced with the octree
+ *                            root.
+ * \param[in] only_allocated  Return pointers only for the newly allocated Blocks instead of all the
+ *                            Blocks corresponding to the Morton codes in voxel_keys.
+ *
+ * \return Pointers to the allocated Octants.
+ */
 template <typename OctreeT>
 std::vector<se::OctantBase*> blocks(std::vector<se::key_t>& voxel_keys,
                                     OctreeT&                octree,
-                                    se::OctantBase*         base_parent_ptr);
+                                    se::OctantBase*         base_parent_ptr,
+                                    const bool              only_allocated = false);
 
 namespace { // anonymous namespace
 template <typename OctreeT>
-inline se::OctantBase* allocate_key(const se::key_t key,
-                                    OctreeT&        octree,
-                                    se::OctantBase* base_parent_ptr);
+inline bool allocate_key(const se::key_t  key,
+                         OctreeT&         octree,
+                         se::OctantBase*  base_parent_ptr,
+                         se::OctantBase*& allocated_octant);
 } // anonymous namespace
 
 

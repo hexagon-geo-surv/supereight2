@@ -369,6 +369,41 @@ TEST(SingleResAllocation, BlockKeys)
     }
     EXPECT_EQ(nullptr, octant_ptr);
   }
+
+
+
+  // Test asking to allocate some allocated and some non-allocated Blocks.
+  // Add the coordinates of another voxel located in an unallocated Block.
+  const Eigen::Vector3i new_voxel (0, 0, 0);
+  voxel_coords.push_back(new_voxel);
+  // Sort the voxel coordinates to make later comparisons easier.
+  std::sort(voxel_coords.begin(), voxel_coords.end(), vector3i_less);
+
+  // Get the coordinates of the Block corresponding to the new voxel.
+  desired_block_coords.clear();
+  desired_block_coords.push_back(adapt_to_scale(new_voxel, octree_ptr->max_block_scale));
+
+  // Allocate the Blocks and return only the newly allocated Blocks.
+  block_ptrs = se::allocator::blocks(voxel_coords, *octree_ptr, octree_ptr->getRoot(), true);
+
+  // Get the coordinates of the returned Blocks and sort them.
+  std::vector<Eigen::Vector3i> actual_block_coords (block_ptrs.size());
+  std::transform(block_ptrs.begin(), block_ptrs.end(), actual_block_coords.begin(),
+      [](auto x){ return x->getCoord(); });
+  std::sort(actual_block_coords.begin(), actual_block_coords.end(), vector3i_less);
+
+  EXPECT_TRUE(std::equal(desired_block_coords.begin(), desired_block_coords.end(),
+        actual_block_coords.begin()));
+
+
+
+  // Test asking to allocate some already allocated Blocks.
+  // Only return newly allocated Blocks.
+  block_ptrs = se::allocator::blocks(voxel_coords, *octree_ptr, octree_ptr->getRoot(), true);
+  EXPECT_EQ(0u, block_ptrs.size());
+  // Return newly or already allocated Blocks.
+  block_ptrs = se::allocator::blocks(voxel_coords, *octree_ptr, octree_ptr->getRoot());
+  EXPECT_EQ(voxel_coords.size(), block_ptrs.size());
 }
 
 
