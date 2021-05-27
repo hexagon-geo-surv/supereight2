@@ -15,6 +15,9 @@ std::vector<se::OctantBase*> frustum(const se::Image<depth_t>& depth_img,
                                     MapT&                      map,
                                     const float                band)
 {
+  // Fetch the currently allocated Blocks in the sensor frustum.
+  std::vector<se::OctantBase*> blocks_in_frustum = fetcher::frustum(map, sensor, T_MS);
+
   auto octree_ptr = map.getOctree();
 
   const int num_steps = ceil(band / map.getRes());
@@ -57,10 +60,13 @@ std::vector<se::OctantBase*> frustum(const se::Image<depth_t>& depth_img,
     }
   }
 
+  // Allocate the Blocks and get pointers only to the newly-allocated Blocks.
   std::vector<key_t> voxel_keys(voxel_key_set.begin(), voxel_key_set.end());
+  std::vector<se::OctantBase*> fetched_block_ptrs = se::allocator::blocks(voxel_keys, *octree_ptr, octree_ptr->getRoot(), true);
 
-  std::vector<se::OctantBase*> fetched_block_ptrs = se::allocator::blocks(voxel_keys, *octree_ptr, octree_ptr->getRoot());
-
+  // Merge the previously-allocated and newly-allocated Block pointers.
+  fetched_block_ptrs.reserve(fetched_block_ptrs.size() + blocks_in_frustum.size());
+  fetched_block_ptrs.insert(fetched_block_ptrs.end(), blocks_in_frustum.begin(), blocks_in_frustum.end());
   return fetched_block_ptrs;
 }
 
