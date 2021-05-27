@@ -38,6 +38,28 @@ std::vector<se::OctantBase*> frustum(const se::Image<depth_t>& depth_img,
 
 
 
+namespace fetcher {
+  /**
+   * \brief Return the currently allocated Blocks that intersect the camera frustum.
+   * Some false positives might be returned since Blocks are approximated by their bounding spheres
+   * and because sphereInFrustum() may return false positives in rare cases.
+   *
+   * \tparam MapT    The map type.
+   * \tparam SensorT The sensor type.
+   * \param map      The map to fetch Blocks from.
+   * \param sensor   The sensor whose frustum is used for the test.
+   * \param T_MS     The pose of the sensor in the map frame.
+   *
+   * \return A vector of pointers to Blocks that intersect the sensor frustum.
+   */
+  template<typename MapT, typename SensorT>
+  inline std::vector<se::OctantBase*> frustum(MapT&                  map,
+                                              const SensorT&         sensor,
+                                              const Eigen::Matrix4f& T_MS);
+} // namespace fetcher
+
+
+
 /**
  * \brief compute the sample coordinates for a given octant coordinate
  *

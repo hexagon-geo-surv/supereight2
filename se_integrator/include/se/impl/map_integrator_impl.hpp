@@ -1,8 +1,6 @@
 #ifndef SE_MAP_INTEGRATOR_IMPL_HPP
 #define SE_MAP_INTEGRATOR_IMPL_HPP
 
-
-
 #include "se/octree/propagator.hpp"
 
 
@@ -67,6 +65,38 @@ std::vector<se::OctantBase*> frustum(const se::Image<depth_t>& depth_img,
 }
 
 } // namespace allocator
+
+
+
+namespace fetcher {
+  template<typename MapT, typename SensorT>
+  inline std::vector<se::OctantBase*> frustum(MapT&                  map,
+                                              const SensorT&         sensor,
+                                              const Eigen::Matrix4f& T_MS)
+  {
+    const Eigen::Matrix4f T_SM = se::math::to_inverse_transformation(T_MS);
+    // The edge lengh of Blocks in voxels.
+    constexpr int block_size = MapT::OctreeType::BlockType::getSize();
+    // The radius of Blocks in metres.
+    const float block_radius = std::sqrt(3.0f) / 2.0f * map.getRes() * block_size ;
+    // Loop over all allocated Blocks.
+    std::vector<se::OctantBase*> block_ptrs;
+    for (auto block_ptr_itr = BlocksIterator<typename MapT::OctreeType>(map.getOctree().get());
+        block_ptr_itr != BlocksIterator<typename MapT::OctreeType>(); ++block_ptr_itr) {
+      auto& block = **block_ptr_itr;
+      // Get the centre of the Block in the map frame.
+      Eigen::Vector3f block_centre_point_M;
+      map.voxelToPoint(block.getCoord(), block_size, block_centre_point_M);
+      // Convert it to the sensor frame.
+      const Eigen::Vector3f block_centre_point_S
+          = (T_SM * block_centre_point_M.homogeneous()).head<3>();
+      if (sensor.sphereInFrustum(block_centre_point_S, block_radius)) {
+        block_ptrs.push_back(&block);
+      }
+    }
+    return block_ptrs;
+  }
+} // namespace fetcher
 
 
 
