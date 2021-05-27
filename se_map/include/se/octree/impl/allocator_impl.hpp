@@ -70,7 +70,10 @@ inline std::vector<se::OctantBase*> blocks(std::vector<se::key_t>& unique_voxel_
 {
   assert(base_parent_ptr); // Verify parent ptr
 
-  // Allocate nodes up to block_scale
+  // Allocate Nodes up to block_scale. It is important that the Nodes are allocated here and not
+  // during the Block allocation below. Since Block allocation happens in parallel, it is possible
+  // for two Blocks to allocate the same parent twice. Doing the allocation scale-by-scale here
+  // prevents this problem.
   for (scale_t scale = octree.getMaxScale(); scale > octree.max_block_scale; scale--)
   {
     std::vector<se::key_t> unique_voxel_keys_at_scale;
