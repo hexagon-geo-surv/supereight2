@@ -345,4 +345,12 @@ void se::PinholeCamera::computeFrustumNormals()
   frustum_normals_.col(4) = Eigen::Vector4f(0.f, 0.f, 1.f, -near_plane);
   // Far plane vector.
   frustum_normals_.col(5) = Eigen::Vector4f(0.f, 0.f, -1.f, far_plane);
+  // The directions of all normal vectors must be multiplied with sign(fx * fy) to account for
+  // negative focal lengths. The near and far plane normals are already set with the correct
+  // direction.
+  float sign = model.focalLengthU() * model.focalLengthV();
+  sign = sign / fabsf(sign);
+  for (int i = 0; i < num_frustum_normals_ - 2; i++) {
+    frustum_normals_.col(i).head<3>() *= sign;
+  }
 }
