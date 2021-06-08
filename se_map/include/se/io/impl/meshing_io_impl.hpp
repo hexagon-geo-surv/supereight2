@@ -24,6 +24,7 @@ int save_mesh_vtk(const std::vector<Triangle>& mesh,
 
   std::stringstream ss_points_W;
   std::stringstream ss_polygons;
+  std::stringstream ss_scale_colors;
   std::stringstream ss_point_data;
   std::stringstream ss_cell_data;
   int point_count = 0;
@@ -52,6 +53,10 @@ int save_mesh_vtk(const std::vector<Triangle>& mesh,
 
     ss_polygons << "3 " << point_count << " " << point_count+1 <<
                 " " << point_count+2 << std::endl;
+
+    // Colour the triangle depending on its scale.
+    const Eigen::Vector3f RGB = se::colours::scale[triangle_M.max_vertex_scale] / 255.0f;
+    ss_scale_colors << RGB[0] << " " << RGB[1] << " " << RGB[2] << " 1\n";
 
     if(has_point_data){
       ss_point_data << point_data[i*3] << std::endl;
@@ -84,8 +89,10 @@ int save_mesh_vtk(const std::vector<Triangle>& mesh,
     file << ss_point_data.str();
   }
 
+  file << "CELL_DATA " << triangle_count << std::endl;
+  file << "COLOR_SCALARS RGBA 4" << std::endl;
+  file << ss_scale_colors.str() << std::endl;
   if(has_cell_data){
-    file << "CELL_DATA " << triangle_count << std::endl;
     file << "SCALARS cell_scalars float 1" << std::endl;
     file << "LOOKUP_TABLE default" << std::endl;
     file << ss_cell_data.str();
@@ -128,6 +135,9 @@ int save_mesh_ply(const std::vector<Triangle>& mesh,
   }
   file << "element face " << num_faces << "\n";
   file << "property list uchar int vertex_index\n";
+  file << "property uchar red\n";
+  file << "property uchar green\n";
+  file << "property uchar blue\n";
   if (has_cell_data) {
     file << "property float face_value\n";
   }
@@ -150,7 +160,11 @@ int save_mesh_ply(const std::vector<Triangle>& mesh,
 
   // Write faces and face data
   for (size_t i = 0; i < num_faces; ++i ) {
+    const Triangle& triangle_M = mesh[i];
     file << "3 " << 3*i << " " << 3*i + 1 << " " << 3*i + 2;
+    // Write the triangle scale colour.
+    const Eigen::Vector3i RGB = se::colours::scale[triangle_M.max_vertex_scale].cast<int>();
+    file << " " << RGB[0] << " " << RGB[1] << " " << RGB[2];
     if (has_cell_data) {
       file << " " << cell_data[i] << "\n";
     } else {

@@ -48,6 +48,7 @@ typedef struct Triangle {
     Eigen::Vector3f normal;
     float color;
     float surface_area;
+    int8_t max_vertex_scale;
 
     Triangle(){
       vertexes[0] = Eigen::Vector3f::Constant(0);
@@ -55,6 +56,7 @@ typedef struct Triangle {
       vertexes[2] = Eigen::Vector3f::Constant(0);
       normal = Eigen::Vector3f::Constant(0);
       surface_area = -1.f;
+      max_vertex_scale = 0;
     }
 
     inline bool iszero(const Eigen::Vector3f& v)
