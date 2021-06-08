@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2019-2020 Sotiris Papatheodorou, Imperial College London
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include "se/image_utils.hpp"
+#include "se/utils/image_utils.hpp"
 
 #include <cstdlib>
 #include <fstream>

@@ -17,7 +17,7 @@
 
 #include "lodepng.h"
 
-#include "se/image_utils.hpp"
+#include "se/utils/image_utils.hpp"
 #include "filesystem.hpp"
 
 

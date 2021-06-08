@@ -7,9 +7,9 @@
 #include <cmath>
 
 #include <Eigen/Dense>
-#include "se/image_utils.hpp"
 #include "se/image/image.hpp"
 #include "se/projection.hpp"
+#include "se/utils/image_utils.hpp"
 #include "se/utils/math_util.hpp"
 
 

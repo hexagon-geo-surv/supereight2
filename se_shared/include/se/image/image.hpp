@@ -1,7 +1,7 @@
 #ifndef SE_IMAGE_HPP
 #define SE_IMAGE_HPP
 
-#include "se/image_utils.hpp"
+#include "se/utils/image_utils.hpp"
 
 #include <vector>
 #include <cassert>

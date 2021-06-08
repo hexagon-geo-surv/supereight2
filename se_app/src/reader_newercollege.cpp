@@ -14,7 +14,7 @@
 #include <iostream>
 #include <regex>
 
-#include "se/image_utils.hpp"
+#include "se/utils/image_utils.hpp"
 #include "filesystem.hpp"
 
 
