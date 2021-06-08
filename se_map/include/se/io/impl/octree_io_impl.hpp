@@ -21,8 +21,7 @@ int save_3d_slice_vtk(const OctreeT&         octree,
 
   auto get_value = [&](int x, int y, int z)
   {
-      typename OctreeT::DataType data;
-      se::visitor::getData(octree, Eigen::Vector3i(x, y, z), data);
+      typename OctreeT::DataType data = se::visitor::getData(octree, Eigen::Vector3i(x, y, z));
       return data.tsdf;
   };
 

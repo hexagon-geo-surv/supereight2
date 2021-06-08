@@ -150,7 +150,7 @@ int main(int argc, char** argv)
     if (config.app.enable_meshing && (frame % config.app.meshing_rate == 0)) {
       map.saveMesh(config.app.mesh_output_dir + "/mesh", std::to_string(frame));
       if (config.app.enable_slice_meshing) {
-        //map.saveSlice(config.app.mesh_output_dir + "/slice", se::math::to_translation(T_MS), std::to_string(frame));
+        map.saveSlice(config.app.mesh_output_dir + "/slice", se::math::to_translation(T_MS), std::to_string(frame));
       }
       if (config.app.enable_structure_meshing) {
         map.saveStrucutre(config.app.mesh_output_dir + "/struct", std::to_string(frame));
