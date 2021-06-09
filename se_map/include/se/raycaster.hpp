@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include "se/image/image.hpp"
+#include "se/utils/colour_utils.hpp"
 #include "se/timings.hpp"
 #include "se/octree/voxel_block_ray_iterator.hpp"
 
@@ -15,19 +16,6 @@
 
 namespace se {
 namespace raycaster {
-
-static std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>
-color_map =
-{
-        {102, 194, 165},
-        {252, 141, 98},
-        {141, 160, 203},
-        {231, 138, 195},
-        {166, 216, 84},
-        {255, 217, 47},
-        {229, 196, 148},
-        {179, 179, 179},
-};
 
 void point_cloud_to_normal(se::Image<Eigen::Vector3f>&       normals,
                            const se::Image<Eigen::Vector3f>& point_cloud,

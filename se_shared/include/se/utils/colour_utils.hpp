@@ -6,12 +6,28 @@
 #define SE_COLOUR_UTILS_HPP
 
 #include <cstdint>
+#include <vector>
 
 #include <Eigen/Dense>
 
 
 
 namespace se {
+  namespace colours {
+    /**
+     * The colours used for the various integration scales.
+     */
+    static const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> scale = {
+      {102, 194, 165},
+      {252, 141,  98},
+      {141, 160, 203},
+      {231, 138, 195},
+      {166, 216,  84},
+      {255, 217,  47},
+      {229, 196, 148},
+      {179, 179, 179}};
+  } // namespace colours
+
   /**
    * Pack the individual RGBA channels into a single 32-bit unsigned integer.
    *
