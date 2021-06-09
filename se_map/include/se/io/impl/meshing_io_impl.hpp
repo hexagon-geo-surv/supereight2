@@ -22,80 +22,64 @@ int save_mesh_vtk(const std::vector<Triangle>& mesh,
     return 1;
   }
 
-  std::stringstream ss_points_W;
-  std::stringstream ss_polygons;
-  std::stringstream ss_scale_colors;
-  std::stringstream ss_point_data;
-  std::stringstream ss_cell_data;
-  int point_count = 0;
-  int triangle_count = 0;
-  bool has_point_data = point_data != nullptr;
-  bool has_cell_data = cell_data != nullptr;
+  const bool has_point_data = point_data != nullptr;
+  const bool has_cell_data = cell_data != nullptr;
+  const size_t num_faces = mesh.size();
+  const size_t num_vertices = 3 * num_faces;
 
-  for(unsigned int i = 0; i < mesh.size(); ++i ){
+  // Write the header.
+  file << "# vtk DataFile Version 1.0\n";
+  file << "vtk mesh generated from supereight 2\n";
+  file << "ASCII\n";
+  file << "DATASET POLYDATA\n";
+
+  // Write the vertices.
+  file << "POINTS " << num_vertices << " FLOAT\n";
+  for (size_t i = 0; i < num_faces; ++i ) {
     const Triangle& triangle_M = mesh[i];
+    const Eigen::Vector3f vertex_0_W = (T_WM * triangle_M.vertexes[0].homogeneous()).head(3);
+    const Eigen::Vector3f vertex_1_W = (T_WM * triangle_M.vertexes[1].homogeneous()).head(3);
+    const Eigen::Vector3f vertex_2_W = (T_WM * triangle_M.vertexes[2].homogeneous()).head(3);
+    file << vertex_0_W.x() << " " << vertex_0_W.y() << " " << vertex_0_W.z() << "\n";
+    file << vertex_1_W.x() << " " << vertex_1_W.y() << " " << vertex_1_W.z() << "\n";
+    file << vertex_2_W.x() << " " << vertex_2_W.y() << " " << vertex_2_W.z() << "\n";
+  }
 
-    Eigen::Vector3f vertex_0_W = (T_WM * triangle_M.vertexes[0].homogeneous()).head(3);
-    Eigen::Vector3f vertex_1_W = (T_WM * triangle_M.vertexes[1].homogeneous()).head(3);
-    Eigen::Vector3f vertex_2_W = (T_WM * triangle_M.vertexes[2].homogeneous()).head(3);
+  // Write the faces.
+  file << "POLYGONS " << num_faces << " " << num_faces * 4 << "\n";
+  for (size_t i = 0; i < num_faces; ++i ) {
+    file << "3 " << 3*i << " " << 3*i + 1 << " " << 3*i + 2 << "\n";
+  }
 
-    ss_points_W << vertex_0_W.x() << " "
-                << vertex_0_W.y() << " "
-                << vertex_0_W.z() << std::endl;
+  // Write the vertex data.
+  if (has_point_data) {
+    file << "POINT_DATA " << num_vertices << "\n";
+    file << "SCALARS vertex_scalars float 1\n";
+    file << "LOOKUP_TABLE default\n";
+    for (size_t i = 0; i < num_faces; ++i ) {
+      file << point_data[i*3] << "\n";
+      file << point_data[i*3 + 1] << "\n";
+      file << point_data[i*3 + 2] << "\n";
+    }
+  }
 
-    ss_points_W << vertex_1_W.x() << " "
-                << vertex_1_W.y() << " "
-                << vertex_1_W.z() << std::endl;
-
-    ss_points_W << vertex_2_W.x() << " "
-                << vertex_2_W.y() << " "
-                << vertex_2_W.z() << std::endl;
-
-    ss_polygons << "3 " << point_count << " " << point_count+1 <<
-                " " << point_count+2 << std::endl;
-
+  // Write the face scale colours.
+  file << "CELL_DATA " << num_faces << "\n";
+  file << "COLOR_SCALARS RGBA 4\n";
+  for (size_t i = 0; i < num_faces; ++i ) {
+    const Triangle& triangle_M = mesh[i];
     // Colour the triangle depending on its scale.
     const Eigen::Vector3f RGB = se::colours::scale[triangle_M.max_vertex_scale] / 255.0f;
-    ss_scale_colors << RGB[0] << " " << RGB[1] << " " << RGB[2] << " 1\n";
-
-    if(has_point_data){
-      ss_point_data << point_data[i*3] << std::endl;
-      ss_point_data << point_data[i*3 + 1] << std::endl;
-      ss_point_data << point_data[i*3 + 2] << std::endl;
-    }
-
-    if(has_cell_data){
-      ss_cell_data << cell_data[i] << std::endl;
-    }
-
-    point_count +=3;
-    triangle_count++;
+    file << RGB[0] << " " << RGB[1] << " " << RGB[2] << " 1\n";
   }
 
-  file << "# vtk DataFile Version 1.0" << std::endl;
-  file << "vtk mesh generated from KFusion" << std::endl;
-  file << "ASCII" << std::endl;
-  file << "DATASET POLYDATA" << std::endl;
-
-  file << "POINTS " << point_count << " FLOAT" << std::endl;
-  file << ss_points_W.str();
-
-  file << "POLYGONS " << triangle_count << " " << triangle_count * 4 << std::endl;
-  file << ss_polygons.str() << std::endl;
-  if(has_point_data){
-    file << "POINT_DATA " << point_count << std::endl;
-    file << "SCALARS vertex_scalars float 1" << std::endl;
-    file << "LOOKUP_TABLE default" << std::endl;
-    file << ss_point_data.str();
-  }
-
-  file << "CELL_DATA " << triangle_count << std::endl;
-  file << "COLOR_SCALARS RGBA 4" << std::endl;
-  file << ss_scale_colors.str() << std::endl;
+  // Write the face data.
   if(has_cell_data){
-    file << "SCALARS cell_scalars float 1" << std::endl;
-    file << "LOOKUP_TABLE default" << std::endl;
-    file << ss_cell_data.str();
+    file << "SCALARS cell_scalars float 1\n";
+    file << "LOOKUP_TABLE default\n";
+    for (size_t i = 0; i < num_faces; ++i ) {
+      file << cell_data[i] << "\n";
+    }
   }
 
   file.close();
