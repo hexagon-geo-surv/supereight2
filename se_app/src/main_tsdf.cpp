@@ -21,7 +21,7 @@
 int main(int argc, char** argv)
 {
   // Read the configuration
-  const std::string config_filename = (argc >= 2) ? argv[1] : "/home/nils/workspace_/projects/supereight-2-srl/datasets/icl_nuim/traj_2/config.yaml";
+  const std::string config_filename = (argc >= 2) ? argv[1] : "PATH/TO/config.yaml";
   const se::Config<se::TSDFDataConfig> config (config_filename);
   std::cout << config;
 
