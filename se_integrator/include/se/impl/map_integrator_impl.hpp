@@ -412,11 +412,12 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi>::integrate(const se::I
           if (sdf_value > -truncation_boundary)
           {
             const float tsdf_value = std::min(1.f, sdf_value / truncation_boundary);
-            typename MapT::DataType data = block_ptr->getData(voxel_coord);
-            data.tsdf = (data.tsdf * data.weight + tsdf_value) / (data.weight + 1.f);
-            data.tsdf = se::math::clamp(data.tsdf, -1.f, 1.f);
-            data.weight = std::min(data.weight + 1, max_weight);
-            block_ptr->setData(voxel_coord, data);
+            typename MapT::OctreeType::BlockType::DataUnion data_union = block_ptr->getDataUnion(voxel_coord, block_ptr->getCurrentScale());
+            data_union.data.tsdf   = (data_union.data.tsdf * data_union.data.weight + tsdf_value) / (data_union.data.weight + 1.f);
+            data_union.data.tsdf   = se::math::clamp(data_union.data.tsdf, -1.f, 1.f);
+            data_union.data.weight = std::min(data_union.data.weight + 1, max_weight);
+            data_union.prop_data.delta_weight++;
+            block_ptr->setDataUnion(data_union);
           }
 
         } // k

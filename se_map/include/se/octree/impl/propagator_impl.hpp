@@ -50,6 +50,7 @@ void propagateBlockUp(const OctreeT&  /* octree */,
 
           size_t sample_count = 0;
           DataType data_tmp;
+          data_tmp.tsdf = 0.f;
 
           for (int k = 0; k < parent_stride; k += child_stride)
           {
@@ -121,7 +122,11 @@ void propagateBlockDown(const OctreeT&  octree,
               {
                 const Eigen::Vector3i child_coord = parent_coord + Eigen::Vector3i(i, j, k);
                 DataUnionType child_data_union = block_ptr->getDataUnion(child_coord, child_scale);
-                child_funct(octree, block_ptr, child_data_union, parent_data_union);
+
+                if (child_funct(octree, block_ptr, child_data_union, parent_data_union))
+                {
+                  block_ptr->setDataUnion(child_data_union);
+                }
               } // i
             } // j
           } // k
