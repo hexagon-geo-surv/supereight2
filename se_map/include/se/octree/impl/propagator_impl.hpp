@@ -123,10 +123,8 @@ void propagateBlockDown(const OctreeT&  octree,
                 const Eigen::Vector3i child_coord = parent_coord + Eigen::Vector3i(i, j, k);
                 DataUnionType child_data_union = block_ptr->getDataUnion(child_coord, child_scale);
 
-                if (child_funct(octree, block_ptr, child_data_union, parent_data_union))
-                {
-                  block_ptr->setDataUnion(child_data_union);
-                }
+                child_funct(octree, block_ptr, child_data_union, parent_data_union);
+                block_ptr->setDataUnion(child_data_union);
               } // i
             } // j
           } // k
