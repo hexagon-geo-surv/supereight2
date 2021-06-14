@@ -1,0 +1,50 @@
+%YAML:1.2
+map:
+  dim:    [10, 10, 10]
+  res:    0.01
+
+data:
+  truncation_boundary_factor: 16
+  max_weight:                 100
+
+sensor:
+  width:      640
+  height:     480
+  fx:         481.2
+  fy:         -480.0
+  cx:         319.5
+  cy:         239.5
+  near_plane: 0.4
+  far_plane:  6.0
+
+tracker:
+  iterations:       [10, 5, 4]
+  dist_threshold:   0.1
+  normal_threshold: 0.8
+  track_threshold:  0.15
+  icp_threshold:    0.00001
+
+reader:
+  reader_type:       "raw"
+  sequence_path:     "scene.raw"
+  ground_truth_file: "association.txt"
+  fps:               0.0
+  drop_frames:       false
+  verbose:           0
+
+app:
+  enable_ground_truth:        true
+  enable_rendering:           true
+  enable_gui:                 true
+  enable_meshing:             false
+  enable_slice_meshing:       false
+  enable_structure_meshing:   false
+  mesh_output_dir:            "meshes"
+  sensor_downsampling_factor: 4
+  tracking_rate:              1
+  integration_rate:           1
+  rendering_rate:             4
+  meshing_rate:               100
+  max_frames:                 400
+  log_file:                   "supereight.log"
+
