@@ -671,7 +671,7 @@ inline void gather_dual_data(const OctreeT&                     octree,
       return;
     }
     typename OctreeT::BlockType* block_neighbour_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(logical_dual_corner_coord, octree, octree.getRoot()));
-    if (block_neighbour_ptr == nullptr || block_ptr->getCurrentScale() <= scale)
+    if (block_neighbour_ptr == nullptr || block_neighbour_ptr->getCurrentScale() <= scale)
     {
       set_invalid(data_arr[0]);
       return;
@@ -686,7 +686,7 @@ inline void gather_dual_data(const OctreeT&                     octree,
       return;
     }
     typename OctreeT::BlockType* block_neighbour_ptr = static_cast<typename OctreeT::BlockType*>(se::fetcher::block(logical_dual_corner_coord, octree, octree.getRoot()));
-    if (block_neighbour_ptr == nullptr || block_ptr->getCurrentScale() < scale)
+    if (block_neighbour_ptr == nullptr || block_neighbour_ptr->getCurrentScale() < scale)
     {
       set_invalid(data_arr[0]);
       return;
