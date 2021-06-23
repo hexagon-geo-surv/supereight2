@@ -2,150 +2,254 @@
 #define SE_VISITOR_HPP
 
 /**
- * Helper wrapper to traverse the octree. All functions take a const octree and as no manipulation of the octree is done.
+ * Helper wrapper to traverse the octree. All functions take a const octree references and as no manipulation of the octree is done.
  */
 namespace se {
 namespace visitor {
 
-/// Single-res get data functions
+
+
+/// Single/multi-res get data functions
 
 /**
  * \brief Get the voxel data for a given coordinate.
- *        The function returns false and invalid data if the data is not allocated.
+ *        The function returns init data if the data is not allocated.
  *
- * \tparam OctreeT          The type of the octree used
- * \param[in]  octree_ptr   The pointer to the octree
- * \param[in]  voxel_coord  The voxel coordinates to be accessed
+ * \tparam OctreeT        The type of the octree used
+ * \param[in] octree      The reference to the octree
+ * \param[in] voxel_coord The voxel coordinates to be accessed
  *
  * \return The data in the voxel to be accessed
  *         Returns init data if block is not allocated
  */
 template <typename OctreeT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, typename OctreeT::DataType>
-getData(const OctreeT&         octree,
-        const Eigen::Vector3i& voxel_coord);
+inline typename OctreeT::DataType getData(const OctreeT&         octree,
+                                          const Eigen::Vector3i& voxel_coord);
 
+/**
+ * \brief Get the voxel data for a given coordinate.
+ *        The function checks first if the voxel coordinates are contained in the provided block pointer.
+ *        If this is not the case the function fetches the correct block.
+ *        The function returns init data if the data is not allocated.
+ *
+ * \tparam OctreeT        The type of the octree used
+ * \param[in] octree      The reference to the octree
+ * \param[in] block_ptr   The pointer to the block to checked first
+ * \param[in] voxel_coord The voxel coordinates to be accessed
+ *
+ * \return The data in the voxel to be accessed
+ *         Returns init data if block is not allocated
+ */
 template <typename OctreeT,
           typename BlockT
 >
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, typename OctreeT::DataType>
-getData(const OctreeT&              octree,
-        BlockT*                     block_ptr,
-        const Eigen::Vector3i&      voxel_coord);
+inline typename OctreeT::DataType getData(const OctreeT&         octree,
+                                          BlockT*                block_ptr,
+                                          const Eigen::Vector3i& voxel_coord);
+
+
 
 /// Multi-res get data functions
 
+/**
+ * \brief Get the voxel data for a given coordinate and desired scale.
+ *        The function returns init data if the data is not allocated.
+ *
+ * \tparam OctreeT           The type of the octree used
+ * \param[in] octree_ptr     The pointer to the octree
+ * \param[in] voxel_coord    The voxel coordinates to be accessed
+ * \param[in] scale_desired  The scale to fetch the data from (init data for MultiresTSDF at node level)
+ * \param[in] scale_returned The scale the data is returned from (max (scale desired, finest scale with valid data)
+ *
+ * \return The data in octant at the returned scale
+ */
 template <typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, typename OctreeT::DataType>
-getData(const OctreeT&         octree,
-        const Eigen::Vector3i& voxel_coord);
+getData(const OctreeT&              octree,
+        const Eigen::Vector3i&      voxel_coord,
+        const int                   scale_desired,
+        int&                        scale_returned);
 
+/**
+ * \brief Get the voxel data for a given coordinate and desired scale.
+ *        The function checks first if the voxel coordinates are contained in the provided block pointer.
+ *        If this is not the case the function fetches the correct block.
+ *        The function returns init data if the data is not allocated.
+ *
+ * \tparam OctreeT           The type of the octree used
+ * \param[in] octree         The reference to the octree
+ * \param[in] block_ptr      The pointer to the block to checked first
+ * \param[in] voxel_coord    The voxel coordinates to be accessed
+ * \param[in] scale_desired  The scale to fetch the data from (init data for MultiresTSDF at node level)
+ * \param[in] scale_returned The scale the data is returned from (max (scale desired, finest scale with valid data)
+ *
+ * \return The data in octant at the returned scale
+ */
 template <typename OctreeT,
           typename BlockT
 >
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, typename OctreeT::DataType>
 getData(const OctreeT&              octree,
         BlockT*                     block_ptr,
-        const Eigen::Vector3i&      voxel_coord);
-
-template <typename OctreeT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, typename OctreeT::DataType&>
-getData(const OctreeT&              octree,
-        const Eigen::Vector3i&      voxel_coord,
-        const int                   scale_desired,
-        int&                        scale_returned);
-
-template <typename OctreeT,
-          typename BlockT
->
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, typename OctreeT::DataType&>
-getData(const OctreeT&              octree,
-        BlockT*                     block_ptr,
         const Eigen::Vector3i&      voxel_coord,
         const int                   scale_desired,
         int&                        scale_returned);
 
 
+// TODO: Reduce getField functions for single and multi-res to one
 
-/// Single-res get field functions
+/// Single/Multi-res get field functions
 
 /**
  * \brief Get the field value for a given coordinate.
- *        The function returns false and invalid data if the data is not allocated.
+ *        The function returns {}/invalid if the data is invalid.
  *
- * \tparam OctreeT         The type of the octree used
- * \param[in] octree_ptr   The pointer to the octree
- * \param[in] voxel_coord  The voxel coordinates to be accessed
+ * \tparam OctreeT        The type of the octree used
+ * \param[in] octree      The reference to the octree
+ * \param[in] voxel_coord The voxel coordinates to be accessed
  *
- * \return The field value to be accessed
+ * \return The field value to be accessed if the data is valid, {}/invalid otherwise
  */
 template <typename OctreeT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, std::optional<se::field_t>>
-getField(const OctreeT&         octree,
-         const Eigen::Vector3i& voxel_coord);
+inline std::optional<se::field_t> getField(const OctreeT&         octree,
+                                           const Eigen::Vector3i& voxel_coord);
 
+/**
+ * \brief Get the field value for a given coordinate.
+ *        The function returns {}/invalid if the data is invalid.
+ *        The function checks first if the voxel coordinates are contained in the provided block pointer.
+ *        If this is not the case the function fetches the correct octant.
+ *
+ * \tparam OctreeT        The type of the octree used
+ * \param[in] octree      The reference to the octree
+ * \param[in] block_ptr   The pointer to the block to checked first
+ * \param[in] voxel_coord The voxel coordinates to be accessed
+ *
+ * \return The field value to be accessed if the data is valid, {}/invalid otherwise
+ */
 template <typename OctreeT, typename BlockT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, std::optional<se::field_t>>
-getField(const OctreeT&         octree,
-         BlockT*                block_ptr,
-         const Eigen::Vector3i& voxel_coord);
+inline std::optional<se::field_t> getField(const OctreeT&         octree,
+                                           BlockT*                block_ptr,
+                                           const Eigen::Vector3i& voxel_coord);
 
 
 
 /// Multi-res get field functions
 
 /**
- * \brief Get the field value for a given coordinate.
- *        The function returns false and invalid data if the data is not allocated.
+ * \brief Get the field value for a given coordinate and desired scale.
+ *        The function returns {}/invalid if the data is invalid.
  *
- * \tparam OctreeT         The type of the octree used
- * \param[in] octree_ptr   The pointer to the octree
- * \param[in] voxel_coord  The voxel coordinates to be accessed
+ * \tparam OctreeT           The type of the octree used
+ * \param[in] octree         The reference to the octree
+ * \param[in] voxel_coord    The voxel coordinates to be accessed
+ * \param[in] scale_desired  The scale to fetch the data from (init data for MultiresTSDF at node level)
+ * \param[in] scale_returned The scale the field value is returned from (max (scale desired, finest scale with valid data)
  *
- * \return The field value to be accessed
+ * \return The field value at the returned scale if the data is valid, {}/invalid otherwise
  */
 template <typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
 getField(const OctreeT&         octree,
-         const Eigen::Vector3i& voxel_coord);
-
-template <typename OctreeT, typename BlockT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
-getField(const OctreeT&         octree,
-         BlockT*                block_ptr,
-         const Eigen::Vector3i& voxel_coord);
-
-template <typename OctreeT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
-getField(const OctreeT&         octree,
-         const Eigen::Vector3i& voxel_coord,
-         const int              scale_desired,
-         int&                   scale_returned);
-
-template <typename OctreeT, typename BlockT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
-getField(const OctreeT&         octree,
-         BlockT*                block_ptr,
          const Eigen::Vector3i& voxel_coord,
          const int              scale_desired,
          int&                   scale_returned);
 
 /**
+ * \brief Get the field value for a given coordinate and desired scale.
+ *        The function returns {}/invalid if the data is invalid.
+ *        The function checks first if the voxel coordinates are contained in the provided block pointer.
+ *        If this is not the case the function fetches the correct octant.
+ *
+ * \tparam OctreeT           The type of the octree used
+ * \param[in] octree         The reference to the octree
+ * \param[in] block_ptr      The pointer to the block to checked first
+ * \param[in] voxel_coord    The voxel coordinates to be accessed
+ * \param[in] scale_desired  The scale to fetch the data from (init data for MultiresTSDF at node level)
+ * \param[in] scale_returned The scale the field value is returned from (max (scale desired, finest scale with valid data)
+ *
+ * \return The field value at the returned scale if the data is valid, {}/invalid otherwise
+ */
+template <typename OctreeT,
+          typename BlockT
+>
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
+getField(const OctreeT&         octree,
+         BlockT*                block_ptr,
+         const Eigen::Vector3i& voxel_coord,
+         const int              scale_desired,
+         int&                   scale_returned);
+
+
+
+/// Single-res get field interpolation functions
+
+/**
  * \brief Get the interplated field value for a given coordinate [float voxel coordinates].
- *        The function returns false and invalid data if the data is not allocated.
+ *        The function returns {}/invalid if the data is invalid.
  *
- * \tparam OctreeT                The type of the octree used
- * \param[in] octree_ptr          The pointer to the octree
- * \param[in] voxel_coord_f       The voxel coordinates to be accessed [float voxel coordiantes]
- * \param[in] interp_field_value  The interplated field value to be accessed
+ * \tparam OctreeT          The type of the octree used
+ * \param[in] octree_ptr    The pointer to the octree
+ * \param[in] voxel_coord_f The voxel coordinates to be accessed [float voxel coordiantes]
  *
- * \return True if the field value is available, False otherwise
+ * \return The interpolated field value if the data is valid, {}/invalid otherwise
  */
 template <typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, std::optional<se::field_t>>
 getFieldInterp(const OctreeT&         octree,
                const Eigen::Vector3f& voxel_coord_f);
 
+
+
+/// Multi-res get field interpolation functions
+
+/**
+ * \brief Get the interplated field value for a given coordinate [float voxel coordinates].
+ *        The value is interpolated at the finest common scale.
+ *        The function returns {}/invalid if the data is invalid.
+ *
+ * \tparam OctreeT          The type of the octree used
+ * \param[in] octree_ptr    The pointer to the octree
+ * \param[in] voxel_coord_f The voxel coordinates to be accessed [float voxel coordiantes]
+ *
+ * \return The interpolated field value if the data is valid, {}/invalid otherwise
+ */
+template <typename OctreeT>
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
+getFieldInterp(const OctreeT&         octree,
+               const Eigen::Vector3f& voxel_coord_f);
+
+/**
+ * \brief Get the interplated field value for a given coordinate [float voxel coordinates].
+ *        The value is interpolated at the finest common scale (scale_returned).
+ *        The function returns {}/invalid if the data is invalid.
+ *
+ * \tparam OctreeT           The type of the octree used
+ * \param[in] octree         The reference to the octree
+ * \param[in] voxel_coord_f  The voxel coordinates to be accessed [float voxel coordiantes]
+ * \param[in] scale_returned The scale the field value has been interpolated at
+ *
+ * \return The interpolated field value at the returned scale if the data is valid, {}/invalid otherwise
+ */
+template <typename OctreeT>
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
+getFieldInterp(const OctreeT&         octree,
+               const Eigen::Vector3f& voxel_coord_f,
+               int&                   scale_returned);
+
+/**
+ * \brief Get the interplated field value for a given coordinate [float voxel coordinates] and desired scale.
+ *        The value is interpolated at the finest common scale (scale_returned).
+ *        The function returns {}/invalid if the data is invalid.
+ *
+ * \tparam OctreeT           The type of the octree used
+ * \param[in] octree         The reference to the octree
+ * \param[in] voxel_coord_f  The voxel coordinates to be accessed [float voxel coordiantes]
+ * \param[in] scale_desired  The finest scale to interpolate the data at
+ * \param[in] scale_returned The scale the field value has been interpolated at (max (scale desired, finest common neighbour scale)
+ *
+ * \return The interpolated field value at the returned scale if the data is valid, {}/invalid otherwise
+ */
 template <typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
 getFieldInterp(const OctreeT&         octree,
@@ -154,67 +258,71 @@ getFieldInterp(const OctreeT&         octree,
                int&                   scale_returned);
 
 
-template <typename OctreeT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
-getFieldInterp(const OctreeT&         octree,
-               const Eigen::Vector3f& voxel_coord_f,
-               int&                   scale_returned);
 
-template <typename OctreeT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
-getFieldInterp(const OctreeT&         octree,
-               const Eigen::Vector3f& voxel_coord_f);
-
-
+/// Single-res get gradient functions
 
 /**
  * \brief Get the field gradient for a given coordinate [float voxel coordinates].
+ *        The function returns {}/invalid if the gradient is invalid.
  *
- * \warning The function only returns false if the base block is not allocated and might
- *          compute the gradient from invalid data. TODO
+ * \tparam OctreeT          The type of the octree used
+ * \param[in] octree        The reference to the octree
+ * \param[in] voxel_coord_f The voxel coordinates to be accessed [float voxel coordiantes]
  *
- * \tparam OctreeT              The type of the octree used
- * \param[in] octree_ptr        The pointer to the octree
- * \param[in] voxel_coord_f     The voxel coordinates to be accessed [float voxel coordiantes]
- * \param[in] grad_field_value  The field gradient to be accessed
- *
- * \return True if base block pointer is allocated, False otherwise
+ * \return The field gradient if the gradient is valid, {}/invalid otherwise
  */
 template <typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, std::optional<se::field_vec_t>>
-getFieldGrad(const OctreeT&         octree_ptr,
+getFieldGrad(const OctreeT&         octree,
              const Eigen::Vector3f& voxel_coord_f);
+
+
+
+/// Multi-res get gradient functions
 
 /**
  * \brief Get the field gradient for a given coordinate [float voxel coordinates].
+ *        The function returns {}/invalid if the gradient is invalid.
  *
- * \warning The function only returns false if the base block is not allocated and might
- *          compute the gradient from invalid data. TODO
+ * \tparam OctreeT          The type of the octree used
+ * \param[in] octree        The reference to the octree
+ * \param[in] voxel_coord_f The voxel coordinates to be accessed [float voxel coordiantes]
  *
- * \tparam OctreeT              The type of the octree used
- * \param[in] octree_ptr        The pointer to the octree
- * \param[in] voxel_coord_f     The voxel coordinates to be accessed [float voxel coordiantes]
- * \param[in] grad_field_value  The field gradient to be accessed
- *
- * \return True if base block pointer is allocated, False otherwise
+ * \return The field gradient if the gradient is valid, {}/invalid otherwise
  */
 template <typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_vec_t>>
-getFieldGrad(const OctreeT&         octree_ptr,
+getFieldGrad(const OctreeT&         octree,
              const Eigen::Vector3f& voxel_coord_f);
 
 /**
  * \brief Get the field gradient for a given coordinate [float voxel coordinates].
+ *        The function returns {}/invalid if the gradient is invalid.
  *
- * \warning The function only returns false if the base block is not allocated and might
- *          compute the gradient from invalid data. TODO
+ * \tparam OctreeT           The type of the octree used
+ * \param[in] octree         The reference to the octree
+ * \param[in] voxel_coord_f  The voxel coordinates to be accessed [float voxel coordiantes]
+ * \param[in] scale_returned The scale the gradient has been computed at
  *
- * \tparam OctreeT              The type of the octree used
- * \param[in] octree_ptr        The pointer to the octree
- * \param[in] voxel_coord_f     The voxel coordinates to be accessed [float voxel coordiantes]
- * \param[in] grad_field_value  The field gradient to be accessed
+ * \return The field gradient if the gradient is valid, {}/invalid otherwise
+ */
+template <typename OctreeT>
+inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_vec_t>>
+getFieldGrad(const OctreeT&         octree,
+             const Eigen::Vector3f& voxel_coord_f,
+             int&                   scale_returned);
+
+/**
+ * \brief Get the field gradient for a given coordinate [float voxel coordinates] and desired scale.
+ *        The function returns {}/invalid if the gradient is invalid.
  *
- * \return True if base block pointer is allocated, False otherwise
+ * \tparam OctreeT           The type of the octree used
+ * \param[in] octree         The reference to the octree
+ * \param[in] voxel_coord_f  The voxel coordinates to be accessed [float voxel coordiantes]
+ * \param[in] scale_desired  The finest scale to compute the gradient at
+ * \param[in] scale_returned The scale the gradient has been computed at (max (scale desired, finest common neighbour scale)
+ *
+ * \return The field gradient if the gradient is valid, {}/invalid otherwise
  */
 template <typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_vec_t>>

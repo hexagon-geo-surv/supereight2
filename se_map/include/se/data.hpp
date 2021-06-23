@@ -37,6 +37,7 @@ struct FieldData<se::Field::Occupancy>
     FieldData() : occupancy(dflt_occupancy), time_stamp(dflt_time_stamp) {}
     se::field_t  occupancy;
     time_stamp_t time_stamp;
+    static constexpr bool invert_normals = false;
 };
 
 template<>
@@ -45,6 +46,7 @@ struct FieldData<se::Field::TSDF>
     FieldData() : tsdf(dflt_tsdf), weight(dflt_weight) {}
     se::field_t tsdf;
     weight_t    weight; // TODO: int or float
+    static constexpr bool invert_normals = true;
 };
 
 // Colour data
@@ -163,6 +165,8 @@ struct FieldDataConfig<se::Field::Occupancy>
      * initialized as in FieldDataConfig<se::Field::Occupancy>::FieldDataConfig().
      */
     FieldDataConfig(const std::string& yaml_file);
+
+    static constexpr se::Field FldT = se::Field::Occupancy;
 };
 
 std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::Occupancy>& c);
@@ -181,6 +185,8 @@ struct FieldDataConfig<se::Field::TSDF>
      * initialized as in FieldDataConfig<se::Field::TSDF>::FieldDataConfig().
      */
     FieldDataConfig(const std::string& yaml_file);
+
+    static constexpr se::Field FldT = se::Field::TSDF;
 };
 
 std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::TSDF>& c);
@@ -323,26 +329,24 @@ inline bool is_valid(const Data<se::Field::TSDF, ColB, SemB>& data) { return dat
 template <se::Colour    ColB,
           se::Semantics SemB
 >
-inline void is_valid(const Data<se::Field::Occupancy, ColB, SemB>& data) { data.time_stamp != dflt_time_stamp; }
-
+inline bool is_valid(const Data<se::Field::Occupancy, ColB, SemB>& data) { return data.weight != dflt_weight; }
 
 
 template <se::Field     FldT,
-        se::Colour    ColB,
-        se::Semantics SemB
+          se::Colour    ColB,
+          se::Semantics SemB
 >
 inline bool is_invalid(const Data<FldT, ColB, SemB>& data);
 
 template <se::Colour    ColB,
-        se::Semantics SemB
+          se::Semantics SemB
 >
-inline bool is_invalid(const Data<se::Field::TSDF, ColB, SemB>& data) { return data.weight == 0; }
+inline bool is_invalid(const Data<se::Field::TSDF, ColB, SemB>& data) { return data.weight == dflt_weight; }
 
 template <se::Colour    ColB,
-        se::Semantics SemB
+         se::Semantics SemB
 >
-inline void is_invalid(const Data<se::Field::Occupancy, ColB, SemB>& data) { data.time_stamp == 0.f; }
-
+inline bool is_invalid(const Data<se::Field::Occupancy, ColB, SemB>& data) { return data.weight == dflt_weight; }
 
 
 template <se::Field     FldT,

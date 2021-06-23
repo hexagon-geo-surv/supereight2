@@ -6,6 +6,8 @@
 namespace se {
 namespace octantops {
 
+
+
 template <typename BlockT, se::Sort SortT = se::Sort::SmallToLarge>
 inline typename std::enable_if_t<SortT == se::Sort::SmallToLarge> sort_blocks(std::vector<se::OctantBase*>& block_ptrs) {
   auto has_smaller_key = [ ](const se::OctantBase* block_ptr_lhs, const se::OctantBase* block_ptr_rhs )
@@ -18,6 +20,8 @@ inline typename std::enable_if_t<SortT == se::Sort::SmallToLarge> sort_blocks(st
   };
   std::sort(block_ptrs.begin( ), block_ptrs.end( ), has_smaller_key);
 }
+
+
 
 template <typename BlockT, se::Sort SortT>
 inline typename std::enable_if_t<SortT == se::Sort::LargeToSmall> sort_blocks(std::vector<se::OctantBase*>& block_ptrs) {
@@ -32,7 +36,23 @@ inline typename std::enable_if_t<SortT == se::Sort::LargeToSmall> sort_blocks(st
   std::sort(block_ptrs.begin( ), block_ptrs.end( ), has_smaller_key);
 }
 
+
+
+inline int size_to_scale(const int octant_size)
+{
+  return se::math::log2_const(octant_size);
 }
+
+
+
+inline int scale_to_size(const int scale)
+{
+  return 1 << scale;
 }
+
+
+
+} // namespace octantops
+} // namespace se
 
 #endif //SE_OCTANT_UTIL_IMPL_HPP

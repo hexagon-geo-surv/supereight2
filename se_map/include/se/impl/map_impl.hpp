@@ -5,6 +5,8 @@
 
 namespace se {
 
+
+
 template <Field     FldT,
           Colour    ColB,
           Semantics SemB,
@@ -13,10 +15,10 @@ template <Field     FldT,
 >
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const Eigen::Vector3f& dim,
                                                   const float            res,
-                                                  const se::DataConfig<FldT, ColB, SemB> data_config)
-    : dimension_(dim), resolution_(res), origin_M_(dim / 2),
-     lb_(- origin_M_), ub_(dim - origin_M_),
-     data_config_(data_config)
+                                                  const se::DataConfig<FldT, ColB, SemB> data_config) :
+    dimension_(dim), resolution_(res), origin_M_(dim / 2),
+    lb_(- origin_M_), ub_(dim - origin_M_),
+    data_config_(data_config)
 {
   initialiseOctree();
 }
@@ -30,10 +32,10 @@ template <Field     FldT,
           int       BlockSize
 >
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const MapConfig&                       map_config,
-                                                  const se::DataConfig<FldT, ColB, SemB> data_config)
-    : dimension_(map_config.dim), resolution_(map_config.res), origin_M_(map_config.origin),
-      lb_(- origin_M_), ub_(map_config.dim - origin_M_),
-      data_config_(data_config)
+                                                  const se::DataConfig<FldT, ColB, SemB> data_config) :
+    dimension_(map_config.dim), resolution_(map_config.res), origin_M_(map_config.origin),
+    lb_(- origin_M_), ub_(map_config.dim - origin_M_),
+    data_config_(data_config)
 {
   if (!contains(origin_M_))
   {
@@ -183,30 +185,6 @@ template <Field     FldT,
           Res       ResT,
           int       BlockSize
 >
-bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::initialiseOctree()
-{
-  if (octree_ptr_ != nullptr)
-  {
-    std::cerr << "Octree has already been initialised" << std::endl;
-    return false;
-  }
-
-  float    max_dim  = dimension_.maxCoeff();
-  unsigned max_size = ceil(max_dim / resolution_);
-  unsigned oct_size = math::power_two_up(max_size);
-  octree_ptr_ =
-          std::shared_ptr<se::Octree<DataType, ResT, BlockSize> >(new se::Octree<DataType, ResT, BlockSize>(oct_size));
-  return true;
-}
-
-
-
-template <Field     FldT,
-          Colour    ColB,
-          Semantics SemB,
-          Res       ResT,
-          int       BlockSize
->
 void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveSlice(const std::string&     file_path,
                                                              const Eigen::Vector3f& point_M,
                                                              const std::string&     num) const
@@ -260,6 +238,64 @@ void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMesh(const std::string& f
 
   const std::string file_name_mesh_dual = (num == std::string("")) ? (file_path + "_dual.vtk") : (file_path + "_dual_" + num + ".vtk");
   se::io::save_mesh_vtk(dual_mesh, file_name_mesh_dual, Eigen::Matrix4f::Identity());
+}
+
+
+
+template <Field     FldT,
+          Colour    ColB,
+          Semantics SemB,
+          Res       ResT,
+          int       BlockSize
+>
+inline void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::voxelToPoint(const Eigen::Vector3i& voxel_coord,
+                                                                       Eigen::Vector3f&       point_M) const
+{
+  point_M = ((voxel_coord.cast<float>() + sample_offset_frac) * resolution_) - origin_M_;
+}
+
+
+
+template <Field     FldT,
+          Colour    ColB,
+          Semantics SemB,
+          Res       ResT,
+          int  BlockSize
+>
+inline void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::voxelToPoint(const Eigen::Vector3i& voxel_coord,
+                                                                       const int              stride,
+                                                                       Eigen::Vector3f&       point_M) const
+{
+  point_M = ((voxel_coord.cast<float>() + stride * sample_offset_frac) * resolution_) - origin_M_;
+}
+
+
+
+template <Field     FldT,
+        Colour    ColB,
+        Semantics SemB,
+        Res       ResT,
+        int  BlockSize
+>
+inline void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::voxelToCornerPoints(const Eigen::Vector3i&      voxel_coord,
+                                                                              Eigen::Matrix<float, 3, 8>& corner_points_M) const
+{
+corner_points_M = ((corner_rel_steps_.colwise() + voxel_coord.cast<float>()) * resolution_).colwise() - origin_M_;
+}
+
+
+
+template <Field     FldT,
+          Colour    ColB,
+          Semantics SemB,
+          Res       ResT,
+          int  BlockSize
+>
+inline void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::voxelToCornerPoints(const Eigen::Vector3i&      voxel_coord,
+                                                                              const int                   stride,
+                                                                              Eigen::Matrix<float, 3, 8>& corner_points_M) const
+{
+  corner_points_M = (((stride * corner_rel_steps_).colwise() + voxel_coord.cast<float>()) * resolution_).colwise() - origin_M_;
 }
 
 
@@ -399,25 +435,20 @@ template <Field     FldT,
           Res       ResT,
           int       BlockSize
 >
-inline void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::voxelToPoint(const Eigen::Vector3i& voxel_coord,
-                                                                       Eigen::Vector3f&       point_M) const
+bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::initialiseOctree()
 {
-  point_M = ((voxel_coord.cast<float>() + sample_offset_frac) * resolution_) - origin_M_;
-}
+  if (octree_ptr_ != nullptr)
+  {
+  std::cerr << "Octree has already been initialised" << std::endl;
+  return false;
+  }
 
-
-
-template <Field     FldT,
-          Colour    ColB,
-          Semantics SemB,
-          Res       ResT,
-          int  BlockSize
->
-inline void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::voxelToPoint(const Eigen::Vector3i& voxel_coord,
-                                                                       const int              stride,
-                                                                       Eigen::Vector3f&       point_M) const
-{
-  point_M = ((voxel_coord.cast<float>() + stride * sample_offset_frac) * resolution_) - origin_M_;
+  float    max_dim  = dimension_.maxCoeff();
+  unsigned max_size = ceil(max_dim / resolution_);
+  unsigned oct_size = math::power_two_up(max_size);
+  octree_ptr_ =
+    std::shared_ptr<se::Octree<DataType, ResT, BlockSize> >(new se::Octree<DataType, ResT, BlockSize>(oct_size));
+  return true;
 }
 
 

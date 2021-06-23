@@ -137,7 +137,7 @@ inline se::key_t compact(uint64_t value);
  */
 inline bool encode_key(const Eigen::Vector3i& coord,
                        const se::scale_t      scale,
-                       key_t&                 key);
+                       se::key_t&                 key);
 
 /**
  * \brief Encodes given coordinates and scale in a key.
@@ -151,8 +151,8 @@ inline bool encode_key(const Eigen::Vector3i& coord,
  *
  * \return The encoded key
  */
-inline key_t encode_key(const Eigen::Vector3i& coord,
-                        const se::scale_t      scale);
+inline se::key_t encode_key(const Eigen::Vector3i& coord,
+                            const se::scale_t      scale);
 
 /**
  * \brief Encodes given morton code and scale in a key.
@@ -169,7 +169,7 @@ inline key_t encode_key(const Eigen::Vector3i& coord,
  */
 inline bool encode_key(const se::key_t   code,
                        const se::scale_t scale,
-                       key_t&            key);
+                       se::key_t&            key);
 
 /**
  * \brief Encodes given morton code and scale in a key.
@@ -183,8 +183,8 @@ inline bool encode_key(const se::key_t   code,
  *
  * \return The encoded key
  */
-inline key_t encode_key(const se::key_t   code,
-                        const se::scale_t scale);
+inline se::key_t encode_key(const se::key_t   code,
+                            const se::scale_t scale);
 
 /**
  * \brief Extracts the 3D coordinates and scale from a given key.
@@ -205,6 +205,14 @@ inline void decode_key(const se::key_t  key,
  */
 inline void encode_code(const Eigen::Vector3i& coord,
                         se::code_t&            code);
+
+/**
+ * \brief Compute the Morton code for given x,y,z coordinates.
+ *
+ * \param[in]  coord    The coordinates to be encoded
+ * \param[out] code     The Morten code representing the coordinates
+ */
+inline se::code_t encode_code(const Eigen::Vector3i& coord);
 
 /**
  * \brief Compute the x,y,z coordinates for a given Morton code.

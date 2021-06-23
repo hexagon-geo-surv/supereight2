@@ -87,16 +87,21 @@ public:
    *
    * \return The size of the octree
    */
-  inline unsigned int getSize() const { return size_; }
+  inline int getSize() const { return size_; }
 
   /**
    * \brief Get the maximum scale of the octree. This is equivalent to the scale of the root.
    *
    * \return The max scale of the octree
    */
-  inline unsigned int getMaxScale() const { return se::math::log2_const(size_); }
+  inline int getMaxScale() const { return se::math::log2_const(size_); }
 
-  inline unsigned int getBlockDepth() const { return se::math::log2_const(size_) - se::math::log2_const(BlockSize); }
+  /**
+   * \brief Get the octree depth the blocks are allocated at.
+   *
+   * \return The octree depth the blocks are allocated at
+   */
+  inline int getBlockDepth() const { return se::math::log2_const(size_) - se::math::log2_const(BlockSize); }
 
   /**
    * \brief Allocate a node for a given parent node.
@@ -116,13 +121,18 @@ public:
   inline se::OctantBase* allocate(NodeType*        parent_ptr,
                                   const unsigned   child_idx);     ///< Allocate child
 
-  static constexpr Res       res_ = ResT;
+  /**
+   * \brief Recursively delete all children of a given node pointer.
+   *
+   * \param[in] parent_ptr The node pointer to delete the children of
+   */
+  inline void deleteChildren(NodeType* parent_ptr);
 
+  static constexpr Res res_ = ResT;
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 private:
-
   int size_;                     ///< The size in [voxel] of the octree
   se::OctantBase* root_ptr_ = nullptr; ///< The pointer to the root node of the octree
 

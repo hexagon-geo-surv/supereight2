@@ -138,7 +138,7 @@ void raycastVolume(const MapT&                 map,
         } else
         {
           // Invert surface normals for TSDF representations.
-          surface_normals_M[pixel.x() + pixel.y() * surface_normals_M.width()] = (true)
+          surface_normals_M[pixel.x() + pixel.y() * surface_normals_M.width()] = (MapT::DataType::invert_normals)
                                                                                  ? (-1.f * (*surface_normal)).normalized()
                                                                                  : (*surface_normal).normalized();
         }

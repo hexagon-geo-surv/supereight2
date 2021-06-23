@@ -41,7 +41,7 @@ OctreeIterator<Octree<DataT, ResT, BlockSize>> Octree<DataT, ResT, BlockSize>::e
 
 template <typename DataT,
           Res      ResT,
-          int            BlockSize
+          int      BlockSize
 >
 inline bool Octree<DataT, ResT, BlockSize>::contains(const Eigen::Vector3i& voxel_coord) const
 {
@@ -89,8 +89,8 @@ inline bool Octree<DataT, ResT, BlockSize>::allocate(NodeType*          parent_p
 
 
 template <typename DataT,
-        Res      ResT,
-        int      BlockSize
+          Res      ResT,
+          int      BlockSize
 >
 inline OctantBase* Octree<DataT, ResT, BlockSize>::allocate(NodeType*          parent_ptr,
                                                             const unsigned int child_idx)
@@ -120,6 +120,37 @@ inline OctantBase* Octree<DataT, ResT, BlockSize>::allocate(NodeType*          p
   parent_ptr->setChild(child_idx, child_ptr);   // Update parent
   return child_ptr;
 }
+
+
+
+template <typename DataT,
+          Res      ResT,
+          int      BlockSize
+>
+inline void Octree<DataT, ResT, BlockSize>::deleteChildren(NodeType* parent_ptr)
+{
+  for (int child_idx = 0; child_idx < 8; child_idx++)
+  {
+    se::OctantBase* octant_ptr = parent_ptr->getChild(child_idx);
+    if (octant_ptr)
+    {
+      if (octant_ptr->isBlock())
+      {
+        BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
+        delete(block_ptr);
+      } else
+      {
+        for (int child_idx = 0; child_idx < 8; child_idx++)
+        {
+          deleteChildren(static_cast<NodeType*>(parent_ptr->getChild(child_idx)));
+        }
+        delete(parent_ptr);
+      }
+    }
+  }
+  parent_ptr->setChildrenMask(0);
+}
+
 
 
 } // namespace se

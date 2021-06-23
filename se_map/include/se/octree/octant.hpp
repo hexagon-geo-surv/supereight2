@@ -34,6 +34,10 @@ public:
 
   inline void setTimeStamp(const unsigned int time_stamp) { time_stamp_ = time_stamp; }
 
+  inline bool getActive() const { return is_active_; }
+
+  inline void setActive (bool is_active) { is_active_ = is_active; }
+
   inline unsigned int getChildrenMask() const { return children_mask_; }
 
   inline void setChildrenMask(const unsigned int child_idx) { children_mask_ |= 1 << child_idx; }
@@ -45,6 +49,7 @@ protected:
   OctantBase*           parent_ptr_;    ///< Every node/block (other than root) needs a parent
   const Eigen::Vector3i coord_;         ///< The coordinates of the block (left, front , bottom corner)
   int                   time_stamp_;    ///< The frame of the last update
+  bool                  is_active_;     ///< The active state of the octant
   unsigned int          children_mask_; ///< The allocated children
 
   template<typename DerT, typename DatT, int BS>
@@ -67,10 +72,33 @@ inline void get_child_idx(const Eigen::Vector3i& voxel_coord,
 
 
 
+template <typename DataT>
+class NodeData
+{
+public:
+  inline const DataT& getData() const { return data_; }
+  inline       DataT& getData()       { return data_; }
+
+  inline void setData(const DataT& data) { data_ = data; }
+
+protected:
+  DataT data_;
+};
+
+template <typename DataT>
+class NodeNoData
+{
+public:
+  static inline DataT getData() { return DataT(); }
+};
+
+
+
 template <typename DataT,
           se::Res  ResT = se::Res::Single
 >
-class Node : public OctantBase
+class Node : public OctantBase,
+             public std::conditional<ResT == Res::Multi && DataT::fld_ == se::Field::Occupancy, NodeData<DataT>, NodeNoData<DataT>>::type
 {
 public:
   typedef DataT DataType;
@@ -89,16 +117,11 @@ public:
 
   inline se::OctantBase* setChild(const unsigned child_idx, se::OctantBase* child_ptr);
 
-  inline void getData(const DataT& data);
-
-  inline void setData(const DataT& data);
-
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 private:
   std::array<se::OctantBase*, 8> children_ptr_; ///< Pointers to the eight children (should be all nullptr at initialisation due to smart pointers)
   const unsigned int             size_;         ///< The size in [voxel] of the node in comparision to the finest voxel
-  DataType                       data_; ///< The data of the node
 };
 
 
@@ -380,58 +403,3 @@ public:
 #include "impl/octant_impl.hpp"
 
 #endif // SE_OCTANT_HPP
-
-//  template <typename OctreeT>
-//  inline void setCurrentScale(const OctreeT octree,
-//                              int           curr_scale)
-//  {
-//    if (curr_scale < curr_scale_)
-//    {
-//
-//      auto getDataUnion = [&this](const OctreeT&              octree,
-//                                  const Eigen::Vector3i&      voxel_coord,
-//                                  const int                   scale)
-//      {
-//        Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
-//        int scale_offset = 0;
-//        int scale_tmp    = 0;
-//        int num_voxels   = BlockSize * BlockSize * BlockSize;
-//
-//        while(scale_tmp < scale)
-//        {
-//          scale_offset += num_voxels;
-//          num_voxels /= 8;
-//          ++scale_tmp;
-//        }
-//
-//        const int size_at_scale = BlockSize / (1 << scale);
-//        voxel_offset = voxel_offset / (1 << scale);
-//        const int voxel_idx = scale_offset + voxel_offset.x() +
-//                              voxel_offset.y() * size_at_scale +
-//                              voxel_offset.z() * se::math::sq(size_at_scale)
-//
-//        DataUnion data_union;
-//        data_union.data           = block_data_[voxel_idx];
-//        data_union.delta_data     = block_delta_data_[voxel_idx];
-//        data_union.data_idx       = voxel_idx;
-//        data_union.delta_data_idx = voxel_idx;
-//
-//        return data_union;
-//      };
-//
-
-//
-//      se::propagator::propagateBlockDown(octree,
-//                                         getDataUnion, setChildDataUnion,
-//                                         getDataUnion, setParentDataUnion)
-//    }
-//    curr_scale_ = curr_scale;
-//  }
-
-//  std::union DataUnion
-//  {
-//    DataType      data;
-//    DeltaDataType delta_data;
-//    int           data_idx;
-//    int           delta_data_idx;
-//  }

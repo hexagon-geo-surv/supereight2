@@ -57,7 +57,7 @@ inline se::key_t compact(uint64_t value)
 
 inline bool encode_key(const Eigen::Vector3i& coord,
                        const se::scale_t      scale,
-                       key_t&                 key)
+                       se::key_t&             key)
 {
   assert(scale <= KEY_SCALE_LIMIT);             // Verify scale is within key limits
   assert(is_valid(coord)); // Verify doesn't surpass max coordinates
@@ -72,8 +72,8 @@ inline bool encode_key(const Eigen::Vector3i& coord,
 
 
 
-inline key_t encode_key(const Eigen::Vector3i& coord,
-                        const se::scale_t      scale)
+inline se::key_t encode_key(const Eigen::Vector3i& coord,
+                            const se::scale_t      scale)
 {
   assert(scale <= KEY_SCALE_LIMIT);             // Verify scale is within key limits
   assert(is_valid(coord)); // Verify doesn't surpass max coordinates
@@ -91,7 +91,7 @@ inline key_t encode_key(const Eigen::Vector3i& coord,
 
 inline bool encode_key(const se::key_t   code,
                        const se::scale_t scale,
-                       key_t&            key)
+                       se::key_t&        key)
 {
   assert(scale <= KEY_SCALE_LIMIT);        // Verify scale is within key limits
 
@@ -104,8 +104,8 @@ inline bool encode_key(const se::key_t   code,
 
 
 
-inline key_t encode_key(const se::key_t   code,
-                        const se::scale_t scale)
+inline se::key_t encode_key(const se::key_t   code,
+                            const se::scale_t scale)
 {
   assert(scale <= KEY_SCALE_LIMIT);        // Verify scale is within key limits
 
@@ -119,10 +119,10 @@ inline key_t encode_key(const se::key_t   code,
 
 inline void decode_key(const se::key_t  key,
                        Eigen::Vector3i& coord,
-                       scale_t&         scale)
+                       se::scale_t&     scale)
 {
   scale = se::keyops::key_to_scale(key);
-  code_t code = se::keyops::key_to_code(key);
+  se::code_t code = se::keyops::key_to_code(key);
 
   assert(se::keyops::is_valid(key)); // Verify key is valid
 
@@ -144,6 +144,18 @@ inline void encode_code(const Eigen::Vector3i& coord,
 
 
 
+inline se::code_t encode_code(const Eigen::Vector3i& coord)
+{
+  assert(is_valid(coord)); // Verify doesn't surpass max coordinates
+
+  se::key_t x = expand(coord.x());
+  se::key_t y = expand(coord.y()) << 1;
+  se::key_t z = expand(coord.z()) << 2;
+  return x | y | z;
+}
+
+
+
 inline void decode_code(const se::code_t code,
                         Eigen::Vector3i& coord)
 {
@@ -154,8 +166,8 @@ inline void decode_code(const se::code_t code,
 
 
 
-inline se::idx_t code_to_child_idx(const se::code_t code,
-                                   const scale_t    child_scale)
+inline se::idx_t code_to_child_idx(const se::code_t  code,
+                                   const se::scale_t child_scale)
 {
   assert(child_scale <= KEY_SCALE_LIMIT);       // Verify scale is within key limits
   return (code >> (child_scale * NUM_DIM)) & 7; // The 7 filters the last 3 bits 111
@@ -176,7 +188,7 @@ inline Eigen::Vector3i key_to_coord(const se::key_t key)
 {
   assert(se::keyops::is_valid(key)); // Verify key is valid
 
-  code_t code = se::keyops::key_to_code(key);
+  se::code_t code = se::keyops::key_to_code(key);
 
   Eigen::Vector3i coord;
   se::keyops::decode_code(code, coord);
@@ -185,7 +197,7 @@ inline Eigen::Vector3i key_to_coord(const se::key_t key)
 
 
 
-inline scale_t key_to_scale(const se::key_t key)
+inline se::scale_t key_to_scale(const se::key_t key)
 {
   assert(se::keyops::is_valid(key)); // Verify key is valid
 
@@ -385,7 +397,7 @@ inline void unique_codes(std::vector<se::key_t>& keys,
 
 template <se::Safe SafeB = se::Safe::On>
 inline void unique_allocation(std::vector<se::key_t>& keys,
-                              const scale_t           max_block_scale,
+                              const se::scale_t       max_block_scale,
                               std::vector<se::key_t>& unique_keys)
 {
   if (keys.size() == 0)

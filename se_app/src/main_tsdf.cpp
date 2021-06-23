@@ -26,8 +26,10 @@ int main(int argc, char** argv)
   std::cout << config;
 
   // Create the mesh output directory
-  if (config.app.enable_meshing) {
-    if (!config.app.mesh_output_dir.empty()) {
+  if (config.app.enable_meshing)
+  {
+    if (!config.app.mesh_output_dir.empty())
+    {
       stdfs::create_directories(config.app.mesh_output_dir);
     }
   }
@@ -63,7 +65,8 @@ int main(int argc, char** argv)
   se::Reader* reader = nullptr;
   reader = se::create_reader(config.reader);
 
-  if (reader == nullptr) {
+  if (reader == nullptr)
+  {
     exit(EXIT_FAILURE);
   }
 
@@ -82,18 +85,23 @@ int main(int argc, char** argv)
   se::Image<Eigen::Vector3f> surface_normals_M(processed_img_res.x(), processed_img_res.y());
   se::Image<int8_t>          surface_scale(processed_img_res.x(), processed_img_res.y());
 
-  while (read_ok == se::ReaderStatus::ok) {
+  while (read_ok == se::ReaderStatus::ok)
+  {
     se::perfstats.setIter(frame++);
 
     TICK("total")
 
     TICK("read")
-    if (config.app.enable_ground_truth) {
+    if (config.app.enable_ground_truth)
+    {
       read_ok = reader->nextData(input_depth_img, input_rgba_img, T_MS);
-    } else {
-      if (frame == 1) {
+    } else
+    {
+      if (frame == 1)
+      {
         read_ok = reader->nextData(input_depth_img, input_rgba_img, T_MS);
-      } else {
+      } else
+      {
         read_ok = reader->nextData(input_depth_img, input_rgba_img);
       }
     }
@@ -109,13 +117,15 @@ int main(int argc, char** argv)
 
     // Render volume
     TICK("tracking")
-    if (!config.app.enable_ground_truth && frame > 1 && (frame % config.app.tracking_rate == 0)) {
+    if (!config.app.enable_ground_truth && frame > 1 && (frame % config.app.tracking_rate == 0))
+    {
       tracker.track(processed_depth_img, T_MS, surface_point_cloud_M, surface_normals_M);
     }
     TOCK("tracking")
 
     TICK("integration")
-    if (frame % config.app.integration_rate == 0) {
+    if (frame % config.app.integration_rate == 0)
+    {
       integrator.integrateDepth(processed_depth_img, sensor, T_MS, frame);
     }
     TOCK("integration")
@@ -125,19 +135,22 @@ int main(int argc, char** argv)
     TOCK("raycast")
 
     TICK("render")
-    if (config.app.enable_rendering) {
+    if (config.app.enable_rendering)
+    {
       const Eigen::Vector3f ambient{0.1, 0.1, 0.1};
       convert_to_output_rgba_img(processed_rgba_img, output_rgba_img_data);
       convert_to_output_depth_img(processed_depth_img, output_depth_img_data);
       tracker.renderTrackingResult(output_tracking_img_data);
-      if (frame % config.app.rendering_rate == 0) {
+      if (frame % config.app.rendering_rate == 0)
+      {
         se::raycaster::renderVolumeKernel(output_volume_img_data, processed_img_res, se::math::to_translation(T_MS), ambient, surface_point_cloud_M, surface_normals_M, surface_scale);
       }
     }
     TOCK("render")
 
     TICK("draw")
-    if (config.app.enable_gui) {
+    if (config.app.enable_gui)
+    {
       drawthem(output_rgba_img_data,     processed_img_res,
                output_depth_img_data,    processed_img_res,
                output_tracking_img_data, processed_img_res,
@@ -147,19 +160,23 @@ int main(int argc, char** argv)
 
     TOCK("total")
 
-    if (config.app.enable_meshing && (frame % config.app.meshing_rate == 0)) {
+    if (config.app.enable_meshing && (frame % config.app.meshing_rate == 0))
+    {
       map.saveMesh(config.app.mesh_output_dir + "/mesh", std::to_string(frame));
-      if (config.app.enable_slice_meshing) {
+      if (config.app.enable_slice_meshing)
+      {
         map.saveSlice(config.app.mesh_output_dir + "/slice", se::math::to_translation(T_MS), std::to_string(frame));
       }
-      if (config.app.enable_structure_meshing) {
+      if (config.app.enable_structure_meshing)
+      {
         map.saveStrucutre(config.app.mesh_output_dir + "/struct", std::to_string(frame));
       }
     }
 
     se::perfstats.writeToFilestream();
 
-    if (frame == config.app.max_frames) {
+    if (frame == config.app.max_frames)
+    {
       break;
     }
   }
