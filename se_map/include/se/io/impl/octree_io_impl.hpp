@@ -12,18 +12,12 @@
 namespace se {
 namespace io {
 
-template <typename OctreeT>
-int save_3d_slice_vtk(const OctreeT&         octree,
-                      const std::string&     filename,
+template <typename GetValueF>
+int save_3d_slice_vtk(const std::string&     filename,
                       const Eigen::Vector3i& lower_coord,
-                      const Eigen::Vector3i& upper_coord)
+                      const Eigen::Vector3i& upper_coord,
+                      GetValueF&             get_value)
 {
-
-  auto get_value = [&](int x, int y, int z)
-  {
-    return se::get_field(se::visitor::getData(octree, Eigen::Vector3i(x, y, z)));
-  };
-
   // Open the file for writing.
   std::ofstream file(filename.c_str());
   if (!file.is_open())

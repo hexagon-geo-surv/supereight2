@@ -48,10 +48,13 @@ inline se::OctantBase* finest_octant(const Eigen::Vector3i& octant_coord,
   {
     se::idx_t child_idx = ((octant_coord.x() & child_size) > 0) + 2 * ((octant_coord.y() & child_size) > 0) + 4 * ((octant_coord.z() & child_size) > 0);
     child_ptr = parent_ptr->getChild(child_idx);
+
     if(!child_ptr)
     {
-      return parent_ptr;
+      se::OctantBase* leaf_ptr = (parent_ptr->getChildrenMask() == 0) ? parent_ptr : nullptr;
+      return leaf_ptr; // leaf is either a block or a parent with no children!
     }
+
     parent_ptr = static_cast<typename OctreeT::NodeType*>(child_ptr);
   }
 
@@ -96,10 +99,13 @@ inline se::OctantBase* leaf(const Eigen::Vector3i& leaf_coord,
   {
     se::idx_t child_idx = ((leaf_coord.x() & child_size) > 0) + 2 * ((leaf_coord.y() & child_size) > 0) + 4 * ((leaf_coord.z() & child_size) > 0);
     child_ptr = parent_ptr->getChild(child_idx);
+
     if(!child_ptr)
     {
-      return parent_ptr;
+      se::OctantBase* leaf_ptr = (parent_ptr->getChildrenMask() == 0) ? parent_ptr : nullptr;
+      return leaf_ptr; // leaf is either a block or a parent with no children!
     }
+
     parent_ptr = static_cast<typename OctreeT::NodeType*>(child_ptr);
   }
 

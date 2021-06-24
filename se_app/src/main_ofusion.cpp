@@ -21,8 +21,10 @@
 int main(int argc, char** argv)
 {
   // Read the configuration
-  const std::string config_filename = (argc >= 2) ? argv[1] : "/home/nils/workspace_/projects/supereight-2-srl-test/datasets/icl_nuim/traj_2/config.yaml";
-  const se::Config<se::TSDFDataConfig> config (config_filename);
+//  const std::string config_filename = (argc >= 2) ? argv[1] : "/home/nils/workspace_/projects/supereight-2-srl/datasets/cow_and_lady/config.yaml";
+  const std::string config_filename = (argc >= 2) ? argv[1] : "/home/nils/workspace_/projects/supereight-2-srl/datasets/icl_nuim/traj_2/config.yaml";
+//  const std::string config_filename = (argc >= 2) ? argv[1] : "/home/nils/workspace_/projects/supereight-2-srl/datasets/rgbd_datasets/rgbd_dataset_freiburg1_desk/config.yaml";
+  const se::Config<se::OccDataConfig> config (config_filename);
   std::cout << config;
 
   // Create the mesh output directory
@@ -40,7 +42,7 @@ int main(int argc, char** argv)
   se::perfstats.setFilestream(&log_file_stream);
 
   // Setup the map
-  se::TSDFMap<SE_RES> map(config.map, config.data);
+  se::OccMap<SE_RES> map(config.map, config.data);
 
   // Setup input images
   const Eigen::Vector2i input_img_res(config.sensor.width, config.sensor.height);
@@ -78,7 +80,6 @@ int main(int argc, char** argv)
 
   // Integrated depth at given pose
   se::MapIntegrator integrator(map);
-
   int frame = 0;
 
   se::Image<Eigen::Vector3f> surface_point_cloud_M(processed_img_res.x(), processed_img_res.y());
@@ -159,7 +160,6 @@ int main(int argc, char** argv)
     TOCK("draw")
 
     TOCK("total")
-
     if (config.app.enable_meshing && (frame % config.app.meshing_rate == 0))
     {
       map.saveMesh(config.app.mesh_output_dir + "/mesh", std::to_string(frame));

@@ -40,7 +40,9 @@ public:
 
   inline unsigned int getChildrenMask() const { return children_mask_; }
 
-  inline void setChildrenMask(const unsigned int child_idx) { children_mask_ |= 1 << child_idx; }
+//  inline void setChildrenMask(const unsigned int child_idx) { children_mask_ |= 1 << child_idx; } // TODO
+
+  inline void clearChildrenMask() { children_mask_ = 0; }
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -57,6 +59,9 @@ protected:
 
   template<typename DatT, int BS, typename DerT>
   friend class BlockMultiRes;
+
+  template<typename DatT, typename DerT>
+  friend class NodeMultiRes;
 };
 
 
@@ -70,26 +75,65 @@ inline void get_child_idx(const Eigen::Vector3i& voxel_coord,
                           NodeT*                 node_ptr,
                           unsigned int&          child_idx);
 
+// Forward Declaration
+template <typename DataT,
+          typename  DerivedT
+>
+class NodeMultiRes
+{
+};
 
+template <Field     FldT,
+          Colour    ColB,
+          Semantics SemB,
+          typename  DerivedT
+>
+class NodeMultiRes<se::Data<FldT, ColB, SemB>, DerivedT>
+{
+};
 
-template <typename DataT>
-class NodeData
+template <Colour    ColB,
+          Semantics SemB,
+          typename  DerivedT
+>
+class NodeMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, DerivedT>
 {
 public:
-  inline const DataT& getData() const { return data_; }
-  inline       DataT& getData()       { return data_; }
+  typedef se::Data<se::Field::TSDF, ColB, SemB> DataType;
+  typedef se::DeltaData<se::Field::TSDF, ColB, SemB> PropDataType;
 
-  inline void setData(const DataT& data) { data_ = data; }
+  inline const DataType getData() const { return DataType(); }
+  inline       DataType getData()       { return DataType(); }
+};
+
+template <Colour    ColB,
+          Semantics SemB,
+          typename  DerivedT
+>
+class NodeMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, DerivedT> {
+public:
+  typedef se::Data<se::Field::Occupancy, ColB, SemB> DataType;
+
+  inline const DataType getData() const { return (data_.observed && this->underlying().children_mask_ == 0) ? data_ : DataType(); }
+
+  inline const DataType getMaxData() const { return data_; }
+
+  inline void setData(const DataType& data)  { data_ = data; }
 
 protected:
-  DataT data_;
+  DataType data_;
+
+private:
+  DerivedT& underlying() { return static_cast<DerivedT&>(*this); }
+  const DerivedT& underlying() const { return static_cast<const DerivedT&>(*this); }
 };
 
 template <typename DataT>
-class NodeNoData
+class NodeSingleRes
 {
 public:
-  static inline DataT getData() { return DataT(); }
+  inline const DataT getData() const { return DataT(); }
+  inline       DataT getData()       { return DataT(); }
 };
 
 
@@ -98,7 +142,7 @@ template <typename DataT,
           se::Res  ResT = se::Res::Single
 >
 class Node : public OctantBase,
-             public std::conditional<ResT == Res::Multi && DataT::fld_ == se::Field::Occupancy, NodeData<DataT>, NodeNoData<DataT>>::type
+             public std::conditional<ResT == Res::Single, NodeSingleRes<DataT>, NodeMultiRes<DataT, Node<DataT, ResT>>>::type
 {
 public:
   typedef DataT DataType;
@@ -143,6 +187,8 @@ class BlockSingleRes
 {
 public:
   typedef DataT DataType;
+
+  BlockSingleRes(const DataType init_data = DataType());
 
   inline const DataType& getData(const int voxel_idx) const;
 
@@ -209,7 +255,7 @@ public:
   typedef se::Data<se::Field::TSDF, ColB, SemB>      DataType;
   typedef se::DeltaData<se::Field::TSDF, ColB, SemB> PropDataType;
 
-  BlockMultiRes();
+  BlockMultiRes(const DataType init_data = DataType());
 
   struct DataUnion
   {
@@ -230,6 +276,12 @@ public:
 
   inline int getVoxelIdx(const Eigen::Vector3i& voxel_coord,
                          const int              scale) const;
+
+  /// Get coarsest block data
+
+  inline const DataType& getData() const;
+
+  inline       DataType& getData();
 
   /// Get data at current scale
 
@@ -363,14 +415,403 @@ private:
 
 
 
+// Forward decleration
+template <typename DataT,
+        Res      ResT      = se::Res::Single,
+        int      BlockSize = 8,
+        typename PolicyT   = std::enable_if_t<math::is_power_of_two(BlockSize)> ///< Verify that the block size is sensible
+>
+class Block;
+
+
+
+template <Colour    ColB,
+          Semantics SemB,
+          int       BlockSize,
+          typename  DerivedT
+>
+class BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>
+{
+public:
+    typedef se::Data<se::Field::Occupancy, ColB, SemB>      DataType;
+    typedef se::DeltaData<se::Field::Occupancy, ColB, SemB> PropDataType;
+
+    BlockMultiRes(const DataType init_data = DataType());
+
+    BlockMultiRes(const Block<se::Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>& block);
+
+    void operator=(const Block<se::Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>& block);
+
+    ~BlockMultiRes();
+
+    inline const DataType initData() const { return init_data_; } ;
+
+    inline void setInitData(const DataType& init_data) { init_data_ = init_data; };
+
+    /// Get voxel index
+
+    inline int getVoxelIdx(const Eigen::Vector3i& voxel_coord) const;
+
+    inline int getVoxelIdx(const Eigen::Vector3i& voxel_coord,
+                           const int              scale) const;
+
+    /// Get data at current scale
+
+    inline const DataType& getData(const Eigen::Vector3i& voxel_coord) const;
+
+    inline       DataType& getData(const Eigen::Vector3i& voxel_coord);
+
+    /// Get data at current scale or coarser
+
+    inline const DataType& getData(const Eigen::Vector3i& voxel_coord,
+                                   const int              scale_in,
+                                   int&                   scale_out) const;
+
+    inline       DataType& getData(const Eigen::Vector3i& voxel_coord,
+                                   const int              scale_in,
+                                   int&                   scale_out);
+
+    /// Get data at scale
+
+    inline const DataType& getData(const Eigen::Vector3i& voxel_coord,
+                                   const int              scale) const;
+
+    inline       DataType& getData(const Eigen::Vector3i& voxel_coord,
+                                   const int              scale);
+
+    inline const DataType& getMaxData(const Eigen::Vector3i& voxel_coord) const;
+
+    inline       DataType& getMaxData(const Eigen::Vector3i& voxel_coord);
+
+    inline const DataType& getMaxData(const Eigen::Vector3i& voxel_coord,
+                                      const int              scale_in,
+                                      int&                   scale_out) const;
+
+    inline      DataType& getMaxData(const Eigen::Vector3i& voxel_coord,
+                                     const int              scale_in,
+                                     int&                   scale_out);
+
+    inline const DataType& getMaxData(const Eigen::Vector3i& voxel_coord,
+                                      const int              scale) const;
+
+    inline       DataType& getMaxData(const Eigen::Vector3i& voxel_coord,
+                                      const int              scale);
+
+    inline const DataType& getMinData() const { return min_data_; };
+
+
+    /// Set data at current scale
+    inline void setData(const Eigen::Vector3i& voxel_coord,
+                        const DataType&        data);
+
+    inline void setData(const Eigen::Vector3i& voxel_coord,
+                        const int              scale,
+                        const DataType&        data);
+
+    inline void setMaxData(const Eigen::Vector3i& voxel_coord,
+                           const DataType&        data);
+
+
+    inline void setMaxData(const Eigen::Vector3i& voxel_coord,
+                           const int              scale,
+                           const DataType&        data);
+
+    void setMinData( const DataType& min_data) { min_data_ = min_data; }
+
+    void allocateDownTo();
+
+    inline void allocateDownTo(const int new_min_scale);
+
+    void deleteUpTo(const int new_min_scale);
+
+    inline const DataType getData() const     { return (min_scale_ != -1) ? block_data_[0][0]     : DataType(); }
+
+    inline const DataType getMaxData() const  { return (min_scale_ != -1) ? block_max_data_[0][0] : DataType(); }
+
+    se::field_t meanValue() { return get_field(getData()); }
+    se::field_t maxValue()  { return get_field(getMaxData()); }
+
+    inline const std::vector<DataType*>& blockData() const { return block_data_; }
+
+    inline       std::vector<DataType*>& blockData() { return block_data_; }
+
+    inline const std::vector<DataType*>& blockMaxData() const { return block_max_data_; }
+
+    inline       std::vector<DataType*>& blockMaxData() { return block_max_data_; }
+
+    inline const size_t& currIntegrCount() const { return curr_integr_count_; } ///< \brief Get the number of integrations at the current scale.
+
+    inline const size_t& currObservedCount() const { return curr_observed_count_; } ///< \brief Get the number of observed voxels at the current scale.
+
+    void incrCurrIntegrCount() { curr_integr_count_++; } ///< \brief Increment the number of integrations at the current scale by 1.
+
+    /**
+     * \brief Increment the number of observed voxels in at the current scale by 1.
+     *
+     * \param[in] do_increment The optional flag indicating if the counter should be incremented.
+     */
+    void incrCurrObservedCount(bool do_increment = true);
+
+    /**
+     * \brief Reset the current integration and observation count to 0.
+     */
+    void resetCurrCount();
+
+    /**
+     * \brief When a block is initialised from an observed block (i.e. init_data_.observed == true), set the current
+     *        observed count to all voxels observed and the integration count to the nodes value. Otherwise reset the current
+     *        count.
+     */
+    void initCurrCout();
+
+    /**
+     * \return The integration scale of the buffer.
+     */
+    const int& buffer_scale() const           { return buffer_scale_; }
+    const size_t& bufferIntegrCount() const   { return buffer_integr_count_; }
+    const size_t& bufferObservedCount() const { return buffer_observed_count_; }
+
+    /**
+     * \brief Increment the buffer count if incrementation criterion is met.
+     *        I.e. the scale normalised number of observations at the buffer scale >= 95% observations at the current scale.
+     */
+    void incrBufferIntegrCount(const bool do_increment = true);
+
+
+    /**
+   * \brief Increment the number of observed voxels at the buffers scale by 1.
+   *
+   * \param[in] do_increment The optional flag indicating if the counter should be incremented.
+   */
+    void incrBufferObservedCount(const bool do_increment = true);
+    /**
+     * \brief Reset the buffer integration and observation count to 0.
+     */
+    void resetBufferCount();
+
+    /**
+     *  \brief Reset buffer variables to the initial values and free the buffer data if applicable.
+     */
+    void resetBuffer();
+
+    /**
+     * \brief Init buffer variables.
+     *
+     * \param[in] buffer_scale The scale the buffer should be initialised at.
+     */
+    void initBuffer(const int buffer_scale);
+
+    /**
+     * \brief Check if the scale should be switched from the current scale to the recommended.
+     *
+     * \return True is data is switched to recommended scale.
+     */
+    bool switchData();
+
+    /**
+     * \brief Get a `const` reference to the voxel data in the buffer at the voxel coordinates.
+     *
+     * \param[in] voxel_coord The voxel coordinates of the data to be accessed.
+     *
+     * \warning The function does not not check if the voxel_idx exceeds the array size.
+     *
+     * \return `const` reference to the voxel data in the buffer for the provided voxel coordinates.
+     */
+    DataType& bufferData(const Eigen::Vector3i& voxel_coord) const;
+
+    /**
+     * \brief Get a reference to the voxel data in the buffer at the voxel coordinates.
+     *
+     * \param[in] voxel_coord The voxel coordinates of the data to be accessed.
+     *
+     * \warning The function does not not check if the voxel_idx exceeds the array size.
+     *
+     * \return Reference to the voxel data in the buffer for the provided voxel coordinates.
+     */
+    DataType& bufferData(const Eigen::Vector3i& voxel_coord);
+
+    /**
+     * \brief Get a `const` reference to the voxel data in the buffer at the voxel index.
+     *
+     * \param[in] voxel_idx The voxel index of the data to be accessed.
+     *
+     * \warning The function does not not check if the voxel_idx exceeds the array size.
+     *
+     * \return `const` reference to the voxel data in the buffer for the provided voxel index.
+     */
+    DataType& bufferData(const int voxel_idx) const { return buffer_data_[voxel_idx]; }
+
+    /**
+     * \brief Get a reference to the voxel data in the buffer at the voxel index.
+     *
+     * \param[in] voxel_idx The voxel index of the data to be accessed.
+     *
+     * \warning The function does not not check if the voxel_idx exceeds the array size.
+     *
+     * \return Reference to the voxel data in the buffer for the provided voxel index.
+     */
+    DataType& bufferData(const int voxel_idx) { return buffer_data_[voxel_idx]; }
+
+    /**
+     * \brief Get a `const` reference to the mean voxel data at the current scale via the voxel index.
+     *
+     * \param[in] voxel_idx The voxel index of the data to be accessed.
+     *
+     * \warning The function does not not check if the voxel_idx exceeds the array size.
+     *
+     * \return `const` reference to the voxel data in the buffer for the provided voxel index.
+     */
+    DataType& currData(const int voxel_idx) const { return curr_data_[voxel_idx]; }
+
+    /**
+     * \brief Get a reference to the mean voxel data at the current scale via the voxel index.
+     *
+     * \param[in] voxel_idx The voxel index of the data to be accessed.
+     *
+     * \warning The function does not not check if the voxel_idx exceeds the array size.
+     *
+     * \return Reference to the mean voxel data at the current scale for the provided voxel index.
+     */
+    DataType& currData(const int voxel_idx) { return curr_data_[voxel_idx]; }
+
+    /**
+     * \brief Get a pointer to the mean block data array at a given scale.
+     *
+     * \param[in] scale The scale to return the mean block data array from.
+     *
+     * \return The pointer to the mean block data array at the provided scale.
+     *         Returns a nullptr if the scale smaller than the min allocated scale.
+     */
+    DataType* blockDataAtScale(const int scale);
+
+    /**
+     * \brief Get a pointer to the max block data array at a given scale.
+     *
+     * \param[in] scale The scale to return the max block data array from.
+     *
+     * \return The pointer to the max block data array at the provided scale.
+     *         Returns a nullptr if the scale smaller than the min allocated scale.
+     */
+    DataType* blockMaxDataAtScale(const int scale);
+
+    /// Get scales
+
+    inline int getMinScale() const { return min_scale_; }
+
+    inline void setMinScale(const int min_scale) { min_scale_ = min_scale; }
+
+    static constexpr inline int getMaxScale() { return max_scale_; }
+
+    inline int getCurrentScale() const { return curr_scale_; }
+
+    inline void setCurrentScale(const int curr_scale) { curr_scale_ = curr_scale; }
+
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+private:
+
+    static constexpr int max_scale_ = math::log2_const(BlockSize);
+
+    // Internal copy helper function
+    void initFromBlock(const BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>& block)
+    {
+//    this->code_          = block.code();
+//    this->size_          = block.size_;
+//    this->children_mask_ = block.children_mask();
+//    this->timestamp_     = block.timestamp();
+//    this->active_        = block.active();
+//    this->coordinates_   = block.coordinates();
+//    this->min_scale_     = block.min_scale();
+//    this->current_scale_ = block.current_scale();
+//    init_data_           = block.initData();
+//    std::copy(block.childrenData(), block.childrenData() + 8, this->children_data_);
+//    if (block.min_scale() != -1)
+//    { // Verify that at least some mip-mapped level has been initialised.
+//      for (int scale = this->max_scale; scale >= block.min_scale(); scale--)
+//      {
+//        int size_at_scale = this->size_li >> scale;
+//        int num_voxels_at_scale = se::math::cu(size_at_scale);
+//        blockData().push_back(new typename T::VoxelData[num_voxels_at_scale]);
+//        std::copy(
+//                block.blockData()[VoxelBlock<T>::max_scale - scale],
+//                block.blockData()[VoxelBlock<T>::max_scale - scale] + num_voxels_at_scale,
+//                blockData()[VoxelBlock<T>::max_scale - scale]);
+//      }
+//      for (int scale = this->max_scale; scale >= block.min_scale() + 1; scale--)
+//      {
+//        int size_at_scale = this->size_li >> scale;
+//        int num_voxels_at_scale = se::math::cu(size_at_scale);
+//        blockMaxData().push_back(new typename T::VoxelData[num_voxels_at_scale]);
+//        std::copy(block.blockMaxData()[VoxelBlock<T>::max_scale - scale],
+//                  block.blockMaxData()[VoxelBlock<T>::max_scale - scale] + num_voxels_at_scale,
+//                  blockMaxData()[VoxelBlock<T>::max_scale - scale]);
+//      }
+//      blockMaxData()[VoxelBlock<T>::max_scale - this->min_scale_] = blockData()[VoxelBlock<T>::max_scale - this->min_scale_];
+//    }
+  }
+
+  ///<< Initalise array of data with `init_data_`.
+  void initialiseData(DataType* voxel_data,
+                      const int num_voxels)
+  {
+    std::fill(voxel_data, voxel_data+num_voxels, init_data_);
+  }
+
+  std::vector<DataType*> block_data_;
+  std::vector<DataType*> block_max_data_;
+
+  DataType* curr_data_ = nullptr; ///<< Pointer to the data at the current integration scale.
+  size_t    curr_integr_count_; ///<< Number of integrations at that current scale.
+  size_t    curr_observed_count_; ///<< Number of observed voxels at the current scale
+
+  /**
+   * \brief Rather than switching directly to a different integration scale once the integration scale computation
+   *        recommends a different scale, data is continued to be integrated at the current scale and additionally into
+   *        a buffer at the recommended scale.
+   *        Recommended scale == current scale:
+   *            The buffer_data_ points to a `nullptr`
+   *        Recommended scale < current scale:
+   *            The buffer_data_ points to a independently allocated array of voxel data. The data is initialised with
+   *            the parent data at the current integration scale. Once the scale changes the data is inserted into the
+   *            block_data_ and block_max_data_ vector.
+   *        Recommended scale > current scale:
+   *            The buffer_data_ points to according scale in the block_data_ vector. The data integration starts from
+   *            the mean up-propagated value. Up until the recommened scale > current scale the mean up-propagation starts
+   *            from the recommened scale such that the data is not overwritten by the up-propagation from the current scale.
+   *            However the max up-propagation continues from the current integration scale. Once the scale changes the
+   *            current_data_ and current_scale_ is set to the buffer setup, the finest scale in the block_data_ and
+   *            block_max_data_ is deleted and the new finest scales in the buffers adjusted accordingly.
+   *
+   * \note  The recommended scale can only differ by +/-1 scale from the current scale.
+   *        The overhead of integrating at two different scales is insignificant compared to switching immediately as
+   *        the double integration only happens in areas where the recommended integration scale changed and stops
+   *        as soon as the criteria for switching to the finer or coarser scale.
+   */
+  int curr_scale_;
+  int min_scale_;
+
+  DataType* buffer_data_ = nullptr; ///<< Pointer to the buffer data.
+  int       buffer_scale_; ///<< The scale of the buffer.
+  size_t    buffer_integr_count_; ///<< Number of integrations at the buffer scale. \note Is only incremented when 95% of the current observations are reached.
+  size_t    buffer_observed_count_; ///<< Number of observed voxels in the buffer.
+
+  DataType min_data_;
+  DataType init_data_;
+
+  DerivedT& underlying() { return static_cast<DerivedT&>(*this); }
+  const DerivedT& underlying() const { return static_cast<const DerivedT&>(*this); }
+};
+
+
 /**
  * \brief The actual block used in the tree.
  *
+ * \note Template defaults set in forward decleration further up
  */
 template <typename DataT,
-          Res      ResT      = Res::Single,
-          int      BlockSize = 8,
-          typename PolicyT   = std::enable_if_t<math::is_power_of_two(BlockSize)> ///< Verify that the block size is sensible
+          Res      ResT,
+          int      BlockSize,
+          typename PolicyT
 >
 class Block : public std::conditional<ResT == Res::Single,
         BlockSingleRes<Block<DataT, ResT, BlockSize>, DataT, BlockSize>,

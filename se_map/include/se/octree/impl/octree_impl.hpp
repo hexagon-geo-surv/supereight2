@@ -137,18 +137,17 @@ inline void Octree<DataT, ResT, BlockSize>::deleteChildren(NodeType* parent_ptr)
       if (octant_ptr->isBlock())
       {
         BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
-        delete(block_ptr);
+        memory_pool_.deleteBlock(block_ptr);
       } else
       {
-        for (int child_idx = 0; child_idx < 8; child_idx++)
-        {
-          deleteChildren(static_cast<NodeType*>(parent_ptr->getChild(child_idx)));
-        }
-        delete(parent_ptr);
+        NodeType* node_ptr = static_cast<NodeType*>(octant_ptr);
+        deleteChildren(node_ptr);
+        memory_pool_.deleteNode(node_ptr);
       }
     }
+    parent_ptr->setChild(child_idx, nullptr);
   }
-  parent_ptr->setChildrenMask(0);
+  parent_ptr->clearChildrenMask();
 }
 
 

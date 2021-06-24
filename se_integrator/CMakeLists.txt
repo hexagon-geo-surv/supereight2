@@ -19,4 +19,3 @@ add_library(SE::Integrator ALIAS ${LIB_NAME})
 # This is required so that the exported target has the name Shared and not
 # se-shared
 set_target_properties(${LIB_NAME} PROPERTIES EXPORT_NAME Integrator)
-

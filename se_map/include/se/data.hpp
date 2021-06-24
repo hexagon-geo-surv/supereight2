@@ -10,21 +10,21 @@ namespace se {
 
 // Typedefs and defaults
 
-static const se::field_t dflt_tsdf = 1.f;
+static const se::field_t  dflt_tsdf       = 1.f;
 
 typedef int weight_t;
-static const weight_t dflt_weight = 0;
+static const weight_t     dflt_weight     = 0;
 
-static const se::field_t dflt_occupancy = 0.f;
+static const se::field_t  dflt_occupancy  = 0.f;
 
 typedef float time_stamp_t;
-static const time_stamp_t dflt_time_stamp = 0.f;
+static const time_stamp_t dflt_time_stamp = -1.f;
 
 typedef uint32_t rgba_t;
-static const rgba_t dflt_rgba = 0xFFFFFFFF; // White
+static const rgba_t       dflt_rgba       = 0xFFFFFFFF; // White
 
 typedef short semantics_t;
-static const semantics_t  dflt_semantics = 0;
+static const semantics_t  dflt_semantics  = 0;
 
 template<se::Field FieldT>
 struct FieldData
@@ -34,8 +34,10 @@ struct FieldData
 template<>
 struct FieldData<se::Field::Occupancy>
 {
-    FieldData() : occupancy(dflt_occupancy), time_stamp(dflt_time_stamp) {}
+    FieldData() : occupancy(dflt_occupancy), weight(dflt_weight), observed(false), time_stamp(dflt_time_stamp) {}
     se::field_t  occupancy;
+    weight_t     weight;
+    bool         observed;
     time_stamp_t time_stamp;
     static constexpr bool invert_normals = false;
 };
@@ -145,6 +147,8 @@ struct DeltaData : public FieldDeltaData<FldT>, ColourDeltaData<ColB>
 /// DATA CONFIG ///
 ///////////////////
 
+enum class UncertaintyModel {linear, quadratic};
+
 template<se::Field FieldT>
 struct FieldDataConfig
 {
@@ -153,9 +157,27 @@ struct FieldDataConfig
 template<>
 struct FieldDataConfig<se::Field::Occupancy>
 {
+    float   k_sigma;
+    float   sigma_min;
+    float   sigma_max;
+
+    float   k_tau;
+    float   tau_min;
+    float   tau_max;
+
     field_t min_occupancy;
     field_t max_occupancy;
+    int     max_weight;
     field_t surface_boundary;
+
+    field_t log_odd_min;
+    field_t log_odd_max;
+
+    int     fs_integr_scale;
+
+    UncertaintyModel uncertainty_model;
+
+    bool const_surface_thickness;
 
     /** Initializes the config to some sensible defaults.
      */
@@ -306,12 +328,12 @@ inline void set_invalid(Data<FldT, ColB, SemB>& data);
 template <se::Colour    ColB,
           se::Semantics SemB
 >
-inline void set_invalid(Data<se::Field::TSDF, ColB, SemB>& data) { data.weight = dflt_tsdf; }
+inline void set_invalid(Data<se::Field::TSDF, ColB, SemB>& data) { data = Data<se::Field::TSDF, ColB, SemB>(); }
 
 template <se::Colour    ColB,
           se::Semantics SemB
 >
-inline void set_invalid(Data<se::Field::Occupancy, ColB, SemB>& data) { data.time_stamp != dflt_time_stamp; }
+inline void set_invalid(Data<se::Field::Occupancy, ColB, SemB>& data) {data = Data<se::Field::Occupancy, ColB, SemB>(); }
 
 
 

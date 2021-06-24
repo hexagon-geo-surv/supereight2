@@ -128,16 +128,49 @@ public:
    *
    * \tparam SafeB          The parameter turning "contains point" verification on and off (Off by default)
    * \param[in]  point_M    The coordinates of the point in map frame [meter] to evaluate
-   * \return                The data at the provided coordinates
+   * \return The data at the provided coordinates
    */
   template<Safe SafeB = Safe::Off>
   inline const DataType getData (const Eigen::Vector3f& point_M) const;
 
   /**
+   * \brief Get the stored max data at the provided coordinates in [meter] for a given scale.
+   *
+   * \tparam SafeB          The parameter turning "contains point" verification on and off (Off by default)
+   * \tparam ResTDummy      The dummy parameter disabling the function off for single res and TSDF maps // TODO: Clean up with C++20 using required
+   * \param point_M         The coordinates of the point in map frame [meter] to accessed
+   * \param scale_desired   The scale to be accessed
+   * \return The max data at the provided coordinates and scale
+   */
+  template<Safe SafeB    = Safe::Off,
+           Res ResTDummy = ResT
+  >
+  inline typename std::enable_if_t<ResTDummy == Res::Multi, DataType>
+  getMaxData(const Eigen::Vector3f& point_M,
+             const int              scale_desired) const
+  {
+    Eigen::Vector3i voxel_coord;
+
+    if constexpr(SafeB == Safe::Off) // Evaluate at compile time
+    {
+      pointToVoxel<Safe::Off>(point_M, voxel_coord);
+    } else
+    {
+      if (!pointToVoxel<Safe::On>(point_M, voxel_coord))
+      {
+        return DataType();
+      }
+    }
+
+    return se::visitor::getMaxData(*octree_ptr_, voxel_coord, scale_desired);
+  }
+
+
+    /**
    * \brief Get the interpolated field value at the provided coordinates.
    *
    * \tparam SafeB          The parameter turning "contains point" verification on and off (Off by default)
-   * \param[in] point_M     The coordinates of the point in map frame [meter] to evaluate
+   * \param[in] point_M     The coordinates of the point in map frame [meter] to accessed
    * \return                The interpolated field value at the coordinates
    */
   template<Safe SafeB = Safe::Off>
@@ -148,7 +181,7 @@ public:
    *
    * \tparam SafeB              The parameter turning "contains point" verification on and off (Off by default)
    * \tparam ResTDummy          The dummy parameter disabling the function off for single res maps // TODO: Clean up with C++20 using required
-   * \param[in] point_M         The coordinates of the point in map frame [meter] to evaluate
+   * \param[in] point_M         The coordinates of the point in map frame [meter] to accessed
    * \param[out] returned_scale The scale the data is stored at
    * \return                    The interpolated field value at the coordinates
    */
@@ -163,20 +196,48 @@ public:
    * \brief Get the field gradient at the provided coordinates.
    *
    * \tparam SafeB          The parameter turning "contains point" verification on and off (Off by default)
-   * \param[in] point_M     The coordinates of the point in map frame [meter] to evaluate
+   * \param[in] point_M     The coordinates of the point in map frame [meter] to accessed
    * \return                The filed gradient at the coordinates
    */
   template<Safe SafeB = Safe::Off>
   inline std::optional<se::field_vec_t> getFieldGrad(const Eigen::Vector3f& point_M) const;
 
   /**
-   * \brief Save three axis aligned slices (x, y and z) at the provided coordinates to a file.
+   * \brief Save three axis aligned slices field value (x, y and z) at the provided coordinates to a file.
    *
    * \param[in] file_path   The path to store the slices at (without .vtk file ending)
    * \param[in] point_M     The coordinates of the point in map frame [meter] to extract the slices from
    * \param[in] num         The slice number, e.g. frame number (OPTIONAL)
    */
-  void saveSlice(const std::string&     file_path,
+  void saveFieldSlice(const std::string&     file_path,
+                      const Eigen::Vector3f& point_M,
+                      const std::string&     num = "") const;
+
+  /**
+   * \brief Save three axis aligned max field value slices (x, y and z) at the provided coordinates to a file.
+   *
+   * \param[in] file_path   The path to store the slices at (without .vtk file ending)
+   * \param[in] point_M     The coordinates of the point in map frame [meter] to extract the slices from
+   * \param[in] scale       The min scale at which to extract the max field data from
+   * \param[in] num         The slice number, e.g. frame number (OPTIONAL)
+   */
+  template<se::Field FldTDummy = FldT>
+  typename std::enable_if_t<FldTDummy == se::Field::Occupancy, void>
+  saveMaxFieldSlice(const std::string&     file_path,
+                    const Eigen::Vector3f& point_M,
+                    const int              scale,
+                    const std::string&     num = "") const;
+
+  /**
+   * \brief Save three axis aligned integration scale slices (x, y and z) at the provided coordinates to a file.
+   *
+   * \param[in] file_path   The path to store the slices at (without .vtk file ending)
+   * \param[in] point_M     The coordinates of the point in map frame [meter] to extract the slices from
+   * \param[in] num         The slice number, e.g. frame number (OPTIONAL)
+   */
+  template<Res ResTDummy = ResT>
+  typename std::enable_if_t<ResTDummy == Res::Multi, void>
+  saveScaleSlice(const std::string&     file_path,
                  const Eigen::Vector3f& point_M,
                  const std::string&     num = "") const;
 
@@ -371,7 +432,7 @@ protected:
   const Eigen::Vector3f lb_;           ///< The lower map bound
   const Eigen::Vector3f ub_;           ///< The upper map bound
 
-  std::shared_ptr< OctreeType >octree_ptr_ = nullptr;
+  std::shared_ptr<OctreeType> octree_ptr_ = nullptr;
 
   DataConfigType data_config_;                  ///< The configuration of the data
 

@@ -128,7 +128,11 @@ public:
    */
   inline void deleteChildren(NodeType* parent_ptr);
 
-  static constexpr Res res_ = ResT;
+  static constexpr se::Field     fld_ = DataT::fld_;
+  static constexpr se::Colour    col_ = DataT::col_;
+  static constexpr se::Semantics sem_ = DataT::sem_;
+
+  static constexpr se::Res       res_ = ResT;
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 

@@ -22,14 +22,26 @@ void point_cloud_to_normal(se::Image<Eigen::Vector3f>&       normals,
                            const bool                        is_lhc = false);
 
 template <typename MapT>
-inline std::optional<Eigen::Vector4f> raycast(MapT&                  map,
-                                              const Eigen::Vector3f& ray_origin_M,
-                                              const Eigen::Vector3f& ray_dir_M,
-                                              const float            t_near,
-                                              const float            t_far,
-                                              const float            mu,
-                                              const float            step,
-                                              const float            largestep);
+inline typename std::enable_if_t<MapT::fld_ == se::Field::Occupancy, std::optional<Eigen::Vector4f>>
+raycast(MapT&                  map,
+        const Eigen::Vector3f& ray_origin_M,
+        const Eigen::Vector3f& ray_dir_M,
+        const float            t_near,
+        const float            t_far,
+        const float            mu,
+        const float            step,
+        const float            largestep);
+
+template <typename MapT>
+inline typename std::enable_if_t<MapT::fld_ == se::Field::TSDF, std::optional<Eigen::Vector4f>>
+raycast(MapT&                  map,
+        const Eigen::Vector3f& ray_origin_M,
+        const Eigen::Vector3f& ray_dir_M,
+        const float            t_near,
+        const float            t_far,
+        const float            mu,
+        const float            step,
+        const float            largestep);
 
 template<typename MapT, typename SensorT>
 void raycastVolume(const MapT&                 map,

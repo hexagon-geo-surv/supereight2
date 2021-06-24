@@ -2,13 +2,22 @@
 #define SE_MAP_INTEGRATOR_IMPL_HPP
 
 #include "se/octree/propagator.hpp"
+#include "se/allocator/dense_pooling_imge.hpp"
+#include "se/updater/multires_ofusion_updater_models.hpp"
+#include "se/utils/math_util.hpp"
+#include "se/allocator/volume_carver.hpp"
+#include "se/updater/multires_ofusion_updater.hpp"
 
 
 
 namespace se {
 namespace allocator {
 
-template<typename SensorT, typename MapT>
+
+
+template<typename SensorT,
+         typename MapT
+>
 std::vector<se::OctantBase*> frustum(const se::Image<depth_t>& depth_img,
                                     SensorT&                   sensor,
                                     const Eigen::Matrix4f&     T_MS,
@@ -70,38 +79,76 @@ std::vector<se::OctantBase*> frustum(const se::Image<depth_t>& depth_img,
   return fetched_block_ptrs;
 }
 
+
+
+template<typename MapT,
+         typename SensorT
+>
+void frustum(const se::Image<depth_t>&               depth_img,
+             const se::DensePoolingImage<SensorT>    depth_pooling_img,
+             MapT&                                   map,
+             SensorT&                                sensor,
+             const Eigen::Matrix4f&                  T_MS,
+             std::vector<se::OctantBase*>&           block_list,           ///< List of blocks to be updated.
+             std::vector<std::set<se::OctantBase*>>& node_list,            ///< Node list of size map.getOctree()->getBlockDepth()
+             std::vector<bool>&                      low_variance_list,    ///< Has updated block low variance? <bool>
+             std::vector<bool>&                      projects_inside_list) ///< Does the updated block reproject completely into the image? <bool>
+{
+  VolumeCarver volume_carver(depth_img, depth_pooling_img, map, sensor, se::math::to_inverse_transformation(T_MS), block_list, node_list, low_variance_list, projects_inside_list);
+
+  // Launch on the 8 voxels of the first depth
+#pragma omp parallel for
+  for (int child_idx = 0; child_idx < 8; ++child_idx)
+  {
+    int child_size = map.size() / 2;
+    Eigen::Vector3i child_rel_step = Eigen::Vector3i((child_idx & 1) > 0, (child_idx & 2) > 0, (child_idx & 4) > 0);
+    Eigen::Vector3i child_coord = child_rel_step * child_size; // Because, + corner is (0, 0, 0) at root depth
+    volume_carver(child_coord, child_size, 1, child_rel_step, map.root());
+  }
+}
+
+
+
 } // namespace allocator
 
 
 
 namespace fetcher {
-  template<typename MapT, typename SensorT>
-  inline std::vector<se::OctantBase*> frustum(MapT&                  map,
-                                              const SensorT&         sensor,
-                                              const Eigen::Matrix4f& T_MS)
-  {
-    const Eigen::Matrix4f T_SM = se::math::to_inverse_transformation(T_MS);
-    // The edge lengh of Blocks in voxels.
-    constexpr int block_size = MapT::OctreeType::BlockType::getSize();
-    // The radius of Blocks in metres.
-    const float block_radius = std::sqrt(3.0f) / 2.0f * map.getRes() * block_size ;
-    // Loop over all allocated Blocks.
-    std::vector<se::OctantBase*> block_ptrs;
-    for (auto block_ptr_itr = BlocksIterator<typename MapT::OctreeType>(map.getOctree().get());
-        block_ptr_itr != BlocksIterator<typename MapT::OctreeType>(); ++block_ptr_itr) {
-      auto& block = **block_ptr_itr;
-      // Get the centre of the Block in the map frame.
-      Eigen::Vector3f block_centre_point_M;
-      map.voxelToPoint(block.getCoord(), block_size, block_centre_point_M);
-      // Convert it to the sensor frame.
-      const Eigen::Vector3f block_centre_point_S
-          = (T_SM * block_centre_point_M.homogeneous()).head<3>();
-      if (sensor.sphereInFrustum(block_centre_point_S, block_radius)) {
-        block_ptrs.push_back(&block);
-      }
+
+
+
+template<typename MapT,
+         typename SensorT
+>
+inline std::vector<se::OctantBase*> frustum(MapT&                  map,
+                                            const SensorT&         sensor,
+                                            const Eigen::Matrix4f& T_MS)
+{
+  const Eigen::Matrix4f T_SM = se::math::to_inverse_transformation(T_MS);
+  // The edge lengh of Blocks in voxels.
+  constexpr int block_size = MapT::OctreeType::BlockType::getSize();
+  // The radius of Blocks in metres.
+  const float block_radius = std::sqrt(3.0f) / 2.0f * map.getRes() * block_size ;
+  // Loop over all allocated Blocks.
+  std::vector<se::OctantBase*> block_ptrs;
+  for (auto block_ptr_itr = BlocksIterator<typename MapT::OctreeType>(map.getOctree().get());
+      block_ptr_itr != BlocksIterator<typename MapT::OctreeType>(); ++block_ptr_itr) {
+    auto& block = **block_ptr_itr;
+    // Get the centre of the Block in the map frame.
+    Eigen::Vector3f block_centre_point_M;
+    map.voxelToPoint(block.getCoord(), block_size, block_centre_point_M);
+    // Convert it to the sensor frame.
+    const Eigen::Vector3f block_centre_point_S
+        = (T_SM * block_centre_point_M.homogeneous()).head<3>();
+    if (sensor.sphereInFrustum(block_centre_point_S, block_radius)) {
+      block_ptrs.push_back(&block);
     }
-    return block_ptrs;
   }
+  return block_ptrs;
+}
+
+
+
 } // namespace fetcher
 
 
@@ -166,6 +213,26 @@ struct IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>
  */
 template <>
 struct IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi>
+{
+    template<typename SensorT,
+            typename MapT,
+            typename ConfigT
+    >
+    static void integrate(const se::Image<se::depth_t>& depth_img,
+                          const SensorT&                sensor,
+                          const Eigen::Matrix4f&        T_MS,
+                          const unsigned int            frame,
+                          MapT&                         map,
+                          ConfigT&                      /* config */);
+};
+
+
+
+/**
+ * Multi-res OFusion integration helper struct for partial function specialisation
+ */
+template <>
+struct IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>
 {
     template<typename SensorT,
             typename MapT,
@@ -460,6 +527,82 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi>::integrate(const se::I
 
   se::propagator::propagateTimeStampToRoot(block_ptrs);
 }
+
+
+
+template<typename SensorT,
+         typename MapT,
+         typename ConfigT
+>
+void IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>::integrate(const se::Image<se::depth_t>& depth_img,
+                                                                          const SensorT&                sensor,
+                                                                          const Eigen::Matrix4f&        T_MS,
+                                                                          const unsigned int            frame,
+                                                                          MapT&                         map,
+                                                                          ConfigT&                      /* config */)
+{
+  // Create min/map depth pooling image for different bounding box sizes
+  se::DensePoolingImage<SensorT> pooling_depth_image(depth_img);
+
+  std::vector<se::OctantBase*> node_list;             ///< List of nodes to be updated
+  std::vector<se::OctantBase*> block_list;            ///< List of blocks to be updated
+  std::vector<bool>            low_variance_list;     ///< Has updated block low variance? <bool>
+  std::vector<bool>            projects_inside_list;  ///< Does the updated block reproject completely into the image? <bool>
+
+  const Eigen::Matrix4f T_SM = se::math::to_inverse_transformation(T_MS);
+
+  // Allocate the frustum
+  VolumeCarver<MapT, SensorT> volume_carver(depth_img, pooling_depth_image,
+                                            map, sensor, T_SM, frame,
+                                            node_list,                                            //< all to be freed
+                                            block_list, low_variance_list, projects_inside_list); //< process based on low_variance and project inside
+
+  // Launch on the 8 voxels of the first depth
+  const int child_size     = map.getOctree()->getSize() / 2;
+  se::OctantBase* root_ptr = map.getOctree()->getRoot();
+#pragma omp parallel for
+  for (int child_idx = 0; child_idx < 8; ++child_idx)
+  {
+    Eigen::Vector3i child_rel_step = Eigen::Vector3i((child_idx & 1) > 0, (child_idx & 2) > 0, (child_idx & 4) > 0);
+    Eigen::Vector3i child_coord    = child_rel_step * child_size; // Because, + corner is (0, 0, 0) at root depth
+    volume_carver(child_coord, child_size, 1, child_rel_step, root_ptr);
+  }
+
+  // ----------------------
+
+  std::vector<std::set<se::OctantBase*>> node_set(map.getOctree()->getBlockDepth());
+  std::vector<se::OctantBase*>           freed_block_list;
+  MultiresOFusionUpdater<MapT, SensorT> updater(depth_img, map, sensor, T_SM, frame, node_set, freed_block_list);
+
+#pragma omp parallel for
+  for (unsigned int i = 0; i < node_list.size(); ++i)
+  {
+    auto node_ptr = static_cast<typename MapT::OctreeType::NodeType*>(node_list[i]);
+    const int depth = map.getOctree()->getMaxScale() - se::math::log2_const(node_ptr->getSize());
+    updater.freeNodeRecurse(node_list[i], depth);
+  }
+
+#pragma omp parallel for
+  for (unsigned int i = 0; i < block_list.size(); ++i)
+  {
+    updater.updateBlock(block_list[i], low_variance_list[i], projects_inside_list[i]);
+  }
+
+  /// Propagation
+#pragma omp parallel for
+  for (unsigned int i = 0; i < block_list.size(); ++i)
+  {
+    updater::propagateBlockToCoarsestScale<typename MapT::OctreeType::BlockType>(block_list[i]);
+  }
+#pragma omp parallel for
+  for (unsigned int i = 0; i < freed_block_list.size(); ++i)
+  {
+    updater::propagateBlockToCoarsestScale<typename MapT::OctreeType::BlockType>(freed_block_list[i]);
+  }
+
+  updater.propagateToRoot(block_list);
+}
+
 
 
 } // namespace anonymous

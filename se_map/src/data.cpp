@@ -7,8 +7,22 @@
 #include "se/yaml.hpp"
 
 namespace se {
-  FieldDataConfig<Field::Occupancy>::FieldDataConfig()
-    : min_occupancy(-500.0f), max_occupancy(500.0f), surface_boundary(0.0f)
+  FieldDataConfig<Field::Occupancy>::FieldDataConfig() :
+      k_sigma(0.052f),
+      sigma_min(2 * 0.015f),
+      sigma_max(2 * 0.06f),
+      k_tau(0.026f),
+      tau_min(2 * 0.06f),
+      tau_max(2 * 0.16f),
+      min_occupancy(-15.f),
+      max_occupancy(15.f),
+      max_weight(3),
+      surface_boundary(0.f),
+      log_odd_min(-5.015),
+      log_odd_max(5.015),
+      fs_integr_scale(1),
+      uncertainty_model(UncertaintyModel::linear),
+      const_surface_thickness(false)
   {
   }
 
@@ -39,9 +53,33 @@ namespace se {
     }
 
     // Read the config parameters.
+    se::yaml::subnode_as_float(node, "k_sigma", k_sigma);
+    se::yaml::subnode_as_float(node, "sigma_min", sigma_min);
+    se::yaml::subnode_as_float(node, "sigma_max", sigma_max);
+    se::yaml::subnode_as_float(node, "k_tau", k_tau);
+    se::yaml::subnode_as_float(node, "tau_min", tau_min);
+    se::yaml::subnode_as_float(node, "tau_max", tau_max);
     se::yaml::subnode_as_float(node, "min_occupancy", min_occupancy);
     se::yaml::subnode_as_float(node, "max_occupancy", max_occupancy);
+    se::yaml::subnode_as_int(node, "max_weight", max_weight);               // TODO: Compute based on min_occupancy and log_odd_min
     se::yaml::subnode_as_float(node, "surface_boundary", surface_boundary);
+    se::yaml::subnode_as_float(node, "log_odd_min", log_odd_min);
+    se::yaml::subnode_as_float(node, "log_odd_max", log_odd_max);
+    se::yaml::subnode_as_int(node, "fs_integr_scale", fs_integr_scale);
+    std::string uncertainty_model_s;
+    se::yaml::subnode_as_string(node, "uncertainty_model", uncertainty_model_s);
+
+    if (uncertainty_model_s == "linear")
+    {
+      uncertainty_model = UncertaintyModel::linear;
+    }
+
+    if (uncertainty_model_s == "quadratic")
+    {
+      uncertainty_model = UncertaintyModel::quadratic;
+    }
+
+    se::yaml::subnode_as_bool(node, "const_surface_thickness", const_surface_thickness);
   }
 
 

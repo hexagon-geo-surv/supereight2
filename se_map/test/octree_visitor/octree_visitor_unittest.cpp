@@ -51,7 +51,7 @@ Eigen::Vector3i adapt_to_scale(const Eigen::Vector3i& coord, const se::scale_t s
 
 
 
-TEST(SingleResVisitor, Interpolation)
+TEST(VisitorTSDFSingleRes, Interpolation)
 {
   Eigen::Vector3i block_coord;
   Eigen::Vector3i coord_ought;
@@ -140,7 +140,8 @@ TEST(SingleResVisitor, Interpolation)
 }
 
 
-TEST(MultiResVisitor, Interpolation)
+
+TEST(VisitorTSDFMultiRes, Interpolation)
 {
   Eigen::Vector3i block_coord;
   Eigen::Vector3i coord_ought;

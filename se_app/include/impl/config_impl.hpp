@@ -23,18 +23,19 @@ namespace se {
   {
     // Read the truncation_boundary_factor for TSDF implementations and compute the
     // truncation_boundary based on that and the map resolution.
-    if (     std::is_same_v<DataConfigT, TSDFDataConfig>
-          || std::is_same_v<DataConfigT, TSDFColDataConfig>
-          || std::is_same_v<DataConfigT, TSDFSemDataConfig>
-          || std::is_same_v<DataConfigT, TSDFColSemDataConfig>) {
+    if constexpr (DataConfigT::FldT == se::Field::TSDF)
+    {
       // Open the file for reading.
       cv::FileStorage fs;
-      try {
-        if (!fs.open(yaml_file, cv::FileStorage::READ | cv::FileStorage::FORMAT_YAML)) {
+      try
+      {
+        if (!fs.open(yaml_file, cv::FileStorage::READ | cv::FileStorage::FORMAT_YAML))
+        {
           std::cerr << "Error: couldn't read configuration file " << yaml_file << "\n";
           return;
         }
-      } catch (const cv::Exception& e) {
+      } catch (const cv::Exception& e)
+      {
         // OpenCV throws if the file contains non-YAML data.
         std::cerr << "Error: invalid YAML in configuration file " << yaml_file << "\n";
         return;
@@ -42,7 +43,8 @@ namespace se {
 
       // Get the node containing the data configuration.
       const cv::FileNode node = fs["data"];
-      if (node.type() != cv::FileNode::MAP) {
+      if (node.type() != cv::FileNode::MAP)
+      {
         std::cerr << "Warning: using default data configuration, no \"data\" section found in "
           << yaml_file << "\n";
         return;

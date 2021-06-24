@@ -2,6 +2,7 @@
 #define SE_MAP_IMPL_HPP
 
 #include "se/timings.hpp"
+#include "se/utils/octant_util.hpp"
 
 namespace se {
 
@@ -20,6 +21,9 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const Eigen::Vector3f& dim,
     lb_(- origin_M_), ub_(dim - origin_M_),
     data_config_(data_config)
 {
+  corner_rel_steps_ << 0, 1, 0, 1, 0, 1, 0, 1,
+                       0, 0, 1, 1, 0, 0, 1, 1,
+                       0, 0, 0, 0, 1, 1, 1, 1;
   initialiseOctree();
 }
 
@@ -41,6 +45,9 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const MapConfig&              
   {
     std::cerr << "Map origin is outside the map" << std::endl;
   }
+  corner_rel_steps_ << 0, 1, 0, 1, 0, 1, 0, 1,
+                       0, 0, 1, 1, 0, 0, 1, 1,
+                       0, 0, 0, 0, 1, 1, 1, 1;
   initialiseOctree();
 }
 
@@ -185,22 +192,105 @@ template <Field     FldT,
           Res       ResT,
           int       BlockSize
 >
-void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveSlice(const std::string&     file_path,
+void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveFieldSlice(const std::string&     file_path,
+                                                                  const Eigen::Vector3f& point_M,
+                                                                  const std::string&     num) const
+{
+  Eigen::Vector3i voxel_coord;
+  pointToVoxel(point_M, voxel_coord);
+
+  auto get_field_value = [&](int x, int y, int z)
+  {
+    return se::get_field(se::visitor::getData(*octree_ptr_, Eigen::Vector3i(x, y, z)));
+  };
+
+  const std::string file_name_x = (num == std::string("")) ? (file_path + "_x.vtk") : (file_path + "_x_" + num + ".vtk");
+  const std::string file_name_y = (num == std::string("")) ? (file_path + "_y.vtk") : (file_path + "_y_" + num + ".vtk");
+  const std::string file_name_z = (num == std::string("")) ? (file_path + "_z.vtk") : (file_path + "_z_" + num + ".vtk");
+  se::io::save_3d_slice_vtk(file_name_x, Eigen::Vector3i(voxel_coord.x(), 0, 0), Eigen::Vector3i(voxel_coord.x() + 1, octree_ptr_->getSize(), octree_ptr_->getSize()), get_field_value);
+  se::io::save_3d_slice_vtk(file_name_y, Eigen::Vector3i(0, voxel_coord.y(), 0), Eigen::Vector3i(octree_ptr_->getSize(), voxel_coord.y() + 1, octree_ptr_->getSize()), get_field_value);
+  se::io::save_3d_slice_vtk(file_name_z, Eigen::Vector3i(0, 0, voxel_coord.z()), Eigen::Vector3i(octree_ptr_->getSize(), octree_ptr_->getSize(), voxel_coord.z() + 1), get_field_value);
+}
+
+
+
+template <Field     FldT,
+          Colour    ColB,
+          Semantics SemB,
+          Res       ResT,
+          int       BlockSize
+>
+template<se::Field FldTDummy>
+typename std::enable_if_t<FldTDummy == se::Field::Occupancy, void>
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMaxFieldSlice(const std::string&     file_path,
+                                                                const Eigen::Vector3f& point_M,
+                                                                const int              scale,
+                                                                const std::string&     num) const
+{
+  Eigen::Vector3i voxel_coord;
+  pointToVoxel(point_M, voxel_coord);
+
+  auto get_max_field_value = [&](int x, int y, int z)
+  {
+//    const DataType max_data  = se::visitor::getMaxData(*octree_ptr_, Eigen::Vector3i(x, y, z), scale);
+//    const field_t  max_field = se::get_field(max_data);
+//    return (max_data.observed) ? max_field : std::max(get_field(DataType()), max_field);
+    return get_field(se::visitor::getMaxData(*octree_ptr_, Eigen::Vector3i(x, y, z), scale));
+  };
+
+  const std::string file_name_x = (num == std::string("")) ? (file_path + "_x.vtk") : (file_path + "_x_" + num + ".vtk");
+  const std::string file_name_y = (num == std::string("")) ? (file_path + "_y.vtk") : (file_path + "_y_" + num + ".vtk");
+  const std::string file_name_z = (num == std::string("")) ? (file_path + "_z.vtk") : (file_path + "_z_" + num + ".vtk");
+  se::io::save_3d_slice_vtk(file_name_x, Eigen::Vector3i(voxel_coord.x(), 0, 0), Eigen::Vector3i(voxel_coord.x() + 1, octree_ptr_->getSize(), octree_ptr_->getSize()), get_max_field_value);
+  se::io::save_3d_slice_vtk(file_name_y, Eigen::Vector3i(0, voxel_coord.y(), 0), Eigen::Vector3i(octree_ptr_->getSize(), voxel_coord.y() + 1, octree_ptr_->getSize()), get_max_field_value);
+  se::io::save_3d_slice_vtk(file_name_z, Eigen::Vector3i(0, 0, voxel_coord.z()), Eigen::Vector3i(octree_ptr_->getSize(), octree_ptr_->getSize(), voxel_coord.z() + 1), get_max_field_value);
+}
+
+
+
+template <Field     FldT,
+          Colour    ColB,
+          Semantics SemB,
+          Res       ResT,
+          int       BlockSize
+>
+template<Res ResTDummy>
+typename std::enable_if_t<ResTDummy == Res::Multi, void>
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveScaleSlice(const std::string&     file_path,
                                                              const Eigen::Vector3f& point_M,
                                                              const std::string&     num) const
 {
   Eigen::Vector3i voxel_coord;
   pointToVoxel(point_M, voxel_coord);
 
+  se::OctantBase* root_ptr = octree_ptr_->getRoot();
+  const int max_scale      = octree_ptr_->getMaxScale();
+
+  auto get_scale = [&](int x, int y, int z)
+  {
+    const se::OctantBase* leaf_ptr = se::fetcher::template leaf<OctreeType>(Eigen::Vector3i(x, y, z), root_ptr);
+
+    if (!leaf_ptr)
+    {
+      return max_scale;
+    } else if (leaf_ptr->isBlock())
+    {
+      const typename OctreeType::BlockType* block_ptr = static_cast<const typename OctreeType::BlockType*>(leaf_ptr);
+      return block_ptr->getCurrentScale();
+    } else
+    {
+      const typename OctreeType::NodeType* node_ptr = static_cast<const typename OctreeType::NodeType*>(leaf_ptr);
+      return (node_ptr->getChildrenMask() == 0) ? se::octantops::size_to_scale(node_ptr->getSize()) : -1;
+    }
+  };
+
   const std::string file_name_x = (num == std::string("")) ? (file_path + "_x.vtk") : (file_path + "_x_" + num + ".vtk");
   const std::string file_name_y = (num == std::string("")) ? (file_path + "_y.vtk") : (file_path + "_y_" + num + ".vtk");
   const std::string file_name_z = (num == std::string("")) ? (file_path + "_z.vtk") : (file_path + "_z_" + num + ".vtk");
-  se::io::save_3d_slice_vtk(*octree_ptr_, file_name_x, Eigen::Vector3i(voxel_coord.x(), 0, 0), Eigen::Vector3i(voxel_coord.x() + 1, octree_ptr_->getSize(), octree_ptr_->getSize()));
-  se::io::save_3d_slice_vtk(*octree_ptr_, file_name_y, Eigen::Vector3i(0, voxel_coord.y(), 0), Eigen::Vector3i(octree_ptr_->getSize(), voxel_coord.y() + 1, octree_ptr_->getSize()));
-  se::io::save_3d_slice_vtk(*octree_ptr_, file_name_z, Eigen::Vector3i(0,0, voxel_coord.z()), Eigen::Vector3i(octree_ptr_->getSize(), octree_ptr_->getSize(), voxel_coord.z() + 1));
+  se::io::save_3d_slice_vtk(file_name_x, Eigen::Vector3i(voxel_coord.x(), 0, 0), Eigen::Vector3i(voxel_coord.x() + 1, octree_ptr_->getSize(), octree_ptr_->getSize()), get_scale);
+  se::io::save_3d_slice_vtk(file_name_y, Eigen::Vector3i(0, voxel_coord.y(), 0), Eigen::Vector3i(octree_ptr_->getSize(), voxel_coord.y() + 1, octree_ptr_->getSize()), get_scale);
+  se::io::save_3d_slice_vtk(file_name_z, Eigen::Vector3i(0, 0, voxel_coord.z()), Eigen::Vector3i(octree_ptr_->getSize(), octree_ptr_->getSize(), voxel_coord.z() + 1), get_scale);
 }
-
-
 
 template <Field     FldT,
           Colour    ColB,

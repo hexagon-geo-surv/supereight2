@@ -40,6 +40,16 @@ public:
     return block_buffer_.construct(parent_ptr, child_idx);
   }
 
+  inline void deleteNode(NodeT* node_ptr)
+  {
+    node_buffer_.destroy(node_ptr);
+  }
+
+  inline void deleteBlock(BlockT* block_ptr)
+  {
+    block_buffer_.destroy(block_ptr);
+  }
+
   boost::object_pool<NodeT>  node_buffer_;
   boost::object_pool<BlockT> block_buffer_;
 };

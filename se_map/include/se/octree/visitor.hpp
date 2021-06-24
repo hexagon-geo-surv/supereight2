@@ -95,6 +95,20 @@ getData(const OctreeT&              octree,
         const int                   scale_desired,
         int&                        scale_returned);
 
+/**
+ * \brief Get the max occupancy data at a given scale.
+ *
+ * \tparam OctreeT      The type of octree used (has to be of field type occupancy and multi-res)
+ * \param octree        The reference to the octree
+ * \param voxel_coord   The voxel coordinates in [voxel] to be accessed
+ * \param scale_desired The scale to be accessed
+ * \return The max data at the requested scale.
+ */
+template <typename OctreeT>
+inline typename std::enable_if_t<OctreeT::DataType::fld_ == se::Field::Occupancy, typename OctreeT::DataType>
+getMaxData(const OctreeT&         octree,
+           const Eigen::Vector3i& voxel_coord,
+           const int              scale_desired);
 
 // TODO: Reduce getField functions for single and multi-res to one
 
@@ -251,7 +265,29 @@ getFieldInterp(const OctreeT&         octree,
  * \return The interpolated field value at the returned scale if the data is valid, {}/invalid otherwise
  */
 template <typename OctreeT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
+inline typename std::enable_if_t<(OctreeT::fld_ == se::Field::TSDF &&
+                                  OctreeT::res_ == se::Res::Multi), std::optional<se::field_t>>
+getFieldInterp(const OctreeT&         octree,
+               const Eigen::Vector3f& voxel_coord_f,
+               const int              scale_desired,
+               int&                   scale_returned);
+
+/**
+ * \brief Get the interplated field value for a given coordinate [float voxel coordinates] and desired scale.
+ *        The value is interpolated at the finest common scale (scale_returned).
+ *        The function returns {}/invalid if the data is invalid.
+ *
+ * \tparam OctreeT           The type of the octree used
+ * \param[in] octree         The reference to the octree
+ * \param[in] voxel_coord_f  The voxel coordinates to be accessed [float voxel coordiantes]
+ * \param[in] scale_desired  The finest scale to interpolate the data at
+ * \param[in] scale_returned The scale the field value has been interpolated at (max (scale desired, finest common neighbour scale)
+ *
+ * \return The interpolated field value at the returned scale if the data is valid, {}/invalid otherwise
+ */
+template <typename OctreeT>
+inline typename std::enable_if_t<OctreeT::fld_ == se::Field::Occupancy &&
+                                 OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
 getFieldInterp(const OctreeT&         octree,
                const Eigen::Vector3f& voxel_coord_f,
                const int              scale_desired,

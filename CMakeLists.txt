@@ -22,11 +22,11 @@ endif()
 
 # Compiler options
 add_compile_options(
-        -Wall
-        -Wextra
-        -Wpedantic
-        -Wno-unknown-pragmas
-        -Wno-unused-function
+    -Wall
+    -Wextra
+    -Wpedantic
+    -Wno-unknown-pragmas
+    -Wno-unused-function
 )
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     # Link against the GNU C++ library even when using clang
