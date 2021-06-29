@@ -9,14 +9,17 @@
 namespace se {
   FieldDataConfig<Field::Occupancy>::FieldDataConfig() :
       k_sigma(0.052f),
-      sigma_min(2 * 0.015f),
-      sigma_max(2 * 0.06f),
+      sigma_min_factor(1.5f),
+      sigma_max_factor(6.f),
+      sigma_min(0.2 * 1.5f),
+      sigma_max(0.2 * 6.f),
       k_tau(0.026f),
-      tau_min(2 * 0.06f),
-      tau_max(2 * 0.16f),
-      min_occupancy(-15.f),
-      max_occupancy(15.f),
-      max_weight(3),
+      tau_min_factor(6.f),
+      tau_max_factor(16.f),
+      tau_min(0.2 * 6.f),
+      tau_max(0.2 * 16.f),
+      min_occupancy(-100.f),
+      max_occupancy(100.f),
       surface_boundary(0.f),
       log_odd_min(-5.015),
       log_odd_max(5.015),
@@ -24,6 +27,8 @@ namespace se {
       uncertainty_model(UncertaintyModel::linear),
       const_surface_thickness(false)
   {
+    max_weight = floor(abs(min_occupancy / (0.97 * log_odd_min)));
+    factor     = (max_weight - 1) / max_weight;
   }
 
 
@@ -80,15 +85,34 @@ namespace se {
     }
 
     se::yaml::subnode_as_bool(node, "const_surface_thickness", const_surface_thickness);
+
+    max_weight = floor(abs(min_occupancy / (0.97 * log_odd_min)));
+    factor     = (max_weight - 1) / max_weight;
   }
 
 
 
   std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::Occupancy>& c)
   {
-    os << "min_occupancy:     " << c.min_occupancy << " log-odds\n";
-    os << "max_occupancy:     " << c.max_occupancy << " log-odds\n";
-    os << "surface_boundary:  " << c.surface_boundary << " log-odds\n";
+    os << "k_sigma:                 " << c.k_sigma << "\n";
+    os << "sigma_min_factor:        " << c.sigma_min_factor << "\n";
+    os << "sigma_max_factor:        " << c.sigma_max_factor << "\n";
+    os << "sigma_min:               " << c.sigma_min << "\n";
+    os << "sigma_max:               " << c.sigma_max << "\n";
+    os << "k_tau:                   " << c.k_tau << "\n";
+    os << "tau_min_factor:          " << c.tau_min_factor << "\n";
+    os << "tau_max_factor:          " << c.tau_max_factor << "\n";
+    os << "tau_min:                 " << c.tau_min << "\n";
+    os << "tau_max:                 " << c.tau_max << "\n";
+    os << "min_occupancy:           " << c.min_occupancy << " log-odds\n";
+    os << "max_occupancy:           " << c.max_occupancy << " log-odds\n";
+    os << "surface_boundary:        " << c.surface_boundary << " log-odds\n";
+    os << "log_odd_min:             " << c.log_odd_min << " log-odds\n";
+    os << "log_odd_max:             " << c.log_odd_max << " log-odds\n";
+    os << "max_weight:              " << c.max_weight << "\n";
+    os << "fs_integr_scale:         " << c.fs_integr_scale << "\n";
+    os << "uncertainty_model:       " << ((c.uncertainty_model == UncertaintyModel::linear) ? "linear" : "quadratic") << "\n";
+    os << "const_surface_thickness: " << c.const_surface_thickness << "\n";
     return os;
   }
 

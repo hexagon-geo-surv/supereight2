@@ -133,8 +133,8 @@ namespace se {
 
   template<typename DataConfigT>
   struct Config {
-    DataConfigT   data;
     MapConfig     map;
+    DataConfigT   data;
     SensorConfig  sensor;
     TrackerConfig tracker;
     ReaderConfig  reader;
