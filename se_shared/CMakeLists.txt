@@ -28,3 +28,4 @@ add_library(SE::Shared ALIAS ${LIB_NAME})
 # se-shared
 set_target_properties(${LIB_NAME} PROPERTIES EXPORT_NAME Shared)
 
+add_subdirectory(test)

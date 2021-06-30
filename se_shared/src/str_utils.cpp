@@ -1,6 +1,7 @@
 #include "se/utils/str_utils.hpp"
 
 #include <algorithm>
+#include <cctype>
 
 // POSIX systems must have the unistd.h header.
 #if __has_include(<unistd.h>)
@@ -10,26 +11,89 @@
 
 namespace str_utils {
 
+
+
   bool begins_with(const std::string& s,
                    const std::string& prefix)
   {
     if (s.size() >= prefix.size())
     {
       return (s.compare(0, prefix.length(), prefix) == 0);
-    } else {
+    } else
+    {
       return false;
     }
   }
 
+
+
   bool ends_with(const std::string& s,
                  const std::string& suffix)
   {
-    if (s.size() >= suffix.size()) {
+    if (s.size() >= suffix.size())
+    {
       return (s.compare(s.length() - suffix.length(), suffix.length(), suffix) == 0);
-    } else {
+    } else
+    {
       return false;
     }
   }
+
+
+
+  bool is_int(const std::string& s,
+              const bool         accept_negative)
+  {
+    // Try to parse the string as a int.
+    try
+    {
+      const int i = std::stoi(s);
+      return (accept_negative || (i >= 0));
+    } catch (const std::exception& e)
+    {
+      return false;
+    }
+  }
+
+
+
+  bool is_float(const std::string& s,
+                const bool         accept_negative)
+  {
+    // Try to parse the string as a float.
+    try
+    {
+      const float f = std::stof(s);
+      return (accept_negative || (f >= 0.0f));
+    } catch (const std::exception& e)
+    {
+      return false;
+    }
+  }
+
+
+
+  void remove_prefix(std::string&       s,
+                     const std::string& prefix)
+  {
+    if (begins_with(s, prefix))
+    {
+      s.erase(0, prefix.size());
+    }
+  }
+
+
+
+  void remove_suffix(std::string&       s,
+                     const std::string& suffix)
+  {
+    if (ends_with(s, suffix))
+    {
+      s.erase(s.size() - suffix.size());
+    }
+  }
+
+
 
   std::vector <std::string> split_str(const std::string& s,
                                       const char         delim,
@@ -51,18 +115,21 @@ namespace str_utils {
   }
 
 
+
   void to_lower(std::string& s)
   {
     std::transform(s.begin(), s.end(), s.begin(),
-        [](unsigned char c){ return std::tolower(c); });
+                   [](unsigned char c){ return std::tolower(c); });
   }
+
 
 
   void to_upper(std::string& s)
   {
     std::transform(s.begin(), s.end(), s.begin(),
-        [](unsigned char c){ return std::toupper(c); });
+                   [](unsigned char c){ return std::toupper(c); });
   }
+
 
 
   std::string bool_to_pretty_str(const bool         state,
@@ -80,9 +147,10 @@ namespace str_utils {
   }
 
 
+
   std::string str_to_pretty_str(const std::string& string,
                                 const std::string& string_name,
-                                const int width)
+                                const int          width)
   {
     std::string l_side = (string_name != "") ? string_name + ":" : "";
     int padding = (width - 1) - string_name.length();
@@ -93,6 +161,7 @@ namespace str_utils {
 
     return l_side + string;
   }
+
 
 
   std::string header_to_pretty_str(const std::string& header_name,
@@ -135,8 +204,10 @@ namespace str_utils {
     // POSIX systems must have the unistd.h header.
 #if __has_include(<unistd.h>)
     wordexp_t expansion;
-    if (wordexp(path.c_str(), &expansion, WRDE_NOCMD) == 0) {
-      if (expansion.we_wordc >= 1) {
+    if (wordexp(path.c_str(), &expansion, WRDE_NOCMD) == 0)
+    {
+      if (expansion.we_wordc >= 1)
+      {
         expanded_path = expansion.we_wordv[0];
       }
     }
@@ -144,6 +215,17 @@ namespace str_utils {
 #endif
     return expanded_path;
   }
+
+
+
 } // namespace str_utils
+
+
+
+
+
+
+
+
 
 

@@ -13,6 +13,14 @@ namespace str_utils {
 
   bool ends_with(const std::string& s, const std::string& suffix);
 
+  bool is_int(const std::string& s, const bool accept_negative = true);
+
+  bool is_float(const std::string& s, const bool accept_negative = true);
+
+  void remove_prefix(std::string& s, const std::string& prefix);
+
+  void remove_suffix(std::string& s, const std::string& suffix);
+
 /**
  * Split a string into a vector of substrings based on a delimiter.
  *
