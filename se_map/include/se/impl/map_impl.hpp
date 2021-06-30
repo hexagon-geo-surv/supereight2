@@ -317,17 +317,21 @@ template <Field     FldT,
 void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMesh(const std::string& file_path,
                                                             const std::string& num) const
 {
-  std::vector<se::Triangle> mesh;
-  se::algorithms::marching_cube(*octree_ptr_, mesh);
+  if constexpr (ResT == se::Res::Single)
+  {
+    std::vector<se::Triangle> mesh;
+    se::algorithms::marching_cube(*octree_ptr_, mesh);
 
-  const std::string file_name_mesh_primal = (num == std::string("")) ? (file_path + "_primal.vtk") : (file_path + "_primal_" + num + ".vtk");
-  se::io::save_mesh_vtk(mesh, file_name_mesh_primal, Eigen::Matrix4f::Identity());
+    const std::string file_name_mesh_primal = (num == std::string("")) ? (file_path + "_primal.vtk") : (file_path + "_primal_" + num + ".vtk");
+    se::io::save_mesh_vtk(mesh, file_name_mesh_primal, Eigen::Matrix4f::Identity());
+  } else
+  {
+    std::vector<se::Triangle> dual_mesh;
+    se::algorithms::dual_marching_cube(*octree_ptr_, dual_mesh);
 
-  std::vector<se::Triangle> dual_mesh;
-  se::algorithms::dual_marching_cube(*octree_ptr_, dual_mesh);
-
-  const std::string file_name_mesh_dual = (num == std::string("")) ? (file_path + "_dual.vtk") : (file_path + "_dual_" + num + ".vtk");
-  se::io::save_mesh_vtk(dual_mesh, file_name_mesh_dual, Eigen::Matrix4f::Identity());
+    const std::string file_name_mesh_dual = (num == std::string("")) ? (file_path + "_dual.vtk") : (file_path + "_dual_" + num + ".vtk");
+    se::io::save_mesh_vtk(dual_mesh, file_name_mesh_dual, Eigen::Matrix4f::Identity());
+  }
 }
 
 
