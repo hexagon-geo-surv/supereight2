@@ -9,6 +9,7 @@ set(READER_SRC
     src/reader_newercollege.cpp
     src/reader_openni.cpp
     src/reader_raw.cpp
+    src/reader_tum.cpp
     src/reader.cpp
     src/config.cpp)
 

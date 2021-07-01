@@ -14,38 +14,48 @@
 #include "reader_newercollege.hpp"
 #include "reader_openni.hpp"
 #include "reader_raw.hpp"
+#include "reader_tum.hpp"
 
 se::Reader* reader = nullptr;
 
 se::Reader* se::create_reader(const se::ReaderConfig& config) {
 
   // OpenNI from a camera or a file
-  if (config.reader_type == se::ReaderType::OPENNI && (config.sequence_path.empty()
-        || (stdfs::path(config.sequence_path).extension() == ".oni"))) {
+  if (    config.reader_type == se::ReaderType::OPENNI
+      && (config.sequence_path.empty()
+      || (stdfs::path(config.sequence_path).extension() == ".oni")))
+  {
     reader = new se::OpenNIReader(config);
-
-  // ICL-NUIM reader
-  } else if (config.reader_type == se::ReaderType::ICLNUIM
-        && stdfs::is_directory(config.sequence_path)) {
+  } // ICL-NUIM reader
+  else if (   config.reader_type == se::ReaderType::ICLNUIM
+           && stdfs::is_directory(config.sequence_path))
+  {
     reader = new se::ICLNUIMReader(config);
-
-  // Slambench 1.0 .raw reader
-  } else if (config.reader_type == se::ReaderType::RAW
-        && stdfs::path(config.sequence_path).extension() == ".raw") {
+  } // Slambench 1.0 .raw reader
+  else if (   config.reader_type == se::ReaderType::RAW
+           && stdfs::path(config.sequence_path).extension() == ".raw")
+  {
     reader = new se::RAWReader(config);
-
-  // NewerCollege reader
-  } else if (config.reader_type == se::ReaderType::NEWERCOLLEGE
-        && stdfs::is_directory(config.sequence_path)) {
+  } // NewerCollege reader
+  else if (   config.reader_type == se::ReaderType::NEWERCOLLEGE
+           && stdfs::is_directory(config.sequence_path))
+  {
     reader = new se::NewerCollegeReader(config);
-
-  } else {
+  } // TUM reader
+  else if (   config.reader_type == se::ReaderType::TUM
+           && stdfs::is_directory(config.sequence_path))
+  {
+    reader = new se::TUMReader(config);
+  }
+  else
+  {
     std::cerr << "Error: Unrecognised file format, file not loaded\n";
     reader = nullptr;
   }
 
   // Handle failed initialization
-  if ((reader != nullptr) && !reader->good()) {
+  if ((reader != nullptr) && !reader->good())
+  {
     delete reader;
     reader = nullptr;
   }

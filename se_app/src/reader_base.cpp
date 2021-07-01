@@ -25,15 +25,28 @@ se::ReaderType se::string_to_reader_type(const std::string& s)
 {
   std::string s_lowered (s);
   str_utils::to_lower(s_lowered);
-  if (s_lowered == "openni") {
+  if (s_lowered == "openni")
+  {
     return se::ReaderType::OPENNI;
-  } else if (s_lowered == "iclnuim") {
+  }
+  else if (s_lowered == "iclnuim")
+  {
     return se::ReaderType::ICLNUIM;
-  } else if (s_lowered == "raw") {
+  }
+  else if (s_lowered == "raw")
+  {
     return se::ReaderType::RAW;
-  } else if (s_lowered == "newercollege") {
+  }
+  else if (s_lowered == "newercollege")
+  {
     return se::ReaderType::NEWERCOLLEGE;
-  } else {
+  }
+  else if (s_lowered == "tum")
+  {
+    return se::ReaderType::TUM;
+  }
+  else
+  {
     return se::ReaderType::UNKNOWN;
   }
 }
@@ -42,15 +55,28 @@ se::ReaderType se::string_to_reader_type(const std::string& s)
 
 std::string se::reader_type_to_string(se::ReaderType t)
 {
-  if (t == se::ReaderType::OPENNI) {
+  if (t == se::ReaderType::OPENNI)
+  {
     return "OpenNI";
-  } else if (t == se::ReaderType::ICLNUIM) {
+  }
+  else if (t == se::ReaderType::ICLNUIM)
+  {
     return "ICLNUIM";
-  } else if (t == se::ReaderType::RAW) {
+  }
+  else if (t == se::ReaderType::RAW)
+  {
     return "raw";
-  } else if (t == se::ReaderType::NEWERCOLLEGE) {
+  }
+  else if (t == se::ReaderType::NEWERCOLLEGE)
+  {
     return "NewerCollege";
-  } else {
+  }
+  else if (t == se::ReaderType::TUM)
+  {
+    return "TUM";
+  }
+  else
+  {
     return "unknown";
   }
 }
@@ -58,8 +84,8 @@ std::string se::reader_type_to_string(se::ReaderType t)
 
 
 se::ReaderConfig::ReaderConfig()
-  : reader_type(se::ReaderType::RAW), sequence_path(""), ground_truth_file(""), fps(30),
-    drop_frames(false), verbose(0)
+  : reader_type(se::ReaderType::RAW), sequence_path(""), ground_truth_file(""),
+    inverse_scale(0), fps(30), drop_frames(false), verbose(0)
 {
 }
 
@@ -91,16 +117,17 @@ se::ReaderConfig::ReaderConfig(const std::string& yaml_file)
 
   // Read the config parameters.
   std::string reader_type_str;
-  se::yaml::subnode_as_string(node, "reader_type", reader_type_str);
+  se::yaml::subnode_as_string(node, "reader_type",       reader_type_str);
   reader_type = string_to_reader_type(reader_type_str);
-  se::yaml::subnode_as_float(node, "fps", fps);
-  se::yaml::subnode_as_bool(node, "drop_frames", drop_frames);
-  se::yaml::subnode_as_int(node, "verbose", verbose);
-  se::yaml::subnode_as_string(node, "sequence_path", sequence_path);
+  se::yaml::subnode_as_float( node, "fps",               fps);
+  se::yaml::subnode_as_float( node, "inverse_scale",     inverse_scale);
+  se::yaml::subnode_as_bool(  node, "drop_frames",       drop_frames);
+  se::yaml::subnode_as_int(   node, "verbose",           verbose);
+  se::yaml::subnode_as_string(node, "sequence_path",     sequence_path);
   se::yaml::subnode_as_string(node, "ground_truth_file", ground_truth_file);
 
   // Expand ~ in the paths.
-  sequence_path = str_utils::expand_user(sequence_path);
+  sequence_path     = str_utils::expand_user(sequence_path);
   ground_truth_file = str_utils::expand_user(ground_truth_file);
 
   // If the sequence_path or ground_truth_file contain relative paths, interpret them as relative
@@ -147,6 +174,8 @@ se::Reader::Reader(const se::ReaderConfig& c)
       frame_(SIZE_MAX),
       num_frames_(0),
       ground_truth_frame_(SIZE_MAX) {
+  // Trim trailing slashes from sequence_path_
+  sequence_path_.erase(sequence_path_.find_last_not_of("/") + 1);
   // Open the ground truth file if supplied
   if (!ground_truth_file_.empty()) {
     ground_truth_fs_.open(ground_truth_file_, std::ios::in);

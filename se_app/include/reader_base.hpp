@@ -23,7 +23,7 @@
 
 namespace se {
 
-  enum class ReaderType { OPENNI, ICLNUIM, RAW, NEWERCOLLEGE, UNKNOWN };
+  enum class ReaderType { OPENNI, ICLNUIM, RAW, TUM, NEWERCOLLEGE, UNKNOWN };
 
   ReaderType string_to_reader_type(const std::string& s);
 
@@ -34,6 +34,7 @@ namespace se {
     ReaderType  reader_type;
     std::string sequence_path;
     std::string ground_truth_file;
+    float       inverse_scale;   ///< depth to meter scaling
     float       fps;
     bool        drop_frames;
     int         verbose;
