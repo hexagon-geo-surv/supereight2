@@ -197,7 +197,7 @@ std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::Occu
 template<>
 struct FieldDataConfig<se::Field::TSDF>
 {
-    float       truncation_boundary;
+    float       truncation_boundary_factor;
     weight_t    max_weight; // TODO: int or float
 
     /** Initializes the config to some sensible defaults.

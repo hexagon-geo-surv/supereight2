@@ -111,7 +111,7 @@ namespace se {
 
 
   FieldDataConfig<Field::TSDF>::FieldDataConfig()
-    : truncation_boundary(0.1f), max_weight(100)
+    : truncation_boundary_factor(8), max_weight(100)
   {
   }
 
@@ -141,12 +141,7 @@ namespace se {
       return;
     }
 
-    // Read the config parameters.
-    // Don't show a warning if truncation_boundary is not available, just keep its default value.
-    // It will be set later using the truncation_boundary_factor.
-    if (!node["truncation_boundary"].isNone()) {
-      se::yaml::subnode_as_float(node, "truncation_boundary", truncation_boundary);
-    }
+    se::yaml::subnode_as_float(node, "truncation_boundary_factor", truncation_boundary_factor);
     se::yaml::subnode_as_int(node, "max_weight", max_weight);
   }
 
@@ -154,8 +149,8 @@ namespace se {
 
   std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::TSDF>& c)
   {
-    os << "truncation_boundary:  " << c.truncation_boundary << " m\n";
-    os << "max_weight:           " << c.max_weight << "\n";
+    os << "truncation_boundary_factor:  " << c.truncation_boundary_factor << " m\n";
+    os << "max_weight:                  " << c.max_weight << "\n";
     return os;
   }
 

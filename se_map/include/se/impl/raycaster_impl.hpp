@@ -500,6 +500,8 @@ raycast(MapT&                  map,
 
   float t = t_min;
 
+  const float truncation_boundary = map.getRes() * map.getDataConfig().truncation_boundary_factor;
+
   if (t_near < t_max) {
     // first walk with largesteps until we found a hit
     float stepsize = largestep;
@@ -537,7 +539,7 @@ raycast(MapT&                  map,
           break;
         } // got it, jump out of inner loop
 
-        stepsize  = std::max(f_tt * map.getDataConfig().truncation_boundary, step);
+        stepsize  = std::max(f_tt * truncation_boundary, step);
         position += stepsize * ray_dir_M;
         f_t = f_tt;
       }

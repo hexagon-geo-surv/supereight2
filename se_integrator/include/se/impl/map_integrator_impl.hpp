@@ -6,150 +6,12 @@
 #include "se/updater/multires_ofusion_core.hpp"
 #include "se/utils/math_util.hpp"
 #include "se/allocator/volume_carver.hpp"
+#include "se/allocator/raycast_carver.hpp"
 #include "se/updater/multires_ofusion_updater.hpp"
 
 
 
 namespace se {
-namespace allocator {
-
-
-
-template<typename SensorT,
-         typename MapT
->
-std::vector<se::OctantBase*> frustum(const se::Image<depth_t>& depth_img,
-                                    SensorT&                   sensor,
-                                    const Eigen::Matrix4f&     T_MS,
-                                    MapT&                      map,
-                                    const float                band)
-{
-  // Fetch the currently allocated Blocks in the sensor frustum.
-  std::vector<se::OctantBase*> blocks_in_frustum = fetcher::frustum(map, sensor, T_MS);
-
-  auto octree_ptr = map.getOctree();
-
-  const int num_steps = ceil(band / map.getRes());
-
-  const Eigen::Vector3f t_MS = T_MS.topRightCorner<3, 1>();
-
-#pragma omp declare reduction (merge : std::set<se::key_t> : omp_out.insert(omp_in.begin(), omp_in.end()))
-  std::set<se::key_t> voxel_key_set;
-
-#pragma omp parallel for reduction(merge: voxel_key_set)
-  for (int x = 0; x < depth_img.width(); ++x) {
-    for (int y = 0; y < depth_img.height(); ++y) {
-      const Eigen::Vector2i pixel(x, y);
-      const float depth_value = depth_img(pixel.x(), pixel.y());
-      if (depth_value < sensor.near_plane) {
-        continue;
-      }
-
-      Eigen::Vector3f ray_dir_C;
-      const Eigen::Vector2f pixel_f = pixel.cast<float>();
-      sensor.model.backProject(pixel_f, &ray_dir_C);
-      const Eigen::Vector3f point_M = (T_MS * (depth_value * ray_dir_C).homogeneous()).head<3>();
-
-      const Eigen::Vector3f reverse_ray_dir_M = (t_MS - point_M).normalized();
-
-      const Eigen::Vector3f ray_origin_M = point_M - (band * 0.5f) * reverse_ray_dir_M;
-      const Eigen::Vector3f step = (reverse_ray_dir_M * band) / num_steps;
-
-      Eigen::Vector3f ray_pos_M = ray_origin_M;
-      for (int i = 0; i < num_steps; i++) {
-        Eigen::Vector3i voxel_coord;
-
-        if (map.template pointToVoxel<se::Safe::On>(ray_pos_M, voxel_coord)) {
-          se::key_t voxel_key;
-          se::keyops::encode_key(voxel_coord, octree_ptr->max_block_scale, voxel_key);
-          voxel_key_set.insert(voxel_key);
-        }
-        ray_pos_M += step;
-      }
-    }
-  }
-
-  // Allocate the Blocks and get pointers only to the newly-allocated Blocks.
-  std::vector<key_t> voxel_keys(voxel_key_set.begin(), voxel_key_set.end());
-  std::vector<se::OctantBase*> fetched_block_ptrs = se::allocator::blocks(voxel_keys, *octree_ptr, octree_ptr->getRoot(), true);
-
-  // Merge the previously-allocated and newly-allocated Block pointers.
-  fetched_block_ptrs.reserve(fetched_block_ptrs.size() + blocks_in_frustum.size());
-  fetched_block_ptrs.insert(fetched_block_ptrs.end(), blocks_in_frustum.begin(), blocks_in_frustum.end());
-  return fetched_block_ptrs;
-}
-
-
-
-template<typename MapT,
-         typename SensorT
->
-void frustum(const se::Image<depth_t>&               depth_img,
-             const se::DensePoolingImage<SensorT>    depth_pooling_img,
-             MapT&                                   map,
-             SensorT&                                sensor,
-             const Eigen::Matrix4f&                  T_MS,
-             std::vector<se::OctantBase*>&           block_list,           ///< List of blocks to be updated.
-             std::vector<std::set<se::OctantBase*>>& node_list,            ///< Node list of size map.getOctree()->getBlockDepth()
-             std::vector<bool>&                      low_variance_list,    ///< Has updated block low variance? <bool>
-             std::vector<bool>&                      projects_inside_list) ///< Does the updated block reproject completely into the image? <bool>
-{
-  VolumeCarver volume_carver(depth_img, depth_pooling_img, map, sensor, se::math::to_inverse_transformation(T_MS), block_list, node_list, low_variance_list, projects_inside_list);
-
-  // Launch on the 8 voxels of the first depth
-#pragma omp parallel for
-  for (int child_idx = 0; child_idx < 8; ++child_idx)
-  {
-    int child_size = map.size() / 2;
-    Eigen::Vector3i child_rel_step = Eigen::Vector3i((child_idx & 1) > 0, (child_idx & 2) > 0, (child_idx & 4) > 0);
-    Eigen::Vector3i child_coord = child_rel_step * child_size; // Because, + corner is (0, 0, 0) at root depth
-    volume_carver(child_coord, child_size, 1, child_rel_step, map.root());
-  }
-}
-
-
-
-} // namespace allocator
-
-
-
-namespace fetcher {
-
-
-
-template<typename MapT,
-         typename SensorT
->
-inline std::vector<se::OctantBase*> frustum(MapT&                  map,
-                                            const SensorT&         sensor,
-                                            const Eigen::Matrix4f& T_MS)
-{
-  const Eigen::Matrix4f T_SM = se::math::to_inverse_transformation(T_MS);
-  // The edge lengh of Blocks in voxels.
-  constexpr int block_size = MapT::OctreeType::BlockType::getSize();
-  // The radius of Blocks in metres.
-  const float block_radius = std::sqrt(3.0f) / 2.0f * map.getRes() * block_size ;
-  // Loop over all allocated Blocks.
-  std::vector<se::OctantBase*> block_ptrs;
-  for (auto block_ptr_itr = BlocksIterator<typename MapT::OctreeType>(map.getOctree().get());
-      block_ptr_itr != BlocksIterator<typename MapT::OctreeType>(); ++block_ptr_itr) {
-    auto& block = **block_ptr_itr;
-    // Get the centre of the Block in the map frame.
-    Eigen::Vector3f block_centre_point_M;
-    map.voxelToPoint(block.getCoord(), block_size, block_centre_point_M);
-    // Convert it to the sensor frame.
-    const Eigen::Vector3f block_centre_point_S
-        = (T_SM * block_centre_point_M.homogeneous()).head<3>();
-    if (sensor.sphereInFrustum(block_centre_point_S, block_radius)) {
-      block_ptrs.push_back(&block);
-    }
-  }
-  return block_ptrs;
-}
-
-
-
-} // namespace fetcher
 
 
 
@@ -173,17 +35,16 @@ template<se::Field FldT,
 >
 struct IntegrateDepthImplD
 {
-
-    template<typename SensorT,
-            typename MapT,
-            typename ConfigT
-    >
-    static void integrate(const se::Image<se::depth_t>& depth_img,
-                          const SensorT&                sensor,
-                          const Eigen::Matrix4f&        T_MS,
-                          const unsigned int            frame,
-                          MapT&                         map,
-                          ConfigT&                      /* config */); // TODO:
+  template<typename SensorT,
+           typename MapT,
+           typename ConfigT
+  >
+  static void integrate(const se::Image<se::depth_t>& depth_img,
+                        const SensorT&                sensor,
+                        const Eigen::Matrix4f&        T_MS,
+                        const unsigned int            frame,
+                        MapT&                         map,
+                        ConfigT&                      /* config */); // TODO:
 };
 
 
@@ -194,16 +55,16 @@ struct IntegrateDepthImplD
 template <>
 struct IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>
 {
-    template<typename SensorT,
-            typename MapT,
-            typename ConfigT
-    >
-    static void integrate(const se::Image<se::depth_t>& depth_img,
-                          const SensorT&                sensor,
-                          const Eigen::Matrix4f&        T_MS,
-                          const unsigned int            frame,
-                          MapT&                         map,
-                          ConfigT&                      /* config */);
+  template<typename SensorT,
+           typename MapT,
+           typename ConfigT
+  >
+  static void integrate(const se::Image<se::depth_t>& depth_img,
+                        const SensorT&                sensor,
+                        const Eigen::Matrix4f&        T_MS,
+                        const unsigned int            frame,
+                        MapT&                         map,
+                        ConfigT&                      /* config */);
 };
 
 
@@ -214,16 +75,16 @@ struct IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>
 template <>
 struct IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi>
 {
-    template<typename SensorT,
-            typename MapT,
-            typename ConfigT
-    >
-    static void integrate(const se::Image<se::depth_t>& depth_img,
-                          const SensorT&                sensor,
-                          const Eigen::Matrix4f&        T_MS,
-                          const unsigned int            frame,
-                          MapT&                         map,
-                          ConfigT&                      /* config */);
+  template<typename SensorT,
+           typename MapT,
+           typename ConfigT
+  >
+  static void integrate(const se::Image<se::depth_t>& depth_img,
+                        const SensorT&                sensor,
+                        const Eigen::Matrix4f&        T_MS,
+                        const unsigned int            frame,
+                        MapT&                         map,
+                        ConfigT&                      /* config */);
 };
 
 
@@ -234,16 +95,16 @@ struct IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi>
 template <>
 struct IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>
 {
-    template<typename SensorT,
-            typename MapT,
-            typename ConfigT
-    >
-    static void integrate(const se::Image<se::depth_t>& depth_img,
-                          const SensorT&                sensor,
-                          const Eigen::Matrix4f&        T_MS,
-                          const unsigned int            frame,
-                          MapT&                         map,
-                          ConfigT&                      /* config */);
+  template<typename SensorT,
+           typename MapT,
+           typename ConfigT
+  >
+  static void integrate(const se::Image<se::depth_t>& depth_img,
+                        const SensorT&                sensor,
+                        const Eigen::Matrix4f&        T_MS,
+                        const unsigned int            frame,
+                        MapT&                         map,
+                        ConfigT&                      /* config */);
 };
 
 
@@ -271,7 +132,10 @@ void IntegrateDepthImplD<FldT, ResT>::integrate(const se::Image<se::depth_t>& de
 
 
 
-template<typename SensorT, typename MapT, typename ConfigT>
+template<typename SensorT,
+         typename MapT,
+         typename ConfigT
+>
 void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(const se::Image<se::depth_t>& depth_img,
                                                                       const SensorT&                sensor,
                                                                       const Eigen::Matrix4f&        T_MS,
@@ -279,11 +143,13 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(const se::
                                                                       MapT&                         map,
                                                                       ConfigT&                      /* config */)
 {
-  const float truncation_boundary = map.getDataConfig().truncation_boundary;
+  const float truncation_boundary = map.getRes() * map.getDataConfig().truncation_boundary_factor;
+  const float band                = 2.f * truncation_boundary;
   const se::weight_t max_weight   = map.getDataConfig().max_weight;
 
   // Allocation
-  std::vector<OctantBase*> block_ptrs = se::allocator::frustum(depth_img, sensor, T_MS, map, 2 * truncation_boundary);
+  se::RaycastCarver raycast_carver(map, sensor, depth_img, T_MS, frame);
+  std::vector<OctantBase*> block_ptrs = raycast_carver.allocateBand(band); //
 
   // Update
   unsigned int block_size = MapT::OctreeType::block_size;
@@ -363,11 +229,13 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi>::integrate(const se::I
                                                                      MapT&                         map,
                                                                      ConfigT&                      /* config */)
 {
-  const float truncation_boundary = map.getDataConfig().truncation_boundary;
+  const float truncation_boundary = map.getRes() * map.getDataConfig().truncation_boundary_factor;
+  const float band                = 2.f * truncation_boundary;
   const se::weight_t max_weight   = map.getDataConfig().max_weight;
 
   // Allocation
-  std::vector<OctantBase*> block_ptrs = se::allocator::frustum(depth_img, sensor, T_MS, map, 2 * truncation_boundary);
+  se::RaycastCarver raycast_carver(map, sensor, depth_img, T_MS, frame);
+  std::vector<OctantBase*> block_ptrs = raycast_carver.allocateBand(band);
 
   // Update
   unsigned int block_size = MapT::OctreeType::block_size;
