@@ -2,7 +2,7 @@
 #define SE_MAP_INTEGRATOR_IMPL_HPP
 
 #include "se/octree/propagator.hpp"
-#include "se/allocator/dense_pooling_imge.hpp"
+#include "se/allocator/dense_pooling_image.hpp"
 #include "se/updater/multires_ofusion_updater_models.hpp"
 #include "se/utils/math_util.hpp"
 #include "se/allocator/volume_carver.hpp"
