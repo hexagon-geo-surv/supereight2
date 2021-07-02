@@ -11,29 +11,23 @@ template<se::Colour    ColB,
          se::Semantics SemB
 >
 VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, PinholeCamera>::VolumeCarver(
-           const se::Image<float>&                     depth_image,
-           const se::DensePoolingImage<PinholeCamera>& depth_pooling_img,
-           MapType&                                    map,
-           const PinholeCamera&                        sensor,
-           const Eigen::Matrix4f&                      T_SM,
-           const int                                   frame,
-           std::vector<se::OctantBase*>&               node_list,
-           std::vector<se::OctantBase*>&               block_list,
-           std::vector<bool>&                          low_variance_list,
-           std::vector<bool>&                          projects_inside_list) :
-  depth_image_(depth_image),
-  depth_pooling_img_(depth_pooling_img),
+          MapType&                                    map,
+          const PinholeCamera&                        sensor,       
+          const se::Image<float>&                     depth_img,
+          const Eigen::Matrix4f&                      T_SM,
+          const int                                   frame) :
   map_(map),
   octree_(*(map.getOctree())),
   sensor_(sensor),
+  depth_pooling_img_(depth_img),
   T_CM_(T_SM),
   frame_(frame),
-  node_list_(node_list),
-  block_list_(block_list),
-  low_variance_list_(low_variance_list),
-  projects_inside_list_(projects_inside_list),
-  voxel_dim_(map.getRes()),
-  max_depth_value_(std::min(sensor.far_plane, depth_pooling_img.maxValue() + map.getDataConfig().tau_max)),
+  map_res_(map.getRes()),
+  sigma_min_(map.getDataConfig().sigma_min_factor * map_res_),
+  sigma_max_(map.getDataConfig().sigma_max_factor * map_res_),
+  tau_min_(map.getDataConfig().tau_min_factor * map_res_),
+  tau_max_(map.getDataConfig().tau_max_factor * map_res_),
+  max_depth_value_(std::min(sensor.far_plane, depth_pooling_img_.maxValue() + tau_max_)),
   zero_depth_band_(1.0e-6f),
   size_to_radius_(std::sqrt(3.0f) / 2.0f)
 {
@@ -42,8 +36,30 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, Pinhol
 
 
 template<se::Colour    ColB,
-          se::Semantics SemB
-  >
+         se::Semantics SemB
+>
+VolumeCarverAllocation VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, PinholeCamera>::allocateFrustum()
+{
+  // Launch on the 8 voxels of the first depth
+  const int child_size     = octree_.getSize() / 2;
+  se::OctantBase* root_ptr = octree_.getRoot();
+
+#pragma omp parallel for
+  for (int child_idx = 0; child_idx < 8; ++child_idx)
+  {
+    Eigen::Vector3i child_rel_step = Eigen::Vector3i((child_idx & 1) > 0, (child_idx & 2) > 0, (child_idx & 4) > 0);
+    Eigen::Vector3i child_coord    = child_rel_step * child_size; // Because, + corner is (0, 0, 0) at root depth
+    (*this)(child_coord, child_size, 1, child_rel_step, root_ptr);
+  }
+
+  return allocation_list_;
+}
+
+
+
+template<se::Colour    ColB,
+         se::Semantics SemB
+>
 bool VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, PinholeCamera>::crossesFrustum(
         std::vector<srl::projection::ProjectionStatus>&  proj_corner_stati)
 {
@@ -60,7 +76,7 @@ bool VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, P
 
 
 template<se::Colour    ColB,
-        se::Semantics SemB
+         se::Semantics SemB
 >
 bool VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, PinholeCamera>::cameraInNode(
         const Eigen::Vector3i& node_coord,
@@ -81,7 +97,37 @@ bool VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, P
 
 
 template<se::Colour    ColB,
-        se::Semantics SemB
+         se::Semantics SemB
+>
+se::VarianceState VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, PinholeCamera>::computeVariance(
+    const float       depth_value_min,
+    const float       depth_value_max,
+    const float       node_dist_min_m,
+    const float       node_dist_max_m)
+{
+  // Assume worst case scenario -> no multiplication with proj_scale
+  const float z_diff_max = (node_dist_max_m - depth_value_min); // * proj_scale;
+  const float z_diff_min = (node_dist_min_m - depth_value_max); // * proj_scale;
+
+  const float tau_max         = compute_tau(depth_value_max, tau_min_, tau_max_, map_.getDataConfig());
+  const float three_sigma_min = compute_three_sigma(depth_value_max, sigma_min_, sigma_max_, map_.getDataConfig());
+
+  if (z_diff_min > 1.25 * tau_max)
+  { // behind of surface
+    return se::VarianceState::Undefined;
+  } else if (z_diff_max < - 1.25 * three_sigma_min)
+  { // guranteed free space
+    return se::VarianceState::Constant;
+  } else
+  {
+    return se::VarianceState::Gradient;
+  }
+}
+
+
+
+template<se::Colour    ColB,
+         se::Semantics SemB
 >
 void VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, PinholeCamera>::operator()(
         const Eigen::Vector3i& node_coord,
@@ -100,8 +146,8 @@ void VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, P
   const Eigen::Vector3f node_centre_point_C = (T_CM_ * node_centre_point_M.homogeneous()).head(3);
 
   // Extend and reduce the depth by the sphere radius covering the entire cube
-  const float approx_depth_value_max = node_centre_point_C.z() + node_size * size_to_radius_ * voxel_dim_;
-  const float approx_depth_value_min = node_centre_point_C.z() - node_size * size_to_radius_ * voxel_dim_;
+  const float approx_depth_value_max = node_centre_point_C.z() + node_size * size_to_radius_ * map_res_;
+  const float approx_depth_value_min = node_centre_point_C.z() - node_size * size_to_radius_ * map_res_;
 
   /// CASE 0.1 (OUT OF BOUNDS): Block is behind the camera or behind the maximum depth value
   if (approx_depth_value_min > max_depth_value_ ||
@@ -147,7 +193,7 @@ void VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, P
   /// Approximate a 2D bounding box covering the projected node in the image plane.
   bool should_split = false;
   bool projects_inside = false;
-  int low_variance = 0; ///<< -1 := low variance infront of the surface, 0 := high variance, 1 = low_variance behind the surface.
+  se::VarianceState variance_state = se::VarianceState::Gradient; ///<< -1 := low variance infront of the surface, 0 := high variance, 1 = low_variance behind the surface.
   se::Pixel pooling_pixel = se::Pixel::crossingUnknownPixel(); ///<< min, max pixel batch depth + crossing frustum state + contains unknown values state.
 
   if (depth < octree_.getBlockDepth() + 1)
@@ -165,7 +211,7 @@ void VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, P
 //        std::cout << "CASE 2 - Frustum Boundary - Split 1" << std::endl;
         should_split = true;
         /// CASE 2 (FRUSTUM BOUNDARY): Node partly behind the camera and crosses the the frustum boundary without a corner reprojecting
-      } else if (sensor_.sphereInFrustumInf(node_centre_point_C, node_size * size_to_radius_ * voxel_dim_))
+      } else if (sensor_.sphereInFrustumInf(node_centre_point_C, node_size * size_to_radius_ * map_res_))
       {
 //        std::cout << "CASE 2 - Frustum Boundary - Split 2" << std::endl;
         should_split = true;
@@ -178,12 +224,12 @@ void VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, P
     } else
     {
       // Compute the minimum and maximum pixel values to generate the bounding box
-      const Eigen::Vector2i image_bb_min = proj_node_corner_pixels_f.rowwise().minCoeff().cast<int>();
-      const Eigen::Vector2i image_bb_max = proj_node_corner_pixels_f.rowwise().maxCoeff().cast<int>();
+      const Eigen::Vector2i img_bb_min = proj_node_corner_pixels_f.rowwise().minCoeff().cast<int>();
+      const Eigen::Vector2i img_bb_max = proj_node_corner_pixels_f.rowwise().maxCoeff().cast<int>();
       const float node_dist_min_m = node_corners_diff.minCoeff();
       const float node_dist_max_m = node_corners_diff.maxCoeff();
 
-      pooling_pixel = depth_pooling_img_.conservativeQuery(image_bb_min, image_bb_max);
+      pooling_pixel = depth_pooling_img_.conservativeQuery(img_bb_min, img_bb_max);
 
       /// CASE 0.3 (OUT OF BOUNDS): The node is outside frustum (i.e left, right, below, above) or
       ///                           all pixel values are unknown -> return intermediately
@@ -194,14 +240,14 @@ void VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, P
       }
 
       /// CASE 0.4 (OUT OF BOUNDS): The node is behind surface
-      if (node_dist_min_m > pooling_pixel.max + map_.getDataConfig().tau_max)
+      if (node_dist_min_m > pooling_pixel.max + tau_max_)
       { // TODO: Can be changed to node_dist_max_m?
 //        std::cout << "Case 0.4 - Out of Bounds - Return 4" << std::endl;
         return;
       }
 
-      low_variance = se::updater::lowVariance(
-              pooling_pixel.min, pooling_pixel.max, node_dist_min_m, node_dist_max_m, map_.getDataConfig());
+      variance_state = computeVariance(pooling_pixel.min, pooling_pixel.max,
+                                       node_dist_min_m, node_dist_max_m);
 
       const int node_scale = octree_.getMaxScale() - depth;
       const se::code_t node_code = se::keyops::encode_code(node_coord); // TODO: Might be correct now
@@ -210,7 +256,7 @@ void VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, P
       /// CASE 1 (REDUNDANT DATA): Depth values in the bounding box are far away from the node or unknown (1).
       ///                          The node to be evaluated is free (2) and fully observed (3),
       se::OctantBase* child_ptr = static_cast<NodeType*>(parent_ptr)->getChild(child_idx);
-      if (low_variance != 0 && child_ptr)
+      if (variance_state != se::VarianceState::Gradient && child_ptr)
       {
         typename OctreeType::DataType child_data = (child_ptr->isBlock()) ? static_cast<BlockType*>(child_ptr)->getMaxData() : static_cast<NodeType*>(child_ptr)->getData();
 
@@ -223,7 +269,7 @@ void VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, P
 
       // TODO: ^SWITCH 1 - Alternative approach (conservative)
       // Don't free node even more under given conditions.
-//        if (   low_variance != 0
+//        if (   variance_state != se::VarianceState::Gradient
 //            && parent->childData(child_idx).observed
 //            && parent->childData(child_idx).x <= 0.95 * map_.getDataConfig().log_odd_min
 //            && parent->childData(child_idx).y > map_.getDataConfig().max_weight / 2) {
@@ -245,7 +291,7 @@ void VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, P
         // If the entire node is already free don't bother splitting it to free only parts of it even more because
         // of missing data and just move on.
         // Approach only saves time.
-//          if (   low_variance != 0
+//          if (   variance_state != 0
 //              && parent->childData(child_idx).observed
 //              && parent->childData(child_idx).x <= 0.95 * map_.getDataConfig().log_odd_min
 //              && parent->childData(child_idx).y > map_.getDataConfig().max_weight / 2) {
@@ -256,7 +302,7 @@ void VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, P
       }
 
         /// CASE 4: The node is inside the frustum with only known data + node has a potential high variance
-      else if (low_variance == 0)
+      else if (variance_state == se::VarianceState::Gradient)
       {
 //        std::cout << "Case 4 - Split 5" << std::endl;
         should_split = true;
@@ -288,9 +334,9 @@ void VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, P
       // Cast from node to voxel block
 #pragma omp critical (block_lock)
       { // Add voxel block to voxel block list for later update and up-propagation
-        block_list_.push_back(octant_ptr);
-        low_variance_list_.push_back((low_variance == -1));
-        projects_inside_list_.push_back(projects_inside);
+        allocation_list_.block_list.push_back(octant_ptr);
+        allocation_list_.variance_state_list.push_back(variance_state);
+        allocation_list_.projects_inside_list.push_back(projects_inside);
       }
     } else
     {
@@ -313,15 +359,15 @@ void VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, P
     {
 #pragma omp critical (block_lock)
       { // Add node to node list for later up propagation (finest node for this branch)
-        block_list_.push_back(octant_ptr);
-        low_variance_list_.push_back((low_variance == -1));
-        projects_inside_list_.push_back(projects_inside);
+        allocation_list_.block_list.push_back(octant_ptr);
+        allocation_list_.variance_state_list.push_back(variance_state);
+        allocation_list_.projects_inside_list.push_back(projects_inside);
       }
-    } else if (low_variance == -1)
+    } else if (variance_state == se::VarianceState::Constant)
     {
 #pragma omp critical (node_lock)
       { // Add node to node list for later up propagation (finest node for this branch)
-        node_list_.push_back(octant_ptr);
+        allocation_list_.node_list.push_back(octant_ptr);
       }
     } // else node has low variance behind surface (ignore)
 

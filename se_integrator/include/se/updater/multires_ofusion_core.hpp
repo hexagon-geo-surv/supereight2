@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 
-#ifndef SE_MULTIRES_OFUSION_UPDATER_MODELS_HPP
-#define SE_MULTIRES_OFUSION_UPDATER_MODELS_HPP
+#ifndef SE_MULTIRES_OFUSION_CORE_HPP
+#define SE_MULTIRES_OFUSION_CORE_HPP
 
 #include <limits>
 
@@ -14,39 +14,6 @@ namespace se {
 
 
 
-//enum class UncertaintyModel {linear, quadratic};
-//
-//struct MultiresOFusion
-//{
-//  static constexpr float k_sigma   = 0.052f;
-//  static constexpr float sigma_min = 2 * 0.015f;
-//  static constexpr float sigma_max = 2 * 0.06f;
-//
-//  static constexpr float k_tau     = 0.026f;
-//  static constexpr float tau_min   = 2 * 0.06f;
-//  static constexpr float tau_max   = 2 * 0.16f;
-//
-//  static constexpr float min_occupancy      = -100;
-//  static constexpr float max_mean_occupancy =  100;
-//  static constexpr int   max_weight         =   20;
-//
-//  static constexpr float log_odd_min        = -5;
-//  static constexpr float log_odd_max        =  5;
-//
-//  static constexpr int fs_integr_scale      = 1;
-//
-//  static constexpr UncertaintyModel uncertainty_model = UncertaintyModel::linear;
-//
-//  static constexpr bool const_surface_thickness = false;
-//};
-
-
-
-
-namespace updater {
-
-
-
 /**
  * \brief Compute the estimated uncertainty boundary for a given depth measurement.
  *
@@ -54,18 +21,18 @@ namespace updater {
  *
  * \return Three sigma uncertainty.
  */
-template <typename DataConfigT>
-inline float computeThreeSigma(const float       depth_value,
-                               const DataConfigT data_config)
+template <typename ConfigT>
+inline float compute_three_sigma(const se::field_t depth_value,
+                                 const float       sigma_min,
+                                 const float       sigma_max,
+                                 const ConfigT     config)
 {
-  if (data_config.uncertainty_model == UncertaintyModel::linear)
+  if (config.uncertainty_model == se::UncertaintyModel::Linear)
   {
-    return 3 * se::math::clamp(data_config.k_sigma * depth_value,
-                               data_config.sigma_min, data_config.sigma_max); // Livingroom dataset
+    return 3 * se::math::clamp(config.k_sigma * depth_value, sigma_min, sigma_max); // Livingroom dataset
   } else
   {
-    return 3 * se::math::clamp(data_config.k_sigma * se::math::sq(depth_value),
-                               data_config.sigma_min, data_config.sigma_max); // Cow and lady
+    return 3 * se::math::clamp(config.k_sigma * se::math::sq(depth_value), sigma_min, sigma_max); // Cow and lady
   }
 }
 
@@ -78,59 +45,24 @@ inline float computeThreeSigma(const float       depth_value,
  *
  * \return The estimated wall thickness.
  */
-template <typename DataConfigT>
-inline float computeTau(const float       depth_value,
-                        const DataConfigT data_config)
+template <typename ConfigT>
+inline float compute_tau(const field_t depth_value,
+                         const float   tau_min,
+                         const float   tau_max,
+                         const ConfigT config)
 {
-  if (data_config.const_surface_thickness == true)
+  if (config.const_surface_thickness)
   {
-    return data_config.tau_max; ///<< e.g. used in ICL-NUIM livingroom dataset.
+    return tau_max; ///<< e.g. used in ICL-NUIM livingroom dataset.
   } else
   {
-    return se::math::clamp(data_config.k_tau * depth_value,
-                           data_config.tau_min, data_config.tau_max);
+    return se::math::clamp(config.k_tau * depth_value, tau_min, tau_max);
   }
 }
 
 
 
-/**
- * \brief Return a conservative meassure of the expected variance of a sensor model inside a voxel
- *        given its position and depth variance.
- *
- * \param[in] depth_value_min Depth measurement max value inside voxel.
- * \param[in] depth_value_max Depth measurement min value inside voxel.
- * \param[in] node_dist_min_m Minimum node distance along z-axis in meter.
- * \param[in] node_dist_max_m Maximum node distance along z-axis in meter.
- *
- * \return Estimate of the variance
- */
-template <typename DataConfigT>
-int lowVariance(const float       depth_value_min,
-                const float       depth_value_max,
-                const float       node_dist_min_m,
-                const float       node_dist_max_m,
-                const DataConfigT data_config)
-{
-  // Assume worst case scenario -> no multiplication with proj_scale
-  float z_diff_max = (node_dist_max_m - depth_value_min); // * proj_scale;
-  float z_diff_min = (node_dist_min_m - depth_value_max); // * proj_scale;
-
-  float tau_max   = computeTau(depth_value_max, data_config);
-  float three_sigma_min = computeThreeSigma(depth_value_max, data_config);
-
-  if (z_diff_min > 1.25 * tau_max)
-  { // behind of surface
-    return  1;
-  } else if (z_diff_max < - 1.25 * three_sigma_min)
-  { // guranteed free space
-    return -1;
-  } else
-  {
-    return  0;
-  }
-}
-
+namespace updater {
 
 
 /**
@@ -141,15 +73,13 @@ int lowVariance(const float       depth_value_min,
  *
  * \return True/false if the voxel has been observed the first time
  */
-template <typename DataT,
-          typename DataConfigT
->
-inline bool weightedMeanUpdate(DataT&            data,
-                               const float       sample_value,
-                               const DataConfigT data_config)
+template <typename DataT>
+inline bool weightedMeanUpdate(DataT&             data,
+                               const float        sample_value,
+                               const se::weight_t max_weight)
 {
   data.occupancy = (data.occupancy * data.weight + sample_value) / (data.weight + 1);
-  data.weight    = std::min((data.weight + 1), data_config.max_weight);
+  data.weight    = std::min((data.weight + 1), max_weight);
   if (data.observed)
   {
     return false;
@@ -173,32 +103,31 @@ inline bool weightedMeanUpdate(DataT&            data,
  * \return True/false if the node has been observed the first time
  */
 template <typename DataT,
-          typename DataConfigT
+          typename ConfigT
 >
-inline bool updateVoxel(const float range_diff,
-                        const float tau,
-                        const float three_sigma,
-                        DataT&      voxel_data,
-                        DataConfigT data_config)
+inline bool updateVoxel(DataT&        data,
+                        const float   range_diff,
+                        const float   tau,
+                        const float   three_sigma,
+                        const ConfigT config)
 {
   float sample_value;
 
   if (range_diff < -three_sigma)
   {
-    sample_value = data_config.log_odd_min;
+    sample_value = config.log_odd_min;
   } else if (range_diff < tau / 2)
   {
-    sample_value = std::min(data_config.log_odd_min -
-                            data_config.log_odd_min / three_sigma * (range_diff + three_sigma), data_config.log_odd_max);
+    sample_value = std::min(config.log_odd_min - config.log_odd_min / three_sigma * (range_diff + three_sigma), config.log_odd_max);
   } else if (range_diff < tau)
   {
-    sample_value = std::min(-data_config.log_odd_min * tau / (2 * three_sigma), data_config.log_odd_max);
+    sample_value = std::min(-config.log_odd_min * tau / (2 * three_sigma), config.log_odd_max);
   } else
   {
     return false;
   }
 
-  return weightedMeanUpdate(voxel_data, sample_value, data_config);
+  return weightedMeanUpdate(data, sample_value, config.max_weight);
 }
 
 
@@ -211,12 +140,12 @@ inline bool updateVoxel(const float range_diff,
  * \param[in,out] node_data The reference to the node data.
  */
 template <typename DataT,
-          typename DataConfigT
+          typename ConfigT
 >
-inline void freeNode(DataT&      node_data,
-                     DataConfigT data_config)
+inline void freeNode(DataT&        node_data,
+                     const ConfigT config)
 {
-  weightedMeanUpdate(node_data, data_config.log_odd_min, data_config);
+  weightedMeanUpdate(node_data, config.log_odd_min, config.max_weight);
 }
 
 
@@ -228,12 +157,12 @@ inline void freeNode(DataT&      node_data,
  * \param[in,out] node_data The reference to the node data.
  */
 template <typename DataT,
-          typename DataConfigT
+          typename ConfigT
 >
-inline bool freeVoxel(DataT&      voxel_data,
-                      DataConfigT data_config)
+inline bool freeVoxel(DataT&        voxel_data,
+                      const ConfigT config)
 {
-  return weightedMeanUpdate(voxel_data, data_config.log_odd_min, data_config);
+  return weightedMeanUpdate(voxel_data, config.log_odd_min, config.max_weight);
 }
 
 
@@ -777,4 +706,4 @@ inline void propagateToVoxelAtCoarserScale(const se::OctantBase*      octant_ptr
 } // namespace updater
 } // namespace se
 
-#endif //SE_MULTIRES_OFUSION_UPDATER_MODELS_HPP
+#endif //SE_MULTIRES_OFUSION_CORE_HPP

@@ -3,7 +3,7 @@
 
 #include "se/octree/propagator.hpp"
 #include "se/allocator/dense_pooling_image.hpp"
-#include "se/updater/multires_ofusion_updater_models.hpp"
+#include "se/updater/multires_ofusion_core.hpp"
 #include "se/utils/math_util.hpp"
 #include "se/allocator/volume_carver.hpp"
 #include "se/updater/multires_ofusion_updater.hpp"
@@ -541,32 +541,11 @@ void IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>::integrate(const 
                                                                           MapT&                         map,
                                                                           ConfigT&                      /* config */)
 {
-  // Create min/map depth pooling image for different bounding box sizes
-  se::DensePoolingImage<SensorT> pooling_depth_image(depth_img);
-
-  std::vector<se::OctantBase*> node_list;             ///< List of nodes to be updated
-  std::vector<se::OctantBase*> block_list;            ///< List of blocks to be updated
-  std::vector<bool>            low_variance_list;     ///< Has updated block low variance? <bool>
-  std::vector<bool>            projects_inside_list;  ///< Does the updated block reproject completely into the image? <bool>
-
   const Eigen::Matrix4f T_SM = se::math::to_inverse_transformation(T_MS);
 
   // Allocate the frustum
-  VolumeCarver<MapT, SensorT> volume_carver(depth_img, pooling_depth_image,
-                                            map, sensor, T_SM, frame,
-                                            node_list,                                            //< all to be freed
-                                            block_list, low_variance_list, projects_inside_list); //< process based on low_variance and project inside
-
-  // Launch on the 8 voxels of the first depth
-  const int child_size     = map.getOctree()->getSize() / 2;
-  se::OctantBase* root_ptr = map.getOctree()->getRoot();
-#pragma omp parallel for
-  for (int child_idx = 0; child_idx < 8; ++child_idx)
-  {
-    Eigen::Vector3i child_rel_step = Eigen::Vector3i((child_idx & 1) > 0, (child_idx & 2) > 0, (child_idx & 4) > 0);
-    Eigen::Vector3i child_coord    = child_rel_step * child_size; // Because, + corner is (0, 0, 0) at root depth
-    volume_carver(child_coord, child_size, 1, child_rel_step, root_ptr);
-  }
+  VolumeCarver<MapT, SensorT> volume_carver(map, sensor, depth_img, T_SM, frame); //< process based on variance state and project inside
+  se::VolumeCarverAllocation allocation_list = volume_carver.allocateFrustum();
 
   // ----------------------
 
@@ -575,24 +554,26 @@ void IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>::integrate(const 
   MultiresOFusionUpdater<MapT, SensorT> updater(depth_img, map, sensor, T_SM, frame, node_set, freed_block_list);
 
 #pragma omp parallel for
-  for (unsigned int i = 0; i < node_list.size(); ++i)
+  for (unsigned int i = 0; i < allocation_list.node_list.size(); ++i)
   {
-    auto node_ptr = static_cast<typename MapT::OctreeType::NodeType*>(node_list[i]);
+    auto node_ptr = static_cast<typename MapT::OctreeType::NodeType*>(allocation_list.node_list[i]);
     const int depth = map.getOctree()->getMaxScale() - se::math::log2_const(node_ptr->getSize());
-    updater.freeNodeRecurse(node_list[i], depth);
+    updater.freeNodeRecurse(allocation_list.node_list[i], depth);
   }
 
 #pragma omp parallel for
-  for (unsigned int i = 0; i < block_list.size(); ++i)
+  for (unsigned int i = 0; i < allocation_list.block_list.size(); ++i)
   {
-    updater.updateBlock(block_list[i], low_variance_list[i], projects_inside_list[i]);
+    updater.updateBlock(allocation_list.block_list[i],
+                        allocation_list.variance_state_list[i] == se::VarianceState::Constant,
+                        allocation_list.projects_inside_list[i]);
   }
 
   /// Propagation
 #pragma omp parallel for
-  for (unsigned int i = 0; i < block_list.size(); ++i)
+  for (unsigned int i = 0; i < allocation_list.block_list.size(); ++i)
   {
-    updater::propagateBlockToCoarsestScale<typename MapT::OctreeType::BlockType>(block_list[i]);
+    updater::propagateBlockToCoarsestScale<typename MapT::OctreeType::BlockType>(allocation_list.block_list[i]);
   }
 #pragma omp parallel for
   for (unsigned int i = 0; i < freed_block_list.size(); ++i)
@@ -600,7 +581,7 @@ void IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>::integrate(const 
     updater::propagateBlockToCoarsestScale<typename MapT::OctreeType::BlockType>(freed_block_list[i]);
   }
 
-  updater.propagateToRoot(block_list);
+  updater.propagateToRoot(allocation_list.block_list);
 }
 
 

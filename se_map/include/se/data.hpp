@@ -147,7 +147,7 @@ struct DeltaData : public FieldDeltaData<FldT>, ColourDeltaData<ColB>
 /// DATA CONFIG ///
 ///////////////////
 
-enum class UncertaintyModel {linear, quadratic};
+enum class UncertaintyModel {Linear, Quadratic};
 
 template<se::Field FieldT>
 struct FieldDataConfig
@@ -160,14 +160,10 @@ struct FieldDataConfig<se::Field::Occupancy>
     float   k_sigma;
     float   sigma_min_factor;
     float   sigma_max_factor;
-    float   sigma_min;
-    float   sigma_max;
 
     float   k_tau;
     float   tau_min_factor;
     float   tau_max_factor;
-    float   tau_min;
-    float   tau_max;
 
     field_t min_occupancy;
     field_t max_occupancy;

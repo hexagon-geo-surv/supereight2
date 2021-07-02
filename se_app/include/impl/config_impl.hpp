@@ -54,40 +54,6 @@ namespace se {
       se::yaml::subnode_as_float(node, "truncation_boundary_factor", truncation_boundary_factor);
       data.truncation_boundary = truncation_boundary_factor * map.res;
     }
-
-    if constexpr (DataConfigT::FldT == se::Field::Occupancy)
-    {
-      // Open the file for reading.
-      cv::FileStorage fs;
-      try
-      {
-        if (!fs.open(yaml_file, cv::FileStorage::READ | cv::FileStorage::FORMAT_YAML))
-        {
-          std::cerr << "Error: couldn't read configuration file " << yaml_file << "\n";
-          return;
-        }
-      } catch (const cv::Exception& e)
-      {
-        // OpenCV throws if the file contains non-YAML data.
-        std::cerr << "Error: invalid YAML in configuration file " << yaml_file << "\n";
-        return;
-      }
-
-      // Get the node containing the data configuration.
-      const cv::FileNode node = fs["data"];
-      if (node.type() != cv::FileNode::MAP)
-      {
-        std::cerr << "Warning: using default data configuration, no \"data\" section found in "
-                  << yaml_file << "\n";
-        return;
-      }
-
-      data.sigma_min  = data.sigma_min_factor * map.res;
-      data.sigma_max  = data.sigma_max_factor * map.res;
-
-      data.tau_min    = data.tau_min_factor * map.res;
-      data.tau_max    = data.tau_max_factor * map.res;
-    }
   }
 
 

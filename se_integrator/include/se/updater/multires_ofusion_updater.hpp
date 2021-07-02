@@ -78,7 +78,11 @@ private:
   const PinholeCamera&       sensor_;
   const Eigen::Matrix4f&     T_CM_;
   const int                  frame_;
-  const float                voxel_dim_;
+  const float                map_res_;
+  const float                sigma_min_;
+  const float                sigma_max_;
+  const float                tau_min_;
+  const float                tau_max_;
   std::vector<std::set<se::OctantBase*>>& node_set_;
   std::vector<se::OctantBase*>& freed_block_list_;
 };

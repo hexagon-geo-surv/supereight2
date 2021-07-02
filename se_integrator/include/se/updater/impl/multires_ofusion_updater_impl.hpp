@@ -23,7 +23,11 @@ MultiresOFusionUpdater<MapT, SensorT>::MultiresOFusionUpdater(const se::Image<fl
     sensor_(sensor),
     T_CM_(T_SM),
     frame_(frame),
-    voxel_dim_(map.getRes()),
+    map_res_(map.getRes()),
+    sigma_min_(map.getDataConfig().sigma_min_factor * map_res_),
+    sigma_max_(map.getDataConfig().sigma_max_factor * map_res_),
+    tau_min_(map.getDataConfig().tau_min_factor * map_res_),
+    tau_max_(map.getDataConfig().tau_max_factor * map_res_),
     node_set_(node_set),
     freed_block_list_(freed_block_list)
 {
@@ -108,7 +112,7 @@ void MultiresOFusionUpdater<MapT, SensorT>::freeBlock(se::OctantBase* octant_ptr
 
   // The recommended integration scale
   const int computed_integration_scale =
-          sensor_.computeIntegrationScale(block_centre_point_C, voxel_dim_, last_scale, block_ptr->getMinScale(), block_ptr->getMaxScale());
+          sensor_.computeIntegrationScale(block_centre_point_C, map_res_, last_scale, block_ptr->getMinScale(), block_ptr->getMaxScale());
 
   // The minimum integration scale (change to last if data has already been integrated)
   const int min_integration_scale = ((block_ptr->getMinScale() == -1 ||
@@ -257,8 +261,8 @@ void MultiresOFusionUpdater<MapT, SensorT>::updateBlock(se::OctantBase* octant_p
   const float block_point_C_m = sensor_.measurementFromPoint(block_centre_point_C);
 
   // Compute one tau and 3x sigma value for the block
-  float tau         = updater::computeTau(block_point_C_m, map_.getDataConfig());
-  float three_sigma = updater::computeThreeSigma(block_point_C_m, map_.getDataConfig());
+  float tau         = compute_tau(block_point_C_m, tau_min_, tau_max_, map_.getDataConfig());
+  float three_sigma = compute_three_sigma(block_point_C_m, sigma_max_, sigma_max_, map_.getDataConfig());
 
   /// Compute the integration scale
   // The last integration scale
@@ -266,7 +270,7 @@ void MultiresOFusionUpdater<MapT, SensorT>::updateBlock(se::OctantBase* octant_p
 
   // The recommended integration scale
   const int computed_integration_scale =
-          sensor_.computeIntegrationScale(block_centre_point_C, voxel_dim_, last_scale, block_ptr->getMinScale(),
+          sensor_.computeIntegrationScale(block_centre_point_C, map_res_, last_scale, block_ptr->getMinScale(),
                                           block_ptr->getMaxScale());
 
   // The minimum integration scale (change to last if data has already been integrated)
@@ -355,7 +359,7 @@ void MultiresOFusionUpdater<MapT, SensorT>::updateBlock(se::OctantBase* octant_p
     const Eigen::Vector3f sample_point_base_C = (T_CM_ * (sample_point_base_M).homogeneous()).head(3);
 
     const Eigen::Matrix3f sample_point_delta_matrix_C = (se::math::to_rotation(T_CM_) *
-                                                         (voxel_dim_ * (Eigen::Matrix3f() << recommended_stride, 0, 0,
+                                                         (map_res_ * (Eigen::Matrix3f() << recommended_stride, 0, 0,
                                                                                              0, recommended_stride, 0,
                                                                                              0, 0, recommended_stride).finished()));
 
@@ -389,7 +393,7 @@ void MultiresOFusionUpdater<MapT, SensorT>::updateBlock(se::OctantBase* octant_p
             const float range = sample_point_C.norm();
             const float range_diff = (sample_point_C_m - depth_value) * (range / sample_point_C_m);
             block_ptr->incrBufferObservedCount(
-                    updater::updateVoxel(range_diff, tau, three_sigma, buffer_data, map_.getDataConfig()));
+                    updater::updateVoxel(buffer_data, range_diff, tau, three_sigma, map_.getDataConfig()));
           }
         } // x
       } // y
@@ -417,9 +421,9 @@ void MultiresOFusionUpdater<MapT, SensorT>::updateBlock(se::OctantBase* octant_p
   const Eigen::Vector3f sample_point_base_C = (T_CM_ * (sample_point_base_M).homogeneous()).head(3);
 
   const Eigen::Matrix3f sample_point_delta_matrix_C = (se::math::to_rotation(T_CM_) *
-                                                       (voxel_dim_ * (Eigen::Matrix3f() << integration_stride, 0, 0,
-                                                                                           0, integration_stride, 0,
-                                                                                           0, 0, integration_stride).finished()));
+                                                       (map_res_ * (Eigen::Matrix3f() << integration_stride, 0, 0,
+                                                                                         0, integration_stride, 0,
+                                                                                         0, 0, integration_stride).finished()));
 
   auto valid_predicate = [&](float depth_value) { return depth_value >= sensor_.near_plane; };
 
@@ -450,7 +454,7 @@ void MultiresOFusionUpdater<MapT, SensorT>::updateBlock(se::OctantBase* octant_p
           const float sample_point_C_m = sensor_.measurementFromPoint(sample_point_C);
           const float range = sample_point_C.norm();
           const float range_diff = (sample_point_C_m - depth_value) * (range / sample_point_C_m);
-          block_ptr->incrCurrObservedCount(updater::updateVoxel(range_diff, tau, three_sigma, voxel_data, map_.getDataConfig()));
+          block_ptr->incrCurrObservedCount(updater::updateVoxel(voxel_data, range_diff, tau, three_sigma, map_.getDataConfig()));
         }
       } // x
     } // y
@@ -458,6 +462,7 @@ void MultiresOFusionUpdater<MapT, SensorT>::updateBlock(se::OctantBase* octant_p
 
   block_ptr->incrCurrIntegrCount();
 }
+
 
 
 template<typename MapT,
