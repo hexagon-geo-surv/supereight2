@@ -1,5 +1,7 @@
-#ifndef SE_OCTANT_IMPL_HPP
-#define SE_OCTANT_IMPL_HPP
+#ifndef SE_BLOCK_IMPL_HPP
+#define SE_BLOCK_IMPL_HPP
+
+
 
 #include <iostream>
 
@@ -8,95 +10,6 @@
 
 
 namespace se {
-
-
-
-template <typename NodeT>
-inline void get_child_idx(const Eigen::Vector3i& voxel_coord,
-                          NodeT*                 node_ptr,
-                          unsigned int&          child_idx)
-{
-  const Eigen::Vector3i node_coord = node_ptr->getCoord();
-  const int             node_size  = node_ptr->getSize;
-
-  assert(se::keyops::is_child(se::keyops::encode_key(node_coord, se::math::log2_const(node_size)),
-                              se::keyops::encode_key(voxel_coord, 0)));
-
-  Eigen::Vector3i offset = voxel_coord - node_coord;
-  const unsigned int child_size = node_size >> 1;
-
-  child_idx = ((      offset.x() & child_size) > 0) +
-                2 * ((offset.y() & child_size) > 0) +
-                4 * ((offset.z() & child_size) > 0);
-}
-
-
-
-template <typename DataT,
-          Res      ResT
->
-Node<DataT, ResT>::Node(const Eigen::Vector3i&                coord,
-                        const unsigned                        size)
-        : OctantBase(false, coord, nullptr), size_(size)
-{
-  children_ptr_.fill(nullptr);
-}
-
-
-
-template <typename DataT,
-          Res      ResT
->
-Node<DataT, ResT>::Node(Node*              parent_ptr,
-                        const unsigned int child_idx)
-    : OctantBase(false,
-                 parent_ptr->coord_ + (parent_ptr->size_ >> 1) * Eigen::Vector3i((1 & child_idx) > 0, (2 & child_idx) > 0, (4 & child_idx) > 0),
-                 parent_ptr), size_(parent_ptr->size_ >> 1)
-{
-  children_ptr_.fill(nullptr);
-}
-
-
-
-template <typename DataT,
-          Res      ResT
->
-inline unsigned int Node<DataT, ResT>::getSize() const
-{
-  return size_;
-}
-
-
-
-template <typename DataT,
-          Res      ResT
->
-inline se::OctantBase* Node<DataT, ResT>::getChild(const unsigned child_idx)
-{
-  return children_ptr_[child_idx];
-}
-
-
-
-template <typename DataT,
-          Res      ResT
->
-inline const se::OctantBase* Node<DataT, ResT>::getChild(const unsigned child_idx) const
-{
-  return children_ptr_[child_idx];
-}
-
-
-
-template <typename DataT,
-          Res      ResT
->
-inline se::OctantBase* Node<DataT, ResT>::setChild(const unsigned child_idx, se::OctantBase* child_ptr)
-{
-  children_mask_ |= 1 << child_idx;
-  std::swap(child_ptr, children_ptr_[child_idx]);
-  return child_ptr;
-}
 
 
 
@@ -213,8 +126,8 @@ inline int BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, Deriv
   const Eigen::Vector3i voxel_offset = (voxel_coord - this->underlying().coord_) / (1 << curr_scale_);
   const int size_at_scale = size_at_scales_[curr_scale_];
   return scale_offsets_[curr_scale_] + voxel_offset.x() +
-                                       voxel_offset.y() * size_at_scale +
-                                       voxel_offset.z() * se::math::sq(size_at_scale);
+         voxel_offset.y() * size_at_scale +
+         voxel_offset.z() * se::math::sq(size_at_scale);
 }
 
 
@@ -230,8 +143,8 @@ inline int BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, Deriv
   const Eigen::Vector3i voxel_offset = (voxel_coord - this->underlying().coord_) / (1 << scale);
   const int size_at_scale = size_at_scales_[scale];
   return scale_offsets_[scale] + voxel_offset.x() +
-                                 voxel_offset.y() * size_at_scale +
-                                 voxel_offset.z() * se::math::sq(size_at_scale);
+         voxel_offset.y() * size_at_scale +
+         voxel_offset.z() * se::math::sq(size_at_scale);
 }
 
 
@@ -250,9 +163,9 @@ BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getDa
 
 
 template <Colour    ColB,
-        Semantics SemB,
-        int       BlockSize,
-        typename  DerivedT
+          Semantics SemB,
+          int       BlockSize,
+          typename  DerivedT
 >
 inline typename BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::DataType&
 BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getData(const int voxel_idx)
@@ -273,17 +186,17 @@ BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getDa
   const Eigen::Vector3i voxel_offset = (voxel_coord - this->underlying().coord_) / (1 << curr_scale_);
   const int size_at_scale = size_at_scales_[curr_scale_];
   const int voxel_idx = scale_offsets_[curr_scale_] + voxel_offset.x() +
-                                                      voxel_offset.y() * size_at_scale +
-                                                      voxel_offset.z() * se::math::sq(size_at_scale);
+                        voxel_offset.y() * size_at_scale +
+                        voxel_offset.z() * se::math::sq(size_at_scale);
   return block_data_[voxel_idx];
 }
 
 
 
 template <Colour    ColB,
-        Semantics SemB,
-        int       BlockSize,
-        typename  DerivedT
+          Semantics SemB,
+          int       BlockSize,
+          typename  DerivedT
 >
 inline typename BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::DataType&
 BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getData(const Eigen::Vector3i& voxel_coord)
@@ -291,8 +204,8 @@ BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getDa
   const Eigen::Vector3i voxel_offset = (voxel_coord - this->underlying().coord_) / (1 << curr_scale_);
   const int size_at_scale = size_at_scales_[curr_scale_];
   const int voxel_idx = scale_offsets_[curr_scale_] + voxel_offset.x() +
-                                                      voxel_offset.y() * size_at_scale +
-                                                      voxel_offset.z() * se::math::sq(size_at_scale);
+                        voxel_offset.y() * size_at_scale +
+                        voxel_offset.z() * se::math::sq(size_at_scale);
   return block_data_[voxel_idx];
 }
 
@@ -313,8 +226,8 @@ BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getDa
   const Eigen::Vector3i voxel_offset = (voxel_coord - this->underlying().coord_) / (1 << scale_returned);
   const int size_at_scale = size_at_scales_[scale_returned];
   const int voxel_idx = scale_offsets_[scale_returned] + voxel_offset.x() +
-                                                         voxel_offset.y() * size_at_scale +
-                                                         voxel_offset.z() * se::math::sq(size_at_scale);
+                        voxel_offset.y() * size_at_scale +
+                        voxel_offset.z() * se::math::sq(size_at_scale);
   return block_data_[voxel_idx];
 }
 
@@ -334,8 +247,8 @@ BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getDa
   const Eigen::Vector3i voxel_offset = (voxel_coord - this->underlying().coord_) / (1 << scale_returned);
   const int size_at_scale = size_at_scales_[scale_returned];
   const int voxel_idx = scale_offsets_[scale_returned] + voxel_offset.x() +
-                                                         voxel_offset.y() * size_at_scale +
-                                                         voxel_offset.z() * se::math::sq(size_at_scale);
+                        voxel_offset.y() * size_at_scale +
+                        voxel_offset.z() * se::math::sq(size_at_scale);
 
   return block_data_[voxel_idx];
 }
@@ -354,17 +267,17 @@ BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getDa
   const Eigen::Vector3i voxel_offset = (voxel_coord - this->underlying().coord_) / (1 << scale);
   const int size_at_scale = size_at_scales_[scale];
   const int voxel_idx = scale_offsets_[scale] + voxel_offset.x() +
-                                                voxel_offset.y() * size_at_scale +
-                                                voxel_offset.z() * se::math::sq(size_at_scale);
+                        voxel_offset.y() * size_at_scale +
+                        voxel_offset.z() * se::math::sq(size_at_scale);
   return block_data_[voxel_idx];
 }
 
 
 
 template <Colour    ColB,
-        Semantics SemB,
-        int       BlockSize,
-        typename  DerivedT
+          Semantics SemB,
+          int       BlockSize,
+          typename  DerivedT
 >
 inline typename BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::DataType&
 BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getData(const Eigen::Vector3i& voxel_coord,
@@ -373,8 +286,8 @@ BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getDa
   const Eigen::Vector3i voxel_offset = (voxel_coord - this->underlying().coord_) / (1 << scale);
   const int size_at_scale = size_at_scales_[scale];
   const int voxel_idx = scale_offsets_[scale] + voxel_offset.x() +
-                                                voxel_offset.y() * size_at_scale +
-                                                voxel_offset.z() * se::math::sq(size_at_scale);
+                        voxel_offset.y() * size_at_scale +
+                        voxel_offset.z() * se::math::sq(size_at_scale);
   return block_data_[voxel_idx];
 }
 
@@ -392,8 +305,8 @@ BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getDa
   const Eigen::Vector3i voxel_offset = (voxel_coord - this->underlying().coord_) / (1 << scale);
   const int size_at_scale = size_at_scales_[scale];
   const int voxel_idx = scale_offsets_[scale] + voxel_offset.x() +
-                                                voxel_offset.y() * size_at_scale +
-                                                voxel_offset.z() * se::math::sq(size_at_scale);
+                        voxel_offset.y() * size_at_scale +
+                        voxel_offset.z() * se::math::sq(size_at_scale);
   DataUnion data_union;
   data_union.coord         = voxel_coord;
   data_union.scale         = scale;
@@ -408,9 +321,9 @@ BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getDa
 
 
 template <Colour    ColB,
-        Semantics SemB,
-        int       BlockSize,
-        typename  DerivedT
+          Semantics SemB,
+          int       BlockSize,
+          typename  DerivedT
 >
 inline typename BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::DataUnion
 BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getDataUnion(const Eigen::Vector3i& voxel_coord,
@@ -458,8 +371,8 @@ inline void BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, Deri
   const Eigen::Vector3i voxel_offset = (voxel_coord - this->underlying().coord_) / (1 << curr_scale_);
   const int size_at_scale = size_at_scales_[curr_scale_];
   const int voxel_idx = scale_offsets_[curr_scale_] + voxel_offset.x() +
-                                                      voxel_offset.y() * size_at_scale +
-                                                      voxel_offset.z() * se::math::sq(size_at_scale);
+                        voxel_offset.y() * size_at_scale +
+                        voxel_offset.z() * se::math::sq(size_at_scale);
   block_data_[voxel_idx] = data;
 }
 
@@ -477,8 +390,8 @@ inline void BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, Deri
   const Eigen::Vector3i voxel_offset = (voxel_coord - this->underlying().coord_) / (1 << scale);
   const int size_at_scale = size_at_scales_[scale];
   const int voxel_idx = scale_offsets_[scale] + voxel_offset.x() +
-                                                voxel_offset.y() * size_at_scale +
-                                                voxel_offset.z() * se::math::sq(size_at_scale);
+                        voxel_offset.y() * size_at_scale +
+                        voxel_offset.z() * se::math::sq(size_at_scale);
   block_data_[voxel_idx] = data;
 }
 
@@ -504,10 +417,10 @@ template <Colour    ColB,
           typename  DerivedT
 >
 BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::BlockMultiRes(const DataType init_data) :
-  curr_scale_(0),
-  min_scale_(-1),
-  buffer_scale_(-1),
-  init_data_(init_data)
+        curr_scale_(0),
+        min_scale_(-1),
+        buffer_scale_(-1),
+        init_data_(init_data)
 {
 }
 
@@ -573,7 +486,6 @@ template <Colour    ColB,
 inline const typename BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::DataType&
 BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getData(const Eigen::Vector3i& voxel_coord) const
 {
-//  std::cout << "GET DATA - 1" << std::endl;
   Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
   voxel_offset = voxel_offset / (1 << curr_scale_);
   const int size_at_scale = BlockSize >> curr_scale_;
@@ -592,7 +504,6 @@ template <Colour    ColB,
 inline typename BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::DataType&
 BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getData(const Eigen::Vector3i& voxel_coord)
 {
-//  std::cout << "GET DATA - 2" << std::endl;
   Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
   voxel_offset = voxel_offset / (1 << curr_scale_);
   const int size_at_scale = BlockSize >> curr_scale_;
@@ -615,7 +526,6 @@ BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::
                                                                                         const int              scale_in,
                                                                                         int&                   scale_out) const
 {
-//  std::cout << "GET DATA - 3" << std::endl;
   scale_out = std::max(scale_in, curr_scale_);
   Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
   voxel_offset = voxel_offset / (1 << scale_out);
@@ -637,7 +547,6 @@ BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::
                                                                                         const int              scale_in,
                                                                                         int&                   scale_out)
 {
-//  std::cout << "GET DATA - 4" << std::endl;
   scale_out = std::max(scale_in, curr_scale_);
   Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
   voxel_offset = voxel_offset / (1 << scale_out);
@@ -660,8 +569,8 @@ inline const typename BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, 
 BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getData(const Eigen::Vector3i& voxel_coord,
                                                                                         const int              scale) const
 {
-//  std::cout << "GET DATA - 5" << std::endl;
-  if (max_scale_ - (block_data_.size() - 1) > static_cast<size_t>(scale)) {
+  if (max_scale_ - (block_data_.size() - 1) > static_cast<size_t>(scale))
+  {
     return init_data_;
   } else
   {
@@ -685,12 +594,11 @@ inline typename BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockS
 BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getData(const Eigen::Vector3i& voxel_coord,
                                                                                         const int              scale)
 {
-//  std::cout << "GET DATA - 6" << std::endl;
-  if (max_scale_ - (block_data_.size() - 1) > static_cast<size_t>(scale)) {
+  if (max_scale_ - (block_data_.size() - 1) > static_cast<size_t>(scale))
+  {
     return init_data_;
   } else
   {
-//    std::cout << this->underlying().coord_ << std::endl;
     Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
     voxel_offset = voxel_offset / (1 << scale);
     const int size_at_scale = BlockSize >> scale;
@@ -710,7 +618,6 @@ template <Colour    ColB,
 inline const typename BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::DataType&
 BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getMaxData(const Eigen::Vector3i& voxel_coord) const
 {
-//  std::cout << "GET DATA - 7" << std::endl;
   Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
   voxel_offset = voxel_offset / (1 << curr_scale_);
   const int size_at_scale = BlockSize >> curr_scale_;
@@ -729,7 +636,6 @@ template <Colour    ColB,
 inline typename BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::DataType&
 BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getMaxData(const Eigen::Vector3i& voxel_coord)
 {
-//  std::cout << "GET MAX DATA - 1" << std::endl;
   Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
   voxel_offset = voxel_offset / (1 << curr_scale_);
   const int size_at_scale = BlockSize >> curr_scale_;
@@ -750,7 +656,6 @@ BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::
                                                                                            const int              scale_in,
                                                                                            int&                   scale_out) const
 {
-//  std::cout << "GET MAX DATA - 2" << std::endl;
   scale_out = std::max(scale_in, curr_scale_);
   Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
   voxel_offset = voxel_offset / (1 << scale_out);
@@ -772,7 +677,6 @@ BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::
                                                                                            const int              scale_in,
                                                                                            int&                   scale_out)
 {
-//  std::cout << "GET MAX DATA - 3" << std::endl;
   scale_out = std::max(scale_in, curr_scale_);
   Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
   voxel_offset = voxel_offset / (1 << scale_out);
@@ -793,10 +697,11 @@ inline const typename BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, 
 BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getMaxData(const Eigen::Vector3i& voxel_coord,
                                                                                            const int              scale) const
 {
-//  std::cout << "GET MAX DATA - 4" << std::endl;
-  if (max_scale_ - (block_data_.size() - 1) > static_cast<size_t>(scale)) {
+  if (max_scale_ - (block_data_.size() - 1) > static_cast<size_t>(scale))
+  {
     return init_data_;
-  } else {
+  } else
+  {
     Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
     voxel_offset = voxel_offset / (1 << scale);
     const int size_at_scale = BlockSize >> scale;
@@ -817,10 +722,11 @@ inline typename BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockS
 BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getMaxData(const Eigen::Vector3i& voxel_coord,
                                                                                            const int              scale)
 {
-//  std::cout << "GET MAX DATA - 5" << std::endl;
-  if (max_scale_ - (block_data_.size() - 1) > static_cast<size_t>(scale)) {
+  if (max_scale_ - (block_data_.size() - 1) > static_cast<size_t>(scale))
+  {
     return init_data_;
-  } else {
+  } else
+  {
     Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
     voxel_offset = voxel_offset / (1 << scale);
     const int size_at_scale = BlockSize >> scale;
@@ -840,7 +746,6 @@ template <Colour    ColB,
 inline void BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::setData(const Eigen::Vector3i& voxel_coord,
                                                                                                     const DataType&        data)
 {
-//  std::cout << "SET DATA - 1" << std::endl;
   Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
   voxel_offset = voxel_offset / (1 << curr_scale_);
   const int size_at_scale = BlockSize >> curr_scale_;
@@ -860,7 +765,6 @@ inline void BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize,
                                                                                                     const int              scale,
                                                                                                     const DataType&        data)
 {
-//  std::cout << "SET DATA - 2" << std::endl;
   Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
   voxel_offset = voxel_offset / (1 << scale);
   const int size_at_scale = BlockSize >> scale;
@@ -879,7 +783,6 @@ template <Colour    ColB,
 inline void BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::setMaxData(const Eigen::Vector3i& voxel_coord,
                                                                                                        const DataType&        data)
 {
-//  std::cout << "SET MAX DATA - 1" << std::endl;
   Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
   voxel_offset = voxel_offset / (1 << curr_scale_);
   const int size_at_scale = BlockSize >> curr_scale_;
@@ -899,7 +802,6 @@ inline void BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize,
                                                                                                        const int              scale,
                                                                                                        const DataType&        data)
 {
-//  std::cout << "SET MAX DATA - 2" << std::endl;
   Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
   voxel_offset = voxel_offset / (1 << scale);
   const int size_at_scale = BlockSize >> scale;
@@ -1295,13 +1197,12 @@ template <typename DataT,
 >
 Block<DataT, ResT, BlockSize, PolicyT>::Block(se::Node<DataT, ResT>* parent_ptr,
                                               const unsigned         child_id) :
-    std::conditional<ResT == Res::Single,
-      BlockSingleRes<Block<DataT, ResT, BlockSize>, DataT, BlockSize>,
-      BlockMultiRes<DataT, BlockSize, Block<DataT, ResT, BlockSize>>>::type(),
     OctantBase(true,
                parent_ptr->getCoord() + BlockSize * Eigen::Vector3i((1 & child_id) > 0, (2 & child_id) > 0, (4 & child_id) > 0),
-               parent_ptr)
-
+               parent_ptr),
+    std::conditional<ResT == Res::Single,
+        BlockSingleRes<Block<DataT, ResT, BlockSize>, DataT, BlockSize>,
+        BlockMultiRes<DataT, BlockSize, Block<DataT, ResT, BlockSize>>>::type(parent_ptr->getData())
 {
   assert(BlockSize == (parent_ptr->getSize() >> 1));
 }
@@ -1310,4 +1211,6 @@ Block<DataT, ResT, BlockSize, PolicyT>::Block(se::Node<DataT, ResT>* parent_ptr,
 
 } // namespace se
 
-#endif // SE_OCTANT_IMPL_HPP
+
+
+#endif //SE_BLOCK_IMPL_HPP

@@ -7,7 +7,7 @@
 #include "se/utils/memory pool.hpp"
 #include "se/utils/key_util.hpp"
 #include "se/utils/setup_util.hpp"
-#include "se/octree/octant.hpp"
+#include "se/octant/octant.hpp"
 #include "se/octree/iterator.hpp"
 
 

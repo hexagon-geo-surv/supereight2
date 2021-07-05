@@ -4,7 +4,7 @@
 #include "se/utils/math_util.hpp"
 #include "se/utils/key_util.hpp"
 
-#include "se/octree/octant.hpp"
+#include "se/octant/octant.hpp"
 
 
 namespace se {

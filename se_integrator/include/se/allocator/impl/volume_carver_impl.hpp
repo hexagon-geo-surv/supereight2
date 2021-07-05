@@ -142,6 +142,12 @@ void VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, Bl
         const Eigen::Vector3i& rel_step,
         se::OctantBase*        parent_ptr)
 {
+//  bool print_case = false;
+//  if (node_coord.x() == 352 && node_coord.y() == 512 && node_coord.z() == 560)
+//  {
+//    print_case = true;
+//  }
+
   /// Approximate max and min depth to quickly check if the node is behind the camera or maximum depth.
   // Compute the node centre's depth in the camera frame
 
@@ -330,6 +336,30 @@ void VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, Bl
   // In either case the node needs to be allocated.
   const int octant_idx = rel_step.x() + rel_step.y() * 2 + rel_step.z() * 4;
   se::OctantBase* octant_ptr = octree_.allocate(static_cast<NodeType*>(parent_ptr), octant_idx);
+//  if (print_case)
+//  {
+//    const Eigen::Vector3i coord(353, 512, 563);
+//    if (octant_ptr->isBlock())
+//    {
+//      BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
+//      std::cout << "-----" << frame_ << "-----" << std::endl;
+//      std::cout << block_ptr->getSize() << std::endl;
+//      if (block_ptr->getMinScale() != -1)
+//      {
+//        std::cout << block_ptr->getData(coord).occupancy << std::endl;
+//      } else
+//      {
+//        std::cout << block_ptr->getInitData().occupancy << std::endl;
+//      }
+//    } else
+//    {
+//      NodeType* node_ptr = static_cast<NodeType*>(octant_ptr);
+//      std::cout << "-----" << frame_ << "-----" << std::endl;
+//      std::cout << node_ptr->getSize() << std::endl;
+//      std::cout << node_ptr->getData().occupancy << std::endl;
+//      std::cout << node_ptr->getMaxData().occupancy << std::endl;
+//    }
+//  }
 
   if (should_split)
   {

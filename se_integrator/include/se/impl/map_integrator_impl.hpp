@@ -153,7 +153,7 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(const se::
 
   // Update
   se::Updater updater(map, sensor, depth_img, T_MS, frame);
-  updater(block_ptrs, truncation_boundary);
+  updater(block_ptrs);
 }
 
 
@@ -179,7 +179,7 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi>::integrate(const se::I
 
   // Update
   se::Updater updater(map, sensor, depth_img, T_MS, frame);
-  updater(block_ptrs, truncation_boundary);
+  updater(block_ptrs);
 }
 
 
@@ -202,39 +202,8 @@ void IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>::integrate(const 
   se::VolumeCarverAllocation allocation_list = volume_carver.allocateFrustum();
 
   // Update
-  std::vector<std::set<se::OctantBase*>> node_set(map.getOctree()->getBlockDepth());
-  std::vector<se::OctantBase*>           freed_block_list;
-  MultiresOFusionUpdater<MapT, SensorT> updater(depth_img, map, sensor, T_SM, frame, node_set, freed_block_list);
-
-#pragma omp parallel for
-  for (unsigned int i = 0; i < allocation_list.node_list.size(); ++i)
-  {
-    auto node_ptr = static_cast<typename MapT::OctreeType::NodeType*>(allocation_list.node_list[i]);
-    const int depth = map.getOctree()->getMaxScale() - se::math::log2_const(node_ptr->getSize());
-    updater.freeNodeRecurse(allocation_list.node_list[i], depth);
-  }
-
-#pragma omp parallel for
-  for (unsigned int i = 0; i < allocation_list.block_list.size(); ++i)
-  {
-    updater.updateBlock(allocation_list.block_list[i],
-                        allocation_list.variance_state_list[i] == se::VarianceState::Constant,
-                        allocation_list.projects_inside_list[i]);
-  }
-
-  /// Propagation
-#pragma omp parallel for
-  for (unsigned int i = 0; i < allocation_list.block_list.size(); ++i)
-  {
-    updater::propagateBlockToCoarsestScale<typename MapT::OctreeType::BlockType>(allocation_list.block_list[i]);
-  }
-#pragma omp parallel for
-  for (unsigned int i = 0; i < freed_block_list.size(); ++i)
-  {
-    updater::propagateBlockToCoarsestScale<typename MapT::OctreeType::BlockType>(freed_block_list[i]);
-  }
-
-  updater.propagateToRoot(allocation_list.block_list);
+  se::Updater updater(map, sensor, depth_img, T_MS, frame);
+  updater(allocation_list);
 }
 
 

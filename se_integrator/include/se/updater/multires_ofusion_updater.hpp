@@ -11,39 +11,86 @@ namespace se {
 
 
 
-template<typename MapT, typename SensorT>
-class MultiresOFusionUpdater
+// Multi-res Occupancy updater
+template<se::Colour    ColB,
+         se::Semantics SemB,
+         int           BlockSize,
+         typename      SensorT
+>
+class Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>, SensorT>
 {
 public:
-  typedef typename MapT::DataType              DataType;
-  typedef typename MapT::OctreeType::NodeType  NodeType;
-  typedef typename MapT::OctreeType::BlockType BlockType;
+  typedef Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize> MapType;
+  typedef typename MapType::DataType                                             DataType;
+  typedef typename MapType::OctreeType                                           OctreeType;
+  typedef typename MapType::OctreeType::NodeType                                 NodeType;
+  typedef typename MapType::OctreeType::BlockType                                BlockType;
 
+
+  struct UpdaterConfig
+  {
+    UpdaterConfig(const MapType& map) :
+        sigma_min(map.getRes() * map.getDataConfig().sigma_min_factor),
+        sigma_max(map.getRes() * map.getDataConfig().sigma_max_factor),
+        tau_min(map.getRes() * map.getDataConfig().tau_min_factor),
+        tau_max(map.getRes() * map.getDataConfig().tau_max_factor)
+    {
+    }
+
+    const float sigma_min;
+    const float sigma_max;
+    const float tau_min;
+    const float tau_max;
+  };
 
   /**
    * \param[in]  map                  The reference to the map to be updated.
-   * \param[out] block_list           The list of blocks to be updated (used for up-propagation in later stage).
-   * \param[out] node_list            The list of nodes that have been updated (used for up-propagation in later stage.
-   * \param[out] free_list            The list verifying if the updated block should be freed. <bool>
-   * \param[out] low_variance_list    The list verifying if the updated block has low variance. <bool>
-   * \param[out] projects_inside_list The list verifying if the updated block projects completely into the image. <bool>
-   * \param[in]  depth_image          The depth image to be integrated.
-   * \param[in]  pooling_depth_image  The pointer to the pooling image created from the depth image.
    * \param[in]  sensor               The sensor model.
-   * \param[in]  T_CM                 The transformation from map to camera frame.
-   * \param[in]  voxel_dim            The dimension in meters of the finest voxel / map resolution.
-   * \param[in]  voxel_depth          The tree depth of the finest voxel.
-   * \param[in]  max_depth_value      The maximum depth value in the image.
+   * \param[in]  depth_img            The depth image to be integrated.
+   * \param[in]  T_MS                 The transformation from camera to map frame.
    * \param[in]  frame                The frame number to be integrated.
    */
-  MultiresOFusionUpdater(const se::Image<float>& depth_image,
-                         MapT&                    map,
-                         const PinholeCamera&     sensor,
-                         const Eigen::Matrix4f&   T_SM,
-                         const int                frame,
-                         std::vector<std::set<se::OctantBase*>>& node_set,
-                         std::vector<se::OctantBase*>& freed_block_list);
+  Updater(MapType&                               map,
+          const SensorT&                         sensor,
+          const se::Image<float>&                depth_img,
+          const Eigen::Matrix4f&                 T_MS,
+          const int                              frame);
 
+  void operator()(se::VolumeCarverAllocation& allocation_list)
+  {
+#pragma omp parallel for
+    for (unsigned int i = 0; i < allocation_list.node_list.size(); ++i)
+    {
+      auto node_ptr = static_cast<NodeType*>(allocation_list.node_list[i]);
+      const int depth = map_.getOctree()->getMaxScale() - se::math::log2_const(node_ptr->getSize());
+      freeNodeRecurse(allocation_list.node_list[i], depth);
+    }
+
+#pragma omp parallel for
+    for (unsigned int i = 0; i < allocation_list.block_list.size(); ++i)
+    {
+      updateBlock(allocation_list.block_list[i],
+                  allocation_list.variance_state_list[i] == se::VarianceState::Constant,
+                  allocation_list.projects_inside_list[i]);
+    }
+
+    /// Propagation
+#pragma omp parallel for
+    for (unsigned int i = 0; i < allocation_list.block_list.size(); ++i)
+    {
+      updater::propagateBlockToCoarsestScale<BlockType>(allocation_list.block_list[i]);
+    }
+#pragma omp parallel for
+    for (unsigned int i = 0; i < freed_block_list_.size(); ++i)
+    {
+      updater::propagateBlockToCoarsestScale<BlockType>(freed_block_list_[i]);
+    }
+
+    propagateToRoot(allocation_list.block_list);
+  }
+
+
+private:
   /**
    * \brief Propage all newly integrated values from the voxel block depth up to the root of the octree.
    */
@@ -72,19 +119,16 @@ public:
                        int             depth);
 
 private:
-  const se::Image<float>&    depth_image_;
-  MapT&                      map_;
-  typename MapT::OctreeType& octree_;
-  const PinholeCamera&       sensor_;
-  const Eigen::Matrix4f&     T_CM_;
-  const int                  frame_;
-  const float                map_res_;
-  const float                sigma_min_;
-  const float                sigma_max_;
-  const float                tau_min_;
-  const float                tau_max_;
-  std::vector<std::set<se::OctantBase*>>& node_set_;
-  std::vector<se::OctantBase*>& freed_block_list_;
+  MapType&                               map_;
+  OctreeType&                            octree_;
+  const SensorT&                         sensor_;
+  const se::Image<float>&                depth_img_;
+  const Eigen::Matrix4f                  T_SM_;
+  const int                              frame_;
+  const float                            map_res_;
+  const UpdaterConfig                    config_;
+  std::vector<std::set<se::OctantBase*>> node_set_;
+  std::vector<se::OctantBase*>           freed_block_list_;
 };
 
 

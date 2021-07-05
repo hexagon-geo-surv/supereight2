@@ -1,4 +1,4 @@
-#include "se/octree/octant.hpp"
+#include "se/octant/octant.hpp"
 
 namespace se
 {

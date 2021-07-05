@@ -1,7 +1,7 @@
 #ifndef SE_VISITOR_IMPL_HPP
 #define SE_VISITOR_IMPL_HPP
 
-#include "se/octree/octant.hpp"
+#include "se/octant/octant.hpp"
 #include "se/octree/allocator.hpp"
 #include "se/octree/fetcher.hpp"
 #include "se/data.hpp"

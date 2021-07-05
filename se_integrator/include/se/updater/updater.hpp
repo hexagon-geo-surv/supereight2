@@ -1,6 +1,8 @@
 #ifndef SE_UPDATER_HPP
 #define SE_UPDATER_HPP
 
+
+
 namespace se {
 
 
@@ -11,17 +13,14 @@ template <typename MapT,
 class Updater
 {
 public:
-  Updater(MapT&                   map,
-          const SensorT&          sensor,
-          const se::Image<float>& depth_img,
-          const Eigen::Matrix4f&  T_MS,
-          const int               frame);
+  Updater(MapT&                               map,
+          const SensorT&                      sensor,
+          const se::Image<float>&             depth_img,
+          const Eigen::Matrix4f&              T_MS,
+          const int                           frame);
 
-  template <typename UpdateListT,
-          typename UpdateConfigT
-  >
-  void operator()(UpdateListT&         updating_list,
-                  const UpdateConfigT& update_config);
+  template <typename UpdateListT>
+  void operator()(UpdateListT& updating_list);
 };
 
 
@@ -48,10 +47,12 @@ class Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>,
 
 // Multi-res Occupancy updater
 template<se::Colour    ColB,
+         se::Semantics SemB,
          int           BlockSize,
-         se::Semantics SemB
+         typename      SensorT
 >
-class Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>, PinholeCamera>;
+class Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>, SensorT>;
+
 
 
 
