@@ -8,37 +8,39 @@ namespace se {
 
 
 template<se::Colour    ColB,
-         se::Semantics SemB
+         se::Semantics SemB,
+         int           BlockSize
 >
-VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, PinholeCamera>::VolumeCarver(
+VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>, PinholeCamera>::VolumeCarver(
           MapType&                                    map,
           const PinholeCamera&                        sensor,       
           const se::Image<float>&                     depth_img,
           const Eigen::Matrix4f&                      T_SM,
           const int                                   frame) :
-  map_(map),
-  octree_(*(map.getOctree())),
-  sensor_(sensor),
-  depth_pooling_img_(depth_img),
-  T_CM_(T_SM),
-  frame_(frame),
-  map_res_(map.getRes()),
-  sigma_min_(map.getDataConfig().sigma_min_factor * map_res_),
-  sigma_max_(map.getDataConfig().sigma_max_factor * map_res_),
-  tau_min_(map.getDataConfig().tau_min_factor * map_res_),
-  tau_max_(map.getDataConfig().tau_max_factor * map_res_),
-  max_depth_value_(std::min(sensor.far_plane, depth_pooling_img_.maxValue() + tau_max_)),
-  zero_depth_band_(1.0e-6f),
-  size_to_radius_(std::sqrt(3.0f) / 2.0f)
+    map_(map),
+    octree_(*(map.getOctree())),
+    sensor_(sensor),
+    depth_pooling_img_(depth_img),
+    T_CM_(T_SM),
+    frame_(frame),
+    map_res_(map.getRes()),
+    sigma_min_(map.getDataConfig().sigma_min_factor * map_res_),
+    sigma_max_(map.getDataConfig().sigma_max_factor * map_res_),
+    tau_min_(map.getDataConfig().tau_min_factor * map_res_),
+    tau_max_(map.getDataConfig().tau_max_factor * map_res_),
+    max_depth_value_(std::min(sensor.far_plane, depth_pooling_img_.maxValue() + tau_max_)),
+    zero_depth_band_(1.0e-6f),
+    size_to_radius_(std::sqrt(3.0f) / 2.0f)
 {
 }
 
 
 
 template<se::Colour    ColB,
-         se::Semantics SemB
+         se::Semantics SemB,
+         int           BlockSize
 >
-VolumeCarverAllocation VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, PinholeCamera>::allocateFrustum()
+VolumeCarverAllocation VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>, PinholeCamera>::allocateFrustum()
 {
   // Launch on the 8 voxels of the first depth
   const int child_size     = octree_.getSize() / 2;
@@ -58,9 +60,10 @@ VolumeCarverAllocation VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, 
 
 
 template<se::Colour    ColB,
-         se::Semantics SemB
+         se::Semantics SemB,
+         int           BlockSize
 >
-bool VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, PinholeCamera>::crossesFrustum(
+bool VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>, PinholeCamera>::crossesFrustum(
         std::vector<srl::projection::ProjectionStatus>&  proj_corner_stati)
 {
   for (int corner_idx = 0; corner_idx < 8; corner_idx++)
@@ -76,9 +79,10 @@ bool VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, P
 
 
 template<se::Colour    ColB,
-         se::Semantics SemB
+         se::Semantics SemB,
+         int           BlockSize
 >
-bool VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, PinholeCamera>::cameraInNode(
+bool VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>, PinholeCamera>::cameraInNode(
         const Eigen::Vector3i& node_coord,
         const int              node_size,
         const Eigen::Matrix4f& T_MC)
@@ -97,9 +101,10 @@ bool VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, P
 
 
 template<se::Colour    ColB,
-         se::Semantics SemB
+         se::Semantics SemB,
+         int           BlockSize
 >
-se::VarianceState VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, PinholeCamera>::computeVariance(
+se::VarianceState VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>, PinholeCamera>::computeVariance(
     const float       depth_value_min,
     const float       depth_value_max,
     const float       node_dist_min_m,
@@ -127,9 +132,10 @@ se::VarianceState VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::R
 
 
 template<se::Colour    ColB,
-         se::Semantics SemB
+         se::Semantics SemB,
+         int           BlockSize
 >
-void VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, PinholeCamera>::operator()(
+void VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>, PinholeCamera>::operator()(
         const Eigen::Vector3i& node_coord,
         const int              node_size,
         const int              depth,

@@ -29,7 +29,9 @@ struct VolumeCarverAllocation
 
 
 
-template<typename MapT, typename SensorT>
+template<typename MapT,
+         typename SensorT
+>
 class VolumeCarver {
 public:
   VolumeCarver(MapT&                                       map,
@@ -46,9 +48,10 @@ public:
 
 
 template<se::Colour    ColB,
-         se::Semantics SemB
+         se::Semantics SemB,
+         int           BlockSize
 >
-class VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi>, PinholeCamera>
+class VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>, PinholeCamera>
 {
 public:
   typedef Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi> MapType;
