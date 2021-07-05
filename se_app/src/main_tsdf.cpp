@@ -126,7 +126,7 @@ int main(int argc, char** argv)
     TICK("integration")
     if (frame % config.app.integration_rate == 0)
     {
-      integrator.integrateDepth(processed_depth_img, sensor, T_MS, frame);
+      integrator.integrateDepth(sensor, processed_depth_img, T_MS, frame);
     }
     TOCK("integration")
 

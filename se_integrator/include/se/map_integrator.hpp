@@ -17,22 +17,24 @@ namespace allocator {
 /**
  * \brief Allocate frustum in band around the surface.
  *
- * \tparam SensorT
  * \tparam MapT
- * \param[in] depth_img The sensor depth image
- * \param[in] sensor    The sensor use for the projection
- * \param[in] T_MS      The transformation from sensor to map frame
+ * \tparam SensorT
  * \param[in] map       The reference to the map
+ * \param[in] sensor    The sensor use for the projection
+ * \param[in] depth_img The sensor depth image
+ * \param[in] T_MS      The transformation from sensor to map frame
  * \param[in] band      The size of the band allocated around the surface
  *
  * \return The allocated and fetched notes in the band around the surface measurements
  */
-template<typename SensorT, typename MapT>
-std::vector<se::OctantBase*> frustum(const se::Image<depth_t>& depth_img,
-                                    SensorT&                   sensor,
-                                    const Eigen::Matrix4f&     T_MS,
-                                    MapT&                      map,
-                                    const float                band);
+template<typename MapT,
+         typename SensorT
+>
+std::vector<se::OctantBase*> frustum(MapT&                      map,
+                                     SensorT&                   sensor,
+                                     const se::Image<depth_t>& depth_img,
+                                     const Eigen::Matrix4f&     T_MS,
+                                     const float                band);
 
 } // namespace allocator
 
@@ -52,7 +54,9 @@ namespace fetcher {
    *
    * \return A vector of pointers to Blocks that intersect the sensor frustum.
    */
-  template<typename MapT, typename SensorT>
+  template<typename MapT,
+           typename SensorT
+  >
   inline std::vector<se::OctantBase*> frustum(MapT&                  map,
                                               const SensorT&         sensor,
                                               const Eigen::Matrix4f& T_MS);
@@ -100,8 +104,8 @@ public:
    * \param[in] T_MS        The transformation from sensor to map frame
    */
   template <typename SensorT>
-  void integrateDepth(const se::Image<se::depth_t>& depth_img,
-                      const SensorT&                sensor,
+  void integrateDepth(const SensorT&                sensor,
+                      const se::Image<se::depth_t>& depth_img,
                       const Eigen::Matrix4f&        T_MS,
                       const unsigned int            frame);
 

@@ -41,7 +41,7 @@ TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
   const int max_frame = 1;
   for (int frame = 0; frame < max_frame; frame++)
   {
-    integrator.integrateDepth(processed_depth_img, sensor, T_MS, frame);
+    integrator.integrateDepth(sensor, processed_depth_img, T_MS, frame);
   }
 
   map.saveFieldSlice("/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/out/test-field-interp-slice",
@@ -105,7 +105,7 @@ TEST(MultiResOFusionSystemTest, GetField)
   const int max_frame = 1;
   for (int frame = 0; frame < max_frame; frame++)
   {
-    integrator.integrateDepth(processed_depth_img, sensor, T_MS, frame);
+    integrator.integrateDepth(sensor, processed_depth_img, T_MS, frame);
   }
 
   const Eigen::Vector3i voxel_coord_unknown_1(688, 500, 933);
@@ -175,7 +175,7 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
   const int max_frame = 1;
   for (int frame = 0; frame < max_frame; frame++)
   {
-    integrator.integrateDepth(processed_depth_img, sensor, T_MS, frame);
+    integrator.integrateDepth(sensor, processed_depth_img, T_MS, frame);
   }
 
   const Eigen::Vector3i voxel_coord(640, 512, 896);
@@ -252,7 +252,7 @@ TEST(MultiResOFusionSystemTest, DeleteChildren)
   {
     std::cout << "FRAME = " << frame << std::endl;
     se::preprocessor::downsample_depth((frame == 0) ? input_noise_depth_img : input_depth_img, processed_depth_img);
-    integrator.integrateDepth(processed_depth_img, sensor, T_MS, frame);
+    integrator.integrateDepth(sensor, processed_depth_img, T_MS, frame);
 
     const Eigen::Vector3i voxel_coord(471, 512, 807);
     Eigen::Vector3f       point_M;
@@ -330,7 +330,7 @@ TEST(MultiResOFusionSystemTest, Raycasting)
   se::preprocessor::downsample_rgba(input_rgba_img,  processed_rgba_img);
 
   se::MapIntegrator integrator(map);
-  integrator.integrateDepth(processed_depth_img, sensor, T_MS, frame);
+  integrator.integrateDepth(sensor, processed_depth_img, T_MS, frame);
 
   se::raycaster::raycastVolume(map, surface_point_cloud_M, surface_normals_M, surface_scale, T_MS, sensor);
 

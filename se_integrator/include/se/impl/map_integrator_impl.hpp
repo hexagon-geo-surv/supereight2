@@ -40,11 +40,11 @@ struct IntegrateDepthImplD
            typename MapT,
            typename ConfigT
   >
-  static void integrate(const se::Image<se::depth_t>& depth_img,
+  static void integrate(MapT&                         map,
                         const SensorT&                sensor,
+                        const se::Image<se::depth_t>& depth_img,
                         const Eigen::Matrix4f&        T_MS,
                         const unsigned int            frame,
-                        MapT&                         map,
                         ConfigT&                      /* config */); // TODO:
 };
 
@@ -60,11 +60,11 @@ struct IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>
            typename MapT,
            typename ConfigT
   >
-  static void integrate(const se::Image<se::depth_t>& depth_img,
+  static void integrate(MapT&                         map,
                         const SensorT&                sensor,
+                        const se::Image<se::depth_t>& depth_img,
                         const Eigen::Matrix4f&        T_MS,
                         const unsigned int            frame,
-                        MapT&                         map,
                         ConfigT&                      /* config */);
 };
 
@@ -80,11 +80,11 @@ struct IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi>
            typename MapT,
            typename ConfigT
   >
-  static void integrate(const se::Image<se::depth_t>& depth_img,
+  static void integrate(MapT&                         map,
                         const SensorT&                sensor,
+                        const se::Image<se::depth_t>& depth_img,
                         const Eigen::Matrix4f&        T_MS,
                         const unsigned int            frame,
-                        MapT&                         map,
                         ConfigT&                      /* config */);
 };
 
@@ -100,11 +100,11 @@ struct IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>
            typename MapT,
            typename ConfigT
   >
-  static void integrate(const se::Image<se::depth_t>& depth_img,
+  static void integrate(MapT&                         map,
                         const SensorT&                sensor,
+                        const se::Image<se::depth_t>& depth_img,
                         const Eigen::Matrix4f&        T_MS,
                         const unsigned int            frame,
-                        MapT&                         map,
                         ConfigT&                      /* config */);
 };
 
@@ -122,11 +122,11 @@ template<typename SensorT,
          typename MapT,
          typename ConfigT
 >
-void IntegrateDepthImplD<FldT, ResT>::integrate(const se::Image<se::depth_t>& depth_img,
+void IntegrateDepthImplD<FldT, ResT>::integrate(MapT&                         map,
                                                 const SensorT&                sensor,
+                                                const se::Image<se::depth_t>& depth_img,
                                                 const Eigen::Matrix4f&        T_MS,
                                                 const unsigned int            frame,
-                                                MapT&                         map,
                                                 ConfigT&                      config)
 {
 }
@@ -137,11 +137,11 @@ template<typename SensorT,
          typename MapT,
          typename ConfigT
 >
-void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(const se::Image<se::depth_t>& depth_img,
+void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(MapT&                         map,
                                                                       const SensorT&                sensor,
+                                                                      const se::Image<se::depth_t>& depth_img,
                                                                       const Eigen::Matrix4f&        T_MS,
                                                                       const unsigned int            frame,
-                                                                      MapT&                         map,
                                                                       ConfigT&                      /* config */)
 {
   const float truncation_boundary = map.getRes() * map.getDataConfig().truncation_boundary_factor;
@@ -149,7 +149,7 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(const se::
 
   // Allocation
   se::RaycastCarver raycast_carver(map, sensor, depth_img, T_MS, frame);
-  std::vector<OctantBase*> block_ptrs = raycast_carver.allocateBand(band); //
+  std::vector<OctantBase*> block_ptrs = raycast_carver.allocateBand(band);
 
   // Update
   se::Updater updater(map, sensor, depth_img, T_MS, frame);
@@ -158,16 +158,15 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(const se::
 
 
 
-
 template<typename SensorT,
          typename MapT,
          typename ConfigT
 >
-void IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi>::integrate(const se::Image<se::depth_t>& depth_img,
+void IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi>::integrate(MapT&                         map,
                                                                      const SensorT&                sensor,
+                                                                     const se::Image<se::depth_t>& depth_img,
                                                                      const Eigen::Matrix4f&        T_MS,
                                                                      const unsigned int            frame,
-                                                                     MapT&                         map,
                                                                      ConfigT&                      /* config */)
 {
   const float truncation_boundary = map.getRes() * map.getDataConfig().truncation_boundary_factor;
@@ -188,11 +187,11 @@ template<typename SensorT,
          typename MapT,
          typename ConfigT
 >
-void IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>::integrate(const se::Image<se::depth_t>& depth_img,
+void IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>::integrate(MapT&                         map,
                                                                           const SensorT&                sensor,
+                                                                          const se::Image<se::depth_t>& depth_img,
                                                                           const Eigen::Matrix4f&        T_MS,
                                                                           const unsigned int            frame,
-                                                                          MapT&                         map,
                                                                           ConfigT&                      /* config */)
 {
   const Eigen::Matrix4f T_SM = se::math::to_inverse_transformation(T_MS);
@@ -223,12 +222,12 @@ MapIntegrator<MapT>::MapIntegrator(MapT&                   map,
 
 template<typename MapT>
 template<typename SensorT>
-void MapIntegrator<MapT>::integrateDepth(const se::Image<se::depth_t>& depth_img,
-                                         const SensorT&                sensor,
+void MapIntegrator<MapT>::integrateDepth(const SensorT&                sensor,
+                                         const se::Image<se::depth_t>& depth_img,
                                          const Eigen::Matrix4f&        T_MS,
                                          const unsigned int            frame)
 {
-  se::details::IntegrateDepthImpl<MapT>::integrate(depth_img, sensor, T_MS, frame, map_, config_);
+  se::details::IntegrateDepthImpl<MapT>::integrate(map_, sensor, depth_img, T_MS, frame, config_);
 }
 
 
