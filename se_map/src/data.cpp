@@ -149,7 +149,7 @@ namespace se {
 
   std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::TSDF>& c)
   {
-    os << "truncation_boundary_factor:  " << c.truncation_boundary_factor << " m\n";
+    os << "truncation_boundary_factor:  " << c.truncation_boundary_factor << "x\n";
     os << "max_weight:                  " << c.max_weight << "\n";
     return os;
   }

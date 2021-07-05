@@ -34,12 +34,12 @@ template<typename MapT,
 >
 class VolumeCarver {
 public:
-  VolumeCarver(MapT&                                       map,
-               const PinholeCamera&                        sensor,
-               const se::Image<float>&                     depth_img,
-               const se::DensePoolingImage<PinholeCamera>& depth_pooling_img,
-               const Eigen::Matrix4f&                      T_SM,
-               const int                                   frame)
+  VolumeCarver(MapT&                                 map,
+               const SensorT&                        sensor,
+               const se::Image<float>&               depth_img,
+               const se::DensePoolingImage<SensorT>& depth_pooling_img,
+               const Eigen::Matrix4f&                T_SM,
+               const int                             frame)
   {
   };
 };
@@ -49,9 +49,10 @@ public:
 
 template<se::Colour    ColB,
          se::Semantics SemB,
-         int           BlockSize
+         int           BlockSize,
+         typename      SensorT
 >
-class VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>, PinholeCamera>
+class VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>, SensorT>
 {
 public:
   typedef Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi> MapType;
@@ -83,11 +84,11 @@ public:
    * \param[in]  T_SM                 The transformation from map to camera frame.
    * \param[in]  frame                The frame number to be integrated.
    */
-  VolumeCarver(MapType&                                    map,
-               const PinholeCamera&                        sensor,
-               const se::Image<float>&                     depth_img,
-               const Eigen::Matrix4f&                      T_MS,
-               const int                                   frame);
+  VolumeCarver(MapType&                map,
+               const SensorT&          sensor,
+               const se::Image<float>& depth_img,
+               const Eigen::Matrix4f&  T_MS,
+               const int               frame);
 
   /**
    * \brief Allocate the frustum using a map-to-camera volume carving approach
@@ -135,25 +136,34 @@ private:
                                     const float       node_dist_min_m,
                                     const float       node_dist_max_m);
 
+  template<class SensorTDummy = SensorT>
+  typename std::enable_if_t<std::is_same<SensorTDummy, se::PinholeCamera>::value, void>
+  operator()(const Eigen::Vector3i& node_coord,
+             const int              node_size,
+             const int              octant_depth,
+             const Eigen::Vector3i& rel_step,
+             se::OctantBase*        parent_ptr);
 
-  void operator()(const Eigen::Vector3i& node_coord,
-                  const int              node_size,
-                  const int              octant_depth,
-                  const Eigen::Vector3i& rel_step,
-                  se::OctantBase*        parent_ptr);
+  template<class SensorTDummy = SensorT>
+  typename std::enable_if_t<std::is_same<SensorTDummy, se::OusterLidar>::value, void>
+  operator()(const Eigen::Vector3i& node_coord,
+             const int              node_size,
+             const int              octant_depth,
+             const Eigen::Vector3i& rel_step,
+             se::OctantBase*        parent_ptr);
 
-  MapType&                                   map_;
-  OctreeType&                                octree_;
-  const PinholeCamera&                       sensor_;
-  const se::DensePoolingImage<PinholeCamera> depth_pooling_img_;
-  const Eigen::Matrix4f                      T_SM_;
-  const int                                  frame_;
-  const float                                map_res_;
-  VolumeCarverConfig                         config_;
-  const float                                max_depth_value_;
-  const float                                zero_depth_band_;
-  const float                                size_to_radius_;
-  VolumeCarverAllocation                     allocation_list_;
+  MapType&                             map_;
+  OctreeType&                          octree_;
+  const SensorT&                       sensor_;
+  const se::DensePoolingImage<SensorT> depth_pooling_img_;
+  const Eigen::Matrix4f                T_SM_;
+  const int                            frame_;
+  const float                          map_res_;
+  VolumeCarverConfig                   config_;
+  const float                          max_depth_value_;
+  const float                          zero_depth_band_;
+  const float                          size_to_radius_;
+  VolumeCarverAllocation               allocation_list_;
 };
 
 

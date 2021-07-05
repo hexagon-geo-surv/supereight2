@@ -37,7 +37,7 @@
 #ifndef SE_TRACKER_HPP
 #define SE_TRACKER_HPP
 
-#include "se/sensor.hpp"
+#include "se/sensor/sensor.hpp"
 #include "se/preprocessor.hpp"
 #include "se/raycaster.hpp"
 

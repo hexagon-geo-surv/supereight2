@@ -4,7 +4,7 @@
 #include "se/map_integrator.hpp"
 #include "se/raycaster.hpp"
 #include "se/tracker.hpp"
-#include "se/sensor.hpp"
+#include "se/sensor/sensor.hpp"
 #include "se/preprocessor.hpp"
 #include "se/perfstats.hpp"
 #include "se/timings.hpp"
@@ -18,13 +18,22 @@
 #define SE_RES se::Res::Single
 #endif
 
+#ifndef SE_SENSOR
+#define SE_SENSOR se::OusterLidar
+#endif
+
+#define CONFIG Config
+#define SE_SENSOR_CONFIG(a,b) a##b
+
+#define SE_SENSOR_CONFIG_X(a,b) SE_SENSOR_CONFIG(a,b)
+
 int main(int argc, char** argv)
 {
   // Read the configuration
 //  const std::string config_filename = (argc >= 2) ? argv[1] : "/home/nils/workspace_/projects/supereight-2-srl/datasets/cow_and_lady/config.yaml";
   const std::string config_filename = (argc >= 2) ? argv[1] : "/home/nils/workspace_/projects/supereight-2-srl/datasets/icl_nuim/traj_2/config.yaml";
 //  const std::string config_filename = (argc >= 2) ? argv[1] : "/home/nils/workspace_/projects/supereight-2-srl/datasets/rgbd_datasets/rgbd_dataset_freiburg1_desk/config.yaml";
-  const se::Config<se::OccDataConfig> config (config_filename);
+  const se::Config<se::OccDataConfig, SE_SENSOR_CONFIG_X(SE_SENSOR, CONFIG)> config(config_filename);
   std::cout << config;
 
   // Create the mesh output directory
@@ -61,7 +70,7 @@ int main(int argc, char** argv)
   uint32_t* output_volume_img_data   =  new uint32_t[processed_img_res.x() * processed_img_res.y()];
 
   // Create a pinhole camera and downsample the intrinsics
-  const se::PinholeCamera sensor(config.sensor, config.app.sensor_downsampling_factor);
+  const SE_SENSOR sensor(config.sensor, config.app.sensor_downsampling_factor);
 
   // ========= READER INITIALIZATION  =========
   se::Reader* reader = nullptr;

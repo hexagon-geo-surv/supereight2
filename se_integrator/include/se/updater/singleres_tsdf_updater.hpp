@@ -4,7 +4,7 @@
 
 
 #include "se/map.hpp"
-#include "se/sensor.hpp"
+#include "se/sensor/sensor.hpp"
 
 
 

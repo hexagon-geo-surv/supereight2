@@ -3,11 +3,13 @@ cmake_minimum_required(VERSION 3.5...3.16)
 # Create library ##############################################################
 set(LIB_NAME "se-shared")
 add_library(${LIB_NAME} STATIC
-    "src/colour_utils.cpp"
-    "src/image_utils.cpp"
+    "src/utils/colour_utils.cpp"
+    "src/utils/image_utils.cpp"
     "src/perfstats.cpp"
-    "src/sensor.cpp"
-    "src/str_utils.cpp"
+    "src/sensor/sensor.cpp"
+    "src/sensor/pinhole_camera.cpp"
+    "src/sensor/ouster_lidar.cpp"
+    "src/utils/str_utils.cpp"
     "src/yaml.cpp"
 )
 target_include_directories(${LIB_NAME}

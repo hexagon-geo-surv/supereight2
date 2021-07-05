@@ -11,7 +11,7 @@
 TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
 {
   const std::string config_filename = "/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/config.yaml";
-  const se::Config<se::OccDataConfig> config (config_filename);
+  const se::Config<se::OccDataConfig, se::PinholeCameraConfig> config (config_filename);
   se::OccMap<se::Res::Multi> map(config.map, config.data);
 
   // Create a pinhole camera and downsample the intrinsics
@@ -75,7 +75,7 @@ TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
 TEST(MultiResOFusionSystemTest, GetField)
 {
   const std::string config_filename = "/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/config.yaml";
-  const se::Config<se::OccDataConfig> config (config_filename);
+  const se::Config<se::OccDataConfig, se::PinholeCameraConfig> config (config_filename);
   se::OccMap<se::Res::Multi> map(config.map, config.data);
 
   // Create a pinhole camera and downsample the intrinsics
@@ -145,7 +145,7 @@ TEST(MultiResOFusionSystemTest, GetField)
 TEST(MultiResOFusionSystemTest, GetMaxField)
 {
   const std::string config_filename = "/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/config.yaml";
-  const se::Config<se::OccDataConfig> config (config_filename);
+  const se::Config<se::OccDataConfig, se::PinholeCameraConfig> config (config_filename);
   se::OccMap<se::Res::Multi> map(config.map, config.data);
 
   // Create a pinhole camera and downsample the intrinsics
@@ -213,7 +213,7 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
 TEST(MultiResOFusionSystemTest, DeleteChildren)
 {
   const std::string config_filename = "/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/config.yaml";
-  const se::Config<se::OccDataConfig> config (config_filename);
+  const se::Config<se::OccDataConfig, se::PinholeCameraConfig> config (config_filename);
   se::OccMap<se::Res::Multi> map(config.map, config.data);
 
   // Create a pinhole camera and downsample the intrinsics
@@ -275,7 +275,7 @@ TEST(MultiResOFusionSystemTest, Raycasting)
 {
   // Read the configuration
   const std::string config_filename = "/home/nils/workspace_/projects/supereight-2-srl/datasets/icl_nuim/traj_2/config.yaml";
-  const se::Config<se::OccDataConfig> config (config_filename);
+  const se::Config<se::OccDataConfig, se::PinholeCameraConfig> config (config_filename);
   std::cout << config;
 
   // Setup log stream

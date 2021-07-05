@@ -34,7 +34,7 @@
 #include "se/image/image.hpp"
 #include "se/perfstats.hpp"
 #include "se/timings.hpp"
-#include "se/sensor.hpp"
+#include "se/sensor/sensor.hpp"
 
 #include <Eigen/Dense>
 #include <iostream>
