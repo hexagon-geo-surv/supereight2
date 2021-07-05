@@ -77,23 +77,13 @@ namespace fetcher {
 static inline Eigen::Vector3f get_sample_coord(const Eigen::Vector3i& octant_coord,
                                                const int              octant_size);
 
-/**
- * TODO:
- */
-struct IntegratorConfig
-{
-  IntegratorConfig() {}
-};
-
-
 
 
 template <typename MapT>
 class MapIntegrator
 {
 public:
-  MapIntegrator(MapT&                   map,
-                const IntegratorConfig& config = IntegratorConfig());
+  MapIntegrator(MapT& map);
 
   /**
    * \brief Integrate depth image into the maps field representation.
@@ -111,7 +101,6 @@ public:
 
 private:
   MapT&            map_;
-  IntegratorConfig config_;
 };
 
 
