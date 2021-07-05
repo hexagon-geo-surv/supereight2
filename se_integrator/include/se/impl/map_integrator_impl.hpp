@@ -132,12 +132,9 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(MapT&     
                                                                       const Eigen::Matrix4f&        T_MS,
                                                                       const unsigned int            frame)
 {
-  const float truncation_boundary = map.getRes() * map.getDataConfig().truncation_boundary_factor;
-  const float band                = 2.f * truncation_boundary;
-
   // Allocation
   se::RaycastCarver raycast_carver(map, sensor, depth_img, T_MS, frame);
-  std::vector<OctantBase*> block_ptrs = raycast_carver.allocateBand(band);
+  std::vector<OctantBase*> block_ptrs = raycast_carver();
 
   // Update
   se::Updater updater(map, sensor, depth_img, T_MS, frame);
@@ -155,12 +152,9 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi>::integrate(MapT&      
                                                                      const Eigen::Matrix4f&        T_MS,
                                                                      const unsigned int            frame)
 {
-  const float truncation_boundary = map.getRes() * map.getDataConfig().truncation_boundary_factor;
-  const float band                = 2.f * truncation_boundary;
-
   // Allocation
   se::RaycastCarver raycast_carver(map, sensor, depth_img, T_MS, frame);
-  std::vector<OctantBase*> block_ptrs = raycast_carver.allocateBand(band);
+  std::vector<OctantBase*> block_ptrs = raycast_carver();
 
   // Update
   se::Updater updater(map, sensor, depth_img, T_MS, frame);
@@ -178,11 +172,9 @@ void IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>::integrate(MapT& 
                                                                           const Eigen::Matrix4f&        T_MS,
                                                                           const unsigned int            frame)
 {
-  const Eigen::Matrix4f T_SM = se::math::to_inverse_transformation(T_MS);
-
   // Allocation
-  VolumeCarver<MapT, SensorT> volume_carver(map, sensor, depth_img, T_SM, frame); //< process based on variance state and project inside
-  se::VolumeCarverAllocation allocation_list = volume_carver.allocateFrustum();
+  VolumeCarver<MapT, SensorT> volume_carver(map, sensor, depth_img, T_MS, frame); //< process based on variance state and project inside
+  se::VolumeCarverAllocation allocation_list = volume_carver();
 
   // Update
   se::Updater updater(map, sensor, depth_img, T_MS, frame);

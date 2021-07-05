@@ -59,6 +59,23 @@ public:
   typedef typename OctreeType::NodeType                               NodeType;
   typedef typename OctreeType::BlockType                              BlockType;
 
+  struct VolumeCarverConfig
+  {
+    VolumeCarverConfig(const MapType& map) :
+        sigma_min(map.getDataConfig().sigma_min_factor * map.getRes()),
+        sigma_max(map.getDataConfig().sigma_max_factor * map.getRes()),
+        tau_min(map.getDataConfig().tau_min_factor * map.getRes()),
+        tau_max(map.getDataConfig().tau_max_factor * map.getRes())
+    {
+    }
+
+    const float sigma_min;
+    const float sigma_max;
+    const float tau_min;
+    const float tau_max;
+  };
+
+
   /**
    * \param[in]  map                  The reference to the map to be updated.
    * \param[in]  sensor               The sensor model.
@@ -69,13 +86,13 @@ public:
   VolumeCarver(MapType&                                    map,
                const PinholeCamera&                        sensor,
                const se::Image<float>&                     depth_img,
-               const Eigen::Matrix4f&                      T_SM,
+               const Eigen::Matrix4f&                      T_MS,
                const int                                   frame);
 
   /**
    * \brief Allocate the frustum using a map-to-camera volume carving approach
    */
-  VolumeCarverAllocation allocateFrustum();
+  VolumeCarverAllocation operator()();
 
 
 
@@ -118,27 +135,25 @@ private:
                                     const float       node_dist_min_m,
                                     const float       node_dist_max_m);
 
+
   void operator()(const Eigen::Vector3i& node_coord,
                   const int              node_size,
                   const int              octant_depth,
                   const Eigen::Vector3i& rel_step,
                   se::OctantBase*        parent_ptr);
 
-  MapType&                                    map_;
-  OctreeType&                                 octree_;
-  const PinholeCamera&                        sensor_;
-  const se::DensePoolingImage<PinholeCamera>  depth_pooling_img_;
-  const Eigen::Matrix4f&                      T_CM_;
-  const int                                   frame_;
-  const float                                 map_res_;
-  const float                                 sigma_min_;
-  const float                                 sigma_max_;
-  const float                                 tau_min_;
-  const float                                 tau_max_;
-  const float                                 max_depth_value_;
-  const float                                 zero_depth_band_;
-  const float                                 size_to_radius_;
-  VolumeCarverAllocation                      allocation_list_;
+  MapType&                                   map_;
+  OctreeType&                                octree_;
+  const PinholeCamera&                       sensor_;
+  const se::DensePoolingImage<PinholeCamera> depth_pooling_img_;
+  const Eigen::Matrix4f                      T_SM_;
+  const int                                  frame_;
+  const float                                map_res_;
+  VolumeCarverConfig                         config_;
+  const float                                max_depth_value_;
+  const float                                zero_depth_band_;
+  const float                                size_to_radius_;
+  VolumeCarverAllocation                     allocation_list_;
 };
 
 

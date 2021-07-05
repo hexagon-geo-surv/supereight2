@@ -15,20 +15,17 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
           MapType&                                    map,
           const PinholeCamera&                        sensor,       
           const se::Image<float>&                     depth_img,
-          const Eigen::Matrix4f&                      T_SM,
+          const Eigen::Matrix4f&                      T_MS,
           const int                                   frame) :
     map_(map),
     octree_(*(map.getOctree())),
     sensor_(sensor),
     depth_pooling_img_(depth_img),
-    T_CM_(T_SM),
+    T_SM_(se::math::to_inverse_transformation(T_MS)),
     frame_(frame),
     map_res_(map.getRes()),
-    sigma_min_(map.getDataConfig().sigma_min_factor * map_res_),
-    sigma_max_(map.getDataConfig().sigma_max_factor * map_res_),
-    tau_min_(map.getDataConfig().tau_min_factor * map_res_),
-    tau_max_(map.getDataConfig().tau_max_factor * map_res_),
-    max_depth_value_(std::min(sensor.far_plane, depth_pooling_img_.maxValue() + tau_max_)),
+    config_(map),
+    max_depth_value_(std::min(sensor.far_plane, depth_pooling_img_.maxValue() + config_.tau_max)),
     zero_depth_band_(1.0e-6f),
     size_to_radius_(std::sqrt(3.0f) / 2.0f)
 {
@@ -40,7 +37,7 @@ template<se::Colour    ColB,
          se::Semantics SemB,
          int           BlockSize
 >
-VolumeCarverAllocation VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>, PinholeCamera>::allocateFrustum()
+VolumeCarverAllocation VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>, PinholeCamera>::operator()()
 {
   // Launch on the 8 voxels of the first depth
   const int child_size     = octree_.getSize() / 2;
@@ -85,10 +82,10 @@ template<se::Colour    ColB,
 bool VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>, PinholeCamera>::cameraInNode(
         const Eigen::Vector3i& node_coord,
         const int              node_size,
-        const Eigen::Matrix4f& T_MC)
+        const Eigen::Matrix4f& T_MS)
 {
   Eigen::Vector3f voxel_coord_f;
-  map_.pointToVoxel(se::math::to_translation(T_MC), voxel_coord_f);
+  map_.pointToVoxel(se::math::to_translation(T_MS), voxel_coord_f);
   if (   voxel_coord_f.x() >= node_coord.x() && voxel_coord_f.x() <= node_coord.x() + node_size
          && voxel_coord_f.y() >= node_coord.y() && voxel_coord_f.y() <= node_coord.y() + node_size
          && voxel_coord_f.z() >= node_coord.z() && voxel_coord_f.z() <= node_coord.z() + node_size)
@@ -114,8 +111,8 @@ se::VarianceState VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::R
   const float z_diff_max = (node_dist_max_m - depth_value_min); // * proj_scale;
   const float z_diff_min = (node_dist_min_m - depth_value_max); // * proj_scale;
 
-  const float tau_max         = compute_tau(depth_value_max, tau_min_, tau_max_, map_.getDataConfig());
-  const float three_sigma_min = compute_three_sigma(depth_value_max, sigma_min_, sigma_max_, map_.getDataConfig());
+  const float tau_max         = compute_tau(depth_value_max, config_.tau_min, config_.tau_max, map_.getDataConfig());
+  const float three_sigma_min = compute_three_sigma(depth_value_max, config_.sigma_min, config_.sigma_max, map_.getDataConfig());
 
   if (z_diff_min > 1.25 * tau_max)
   { // behind of surface
@@ -155,11 +152,11 @@ void VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, Bl
   Eigen::Vector3f node_centre_point_M;
   map_.voxelToPoint(node_coord, node_size, node_centre_point_M);
 
-  const Eigen::Vector3f node_centre_point_C = (T_CM_ * node_centre_point_M.homogeneous()).head(3);
+  const Eigen::Vector3f node_centre_point_S = (T_SM_ * node_centre_point_M.homogeneous()).head(3);
 
   // Extend and reduce the depth by the sphere radius covering the entire cube
-  const float approx_depth_value_max = node_centre_point_C.z() + node_size * size_to_radius_ * map_res_;
-  const float approx_depth_value_min = node_centre_point_C.z() - node_size * size_to_radius_ * map_res_;
+  const float approx_depth_value_max = node_centre_point_S.z() + node_size * size_to_radius_ * map_res_;
+  const float approx_depth_value_min = node_centre_point_S.z() - node_size * size_to_radius_ * map_res_;
 
   /// CASE 0.1 (OUT OF BOUNDS): Block is behind the camera or behind the maximum depth value
   if (approx_depth_value_min > max_depth_value_ ||
@@ -174,14 +171,14 @@ void VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, Bl
   /// CHANGE: USE voxelToCornerPoints(...)
   Eigen::Matrix<float, 3, 8> node_corner_points_M;
   map_.voxelToCornerPoints(node_coord, node_size, node_corner_points_M);
-  Eigen::Matrix<float, 3, 8> node_corner_points_C =
-          (T_CM_  * node_corner_points_M.colwise().homogeneous()).topRows(3);
+  Eigen::Matrix<float, 3, 8> node_corner_points_S =
+          (T_SM_  * node_corner_points_M.colwise().homogeneous()).topRows(3);
 
   Eigen::VectorXi node_corners_infront(8);
   node_corners_infront << 1, 1, 1, 1, 1, 1, 1, 1;
   for (int corner_idx = 0; corner_idx < 8; corner_idx++)
   {
-    if (node_corner_points_C(2, corner_idx) < zero_depth_band_)
+    if (node_corner_points_S(2, corner_idx) < zero_depth_band_)
     {
       node_corners_infront(corner_idx) = 0;
     }
@@ -198,9 +195,9 @@ void VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, Bl
 
   // Project the 8 corners into the image plane
   Eigen::Matrix2Xf proj_node_corner_pixels_f(2, 8);
-  const Eigen::VectorXf node_corners_diff = node_corner_points_C.row(2);
+  const Eigen::VectorXf node_corners_diff = node_corner_points_S.row(2);
   std::vector<srl::projection::ProjectionStatus> proj_node_corner_stati;
-  sensor_.model.projectBatch(node_corner_points_C, &proj_node_corner_pixels_f, &proj_node_corner_stati);
+  sensor_.model.projectBatch(node_corner_points_S, &proj_node_corner_pixels_f, &proj_node_corner_stati);
 
   /// Approximate a 2D bounding box covering the projected node in the image plane.
   bool should_split = false;
@@ -213,7 +210,7 @@ void VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, Bl
     if (num_node_corners_infront < 8)
     {
       /// CASE 1 (CAMERA IN NODE):
-      if (cameraInNode(node_coord, node_size, se::math::to_inverse_transformation(T_CM_)))
+      if (cameraInNode(node_coord, node_size, se::math::to_inverse_transformation(T_SM_)))
       {
 //        std::cout << "CASE 1 - Camera in Node - Split 0" << std::endl;
         should_split = true;
@@ -223,7 +220,7 @@ void VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, Bl
 //        std::cout << "CASE 2 - Frustum Boundary - Split 1" << std::endl;
         should_split = true;
         /// CASE 2 (FRUSTUM BOUNDARY): Node partly behind the camera and crosses the the frustum boundary without a corner reprojecting
-      } else if (sensor_.sphereInFrustumInf(node_centre_point_C, node_size * size_to_radius_ * map_res_))
+      } else if (sensor_.sphereInFrustumInf(node_centre_point_S, node_size * size_to_radius_ * map_res_))
       {
 //        std::cout << "CASE 2 - Frustum Boundary - Split 2" << std::endl;
         should_split = true;
@@ -252,7 +249,7 @@ void VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, Bl
       }
 
       /// CASE 0.4 (OUT OF BOUNDS): The node is behind surface
-      if (node_dist_min_m > pooling_pixel.max + tau_max_)
+      if (node_dist_min_m > pooling_pixel.max + config_.tau_max)
       { // TODO: Can be changed to node_dist_max_m?
 //        std::cout << "Case 0.4 - Out of Bounds - Return 4" << std::endl;
         return;

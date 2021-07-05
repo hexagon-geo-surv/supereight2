@@ -30,6 +30,18 @@ class RaycastCarver
 public:
   typedef typename MapT::OctreeType OctreeType;
 
+  struct RaycastCarverConfig
+  {
+    RaycastCarverConfig(const MapT& map) :
+      truncation_boundary(map.getRes() * map.getDataConfig().truncation_boundary_factor),
+      band(2 * truncation_boundary)
+    {
+    }
+
+    const float truncation_boundary;
+    const float band;
+  };
+
   RaycastCarver(MapT&                   map,
                 const SensorT&          sensor,
                 const se::Image<float>& depth_img,
@@ -39,18 +51,17 @@ public:
   /**
    * \brief Allocate a band around the depth measurements using a raycasting approach
    *
-   * \param[in] band    The band around the depth value to be allocated
-   *
    * \retrun The allocated blocks
    */
-  std::vector<se::OctantBase*> allocateBand(const float band);
+  std::vector<se::OctantBase*> operator()();
 
-  MapT&                   map_;
-  OctreeType&             octree_;
-  const SensorT&          sensor_;
-  const se::Image<float>& depth_img_;
-  const Eigen::Matrix4f&  T_MS_;
-  const int               frame_;
+  MapT&                     map_;
+  OctreeType&               octree_;
+  const SensorT&            sensor_;
+  const se::Image<float>&   depth_img_;
+  const Eigen::Matrix4f&    T_MS_;
+  const int                 frame_;
+  const RaycastCarverConfig config_;
 };
 
 

@@ -65,7 +65,8 @@ RaycastCarver<MapT, SensorT>::RaycastCarver(MapT&                   map,
     sensor_(sensor),
     depth_img_(depth_img),
     T_MS_(T_MS),
-    frame_(frame)
+    frame_(frame),
+    config_(map)
 {
 }
 
@@ -74,7 +75,7 @@ RaycastCarver<MapT, SensorT>::RaycastCarver(MapT&                   map,
 template<typename MapT,
         typename SensorT
 >
-std::vector<se::OctantBase*> RaycastCarver<MapT, SensorT>::allocateBand(const float band)
+std::vector<se::OctantBase*> RaycastCarver<MapT, SensorT>::operator()()
 {
   // Fetch the currently allocated Blocks in the sensor frustum.
   // i.e. the fetched blocks might contain blocks outside the current valid sensor range.
@@ -82,7 +83,7 @@ std::vector<se::OctantBase*> RaycastCarver<MapT, SensorT>::allocateBand(const fl
 
   auto octree_ptr = map_.getOctree();
 
-  const int num_steps = ceil(band / map_.getRes());
+  const int num_steps = ceil(config_.band / map_.getRes());
 
   const Eigen::Vector3f t_MS = T_MS_.topRightCorner<3, 1>();
 
@@ -97,7 +98,7 @@ std::vector<se::OctantBase*> RaycastCarver<MapT, SensorT>::allocateBand(const fl
       const Eigen::Vector2i pixel(x, y);
       const float depth_value = depth_img_(pixel.x(), pixel.y());
       // Only consider depth values inside the valid sensor range
-      if (depth_value < sensor_.near_plane || depth_value > (sensor_.far_plane + band * 0.5f))
+      if (depth_value < sensor_.near_plane || depth_value > (sensor_.far_plane + config_.band * 0.5f))
       {
         continue;
       }
@@ -109,8 +110,8 @@ std::vector<se::OctantBase*> RaycastCarver<MapT, SensorT>::allocateBand(const fl
 
       const Eigen::Vector3f reverse_ray_dir_M = (t_MS - point_M).normalized();
 
-      const Eigen::Vector3f ray_origin_M = point_M - (band * 0.5f) * reverse_ray_dir_M;
-      const Eigen::Vector3f step = (reverse_ray_dir_M * band) / num_steps;
+      const Eigen::Vector3f ray_origin_M = point_M - (config_.band * 0.5f) * reverse_ray_dir_M;
+      const Eigen::Vector3f step = (reverse_ray_dir_M * config_.band) / num_steps;
 
       Eigen::Vector3f ray_pos_M = ray_origin_M;
       for (int i = 0; i < num_steps; i++)
