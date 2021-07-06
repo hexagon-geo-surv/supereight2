@@ -123,19 +123,20 @@ int se::OusterLidar::computeIntegrationScaleImpl(const Eigen::Vector3f& block_ce
   // the camera. This computes the chord length corresponding to the ray angle
   // at distance dist.
   const float pixel_dim = 2.0f * dist * std::tan(min_ray_angle / 2.0f * deg_to_rad);
-  // Compute the ratio using the worst case map_res (space diagonal)
+  // Compute the ratio using the worst case voxel_dim (space diagonal)
   const float pv_ratio = pixel_dim / (std::sqrt(3) * map_res);
   int scale = 0;
-  if (pv_ratio < 1.0f)
+  if (pv_ratio < 1.5f)
   {
     scale = 0;
-  } else if (pv_ratio < 2.0f)
+  } else if (pv_ratio < 3.0f)
   {
     scale = 1;
-  } else if (pv_ratio < 4.0f)
+  } else if (pv_ratio < 6.0f)
   {
     scale = 2;
-  } else {
+  } else
+  {
     scale = 3;
   }
   scale = std::min(scale, max_block_scale);
@@ -156,7 +157,7 @@ int se::OusterLidar::computeIntegrationScaleImpl(const Eigen::Vector3f& block_ce
   {
     return computeIntegrationScale(block_centre_hyst, map_res, last_scale, -1, max_block_scale);
   } else
-    {
+  {
     return scale;
   }
 }
