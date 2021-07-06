@@ -150,7 +150,7 @@ int main(int argc, char** argv)
     {
       const Eigen::Vector3f ambient{0.1, 0.1, 0.1};
       convert_to_output_rgba_img(processed_rgba_img, output_rgba_img_data);
-      convert_to_output_depth_img(processed_depth_img, output_depth_img_data);
+      convert_to_output_depth_img(processed_depth_img, sensor.near_plane, sensor.far_plane, output_depth_img_data);
       tracker.renderTrackingResult(output_tracking_img_data);
       if (frame % config.app.rendering_rate == 0)
       {

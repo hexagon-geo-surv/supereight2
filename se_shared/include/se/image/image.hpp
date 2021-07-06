@@ -63,13 +63,25 @@ static void convert_to_output_rgba_img(const se::Image<uint32_t>& input_rgba_img
 static void convert_to_output_depth_img(const se::Image<float>& input_depth_img,
                                         uint32_t*               output_depth_img_data)
 {
-  const float min_depth = 0.4f;
-  const float max_depth = 6.0f;
   depth_to_rgba(output_depth_img_data, input_depth_img.data(),
-      Eigen::Vector2i(input_depth_img.width(), input_depth_img.height()), min_depth, max_depth);
+      Eigen::Vector2i(input_depth_img.width(), input_depth_img.height()), 0, std::numeric_limits<float>::max());
+}
+
+
+
+static void convert_to_output_depth_img(const se::Image<float>& input_depth_img,
+                                        const float             min_depth,
+                                        const float             max_depth,
+                                        uint32_t*               output_depth_img_data)
+{
+  depth_to_rgba(output_depth_img_data, input_depth_img.data(),
+                Eigen::Vector2i(input_depth_img.width(), input_depth_img.height()), min_depth, max_depth);
 }
 
 
 
 } // end namespace se
+
+
+
 #endif // SE_IMAGE_HPP
