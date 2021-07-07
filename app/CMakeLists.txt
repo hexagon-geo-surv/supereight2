@@ -38,18 +38,20 @@ foreach(APP_CONFIG ${SE_APP_CONFIG})
 	string(TOLOWER ${RES} RES_LC)
 	string(TOLOWER ${SENSOR} SENSOR_LC)
 
-	# Read main.cpp and change the field, resolution and sensor.
-	file(READ "src/main.cpp" FILE_CONTENTS)
-	string(REPLACE "se::TSDF" "se::${FIELD}" FILE_CONTENTS "${FILE_CONTENTS}")
-	string(REPLACE "se::Res::Single" "se::Res::${RES}" FILE_CONTENTS "${FILE_CONTENTS}")
-	string(REPLACE "se::PinholeCamera" "se::${SENSOR}" FILE_CONTENTS "${FILE_CONTENTS}")
-	# Write the result in a file in the build directory.
-	set(MAIN_SRC "${CMAKE_CURRENT_BINARY_DIR}/main_${FIELD_LC}_${RES_LC}_${SENSOR_LC}.cpp")
-	file(WRITE ${MAIN_SRC} "${FILE_CONTENTS}")
+	# Add a custom command that replaces the field, resolution and sensor in
+	# main.cpp using sed. The generated file is then used as the main of the
+	# app.
+	set(INPUT_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
+	set(GENERATED_MAIN "${CMAKE_CURRENT_BINARY_DIR}/main_${FIELD_LC}_${RES_LC}_${SENSOR_LC}.cpp")
+	add_custom_command(
+		OUTPUT  ${GENERATED_MAIN}
+		COMMAND sed -e "s/se::TSDF/se::${FIELD}/g" -e "s/se::Res::Single/se::Res::${RES}/g" -e "s/se::PinholeCamera/se::${SENSOR}/g" ${INPUT_MAIN} > ${GENERATED_MAIN}
+		DEPENDS ${INPUT_MAIN}
+	)
 
 	# Compile the app using the generated file.
 	set(EXE_NAME "supereight_${FIELD_LC}_${RES_LC}_${SENSOR_LC}")
-	add_executable(${EXE_NAME} ${MAIN_SRC})
+	add_executable(${EXE_NAME} ${GENERATED_MAIN})
 	target_include_directories(${EXE_NAME} BEFORE PRIVATE include)
 	target_link_libraries(${EXE_NAME} PRIVATE SE::Supereight ${LIB_NAME})
 	# Allow handling large files in 32-bit systems
