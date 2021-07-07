@@ -15,8 +15,8 @@ const std::vector<std::string> s
 
 TEST(StrUtils, isInt) {
   // Create the expected outputs
-  const std::vector<bool> r        = {true, true,  false, false, false, false, false, false, false, false, false, false};
-  const std::vector<bool> r_nonneg = {true, false, false, false, false, false, false, false, false, false, false, false};
+  const std::vector<bool> r        = {true, true,  false, false, false, false, false, false, true, false, false, false};
+  const std::vector<bool> r_nonneg = {true, false, false, false, false, false, false, false, true, false, false, false};
   // Test both modes of operation
   for (size_t i = 0; i < s.size(); ++i)
   {
@@ -29,8 +29,8 @@ TEST(StrUtils, isInt) {
 
 TEST(StrUtils, isFloat) {
   // Create the expected outputs
-  const std::vector<bool> r        = {true, true,  true, true, true,  false, false, false, false, false, false, false};
-  const std::vector<bool> r_nonneg = {true, false, true, true, false, false, false, false, false, false, false, false};
+  const std::vector<bool> r        = {true, true,  true, true, true,  false, false, false, true, false, false, false};
+  const std::vector<bool> r_nonneg = {true, false, true, true, false, false, false, false, true, false, false, false};
   // Test both modes of operation
   for (size_t i = 0; i < s.size(); ++i)
   {

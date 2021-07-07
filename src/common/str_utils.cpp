@@ -46,8 +46,9 @@ namespace str_utils {
     // Try to parse the string as a int.
     try
     {
-      const int i = std::stoi(s);
-      return (accept_negative || (i >= 0));
+      size_t int_len = 0;
+      const int i = std::stoi(s, &int_len, 0);
+      return ((int_len == s.size()) && (accept_negative || (i >= 0)));
     } catch (const std::exception& e)
     {
       return false;
@@ -62,8 +63,9 @@ namespace str_utils {
     // Try to parse the string as a float.
     try
     {
-      const float f = std::stof(s);
-      return (accept_negative || (f >= 0.0f));
+      size_t int_len = 0;
+      const float f = std::stof(s, &int_len);
+      return ((int_len == s.size()) && (accept_negative || (f >= 0.0f)));
     } catch (const std::exception& e)
     {
       return false;
