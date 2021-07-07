@@ -12,9 +12,7 @@ set(READER_SRC
 )
 
 add_executable(multires-ofusion-systemtest multires_ofusion_systemtest.cpp ${READER_SRC})
-target_include_directories(multires-ofusion-systemtest PRIVATE ${GTEST_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS} ../../../app/include)
-target_link_libraries(multires-ofusion-systemtest
-    PRIVATE
-        Lode::PNG
-)
+target_include_directories(multires-ofusion-systemtest PRIVATE ../../../app/include)
+target_link_libraries(multires-ofusion-systemtest PRIVATE Lode::PNG)
 add_test(NAME multires-ofusion-systemtest COMMAND multires-ofusion-systemtest)
+

@@ -82,6 +82,8 @@ set_target_properties(${LIB_NAME} PROPERTIES EXPORT_NAME Supereight)
 
 # Compile the tests
 if(SE_TEST)
+    # enable_testing() must be called in the root CMakeLists.txt.
+    enable_testing()
     add_subdirectory(test)
 endif()
 
