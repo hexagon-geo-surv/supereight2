@@ -95,6 +95,5 @@ public:
 
 } // namespace se
 
+#endif // SE_PINHOLE_CAMERA_HPP
 
-
-#endif //SE_PINHOLE_CAMERA_HPP

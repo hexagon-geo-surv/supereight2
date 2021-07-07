@@ -82,6 +82,5 @@ static void convert_to_output_depth_img(const se::Image<float>& input_depth_img,
 
 } // end namespace se
 
-
-
 #endif // SE_IMAGE_HPP
+

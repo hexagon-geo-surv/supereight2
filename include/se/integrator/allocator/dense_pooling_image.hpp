@@ -28,8 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef DENSE_POOLING_IMAGE
-#define DENSE_POOLING_IMAGE
+#ifndef SE_DENSE_POOLING_IMAGE
+#define SE_DENSE_POOLING_IMAGE
 
 #include "se/image/image.hpp"
 #include "se/common/perfstats.hpp"
@@ -499,10 +499,6 @@ namespace se {
 
 } // namespace se
 
-
-
 #include "impl/dense_pooling_image_impl.hpp"
 
-
-
-#endif // DENSE_POOLING_IMAGE
+#endif // SE_DENSE_POOLING_IMAGE

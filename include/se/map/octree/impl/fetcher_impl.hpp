@@ -116,6 +116,5 @@ inline se::OctantBase* leaf(const Eigen::Vector3i& leaf_coord,
 } // namespace fetcher
 } // namespace se
 
-
-
 #endif // SE_FETCHER_IMPL_HPP
+

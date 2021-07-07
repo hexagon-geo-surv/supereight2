@@ -211,3 +211,4 @@ int save_mesh_obj(const std::vector<Triangle>& mesh,
 } // namespace se
 
 #endif // SE_MESHING_IO_IMPL_HPP
+

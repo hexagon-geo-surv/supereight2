@@ -468,4 +468,5 @@ inline void siblings(const se::key_t          key,
 
 #include "impl/key_util_impl.hpp"
 
-#endif // SE_KEY_UTIL
+#endif // SE_KEY_UTIL_HPP
+

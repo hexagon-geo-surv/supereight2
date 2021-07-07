@@ -568,6 +568,5 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
 
 } // namespace se
 
+#endif // SE_VOXEL_CARVER_IMPL_HPP
 
-
-#endif //SE_VOXEL_CARVER_IMPL_HPP

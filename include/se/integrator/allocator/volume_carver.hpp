@@ -210,4 +210,5 @@ private:
 
 #include "impl/volume_carver_impl.hpp"
 
-#endif //SE_VOLUME_CARVER_HPP
+#endif // SE_VOLUME_CARVER_HPP
+

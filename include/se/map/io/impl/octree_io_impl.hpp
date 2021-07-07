@@ -172,3 +172,4 @@ int save_octree_structure_ply(OctreeT&           octree,
 }
 
 #endif // SE_OCTREE_IO_IMPL_HPP
+

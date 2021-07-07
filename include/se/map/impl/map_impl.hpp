@@ -549,6 +549,5 @@ bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::initialiseOctree()
 
 } // namespace se
 
+#endif // SE_MAP_IMPL_HPP
 
-
-#endif //SE_MAP_IMPL_HPP

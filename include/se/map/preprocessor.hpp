@@ -129,3 +129,4 @@ void downsample_image(const uint32_t*        input_RGBA,
 } // namespace se
 
 #endif // SE_PREPROCESSOR_HPP
+

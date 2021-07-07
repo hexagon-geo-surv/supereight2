@@ -480,4 +480,5 @@ using TSDFColSemMap = Map<TSDFColSemData, ResT, BlockSize> ;
 
 #include "impl/map_impl.hpp"
 
-#endif //SE_MAP_HPP
+#endif // SE_MAP_HPP
+

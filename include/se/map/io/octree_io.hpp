@@ -23,3 +23,4 @@ int save_octree_structure_ply(OctreeT&           octree_ptr,
 #include "impl/octree_io_impl.hpp"
 
 #endif // SE_OCTREE_IO_HPP
+

@@ -678,5 +678,5 @@ public:
 
 #include "impl/block_impl.hpp"
 
-#endif //SE_BLOCK_HPP
+#endif // SE_BLOCK_HPP
 

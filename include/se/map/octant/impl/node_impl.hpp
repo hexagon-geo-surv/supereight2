@@ -110,4 +110,5 @@ inline se::OctantBase* Node<DataT, ResT>::setChild(const unsigned child_idx, se:
 
 } // namespace se
 
-#endif //SE_NODE_IMPL_HPP
+#endif // SE_NODE_IMPL_HPP
+

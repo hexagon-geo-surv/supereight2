@@ -1028,4 +1028,5 @@ void dual_marching_cube(OctreeT&                octree,
 } // namespace algorithms
 } // namespace se
 
-#endif //SE_MARCHING_CUBE_IMPL_HPP
+#endif // SE_MARCHING_CUBE_IMPL_HPP
+

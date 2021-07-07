@@ -9,5 +9,5 @@
 #define TICKD(str) se::perfstats.sampleDurationStart(str, true);
 #define TOCK(str) se::perfstats.sampleDurationEnd(str);
 
-#endif // TIMINGS_H
+#endif // SE_TIMINGS_HPP
 

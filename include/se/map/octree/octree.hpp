@@ -156,3 +156,4 @@ constexpr se::scale_t Octree<DataT, ResT, BlockSize>::max_block_scale;
 #include "impl/octree_impl.hpp"
 
 #endif // SE_OCTREE_HPP
+

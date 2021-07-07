@@ -372,4 +372,5 @@ getFieldGrad(const OctreeT&         octree,
 
 #include "impl/visitor_impl.hpp"
 
-#endif //SE_TRYOUT_VISITOR_HPP
+#endif // SE_VISITOR_HPP
+

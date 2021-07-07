@@ -227,3 +227,4 @@ struct BaseTraits<UpdateIterator<OctreeT> > {
 #include "impl/iterator_impl.hpp"
 
 #endif // SE_ITERATOR_HPP
+

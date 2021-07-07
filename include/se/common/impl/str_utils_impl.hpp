@@ -1,5 +1,5 @@
-#ifndef __STR_UTILS_IMPL_HPP
-#define __STR_UTILS_IMPL_HPP
+#ifndef SE_STR_UTILS_IMPL_HPP
+#define SE_STR_UTILS_IMPL_HPP
 
 #include <sstream>
 #include <iomanip>
@@ -101,7 +101,5 @@ namespace str_utils {
 
 } // namespace str_utils
 
-
-
-#endif // STR_UTILS_IMPL_HPP
+#endif // SE_STR_UTILS_IMPL_HPP
 

@@ -147,6 +147,5 @@ std::vector<se::OctantBase*> RaycastCarver<MapT, SensorT>::operator()()
 
 } // namespace se
 
+#endif // SE_RAYCAST_CARVER_IMPL_HPP
 
-
-#endif //SE_RAYCAST_CARVER_IMPL_HPP

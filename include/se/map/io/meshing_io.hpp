@@ -3,8 +3,9 @@
 // SPDX-FileCopyrightText: 2019-2020 Nils Funk, Imperial College London
 // SPDX-License-Identifier: BSD-3-Clause
 
-#ifndef SE_MESH_IO_HPP
-#define SE_MESH_IO_HPP
+#ifndef SE_MESHING_IO_HPP
+#define SE_MESHING_IO_HPP
+
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -78,4 +79,4 @@ static int save_mesh_obj(const std::vector<Triangle>& mesh,
 
 #include "impl/meshing_io_impl.hpp"
 
-#endif // SE_MESH_IO_HPP
+#endif // SE_MESHING_IO_HPP

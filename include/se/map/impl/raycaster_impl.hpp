@@ -628,3 +628,4 @@ void raycastVolume(const MapT&                 map,
 } // namespace se
 
 #endif // SE_RAYCASTER_IMPL_HPP
+

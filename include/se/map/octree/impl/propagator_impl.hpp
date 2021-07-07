@@ -246,6 +246,5 @@ void propagateTimeStampToRoot(std::vector<se::OctantBase*>& octant_ptrs)
 }
 }
 
+#endif // SE_PROPAGATOR_IMPL_HPP
 
-
-#endif //SE_PROPAGATOR_IMPL_HPP

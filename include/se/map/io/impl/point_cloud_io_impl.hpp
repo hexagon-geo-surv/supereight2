@@ -34,4 +34,5 @@ int save_point_cloud_vtk(se::Image<Eigen::Vector3f>& point_cloud,
   return 0;
 }
 
-#endif //SE_POINT_CLOUD_IO_IMPL_HPP
+#endif // SE_POINT_CLOUD_IO_IMPL_HPP
+

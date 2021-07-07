@@ -20,4 +20,5 @@ int save_point_cloud_vtk(se::Image<Eigen::Vector3f>& point_cloud,
 
 #include "impl/point_cloud_io_impl.hpp"
 
-#endif //SE_POINT_CLOUD_IO_HPP
+#endif // SE_POINT_CLOUD_IO_HPP
+

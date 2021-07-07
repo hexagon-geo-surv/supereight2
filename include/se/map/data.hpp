@@ -433,4 +433,5 @@ typedef DataConfig<se::Field::TSDF, se::Colour::On,  se::Semantics::On>  TSDFCol
 
 } // namespace se
 
-#endif //SE_DATA_HPP
+#endif // SE_DATA_HPP
+

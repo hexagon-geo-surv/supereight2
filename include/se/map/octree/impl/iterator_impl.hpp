@@ -179,5 +179,5 @@ void BaseIterator<DerivedT>::clear()
 
 }
 
+#endif // SE_ITERATOR_IMPL_HPP
 
-#endif //SE_ITERATOR_IMPL_HPP

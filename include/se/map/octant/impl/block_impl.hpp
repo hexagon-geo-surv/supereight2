@@ -1211,6 +1211,5 @@ Block<DataT, ResT, BlockSize, PolicyT>::Block(se::Node<DataT, ResT>* parent_ptr,
 
 } // namespace se
 
+#endif // SE_BLOCK_IMPL_HPP
 
-
-#endif //SE_BLOCK_IMPL_HPP

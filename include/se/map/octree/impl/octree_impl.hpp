@@ -155,3 +155,4 @@ inline void Octree<DataT, ResT, BlockSize>::deleteChildren(NodeType* parent_ptr)
 } // namespace se
 
 #endif // SE_OCTREE_IMPL_HPP
+

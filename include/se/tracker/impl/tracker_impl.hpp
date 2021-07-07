@@ -458,6 +458,4 @@ bool Tracker<MapT, SensorT>::checkPoseKernel(Eigen::Matrix4f&       T_MS,
 
 }
 
-
-
-#endif //SE_TRACKER_IMPL_HPP
+#endif // SE_TRACKER_IMPL_HPP

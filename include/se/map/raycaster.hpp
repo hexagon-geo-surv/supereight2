@@ -67,3 +67,4 @@ void renderVolumeKernel(uint32_t*                         volume_RGBA_image_data
 #include "impl/raycaster_impl.hpp"
 
 #endif // SE_RAYCASTER_HPP
+

@@ -55,4 +55,6 @@ public:
 };
 
 }
-#endif //SE_MEMORY_POOL_HPP
+
+#endif // SE_MEMORY_POOL_HPP
+

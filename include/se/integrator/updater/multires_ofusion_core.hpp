@@ -706,4 +706,5 @@ inline void propagateToVoxelAtCoarserScale(const se::OctantBase*      octant_ptr
 } // namespace updater
 } // namespace se
 
-#endif //SE_MULTIRES_OFUSION_CORE_HPP
+#endif // SE_MULTIRES_OFUSION_CORE_HPP
+

@@ -65,7 +65,5 @@ void subnode_as_eigen_vector_x(const cv::FileNode&                  base_node,
 } // namespace yaml
 } // namespace se
 
-
-
 #endif // SE_YAML_IMPL_HPP
 

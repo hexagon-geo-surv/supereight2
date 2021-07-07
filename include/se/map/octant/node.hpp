@@ -130,5 +130,5 @@ private:
 
 #include "impl/node_impl.hpp"
 
-#endif //SE_NODE_HPP
+#endif // SE_NODE_HPP
 

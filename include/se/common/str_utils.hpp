@@ -1,5 +1,5 @@
-#ifndef __STR_UTILS_HPP
-#define __STR_UTILS_HPP
+#ifndef SE_STR_UTILS_HPP
+#define SE_STR_UTILS_HPP
 
 #include <string>
 #include <vector>
@@ -83,4 +83,5 @@ namespace str_utils {
 
 #include "impl/str_utils_impl.hpp"
 
-#endif // STR_UTILS_HPP
+#endif // SE_STR_UTILS_HPP
+

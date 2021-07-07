@@ -315,4 +315,5 @@ void dual_marching_cube(OctreeT&                octree,
 
 #include "impl/marching_cube_impl.hpp"
 
-#endif //SE_MARCHING_CUBE_HPP
+#endif // SE_MARCHING_CUBE_HPP
+

@@ -40,4 +40,5 @@ inline bool setData(OctreeT&                          octree,
 } // namespace integrator
 } // namespace se
 
-#endif //SE_INTEGRATOR_IMPL_HPP
+#endif // SE_INTEGRATOR_IMPL_HPP
+

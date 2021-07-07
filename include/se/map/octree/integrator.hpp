@@ -30,4 +30,5 @@ inline bool setData(OctreeT&                          octree,
 
 #include "impl/integrator_impl.hpp"
 
-#endif //SE_INTEGRATOR_HPP
+#endif // SE_INTEGRATOR_HPP
+

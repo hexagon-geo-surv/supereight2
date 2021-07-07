@@ -152,4 +152,5 @@ static Eigen::Matrix4f exp(const Eigen::Matrix<float, 6, 1>& a);
 
 #include "impl/math_util_impl.hpp"
 
-#endif //SE_MATH_UTIL_HPP
+#endif // SE_MATH_UTIL_HPP
+

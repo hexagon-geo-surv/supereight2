@@ -55,4 +55,5 @@ inline int scale_to_size(const int scale)
 } // namespace octantops
 } // namespace se
 
-#endif //SE_OCTANT_UTIL_IMPL_HPP
+#endif // SE_OCTANT_UTIL_IMPL_HPP
+

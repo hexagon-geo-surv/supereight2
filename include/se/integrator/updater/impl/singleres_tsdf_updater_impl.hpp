@@ -119,6 +119,5 @@ void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Single, BlockSize>,
 
 } // namespace se
 
-
-
 #endif // SE_SINGLERES_TSDF_UPDATER_IMPL_HPP
+

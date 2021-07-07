@@ -98,4 +98,5 @@ inline bool allocate_key(const se::key_t  key,
 
 #include "impl/allocator_impl.hpp"
 
-#endif //SE_ALLOCATOR_HPP
+#endif // SE_ALLOCATOR_HPP
+

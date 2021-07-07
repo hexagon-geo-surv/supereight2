@@ -396,5 +396,5 @@ private:
 };
 }
 
-#endif
+#endif // SE_VOXEL_BLOCK_RAY_ITERATOR_HPP
 

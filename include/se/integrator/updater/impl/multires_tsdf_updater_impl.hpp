@@ -199,6 +199,5 @@ void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>, 
 
 } // namespace se
 
+#endif // SE_MULTIRES_TSDF_UPDATER_IMPL_HPP
 
-
-#endif //SE_MULTIRES_TSDF_UPDATER_IMPL_HPP

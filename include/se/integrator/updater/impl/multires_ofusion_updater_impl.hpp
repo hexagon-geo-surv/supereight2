@@ -527,6 +527,5 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
 
 } // namespace se
 
+#endif // SE_MULTIRES_OFUSION_UPDATER_IMPL_HPP
 
-
-#endif //SE_MULTIRES_OFUSION_UPDATER_IMPL_HPP

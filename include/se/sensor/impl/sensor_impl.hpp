@@ -54,6 +54,5 @@ bool SensorBase<DerivedT>::getPixelValue(const Eigen::Vector2f&  pixel_f,
 
 } // namespace se
 
+#endif // SE_SENSOR_IMPL_HPP
 
-
-#endif //SE_SENSOR_IMPL_HPP

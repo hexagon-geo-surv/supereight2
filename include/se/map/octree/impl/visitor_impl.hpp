@@ -1495,3 +1495,4 @@ getFieldGrad(const OctreeT&         octree,
 } // namespace se
 
 #endif // SE_VISITOR_IMPL_HPP
+

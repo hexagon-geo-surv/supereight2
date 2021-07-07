@@ -135,10 +135,7 @@ private:
 
 } // namespace se
 
-
-
 #include "impl/multires_ofusion_updater_impl.hpp"
 
+#endif // SE_MULTIRES_OFUSION_UPDATER_HPP
 
-
-#endif //SE_MULTIRES_OFUSION_UPDATER_HPP

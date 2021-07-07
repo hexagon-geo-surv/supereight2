@@ -61,4 +61,5 @@ inline int scale_to_size(const int octant_scale);
 
 #include "impl/octant_util_impl.hpp"
 
-#endif //SE_OCTANT_UTIL_HPP
+#endif // SE_OCTANT_UTIL_HPP
+

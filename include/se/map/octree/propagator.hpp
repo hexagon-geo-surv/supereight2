@@ -40,10 +40,7 @@ void propagateTimeStampToRoot(std::vector<se::OctantBase*>& octant_ptrs);
 } // namespace propagator
 } // namespace se
 
-
-
 #include "impl/propagator_impl.hpp"
 
+#endif // SE_PROPAGATOR_HPP
 
-
-#endif //SE_PROPAGATOR_HPP

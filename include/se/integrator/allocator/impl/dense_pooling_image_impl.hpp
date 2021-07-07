@@ -764,4 +764,5 @@ Pixel DensePoolingImage<OusterLidar>::conservativeQuery(const Eigen::Vector2i& b
 
 } // namespace se
 
-#endif //SE_DENSE_POOLING_IMAGE_HPP
+#endif // SE_DENSE_POOLING_IMAGE_HPP
+

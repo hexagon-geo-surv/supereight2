@@ -110,6 +110,5 @@ private:
 
 #include "impl/map_integrator_impl.hpp"
 
+#endif // SE_MAP_INTEGRATOR_HPP
 
-
-#endif //SE_TRYOUT_MAP_INTEGRATOR_HPP

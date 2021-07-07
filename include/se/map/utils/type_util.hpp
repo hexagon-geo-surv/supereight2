@@ -52,5 +52,5 @@ typedef Eigen::Matrix<field_t, 3, 1> field_vec_t;
 
 } // namespace se
 
-
 #endif // SE_TYPE_UTIL_HPP
+

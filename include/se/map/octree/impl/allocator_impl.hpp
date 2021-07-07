@@ -152,4 +152,5 @@ inline bool allocate_key(const se::key_t  key,
 } // namespace allocator
 } // namespace se
 
-#endif //SE_TRYOUT_ALLOCATOR_IMPL_HPP
+#endif // SE_ALLOCATOR_IMPL_HPP
+

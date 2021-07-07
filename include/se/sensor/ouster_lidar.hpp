@@ -84,4 +84,5 @@ public:
 
 } // namespace se
 
-#endif //SE_OUSTER_LIDAR_HPP
+#endif // SE_OUSTER_LIDAR_HPP
+

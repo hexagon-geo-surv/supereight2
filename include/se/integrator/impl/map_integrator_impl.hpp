@@ -209,4 +209,5 @@ void MapIntegrator<MapT>::integrateDepth(const SensorT&                sensor,
 
 } // namespace se
 
-#endif //SE_MAP_INTEGRATOR_IMPL_HPP
+#endif // SE_MAP_INTEGRATOR_IMPL_HPP
+

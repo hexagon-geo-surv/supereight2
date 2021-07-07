@@ -72,5 +72,5 @@ private:
 
 #include "impl/multires_tsdf_updater_impl.hpp"
 
-#endif //SE_MULTIRES_TSDF_UPDATER_HPP
+#endif // SE_MULTIRES_TSDF_UPDATER_HPP
 

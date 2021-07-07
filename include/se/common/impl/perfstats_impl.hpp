@@ -533,6 +533,5 @@ inline void PerfStats::writeSummaryToOStream(std::ostream& ostream,
   return;
 }
 
-
-
 #endif // SE_PERFSTATS_IMPL_HPP
+

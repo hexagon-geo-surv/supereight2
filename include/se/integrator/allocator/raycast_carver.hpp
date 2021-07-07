@@ -81,11 +81,7 @@ public:
 
 } // namespace se
 
-
-
 #include "impl/raycast_carver_impl.hpp"
 
-
-
-#endif //SE_RAYCAST_CARVER_HPP
+#endif // SE_RAYCAST_CARVER_HPP
 
