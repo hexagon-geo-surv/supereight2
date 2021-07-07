@@ -16,6 +16,10 @@ int main(int argc, char** argv)
   ::testing::InitGoogleTest(&argc, argv);
   my_argc = argc;
   my_argv = argv;
+  if (argc != 2) {
+    std::cerr << "Usage: " << argv[0] << " YAML_FILE\n";
+    exit(2);
+  }
   return RUN_ALL_TESTS();
 }
 
@@ -23,7 +27,7 @@ int main(int argc, char** argv)
 
 TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
 {
-  const std::string config_filename = "/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/config.yaml";
+  const std::string config_filename (my_argv[1]);
   const se::Config<se::OccupancyDataConfig, se::PinholeCameraConfig> config (config_filename);
   se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
 
@@ -89,7 +93,7 @@ TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
 
 TEST(MultiResOFusionSystemTest, GetField)
 {
-  const std::string config_filename = "/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/config.yaml";
+  const std::string config_filename (my_argv[1]);
   const se::Config<se::OccupancyDataConfig, se::PinholeCameraConfig> config (config_filename);
   se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
 
@@ -159,7 +163,7 @@ TEST(MultiResOFusionSystemTest, GetField)
 
 TEST(MultiResOFusionSystemTest, GetMaxField)
 {
-  const std::string config_filename = "/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/config.yaml";
+  const std::string config_filename (my_argv[1]);
   const se::Config<se::OccupancyDataConfig, se::PinholeCameraConfig> config (config_filename);
   se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
 
@@ -229,7 +233,7 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
 
 TEST(MultiResOFusionSystemTest, DeleteChildren)
 {
-  const std::string config_filename = "/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/config.yaml";
+  const std::string config_filename (my_argv[1]);
   const se::Config<se::OccupancyDataConfig, se::PinholeCameraConfig> config (config_filename);
   se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
 
@@ -293,7 +297,7 @@ TEST(MultiResOFusionSystemTest, DeleteChildren)
 TEST(MultiResOFusionSystemTest, Raycasting)
 {
   // Read the configuration
-  const std::string config_filename = "/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/config.yaml";
+  const std::string config_filename (my_argv[1]);
   const se::Config<se::OccupancyDataConfig, se::PinholeCameraConfig> config (config_filename);
   std::cout << config;
 
