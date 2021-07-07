@@ -61,12 +61,11 @@ namespace se {
     se::yaml::subnode_as_float(node, "tau_min_factor", tau_min_factor);
     se::yaml::subnode_as_float(node, "tau_max_factor", tau_max_factor);
     se::yaml::subnode_as_float(node, "min_occupancy", min_occupancy);
-    se::yaml::subnode_as_float(node, "max_occupancy", max_occupancy);
-    se::yaml::subnode_as_int(node, "max_weight", max_weight);               // TODO: Compute based on min_occupancy and log_odd_min
-    se::yaml::subnode_as_float(node, "surface_boundary", surface_boundary);
+    se::yaml::subnode_as_float(node, "max_occupancy", max_occupancy);// TODO: Compute based on min_occupancy and log_odd_min
+    se::yaml::subnode_as_float(node,  "surface_boundary", surface_boundary);
     se::yaml::subnode_as_float(node, "log_odd_min", log_odd_min);
     se::yaml::subnode_as_float(node, "log_odd_max", log_odd_max);
-    se::yaml::subnode_as_int(node, "fs_integr_scale", fs_integr_scale);
+    se::yaml::subnode_as_int(node,   "fs_integr_scale", fs_integr_scale);
     std::string uncertainty_model_s;
     se::yaml::subnode_as_string(node, "uncertainty_model", uncertainty_model_s);
 

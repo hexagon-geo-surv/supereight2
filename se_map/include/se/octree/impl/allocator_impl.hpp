@@ -34,7 +34,7 @@ inline se::OctantBase* block(const se::key_t voxel_key,
   assert(se::keyops::key_to_scale(voxel_key) <= octree.max_block_scale); // Verify scale is within block
 
   se::OctantBase* child_ptr;
-  se::allocator::allocate_key(voxel_key, octree, base_parent_ptr, child_ptr);
+  se::allocator::detail::allocate_key(voxel_key, octree, base_parent_ptr, child_ptr);
   return child_ptr;
 }
 
@@ -88,7 +88,7 @@ inline std::vector<se::OctantBase*> blocks(std::vector<se::key_t>& unique_voxel_
       const auto unique_voxel_key_at_scale = unique_voxel_keys_at_scale[i];
       // We don't care what the address of the allocated Node is, just that it's allocated.
       se::OctantBase* unused_result;
-      se::allocator::allocate_key(unique_voxel_key_at_scale, octree, base_parent_ptr, unused_result);
+      se::allocator::detail::allocate_key(unique_voxel_key_at_scale, octree, base_parent_ptr, unused_result);
     }
   }
 
@@ -102,7 +102,7 @@ inline std::vector<se::OctantBase*> blocks(std::vector<se::key_t>& unique_voxel_
     assert(se::keyops::key_to_scale(unique_voxel_key) <= octree.max_block_scale); // Verify scale is within block
 
     se::OctantBase* child_ptr;
-    const bool did_allocation = se::allocator::allocate_key(unique_voxel_key, octree, base_parent_ptr,
+    const bool did_allocation = se::allocator::detail::allocate_key(unique_voxel_key, octree, base_parent_ptr,
         child_ptr);
 
     // Don't push back if only the newly allocated Octants are returned and no allocation happened.
@@ -119,7 +119,7 @@ inline std::vector<se::OctantBase*> blocks(std::vector<se::key_t>& unique_voxel_
 
 
 
-namespace { // anonymous namespace
+namespace detail {
 
 template <typename OctreeT>
 inline bool allocate_key(const se::key_t  key,
@@ -145,8 +145,10 @@ inline bool allocate_key(const se::key_t  key,
   allocated_octant = child_ptr;
   return did_allocation;
 }
-} // anonymous namespace
 
+
+
+} // namespace detail
 } // namespace allocator
 } // namespace se
 

@@ -1,10 +1,23 @@
 #include <gtest/gtest.h>
 
 #include "config.hpp"
-#include "draw.h"
 #include "lodepng.h"
 #include "se/map.hpp"
 #include "se/map_integrator.hpp"
+
+extern int my_argc;
+extern char** my_argv;
+
+int my_argc;
+char** my_argv;
+
+int main(int argc, char** argv)
+{
+  ::testing::InitGoogleTest(&argc, argv);
+  my_argc = argc;
+  my_argv = argv;
+  return RUN_ALL_TESTS();
+}
 
 
 
@@ -44,10 +57,10 @@ TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
     integrator.integrateDepth(sensor, processed_depth_img, T_MS, frame);
   }
 
-  map.saveFieldSlice("/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/out/test-field-interp-slice",
+  map.saveFieldSlice(config.app.mesh_output_dir + "/test-field-interp-slice",
                      se::math::to_translation(T_MS),
                      std::to_string(max_frame));
-  map.saveStrucutre("/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/out/test-field-interp-structure",
+  map.saveStrucutre(config.app.mesh_output_dir + "/test-field-interp-structure",
                     std::to_string(max_frame));
 
   Eigen::Vector3f       point_M;
@@ -71,6 +84,8 @@ TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
   field_value = map.getFieldInterp(point_M);
   EXPECT_FLOAT_EQ(-5.015, *field_value);
 }
+
+
 
 TEST(MultiResOFusionSystemTest, GetField)
 {
@@ -116,11 +131,11 @@ TEST(MultiResOFusionSystemTest, GetField)
 
   se::OccData data;
 
-  map.saveFieldSlice("/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/out/test-field-slice",
+  map.saveFieldSlice(config.app.mesh_output_dir + "/test-field-slice",
                      se::math::to_translation(T_MS),
                      std::to_string(max_frame));
 
-  map.saveStrucutre("/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/out/test-field-structure",
+  map.saveStrucutre(config.app.mesh_output_dir + "/test-field-structure",
                     std::to_string(max_frame));
 
   map.voxelToPoint(voxel_coord_unknown_1, point_M);
@@ -187,11 +202,11 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
   map.voxelToPoint(voxel_coord, point_M);
   data = map.getMaxData(point_M, scale_5);
 
-  map.saveFieldSlice("/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/out/test-max-field-slice-field",
+  map.saveFieldSlice(config.app.mesh_output_dir + "/test-max-field-slice-field",
                      se::math::to_translation(T_MS),
                      std::to_string(max_frame));
 
-  map.saveScaleSlice("/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/out/test-max-field-slice-scale",
+  map.saveScaleSlice(config.app.mesh_output_dir + "/test-max-field-slice-scale",
                      se::math::to_translation(T_MS),
                      std::to_string(max_frame));
 
@@ -200,15 +215,17 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
 
   for (int scale = 0; scale < map.getOctree()->getMaxScale(); scale++)
   {
-    map.saveMaxFieldSlice("/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/out/test-max-field-slice-max-field-scale-" + std::to_string(scale),
+    map.saveMaxFieldSlice(config.app.mesh_output_dir + "/test-max-field-slice-max-field-scale-" + std::to_string(scale),
                           se::math::to_translation(T_MS),
                           scale,
                           std::to_string(max_frame));
   }
 
-  map.saveStrucutre("/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/out/test-max-field-structure",
+  map.saveStrucutre(config.app.mesh_output_dir + "/test-max-field-structure",
                     std::to_string(max_frame));
 }
+
+
 
 TEST(MultiResOFusionSystemTest, DeleteChildren)
 {
@@ -262,19 +279,21 @@ TEST(MultiResOFusionSystemTest, DeleteChildren)
     map.voxelToPoint(voxel_coord, point_M);
     data = map.getData(point_M);
 
-    map.saveFieldSlice("/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/out/test-delete-child-slice",
+    map.saveFieldSlice(config.app.mesh_output_dir + "/test-delete-child-slice",
                        se::math::to_translation(T_MS),
                        std::to_string(frame));
 
-    map.saveStrucutre("/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/out/test-delete-child-structure",
+    map.saveStrucutre(config.app.mesh_output_dir + "/test-delete-child-structure",
                       std::to_string(frame));
   }
 }
 
+
+
 TEST(MultiResOFusionSystemTest, Raycasting)
 {
   // Read the configuration
-  const std::string config_filename = "/home/nils/workspace_/projects/supereight-2-srl/datasets/icl_nuim/traj_2/config.yaml";
+  const std::string config_filename = "/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/config.yaml";
   const se::Config<se::OccDataConfig, se::PinholeCameraConfig> config (config_filename);
   std::cout << config;
 
@@ -339,19 +358,11 @@ TEST(MultiResOFusionSystemTest, Raycasting)
   convert_to_output_depth_img(processed_depth_img, output_depth_img_data);
   se::raycaster::renderVolumeKernel(output_volume_img_data, processed_img_res, se::math::to_translation(T_MS), ambient, surface_point_cloud_M, surface_normals_M, surface_scale);
 
-  map.saveStrucutre("/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/out/test-raycasting-structure", std::to_string(frame));
-  map.saveFieldSlice("/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/out/test-raycasting-slice-field", se::math::to_translation(T_MS), std::to_string(frame));
-  map.saveMesh("/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/out/test-raycasting-mesh", std::to_string(frame));
+  map.saveStrucutre(config.app.mesh_output_dir + "/test-raycasting-structure", std::to_string(frame));
+  map.saveFieldSlice(config.app.mesh_output_dir + "/test-raycasting-slice-field", se::math::to_translation(T_MS), std::to_string(frame));
+  map.saveMesh(config.app.mesh_output_dir + "/test-raycasting-mesh", std::to_string(frame));
 
-  lodepng_encode32_file("/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/out/test-raycasting-img.png", reinterpret_cast<const unsigned char*>(output_volume_img_data), processed_img_res.x(), processed_img_res.y());
-
-  while (true)
-  {
-    drawthem(output_rgba_img_data,     processed_img_res,
-             output_depth_img_data,    processed_img_res,
-             output_tracking_img_data, processed_img_res,
-             output_volume_img_data,   processed_img_res);
-  }
+  lodepng_encode32_file((config.app.mesh_output_dir + "/test-raycasting-img.png").c_str(), reinterpret_cast<const unsigned char*>(output_volume_img_data), processed_img_res.x(), processed_img_res.y());
 
   delete[] output_rgba_img_data;
   delete[] output_depth_img_data;

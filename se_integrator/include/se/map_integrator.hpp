@@ -92,6 +92,7 @@ public:
    * \param[in] depth_img   The sensor depth image
    * \param[in] sensor      The sensor use for the projection
    * \param[in] T_MS        The transformation from sensor to map frame
+   * \param[in] frame       The frame number to be integrated
    */
   template <typename SensorT>
   void integrateDepth(const SensorT&                sensor,

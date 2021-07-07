@@ -164,7 +164,6 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
   if (approx_depth_value_min > max_depth_value_ ||
       approx_depth_value_max < zero_depth_band_)
   { // TODO: Alternative sensor_.near_plane.
-//    std::cout << "CASE 0.1 - Return 0" << std::endl;
     return;
   }
 
@@ -191,7 +190,6 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
   /// CASE 0.2 (OUT OF BOUNDS): Node is behind the camera.
   if (num_node_corners_infront == 0)
   {
-//    std::cout << "CASE 0.2 - Return 1" << std::endl;
     return;
   }
 
@@ -214,21 +212,17 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
       /// CASE 1 (CAMERA IN NODE):
       if (cameraInNode(node_coord, node_size, se::math::to_inverse_transformation(T_SM_)))
       {
-//        std::cout << "CASE 1 - Camera in Node - Split 0" << std::endl;
         should_split = true;
         /// CASE 2 (FRUSTUM BOUNDARY): Node partly behind the camera and crosses the the frustum boundary
       } else if (crossesFrustum(proj_node_corner_stati))
       {
-//        std::cout << "CASE 2 - Frustum Boundary - Split 1" << std::endl;
         should_split = true;
         /// CASE 2 (FRUSTUM BOUNDARY): Node partly behind the camera and crosses the the frustum boundary without a corner reprojecting
       } else if (sensor_.sphereInFrustumInf(node_centre_point_S, node_size * size_to_radius_ * map_res_))
       {
-//        std::cout << "CASE 2 - Frustum Boundary - Split 2" << std::endl;
         should_split = true;
       } else
       {
-//        std::cout << "Return 2" << std::endl;
         return;
       }
 
@@ -246,14 +240,12 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
       ///                           all pixel values are unknown -> return intermediately
       if(pooling_pixel.status_known == se::Pixel::statusKnown::unknown)
       {
-//        std::cout << "Case 0.3 - Out of Bounds - Return 3" << std::endl;
         return;
       }
 
       /// CASE 0.4 (OUT OF BOUNDS): The node is behind surface
       if (node_dist_min_m > pooling_pixel.max + config_.tau_max)
       { // TODO: Can be changed to node_dist_max_m?
-//        std::cout << "Case 0.4 - Out of Bounds - Return 4" << std::endl;
         return;
       }
 
@@ -272,63 +264,32 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
         typename OctreeType::DataType child_data = (child_ptr->isBlock()) ? static_cast<BlockType*>(child_ptr)->getMaxData() : static_cast<NodeType*>(child_ptr)->getData();
 
         if (   child_data.observed  // Check if the child is fully observed (i.e. all children are observed) // TODO: incooperate MAX occupancy
-               && child_data.occupancy * child_data.weight <= 0.95 * map_.getDataConfig().min_occupancy)
+            && child_data.occupancy * child_data.weight <= 0.95 * map_.getDataConfig().min_occupancy)
         {
           return;
         }
       }
 
-      // TODO: ^SWITCH 1 - Alternative approach (conservative)
-      // Don't free node even more under given conditions.
-//        if (   variance_state != se::VarianceState::Gradient
-//            && parent->childData(child_idx).observed
-//            && parent->childData(child_idx).x <= 0.95 * map_.getDataConfig().log_odd_min
-//            && parent->childData(child_idx).y > map_.getDataConfig().max_weight / 2) {
-//          return;
-//        }
-
       /// CASE 2 (FRUSTUM BOUNDARY): The node is crossing the frustum boundary
       if(pooling_pixel.status_crossing == se::Pixel::statusCrossing::crossing)
       {
-//        std::cout << "Case 2 - Frustum Bondary - Split 4" << std::endl;
         should_split = true;
       }
 
         /// CASE 3: The node is inside the frustum, but projects into partially known pixel
       else if (pooling_pixel.status_known == se::Pixel::statusKnown::part_known)
       {
-//        std::cout << "Case 3 - Split 5" << std::endl;
-        // TODO: SWITCH 1 - Alternative approach (conservative)
-        // If the entire node is already free don't bother splitting it to free only parts of it even more because
-        // of missing data and just move on.
-        // Approach only saves time.
-//          if (   variance_state != 0
-//              && parent->childData(child_idx).observed
-//              && parent->childData(child_idx).x <= 0.95 * map_.getDataConfig().log_odd_min
-//              && parent->childData(child_idx).y > map_.getDataConfig().max_weight / 2) {
-//            return;
-//          }
-
         should_split = true;
       }
 
         /// CASE 4: The node is inside the frustum with only known data + node has a potential high variance
       else if (variance_state == se::VarianceState::Gradient)
       {
-//        std::cout << "Case 4 - Split 5" << std::endl;
         should_split = true;
-      }
-
-      else
-      {
-//        std::cout << "DON'T SPLIT" << std::endl;
       }
 
       projects_inside = (pooling_pixel.status_known == se::Pixel::known);
     }
-  } else
-  {
-//    std::cout << "TOO DEEP" << std::endl;
   }
 
   // Once we reach this point the node is either updated or split.

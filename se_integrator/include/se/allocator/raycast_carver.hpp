@@ -21,7 +21,6 @@ inline std::vector<se::OctantBase *> frustum(MapT&                  map,
 
 
 
-
 template<typename MapT,
          typename SensorT
 >
@@ -30,6 +29,11 @@ class RaycastCarver
 public:
   typedef typename MapT::OctreeType OctreeType;
 
+  /**
+   * \brief The config file of the raycast carver
+   *
+   * \param[in] map   The map allocate the frustum in
+   */
   struct RaycastCarverConfig
   {
     RaycastCarverConfig(const MapT& map) :
@@ -42,6 +46,15 @@ public:
     const float band;
   };
 
+  /**
+   * \brief Setup the raycast carver.
+   *
+   * \param[in]  map                  The reference to the map to be updated.
+   * \param[in]  sensor               The sensor model.
+   * \param[in]  depth_img            The depth image to be integrated.
+   * \param[in]  T_MS                 The transformation from map to camera frame.
+   * \param[in]  frame                The frame number to be integrated.
+   */
   RaycastCarver(MapT&                   map,
                 const SensorT&          sensor,
                 const se::Image<float>& depth_img,

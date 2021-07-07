@@ -19,7 +19,7 @@
 #endif
 
 #ifndef SE_SENSOR
-#define SE_SENSOR se::OusterLidar
+#define SE_SENSOR se::PinholeCamera
 #endif
 
 #define CONFIG Config
@@ -29,10 +29,10 @@
 
 
 
-int main(int argc, char** argv)
+int main(int /* argc */, char** argv)
 {
   // Read the configuration
-  const std::string config_filename = (argc >= 2) ? argv[1] : "/home/nils/workspace_/projects/supereight-2-srl-test/datasets/icl_nuim/traj_2/config.yaml";
+  const std::string config_filename = argv[1];
   const se::Config<se::TSDFDataConfig, SE_SENSOR_CONFIG_X(SE_SENSOR, CONFIG)> config(config_filename);
   std::cout << config;
 

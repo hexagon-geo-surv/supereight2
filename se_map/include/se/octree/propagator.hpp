@@ -1,11 +1,11 @@
 #ifndef SE_PROPAGATOR_HPP
 #define SE_PROPAGATOR_HPP
 
-//#include "se/octree/octant.hpp"
-
 
 
 namespace se {
+
+
 
 // Forward decleration
 class OctantBase;

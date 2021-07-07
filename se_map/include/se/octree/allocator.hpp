@@ -72,16 +72,27 @@ std::vector<se::OctantBase*> blocks(std::vector<se::key_t>& voxel_keys,
                                     se::OctantBase*         base_parent_ptr,
                                     const bool              only_allocated = false);
 
-namespace { // anonymous namespace
+namespace detail {
+
+
+/**
+ *
+ * \tparam OctreeT
+ * \param key
+ * \param octree
+ * \param base_parent_ptr
+ * \param allocated_octant
+ * \return
+ */
 template <typename OctreeT>
 inline bool allocate_key(const se::key_t  key,
                          OctreeT&         octree,
                          se::OctantBase*  base_parent_ptr,
                          se::OctantBase*& allocated_octant);
-} // anonymous namespace
 
 
 
+} // namespace detail
 } // struct allocator
 } // namespace se
 

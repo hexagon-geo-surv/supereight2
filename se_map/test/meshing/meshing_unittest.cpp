@@ -1,7 +1,3 @@
-//
-// Created by nils on 21/04/2021.
-//
-
 /*
   Copyright 2016 Nils Funk, Imperial College London
   Redistribution and use in source and binary forms, with or without

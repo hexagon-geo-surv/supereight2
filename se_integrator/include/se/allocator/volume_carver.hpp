@@ -46,7 +46,14 @@ public:
 
 
 
-
+/**
+ * \brief Allocate the frustum using a map-to-camera volume carving approach
+ *
+ * \tparam ColB
+ * \tparam SemB
+ * \tparam BlockSize
+ * \tparam SensorT
+ */
 template<se::Colour    ColB,
          se::Semantics SemB,
          int           BlockSize,
@@ -60,6 +67,11 @@ public:
   typedef typename OctreeType::NodeType                               NodeType;
   typedef typename OctreeType::BlockType                              BlockType;
 
+  /**
+   * \brief The config file of the volume carver
+   *
+   * \param[in] map   The map allocate the frustum in
+   */
   struct VolumeCarverConfig
   {
     VolumeCarverConfig(const MapType& map) :
@@ -78,10 +90,12 @@ public:
 
 
   /**
+   * \brief Setup the volume carver.
+   *
    * \param[in]  map                  The reference to the map to be updated.
    * \param[in]  sensor               The sensor model.
    * \param[in]  depth_img            The depth image to be integrated.
-   * \param[in]  T_SM                 The transformation from map to camera frame.
+   * \param[in]  T_MS                 The transformation from map to camera frame.
    * \param[in]  frame                The frame number to be integrated.
    */
   VolumeCarver(MapType&                map,
@@ -136,6 +150,18 @@ private:
                                     const float       node_dist_min_m,
                                     const float       node_dist_max_m);
 
+  /**
+   * \brief Recursively decide if to allocate or terminate a node.
+   *
+   * \note se::PinholeCamera implementation
+   *
+   * \tparam SensorTDummy
+   * \param[in] node_coord      The coordinates of the nodes corner (front, left, bottom) to be evaluated
+   * \param[in] node_size       The size of the node in [voxel]
+   * \param[in] octant_depth    The tree depth of the node
+   * \param[in] rel_step        The relative child step of the node
+   * \param[in] parent_ptr      The pointer to the nodes parent
+   */
   template<class SensorTDummy = SensorT>
   typename std::enable_if_t<std::is_same<SensorTDummy, se::PinholeCamera>::value, void>
   operator()(const Eigen::Vector3i& node_coord,
@@ -144,6 +170,18 @@ private:
              const Eigen::Vector3i& rel_step,
              se::OctantBase*        parent_ptr);
 
+  /**
+   * \brief Recursively decide if to allocate or terminate a node.
+   *
+   * \note se::PinholeCamera implementation
+   *
+   * \tparam SensorTDummy
+   * \param[in] node_coord      The coordinates of the nodes corner (front, left, bottom) to be evaluated
+   * \param[in] node_size       The size of the node in [voxel]
+   * \param[in] octant_depth    The tree depth of the node
+   * \param[in] rel_step        The relative child step of the node
+   * \param[in] parent_ptr      The pointer to the nodes parent
+   */
   template<class SensorTDummy = SensorT>
   typename std::enable_if_t<std::is_same<SensorTDummy, se::OusterLidar>::value, void>
   operator()(const Eigen::Vector3i& node_coord,

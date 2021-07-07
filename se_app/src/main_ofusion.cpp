@@ -19,7 +19,7 @@
 #endif
 
 #ifndef SE_SENSOR
-#define SE_SENSOR se::OusterLidar
+#define SE_SENSOR se::PinholeCamera
 #endif
 
 #define CONFIG Config
@@ -27,12 +27,10 @@
 
 #define SE_SENSOR_CONFIG_X(a,b) SE_SENSOR_CONFIG(a,b)
 
-int main(int argc, char** argv)
+int main(int /* argc */, char** argv)
 {
   // Read the configuration
-//  const std::string config_filename = (argc >= 2) ? argv[1] : "/home/nils/workspace_/projects/supereight-2-srl/datasets/cow_and_lady/config.yaml";
-  const std::string config_filename = (argc >= 2) ? argv[1] : "/home/nils/workspace_/projects/supereight-2-srl/datasets/icl_nuim/traj_2/config.yaml";
-//  const std::string config_filename = (argc >= 2) ? argv[1] : "/home/nils/workspace_/projects/supereight-2-srl/datasets/rgbd_datasets/rgbd_dataset_freiburg1_desk/config.yaml";
+  const std::string config_filename = argv[1];
   const se::Config<se::OccDataConfig, SE_SENSOR_CONFIG_X(SE_SENSOR, CONFIG)> config(config_filename);
   std::cout << config;
 

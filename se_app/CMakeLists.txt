@@ -63,4 +63,4 @@ foreach(SE_FLD ${SE_FLD})
   endforeach()
 endforeach()
 
-add_subdirectory(../se_app/test)
+add_subdirectory(./test)

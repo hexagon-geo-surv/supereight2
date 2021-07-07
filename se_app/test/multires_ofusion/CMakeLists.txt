@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 3.5...3.16)
 
-find_package(GLUT)
-find_package(OpenGL)
-
 set(READER_SRC
   ../../src/reader_base.cpp
   ../../src/reader_iclnuim.cpp
@@ -23,11 +20,7 @@ target_link_libraries(multires-ofusion-systemtest
   SE::Integrator
   SE::Tracker
   stdc++fs
-  GL
-  ${GLUT_LIBRARIES}
-  ${OPENGL_LIBRARIES}
   ${GTEST_BOTH_LIBRARIES}
   ${CMAKE_THREAD_LIBS_INIT}
 )
-target_compile_definitions(multires-ofusion-systemtest PRIVATE "-DSE_GLUT")
 add_test(NAME multires-ofusion-systemtest COMMAND multires-ofusion-systemtest)
