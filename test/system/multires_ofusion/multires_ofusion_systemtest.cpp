@@ -24,8 +24,8 @@ int main(int argc, char** argv)
 TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
 {
   const std::string config_filename = "/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/config.yaml";
-  const se::Config<se::OccDataConfig, se::PinholeCameraConfig> config (config_filename);
-  se::OccMap<se::Res::Multi> map(config.map, config.data);
+  const se::Config<se::OccupancyDataConfig, se::PinholeCameraConfig> config (config_filename);
+  se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
 
   // Create a pinhole camera and downsample the intrinsics
   const se::PinholeCamera sensor(config.sensor, config.app.sensor_downsampling_factor);
@@ -90,8 +90,8 @@ TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
 TEST(MultiResOFusionSystemTest, GetField)
 {
   const std::string config_filename = "/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/config.yaml";
-  const se::Config<se::OccDataConfig, se::PinholeCameraConfig> config (config_filename);
-  se::OccMap<se::Res::Multi> map(config.map, config.data);
+  const se::Config<se::OccupancyDataConfig, se::PinholeCameraConfig> config (config_filename);
+  se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
 
   // Create a pinhole camera and downsample the intrinsics
   const se::PinholeCamera sensor(config.sensor, config.app.sensor_downsampling_factor);
@@ -129,7 +129,7 @@ TEST(MultiResOFusionSystemTest, GetField)
   const Eigen::Vector3i voxel_coord_free_2(477, 500, 618);
   Eigen::Vector3f       point_M;
 
-  se::OccData data;
+  se::OccupancyData data;
 
   map.saveFieldSlice(config.app.mesh_output_dir + "/test-field-slice",
                      se::math::to_translation(T_MS),
@@ -140,11 +140,11 @@ TEST(MultiResOFusionSystemTest, GetField)
 
   map.voxelToPoint(voxel_coord_unknown_1, point_M);
   data = map.getData(point_M);
-  EXPECT_EQ(se::OccData().occupancy, data.occupancy);
+  EXPECT_EQ(se::OccupancyData().occupancy, data.occupancy);
 
   map.voxelToPoint(voxel_coord_unknown_2, point_M);
   data = map.getData(point_M);
-  EXPECT_EQ(se::OccData().occupancy, data.occupancy);
+  EXPECT_EQ(se::OccupancyData().occupancy, data.occupancy);
 
   map.voxelToPoint(voxel_coord_free_1, point_M);
   data = map.getData(point_M);
@@ -160,8 +160,8 @@ TEST(MultiResOFusionSystemTest, GetField)
 TEST(MultiResOFusionSystemTest, GetMaxField)
 {
   const std::string config_filename = "/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/config.yaml";
-  const se::Config<se::OccDataConfig, se::PinholeCameraConfig> config (config_filename);
-  se::OccMap<se::Res::Multi> map(config.map, config.data);
+  const se::Config<se::OccupancyDataConfig, se::PinholeCameraConfig> config (config_filename);
+  se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
 
   // Create a pinhole camera and downsample the intrinsics
   const se::PinholeCamera sensor(config.sensor, config.app.sensor_downsampling_factor);
@@ -197,7 +197,7 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
   const int             scale_5 = 5;
   Eigen::Vector3f       point_M;
 
-  se::OccData data;
+  se::OccupancyData data;
 
   map.voxelToPoint(voxel_coord, point_M);
   data = map.getMaxData(point_M, scale_5);
@@ -230,8 +230,8 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
 TEST(MultiResOFusionSystemTest, DeleteChildren)
 {
   const std::string config_filename = "/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/config.yaml";
-  const se::Config<se::OccDataConfig, se::PinholeCameraConfig> config (config_filename);
-  se::OccMap<se::Res::Multi> map(config.map, config.data);
+  const se::Config<se::OccupancyDataConfig, se::PinholeCameraConfig> config (config_filename);
+  se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
 
   // Create a pinhole camera and downsample the intrinsics
   const se::PinholeCamera sensor(config.sensor, config.app.sensor_downsampling_factor);
@@ -274,7 +274,7 @@ TEST(MultiResOFusionSystemTest, DeleteChildren)
     const Eigen::Vector3i voxel_coord(471, 512, 807);
     Eigen::Vector3f       point_M;
 
-    se::OccData data;
+    se::OccupancyData data;
 
     map.voxelToPoint(voxel_coord, point_M);
     data = map.getData(point_M);
@@ -294,7 +294,7 @@ TEST(MultiResOFusionSystemTest, Raycasting)
 {
   // Read the configuration
   const std::string config_filename = "/home/nils/workspace_/projects/supereight-2-srl-test/se_app/test/multires_ofusion/config.yaml";
-  const se::Config<se::OccDataConfig, se::PinholeCameraConfig> config (config_filename);
+  const se::Config<se::OccupancyDataConfig, se::PinholeCameraConfig> config (config_filename);
   std::cout << config;
 
   // Setup log stream
@@ -303,7 +303,7 @@ TEST(MultiResOFusionSystemTest, Raycasting)
   se::perfstats.setFilestream(&log_file_stream);
 
   // Setup the map
-  se::OccMap<se::Res::Multi> map(config.map, config.data);
+  se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
 
   // Setup input images
   const Eigen::Vector2i input_img_res(config.sensor.width, config.sensor.height);

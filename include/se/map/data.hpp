@@ -407,16 +407,16 @@ inline float is_inside(const Data<se::Field::Occupancy, ColB, SemB>& data) { ret
 
 
 // Occupancy data setups
-typedef Data<se::Field::Occupancy, se::Colour::Off, se::Semantics::Off> OccData;
-typedef Data<se::Field::Occupancy, se::Colour::On,  se::Semantics::Off> OccColData;
-typedef Data<se::Field::Occupancy, se::Colour::Off, se::Semantics::On>  OccSemData;
-typedef Data<se::Field::Occupancy, se::Colour::On,  se::Semantics::On>  OccColSemData;
+typedef Data<se::Field::Occupancy, se::Colour::Off, se::Semantics::Off> OccupancyData;
+typedef Data<se::Field::Occupancy, se::Colour::On,  se::Semantics::Off> OccupancyColData;
+typedef Data<se::Field::Occupancy, se::Colour::Off, se::Semantics::On>  OccupancySemData;
+typedef Data<se::Field::Occupancy, se::Colour::On,  se::Semantics::On>  OccupancyColSemData;
 
 // Occupancy data setups
-typedef DataConfig<se::Field::Occupancy, se::Colour::Off, se::Semantics::Off> OccDataConfig;
-typedef DataConfig<se::Field::Occupancy, se::Colour::On,  se::Semantics::Off> OccColDataConfig;
-typedef DataConfig<se::Field::Occupancy, se::Colour::Off, se::Semantics::On>  OccSemDataConfig;
-typedef DataConfig<se::Field::Occupancy, se::Colour::On,  se::Semantics::On>  OccColSemDataConfig;
+typedef DataConfig<se::Field::Occupancy, se::Colour::Off, se::Semantics::Off> OccupancyDataConfig;
+typedef DataConfig<se::Field::Occupancy, se::Colour::On,  se::Semantics::Off> OccupancyColDataConfig;
+typedef DataConfig<se::Field::Occupancy, se::Colour::Off, se::Semantics::On>  OccupancySemDataConfig;
+typedef DataConfig<se::Field::Occupancy, se::Colour::On,  se::Semantics::On>  OccupancyColSemDataConfig;
 
 // TSDF data setups
 typedef Data<se::Field::TSDF, se::Colour::Off, se::Semantics::Off> TSDFData;

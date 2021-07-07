@@ -443,16 +443,16 @@ using MapD = Map<Data<FldT, ColB, SemB>, ResT, BlockSize> ;
 
 // Occupancy map setups
 template <se::Res ResT = se::Res::Single, int BlockSize = 8>
-using OccMap = Map<OccData, ResT, BlockSize> ;
+using OccupancyMap = Map<OccupancyData, ResT, BlockSize> ;
 
 template <se::Res ResT = se::Res::Single, int BlockSize = 8>
-using OccColMap = Map<OccColData, ResT, BlockSize> ;
+using OccupancyColMap = Map<OccupancyColData, ResT, BlockSize> ;
 
 template <se::Res ResT = se::Res::Single, int BlockSize = 8>
-using OccSemMap = Map<OccSemData, ResT, BlockSize> ;
+using OccupancySemMap = Map<OccupancySemData, ResT, BlockSize> ;
 
 template <se::Res ResT = se::Res::Single, int BlockSize = 8>
-using OccColSemMap = Map<OccColSemData, ResT, BlockSize> ;
+using OccupancyColSemMap = Map<OccupancyColSemData, ResT, BlockSize> ;
 
 
 // TSDF map setups
