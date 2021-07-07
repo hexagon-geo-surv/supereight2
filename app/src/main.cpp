@@ -5,8 +5,13 @@
 #include "filesystem.hpp"
 #include "reader.hpp"
 
-int main(int /* argc */, char** argv)
+int main(int argc, char** argv)
 {
+  if (argc != 2) {
+    std::cerr << "Usage: " << argv[0] << " YAML_FILE\n";
+    exit(2);
+  }
+
   // Read the configuration
   const std::string config_filename = argv[1];
   const se::Config<se::TSDFDataConfig, se::PinholeCameraConfig> config(config_filename);
