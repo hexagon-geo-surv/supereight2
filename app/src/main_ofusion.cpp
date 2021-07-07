@@ -1,13 +1,4 @@
-#include "se/map/utils/type_util.hpp"
-#include "se/map/octree/octree.hpp"
-#include "se/map/map.hpp"
-#include "se/integrator/map_integrator.hpp"
-#include "se/map/raycaster.hpp"
-#include "se/tracker/tracker.hpp"
-#include "se/sensor/sensor.hpp"
-#include "se/map/preprocessor.hpp"
-#include "se/common/perfstats.hpp"
-#include "se/common/timings.hpp"
+#include <se/supereight.hpp>
 
 #include "config.hpp"
 #include "draw.h"
