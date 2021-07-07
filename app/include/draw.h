@@ -9,6 +9,9 @@
 
  */
 
+#ifndef SE_DRAW_H
+#define SE_DRAW_H
+
 #include <algorithm>
 #include <cstdint>
 
@@ -161,4 +164,6 @@ void drawthem(const A* scene_1, const Eigen::Vector2i& res_1,
 
   glutSwapBuffers();
 }
+
+#endif // SE_DRAW_H
 
