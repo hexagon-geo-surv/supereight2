@@ -44,30 +44,15 @@ cmake --build .
 
 ## Usage example
 
-Download the dataset tools and download one or more ICL-NUIM datasets:
+Download the ICL-NUIM datasets:
 
 ``` sh
-cd /SOME/PATH
-git clone git@bitbucket.org:smartroboticslab/dataset-tools.git
-cd dataset-tools
-./ICL-NUIM/icl-nuim-download.sh /ANOTHER/PATH
-# You can stop the download with Ctrl+C after the second dataset has started
-# downloading, only the first dataset will be used in this example.
-```
-
-Convert the downloaded dataset to the appropriate format:
-
-``` sh
-cd TUM/tum2raw
-make
-./bin/tum2raw /ANOTHER/PATH/living_room_traj0_frei_png
+make download-icl-nuim 
 ```
 
 Copy the configuration file into the dataset folder and run supereight:
 
 ``` sh
-cd /PATH/TO/supereight-2-srl
-cp config/living_room_traj0_frei_png.yaml /ANOTHER/PATH/living_room_traj0_frei_png/config.yaml
-./build/release/se_app/main_tsdf_multi /ANOTHER/PATH/living_room_traj0_frei_png/config.yaml
+./build/release/se_app/main_tsdf_multi PATH/TO/dataset/living_room_traj0_frei_png/config.yaml
 ```
 
