@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.5...3.16)
 project(se VERSION 0.1.0 LANGUAGES C CXX)
 
-option(SE_USE_OMP "Compile with OpenMP" ON)
+option(SE_OPENMP "Compile supereight with OpenMP" ON)
+option(SE_TEST "Compile the supereight tests" ON)
+option(SE_APP "Compile the supereight application" ON)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -11,7 +13,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(Eigen3 3.3 REQUIRED)
 
 # Find OpenMP, warn if disabled
-if(SE_USE_OMP)
+if(SE_OPENMP)
     find_package(OpenMP)
     if(OPENMP_FOUND)
         add_compile_options(${OpenMP_CXX_FLAGS})
@@ -20,7 +22,7 @@ if(SE_USE_OMP)
     else()
         message(WARNING "OpenMP not found. Performance may be terrible.")
     endif()
-else(NOT SE_USE_OMP)
+else()
     message(WARNING "Building without OpenMP. Performance may be terrible.")
 endif()
 
@@ -78,9 +80,13 @@ add_library(SE::Supereight ALIAS ${LIB_NAME})
 # supereight.
 set_target_properties(${LIB_NAME} PROPERTIES EXPORT_NAME Supereight)
 
-# Compile the app
-add_subdirectory(app)
-
 # Compile the tests
-add_subdirectory(test)
+if(SE_TEST)
+    add_subdirectory(test)
+endif()
+
+# Compile the app
+if(SE_APP)
+    add_subdirectory(app)
+endif()
 
