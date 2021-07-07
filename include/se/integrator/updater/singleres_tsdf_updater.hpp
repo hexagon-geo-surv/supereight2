@@ -69,11 +69,7 @@ private:
 
 } // namespace se
 
-
+#include "impl/singleres_tsdf_updater_impl.hpp"
 
 #endif // SE_SINGLERES_TSDF_UPDATER_HPP
-
-
-
-#include "impl/singleres_tsdf_updater_impl.hpp"
 

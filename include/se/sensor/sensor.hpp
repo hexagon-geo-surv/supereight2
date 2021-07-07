@@ -226,14 +226,10 @@ private:
 
 } // namespace se
 
-
-
-#endif // SE_SENSOR_HPP
-
-
-
 #include "pinhole_camera.hpp"
 #include "ouster_lidar.hpp"
 
 #include "impl/sensor_impl.hpp"
+
+#endif // SE_SENSOR_HPP
 

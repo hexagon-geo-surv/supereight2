@@ -128,10 +128,7 @@ private:
 
 } // namespace se
 
-
+#include "impl/node_impl.hpp"
 
 #endif //SE_NODE_HPP
 
-
-
-#include "impl/node_impl.hpp"

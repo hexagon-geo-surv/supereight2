@@ -676,10 +676,7 @@ public:
 
 } // namespace se
 
-
+#include "impl/block_impl.hpp"
 
 #endif //SE_BLOCK_HPP
 
-
-
-#include "impl/block_impl.hpp"

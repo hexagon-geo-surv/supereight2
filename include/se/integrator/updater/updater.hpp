@@ -58,13 +58,9 @@ class Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockS
 
 } // namespace se
 
-
-
-#endif //SE_UPDATER_HPP
-
-
-
 #include "singleres_tsdf_updater.hpp"
 #include "multires_tsdf_updater.hpp"
 #include "multires_ofusion_updater.hpp"
+
+#endif //SE_UPDATER_HPP
 

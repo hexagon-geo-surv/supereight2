@@ -81,6 +81,6 @@ namespace str_utils {
 
 } // namespace str_utils
 
-#endif // STR_UTILS_HPP
-
 #include "impl/str_utils_impl.hpp"
+
+#endif // STR_UTILS_HPP
