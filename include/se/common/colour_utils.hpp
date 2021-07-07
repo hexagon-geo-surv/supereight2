@@ -5,10 +5,9 @@
 #ifndef SE_COLOUR_UTILS_HPP
 #define SE_COLOUR_UTILS_HPP
 
+#include <Eigen/Dense>
 #include <cstdint>
 #include <vector>
-
-#include <Eigen/Dense>
 
 
 

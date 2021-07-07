@@ -1,8 +1,6 @@
 #ifndef SE_KEY_UTIL_IMPL_HPP
 #define SE_KEY_UTIL_IMPL_HPP
 
-#include <parallel/algorithm>
-
 namespace se {
 namespace keyops {
 

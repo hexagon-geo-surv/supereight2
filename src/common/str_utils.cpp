@@ -1,7 +1,6 @@
 #include "se/common/str_utils.hpp"
 
 #include <algorithm>
-#include <cctype>
 
 // POSIX systems must have the unistd.h header.
 #if __has_include(<unistd.h>)

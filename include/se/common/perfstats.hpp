@@ -18,17 +18,14 @@
 
 
 #include <algorithm>
-#include <iostream>
+#include <fstream>
 #include <map>
+#include <mutex>
 #include <numeric>
+#include <ostream>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <ctime>
-#include <iomanip>
-#include <time.h>
-#include <math.h>
-#include <mutex>
-#include <fstream>
 
 struct PerfStats {
   enum Type {

@@ -5,10 +5,6 @@
 #ifndef SE_IMAGE_UTILS_IMPL_HPP
 #define SE_IMAGE_UTILS_IMPL_HPP
 
-#include <cmath>
-
-
-
 namespace se {
   static inline Eigen::Vector2i round_pixel(const Eigen::Vector2f& pixel_f) {
     return (pixel_f + Eigen::Vector2f::Constant(0.5f)).cast<int>();

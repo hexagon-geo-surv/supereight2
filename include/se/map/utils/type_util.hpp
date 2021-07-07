@@ -1,13 +1,9 @@
 #ifndef SE_TYPE_UTIL_HPP
 #define SE_TYPE_UTIL_HPP
 
-#include <cstdint>
-#include <vector>
-#include <set>
-#include <unordered_set>
-#include <array>
 #include <Eigen/Dense>
 #include <Eigen/StdVector>
+#include <cstdint>
 
 EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector2f)
 EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector3f)

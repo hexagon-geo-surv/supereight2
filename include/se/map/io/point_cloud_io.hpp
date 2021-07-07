@@ -1,6 +1,11 @@
 #ifndef SE_POINT_CLOUD_IO_HPP
 #define SE_POINT_CLOUD_IO_HPP
 
+#include <fstream>
+#include <string>
+
+#include "se/image/image.hpp"
+
 /**
  * \brief Save a point cloud as a VTK file.
  *

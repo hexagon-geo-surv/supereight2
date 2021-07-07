@@ -31,7 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <gtest/gtest.h>
 
-#include "se/map/utils/type_util.hpp"
 #include "se/map/utils/key_util.hpp"
 #include "se/common/math_util.hpp"
 

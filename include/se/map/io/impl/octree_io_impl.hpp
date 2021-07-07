@@ -1,14 +1,6 @@
 #ifndef SE_OCTREE_IO_IMPL_HPP
 #define SE_OCTREE_IO_IMPL_HPP
 
-#include <fstream>
-#include <sstream>
-#include <iostream>
-
-#include "se/map/octree/visitor.hpp"
-
-
-
 namespace se {
 namespace io {
 

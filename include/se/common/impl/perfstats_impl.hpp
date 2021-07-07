@@ -1,8 +1,6 @@
 #ifndef SE_PERFSTATS_IMPL_HPP
 #define SE_PERFSTATS_IMPL_HPP
 
-
-
 inline double PerfStats::Stats::meanIter(const std::vector<double>& iter_data_vec) {
   return sumIter(iter_data_vec) / std::max(iter_data_vec.size(), size_t(1));
 }

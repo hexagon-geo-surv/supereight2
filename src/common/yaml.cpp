@@ -2,9 +2,8 @@
 // SPDX-FileCopyrightText: 2021 Sotiris Papatheodorou, Imperial College London
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include "se/common/yaml.hpp"
-
 #include "se/common/str_utils.hpp"
+#include "se/common/yaml.hpp"
 
 namespace se {
   namespace yaml {

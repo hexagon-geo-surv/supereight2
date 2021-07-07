@@ -4,17 +4,10 @@
 #ifndef SE_SENSOR_HPP
 #define SE_SENSOR_HPP
 
-
-
-#include <cmath>
-
-#include <Eigen/Dense>
-
-#include "se/common/yaml.hpp"
-
 #include "se/common/image_utils.hpp"
 #include "se/common/math_util.hpp"
 #include "se/common/projection.hpp"
+#include "se/common/yaml.hpp"
 #include "se/image/image.hpp"
 
 

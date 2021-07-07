@@ -1,6 +1,11 @@
 #ifndef SE_VISITOR_HPP
 #define SE_VISITOR_HPP
 
+#include "octree.hpp"
+#include "se/map/data.hpp"
+#include "se/map/octree/allocator.hpp"
+#include "se/map/octree/fetcher.hpp"
+
 /**
  * Helper wrapper to traverse the octree. All functions take a const octree references and as no manipulation of the octree is done.
  */

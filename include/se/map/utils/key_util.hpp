@@ -31,15 +31,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SE_KEY_UTIL_HPP
 #define SE_KEY_UTIL_HPP
 
-#include <cstdint>
-#include <bitset>
-#include <iostream>
-#include <Eigen/Dense>
+#include <parallel/algorithm>
 
-#include "type_util.hpp"
 #include "setup_util.hpp"
-
-
+#include "type_util.hpp"
 
 namespace se {
 

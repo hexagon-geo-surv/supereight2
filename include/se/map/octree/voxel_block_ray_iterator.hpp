@@ -31,8 +31,6 @@
 #ifndef SE_VOXEL_BLOCK_RAY_ITERATOR_HPP
 #define SE_VOXEL_BLOCK_RAY_ITERATOR_HPP
 
-#include <Eigen/Dense>
-
 #include "se/map/octree/octree.hpp"
 
 #define CAST_STACK_DEPTH 23

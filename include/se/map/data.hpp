@@ -1,8 +1,6 @@
 #ifndef SE_DATA_HPP
 #define SE_DATA_HPP
 
-#include <cstdint>
-
 #include "utils/type_util.hpp"
 #include "utils/setup_util.hpp"
 

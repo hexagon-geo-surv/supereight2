@@ -1,9 +1,6 @@
 #ifndef SE_MAP_IMPL_HPP
 #define SE_MAP_IMPL_HPP
 
-#include "se/common/timings.hpp"
-#include "se/map/utils/octant_util.hpp"
-
 namespace se {
 
 

@@ -1,11 +1,6 @@
 #ifndef SE_STR_UTILS_IMPL_HPP
 #define SE_STR_UTILS_IMPL_HPP
 
-#include <sstream>
-#include <iomanip>
-
-
-
 namespace str_utils {
 
   template<typename MatrixT>

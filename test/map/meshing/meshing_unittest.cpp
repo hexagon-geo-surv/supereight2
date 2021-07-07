@@ -26,18 +26,10 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <gtest/gtest.h>
 #include <random>
 
-#include <gtest/gtest.h>
-
-#include "se/map/algorithms/marching_cube.hpp"
-#include "se/map/io/meshing_io.hpp"
-#include "se/map/data.hpp"
-#include "se/map/octree/iterator.hpp"
-#include "se/map/octree/octree.hpp"
-#include "se/common/math_util.hpp"
-#include "se/map/utils/key_util.hpp"
-#include "se/map/octree/allocator.hpp"
+#include "se/map/map.hpp"
 
 TEST(MeshingTest, EqualScaleNeighbour) {
 

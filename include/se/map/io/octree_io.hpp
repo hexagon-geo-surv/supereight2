@@ -1,8 +1,14 @@
 #ifndef SE_OCTREE_IO_HPP
 #define SE_OCTREE_IO_HPP
 
+#include <fstream>
+#include <iostream>
+#include <sstream>
+
 namespace se {
 namespace io {
+
+#include "se/map/octree/octree.hpp"
 
 template <typename GetValueF>
 int save_3d_slice_vtk(const std::string&     filename,

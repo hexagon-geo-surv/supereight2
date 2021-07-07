@@ -3,13 +3,9 @@
 
 #define INVALID -2
 
-#include <fstream>
-#include <sstream>
-#include <iostream>
-
-#include "se/image/image.hpp"
 #include "se/common/colour_utils.hpp"
-#include "se/common/timings.hpp"
+#include "se/image/image.hpp"
+#include "se/map/octree/visitor.hpp"
 #include "se/map/octree/voxel_block_ray_iterator.hpp"
 
 

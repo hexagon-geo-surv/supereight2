@@ -2,9 +2,8 @@
 // SPDX-FileCopyrightText: 2021 Sotiris Papatheodorou, Imperial College London
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include "se/tracker/tracker.hpp"
-
 #include "se/common/yaml.hpp"
+#include "se/tracker/tracker.hpp"
 
 namespace se {
   TrackerConfig::TrackerConfig()

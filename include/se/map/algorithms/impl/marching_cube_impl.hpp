@@ -1,10 +1,6 @@
 #ifndef SE_MARCHING_CUBE_IMPL_HPP
 #define SE_MARCHING_CUBE_IMPL_HPP
 
-#include "se/map/octree/fetcher.hpp"
-#include "se/map/octree/iterator.hpp"
-#include "se/map/octree/visitor.hpp"
-
 namespace se {
 
 namespace meshing {

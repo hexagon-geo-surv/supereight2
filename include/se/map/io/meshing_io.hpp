@@ -11,6 +11,7 @@
 #include <iostream>
 #include <algorithm>
 
+#include "se/common/colour_utils.hpp"
 #include "se/map/algorithms/marching_cube.hpp"
 
 namespace se {

@@ -5,8 +5,6 @@
 #ifndef SE_YAML_IMPL_HPP
 #define SE_YAML_IMPL_HPP
 
-#include <iostream>
-
 namespace se {
 namespace yaml {
 

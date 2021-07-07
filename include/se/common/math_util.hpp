@@ -1,6 +1,7 @@
 #ifndef SE_MATH_UTIL_HPP
 #define SE_MATH_UTIL_HPP
 
+#include <Eigen/Dense>
 #include <vector>
 
 namespace se {

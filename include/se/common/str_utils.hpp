@@ -1,11 +1,11 @@
 #ifndef SE_STR_UTILS_HPP
 #define SE_STR_UTILS_HPP
 
+#include <Eigen/Dense>
+#include <iomanip>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <Eigen/Dense>
-
-
 
 namespace str_utils {
 

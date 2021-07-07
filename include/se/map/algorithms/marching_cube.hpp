@@ -33,8 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SE_MARCHING_CUBE_HPP
 #define SE_MARCHING_CUBE_HPP
 
-#include "se/map/octree/octree.hpp"
 #include "edge_tables.hpp"
+#include "se/common/timings.hpp"
+#include "se/map/octree/fetcher.hpp"
+#include "se/map/octree/iterator.hpp"
+#include "se/map/octree/visitor.hpp"
 
 
 

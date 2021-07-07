@@ -1,11 +1,6 @@
 #ifndef SE_VISITOR_IMPL_HPP
 #define SE_VISITOR_IMPL_HPP
 
-#include "se/map/octant/octant.hpp"
-#include "se/map/octree/allocator.hpp"
-#include "se/map/octree/fetcher.hpp"
-#include "se/map/data.hpp"
-
 namespace se {
 namespace visitor {
 

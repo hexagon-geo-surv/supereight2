@@ -1,12 +1,6 @@
 #ifndef SE_PROPAGATOR_IMPL_HPP
 #define SE_PROPAGATOR_IMPL_HPP
 
-
-
-#include "se/map/utils/type_util.hpp"
-#include "se/common/timings.hpp"
-
-
 namespace se {
 namespace propagator
 {

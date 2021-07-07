@@ -1,21 +1,13 @@
 #ifndef SE_MAP_HPP
 #define SE_MAP_HPP
 
-#include <memory>
-#include <ostream>
-
-#include <Eigen/Dense>
-
 #include "se/common/math_util.hpp"
-#include "se/map/utils/setup_util.hpp"
 #include "se/map/data.hpp"
-#include "se/map/octree/octree.hpp"
-#include "se/map/octree/visitor.hpp"
-#include "se/map/octree/fetcher.hpp"
-#include "se/map/io/octree_io.hpp"
 #include "se/map/io/meshing_io.hpp"
-
+#include "se/map/io/octree_io.hpp"
+#include "se/map/octree/visitor.hpp"
 #include "se/map/raycaster.hpp"
+#include "se/map/utils/octant_util.hpp"
 
 
 

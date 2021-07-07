@@ -1,12 +1,6 @@
 #ifndef SE_RAYCASTER_IMPL_HPP
 #define SE_RAYCASTER_IMPL_HPP
 
-
-
-#include "se/map/octree/visitor.hpp"
-
-
-
 namespace se {
 namespace raycaster {
 

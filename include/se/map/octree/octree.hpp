@@ -2,7 +2,6 @@
 #define SE_OCTREE_HPP
 
 #include <memory>
-#include <deque>
 
 #include "se/map/utils/memory pool.hpp"
 #include "se/map/utils/key_util.hpp"

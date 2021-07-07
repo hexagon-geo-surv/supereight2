@@ -1,7 +1,11 @@
 #ifndef SE_RAYCAST_CARVER_HPP
 #define SE_RAYCAST_CARVER_HPP
 
-
+#include "se/map/octree/propagator.hpp"
+#include "se/integrator/allocator/dense_pooling_image.hpp"
+#include "se/integrator/updater/multires_ofusion_core.hpp"
+#include "se/common/math_util.hpp"
+#include "se/integrator/allocator/volume_carver.hpp"
 
 namespace se {
 namespace fetcher {

@@ -1,16 +1,7 @@
 #ifndef SE_MAP_INTEGRATOR_IMPL_HPP
 #define SE_MAP_INTEGRATOR_IMPL_HPP
 
-
-
-#include "se/common/math_util.hpp"
-
-#include "se/integrator/allocator/raycast_carver.hpp"
-#include "se/integrator/allocator/volume_carver.hpp"
-
 #include "se/integrator/updater/updater.hpp"
-
-
 
 namespace se {
 

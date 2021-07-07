@@ -1,8 +1,6 @@
 // SPDX-FileCopyrightText: 2020 Sotiris Papatheodorou, Imperial College London
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <cassert>
-
 #include "se/sensor/sensor.hpp"
 
 

@@ -5,10 +5,9 @@
 #ifndef SE_IMAGE_UTILS_HPP
 #define SE_IMAGE_UTILS_HPP
 
+#include <Eigen/Dense>
 #include <cstdint>
 #include <string>
-
-#include <Eigen/Dense>
 
 
 

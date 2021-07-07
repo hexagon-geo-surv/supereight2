@@ -1,14 +1,12 @@
 #ifndef SE_OCTANT_HPP
 #define SE_OCTANT_HPP
 
-#include <memory>
-#include <Eigen/Dense>
+#include <iostream>
 
 #include "se/common/math_util.hpp"
 #include "se/map/data.hpp"
+#include "se/map/utils/key_util.hpp"
 #include "se/map/utils/setup_util.hpp"
-
-#include <iostream>
 
 namespace se {
 

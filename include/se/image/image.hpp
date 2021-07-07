@@ -7,11 +7,10 @@
 #ifndef SE_IMAGE_HPP
 #define SE_IMAGE_HPP
 
-#include "se/common/colour_utils.hpp"
-
-#include <vector>
-#include <cassert>
 #include <Eigen/StdVector>
+#include <cassert>
+
+#include "se/common/colour_utils.hpp"
 
 namespace se {
 

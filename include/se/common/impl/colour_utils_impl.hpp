@@ -5,14 +5,6 @@
 #ifndef SE_COLOUR_UTILS_IMPL_HPP
 #define SE_COLOUR_UTILS_IMPL_HPP
 
-#include <cmath>
-#include <cstdint>
-#include <string>
-
-#include <Eigen/Dense>
-
-
-
 namespace se {
   static inline uint32_t pack_rgba(const uint8_t r,
                                    const uint8_t g,

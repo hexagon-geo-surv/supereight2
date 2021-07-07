@@ -5,11 +5,11 @@
 #ifndef SE_YAML_HPP
 #define SE_YAML_HPP
 
+#include <Eigen/Dense>
+#include <iostream>
+#include <opencv2/core.hpp>
 #include <string>
 #include <vector>
-
-#include <Eigen/Dense>
-#include <opencv2/core.hpp>
 
 namespace se {
   namespace yaml {

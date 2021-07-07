@@ -1,6 +1,8 @@
 #ifndef SE_SETUP_UTIL_HPP
 #define SE_SETUP_UTIL_HPP
 
+#include <Eigen/Dense>
+
 namespace se {
 
 static inline Eigen::Vector3f sample_offset_frac = Eigen::Vector3f::Constant(0.5f);

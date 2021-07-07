@@ -1,11 +1,11 @@
 #ifndef SE_ALLOCATOR_HPP
 #define SE_ALLOCATOR_HPP
 
-#include <memory>
-#include <Eigen/Dense>
+#include <parallel/algorithm>
+#include <set>
 
+#include "octree.hpp"
 #include "se/map/utils/type_util.hpp"
-#include "se/map/octree/octree.hpp"
 
 /**
  * Helper wrapper to allocate and de-allocate octants in the octree.
