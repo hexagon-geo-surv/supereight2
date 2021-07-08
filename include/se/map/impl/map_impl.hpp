@@ -38,7 +38,9 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const MapConfig&              
     lb_(- origin_M_), ub_(map_config.dim - origin_M_),
     data_config_(data_config)
 {
-  if (!contains(origin_M_))
+  if (origin_M_.x() < 0 || origin_M_.x() >= dimension_.x() ||
+      origin_M_.y() < 0 || origin_M_.y() >= dimension_.y() ||
+      origin_M_.z() < 0 || origin_M_.z() >= dimension_.z())
   {
     std::cerr << "Map origin is outside the map" << std::endl;
   }
