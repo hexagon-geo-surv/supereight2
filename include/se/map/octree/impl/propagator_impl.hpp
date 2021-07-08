@@ -2,14 +2,13 @@
 #define SE_PROPAGATOR_IMPL_HPP
 
 namespace se {
-namespace propagator
-{
+namespace propagator {
 
 
 
 template <typename OctreeT,
-        typename ChildF,
-        typename ParentF
+          typename ChildF,
+          typename ParentF
 >
 void propagateBlockUp(const OctreeT&  /* octree */,
                       se::OctantBase* octant_ptr,
@@ -158,9 +157,6 @@ void propagateToRoot(std::vector<std::unordered_set<se::OctantBase*>> octant_ptr
 
 
 
-/**
- * \brief Propage all newly integrated values from the voxel block depth up to the root of the octree
- */
 template <typename PropagateF>
 void propagateToRoot(std::vector<se::OctantBase*>& octant_ptrs,
                      PropagateF&                   propagate_funct)
@@ -208,21 +204,6 @@ void propagateToRoot(std::vector<se::OctantBase*>& octant_ptrs,
 
 
 
-void propagateTimeStampToRoot(std::vector<std::unordered_set<se::OctantBase*>> octant_ptrs)
-{
-  auto time_step_prop = [](se::OctantBase* octant_ptr, se::OctantBase* parent_ptr)
-  {
-      if (octant_ptr->getTimeStamp() > parent_ptr->getTimeStamp())
-      {
-        parent_ptr->setTimeStamp(octant_ptr->getTimeStamp());
-      }
-  };
-
-  propagateToRoot(octant_ptrs, time_step_prop);
-}
-
-
-
 void propagateTimeStampToRoot(std::vector<se::OctantBase*>& octant_ptrs)
 {
   auto time_step_prop = [](se::OctantBase* child_ptr, se::OctantBase* parent_ptr)
@@ -237,8 +218,11 @@ void propagateTimeStampToRoot(std::vector<se::OctantBase*>& octant_ptrs)
 }
 
 
-}
-}
+
+} // namespace propagator
+} // namespace se
+
+
 
 #endif // SE_PROPAGATOR_IMPL_HPP
 

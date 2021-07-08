@@ -1,11 +1,17 @@
 #ifndef SE_MATH_UTIL_HPP
 #define SE_MATH_UTIL_HPP
 
+
+
 #include <Eigen/Dense>
 #include <vector>
 
+
+
 namespace se {
 namespace math {
+
+
 
 template <typename T>
 constexpr bool is_power_of_two(T);
@@ -148,10 +154,16 @@ static Eigen::Matrix3f exp_and_theta(const Eigen::Vector3f& omega,
  */
 static Eigen::Matrix4f exp(const Eigen::Matrix<float, 6, 1>& a);
 
+
+
 } // namespace math
 } // namespace se
 
+
+
 #include "impl/math_util_impl.hpp"
+
+
 
 #endif // SE_MATH_UTIL_HPP
 

@@ -35,7 +35,7 @@ struct TUMImageEntry {
    * performed by the caller.
    */
   TUMImageEntry(const std::string& s) {
-    const std::vector<std::string> columns = str_utils::split_str(s, ' ', true);
+    const std::vector<std::string> columns = se::str_utils::split_str(s, ' ', true);
     timestamp = std::stod(columns[0]);
     filename = columns[1];
   }
@@ -70,7 +70,7 @@ struct TUMPoseEntry {
    * performed by the caller.
    */
   TUMPoseEntry(const std::string& s) {
-    const std::vector<std::string> columns = str_utils::split_str(s, ' ', true);
+    const std::vector<std::string> columns = se::str_utils::split_str(s, ' ', true);
     timestamp = std::stod(columns[0]);
     position = Eigen::Vector3f(
         std::stof(columns[1]), std::stof(columns[2]), std::stof(columns[3]));
@@ -118,7 +118,7 @@ std::vector<TUMImageEntry> read_tum_image_list(const std::string& filename) {
       continue;
     }
     // Data line read, split on spaces
-    const std::vector<std::string> columns = str_utils::split_str(line, ' ', true);
+    const std::vector<std::string> columns = se::str_utils::split_str(line, ' ', true);
     // Ensure it has the expected number of columns
     if (columns.size() != 2) {
       std::cerr << "Error: Invalid format in data line " << images.size() + 1 << " of "
@@ -129,7 +129,7 @@ std::vector<TUMImageEntry> read_tum_image_list(const std::string& filename) {
       return images;
     }
     // Ensure that the timestamp is a positive float
-    if (!str_utils::is_float(columns[0], false)) {
+    if (!se::str_utils::is_float(columns[0], false)) {
       std::cerr << "Error: Invalid timestamp in data line " << images.size() + 1 << " of "
           << filename << "\n";
       std::cerr << "Error: The TUM timestamps must be non-negative floats\n";
@@ -164,7 +164,7 @@ std::vector<TUMPoseEntry> read_tum_ground_truth(const std::string& filename) {
       continue;
     }
     // Data line read, split on spaces
-    const std::vector<std::string> columns = str_utils::split_str(line, ' ', true);
+    const std::vector<std::string> columns = se::str_utils::split_str(line, ' ', true);
     // Ensure it has the expected number of columns
     if (columns.size() != 8) {
       std::cerr << "Error: Invalid format in data line " << poses.size() + 1 << " of "
@@ -175,7 +175,7 @@ std::vector<TUMPoseEntry> read_tum_ground_truth(const std::string& filename) {
       return poses;
     }
     // Ensure that the timestamp is a positive float
-    if (!str_utils::is_float(columns[0], false)) {
+    if (!se::str_utils::is_float(columns[0], false)) {
       std::cerr << "Error: Invalid timestamp in data line " << poses.size() + 1 << " of "
           << filename << "\n";
       std::cerr << "Error: The TUM ground truth timestamps must be non-negative floats\n";
@@ -184,7 +184,7 @@ std::vector<TUMPoseEntry> read_tum_ground_truth(const std::string& filename) {
     }
     // Ensure that the rest of the data are floats
     for (size_t i = 0; i < columns.size(); ++i) {
-      if (!str_utils::is_float(columns[i])) {
+      if (!se::str_utils::is_float(columns[i])) {
         std::cerr << "Error: Invalid pose in data line " << poses.size() + 1 << " of "
             << filename << "\n";
         std::cerr << "Error: The TUM ground truth pose data must be floats\n";

@@ -438,8 +438,8 @@ inline void propagateBlockToCoarsestScale(se::OctantBase* octant_ptr)
 //                      const int child_data_idx = (2 * x + i) + (2 * y + j) * size_at_child_scale_li + (2 * z + k) * size_at_child_scale_sq;
 //                      const auto child_data = data_at_child_scale[child_data_idx];
 //
-//                      std::cout << str_utils::value_to_pretty_str(child_data.occupancy, "child.x") << std::endl;
-//                      std::cout << str_utils::value_to_pretty_str(child_data.weight, "child.y") << std::endl;
+//                      std::cout << se::str_utils::value_to_pretty_str(child_data.occupancy, "child.x") << std::endl;
+//                      std::cout << se::str_utils::value_to_pretty_str(child_data.weight, "child.y") << std::endl;
 //
 //                    } // i
 //                  } // j

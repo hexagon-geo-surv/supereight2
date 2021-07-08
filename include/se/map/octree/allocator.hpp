@@ -76,13 +76,15 @@ namespace detail {
 
 
 /**
+ * \brief Allocate a given key in the octree.
  *
  * \tparam OctreeT
- * \param key
- * \param octree
- * \param base_parent_ptr
- * \param allocated_octant
- * \return
+ * \param[in] key               The key to be allocated
+ * \param[in] octree            The octree to allocate the key in
+ * \param[in] base_parent_ptr   The base pointer to start the octree traversal from (e.g. octree.getRoot())
+ * \param[in] allocated_octant  The pointer to the allocated octant
+ *
+ * \return True if the octant has been allocated, false if it already was
  */
 template <typename OctreeT>
 inline bool allocate_key(const se::key_t  key,

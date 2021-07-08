@@ -1,8 +1,10 @@
 #ifndef SE_BLOCK_HPP
 #define SE_BLOCK_HPP
 
-namespace se
-{
+namespace se {
+
+
+
 /**
  * \brief The base used for single-resolution blocks
  */
@@ -350,17 +352,55 @@ public:
 
   void setMinData( const DataType& min_data) { min_data_ = min_data; }
 
+  /**
+   * \brief Allocate the mip-mapped scales down to scale 0.
+   */
   void allocateDownTo();
 
+  /**
+   * \brief Allocate the mip-mapped scales down to 'new_min_scale'.
+   */
   inline void allocateDownTo(const int new_min_scale);
 
+  /**
+   * \brief Delete the mip-mapped scales up to 'new_min_scale'.
+   */
   void deleteUpTo(const int new_min_scale);
 
+  /**
+   * \brief Get the block's data at the coarsest scale.
+   *
+   * \warning The function does not return a reference to the data.
+   *
+   * \return The block's data at the coarsest scale. Default value if the block doesn't contain any data
+   */
   inline const DataType getData() const     { return (min_scale_ != -1) ? block_data_[0][0]     : DataType(); }
 
+  /**
+   * \brief Get the block's max data at the coarsest scale.
+   *
+   * \warning The function does not return a reference to the data.
+   *
+   * \return The block's max data at the coarsest scale. Default data if the block doesn't contain any data
+   */
   inline const DataType getMaxData() const  { return (min_scale_ != -1) ? block_max_data_[0][0] : DataType(); }
 
+  /**
+   * \brief Get the block's value at the coarsest scale.
+   *
+   * \warning The function does not return a reference to the value.
+   *
+   * \return The block's value at the coarsest scale. Default value if the block doesn't contain any data
+   */
   se::field_t meanValue() { return get_field(getData()); }
+
+  /**
+   * \brief Get the block's max value at the coarsest scale.
+   *
+   * \warning The function does not return a reference to the value.
+   *
+   * \return The block's max value at the coarsest scale. Default value if the block doesn't contain any data
+   */
   se::field_t maxValue()  { return get_field(getMaxData()); }
 
   inline const std::vector<DataType*>& blockData() const { return block_data_; }
@@ -371,11 +411,20 @@ public:
 
   inline       std::vector<DataType*>& blockMaxData() { return block_max_data_; }
 
-  inline const size_t& currIntegrCount() const { return curr_integr_count_; } ///< \brief Get the number of integrations at the current scale.
+  /**
+   * \brief Get the number of integrations at the current scale.
+   */
+  inline const size_t& currIntegrCount() const { return curr_integr_count_; }
 
-  inline const size_t& currObservedCount() const { return curr_observed_count_; } ///< \brief Get the number of observed voxels at the current scale.
+  /**
+   * \brief Get the number of observed voxels at the current scale.
+   */
+  inline const size_t& currObservedCount() const { return curr_observed_count_; } ///<
 
-  void incrCurrIntegrCount() { curr_integr_count_++; } ///< \brief Increment the number of integrations at the current scale by 1.
+  /**
+   * \brief Increment the number of integrations at the current scale by 1.
+   */
+  void incrCurrIntegrCount() { curr_integr_count_++; }
 
   /**
    * \brief Increment the number of observed voxels in at the current scale by 1.
@@ -443,9 +492,9 @@ public:
   /**
    * \brief Get a `const` reference to the voxel data in the buffer at the voxel coordinates.
    *
-   * \param[in] voxel_coord The voxel coordinates of the data to be accessed.
-   *
    * \warning The function does not not check if the voxel_idx exceeds the array size.
+   *
+   * \param[in] voxel_coord The voxel coordinates of the data to be accessed.
    *
    * \return `const` reference to the voxel data in the buffer for the provided voxel coordinates.
    */
@@ -454,9 +503,9 @@ public:
   /**
    * \brief Get a reference to the voxel data in the buffer at the voxel coordinates.
    *
-   * \param[in] voxel_coord The voxel coordinates of the data to be accessed.
-   *
    * \warning The function does not not check if the voxel_idx exceeds the array size.
+   *
+   * \param[in] voxel_coord The voxel coordinates of the data to be accessed.
    *
    * \return Reference to the voxel data in the buffer for the provided voxel coordinates.
    */
@@ -465,9 +514,9 @@ public:
   /**
    * \brief Get a `const` reference to the voxel data in the buffer at the voxel index.
    *
-   * \param[in] voxel_idx The voxel index of the data to be accessed.
-   *
    * \warning The function does not not check if the voxel_idx exceeds the array size.
+   *
+   * \param[in] voxel_idx The voxel index of the data to be accessed.
    *
    * \return `const` reference to the voxel data in the buffer for the provided voxel index.
    */
@@ -476,9 +525,9 @@ public:
   /**
    * \brief Get a reference to the voxel data in the buffer at the voxel index.
    *
-   * \param[in] voxel_idx The voxel index of the data to be accessed.
-   *
    * \warning The function does not not check if the voxel_idx exceeds the array size.
+   *
+   * \param[in] voxel_idx The voxel index of the data to be accessed.
    *
    * \return Reference to the voxel data in the buffer for the provided voxel index.
    */
@@ -487,9 +536,9 @@ public:
   /**
    * \brief Get a `const` reference to the mean voxel data at the current scale via the voxel index.
    *
-   * \param[in] voxel_idx The voxel index of the data to be accessed.
-   *
    * \warning The function does not not check if the voxel_idx exceeds the array size.
+   *
+   * \param[in] voxel_idx The voxel index of the data to be accessed.
    *
    * \return `const` reference to the voxel data in the buffer for the provided voxel index.
    */
@@ -498,9 +547,9 @@ public:
   /**
    * \brief Get a reference to the mean voxel data at the current scale via the voxel index.
    *
-   * \param[in] voxel_idx The voxel index of the data to be accessed.
-   *
    * \warning The function does not not check if the voxel_idx exceeds the array size.
+   *
+   * \param[in] voxel_idx The voxel index of the data to be accessed.
    *
    * \return Reference to the mean voxel data at the current scale for the provided voxel index.
    */
@@ -660,9 +709,9 @@ public:
   /**
    * \brief Initialise block via parent node
    *
-   * \param parent        The shared pointer to the parent node
-   * \param child_id      The child id {0,...,7} in relation to the parent
-   * \param init_data     The initial data of the block
+   * \param[in] parent        The shared pointer to the parent node
+   * \param[in] child_id      The child id {0,...,7} in relation to the parent
+   * \param[in] init_data     The initial data of the block
    */
   Block(se::Node<DataT, ResT>* parent_ptr = nullptr,
         const unsigned         child_id   = 0);
@@ -676,7 +725,11 @@ public:
 
 } // namespace se
 
+
+
 #include "impl/block_impl.hpp"
+
+
 
 #endif // SE_BLOCK_HPP
 

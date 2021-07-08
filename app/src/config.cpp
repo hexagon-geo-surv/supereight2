@@ -60,8 +60,8 @@ namespace se {
     se::yaml::subnode_as_string(node, "log_file", log_file);
 
     // Expand ~ in the paths.
-    mesh_output_dir = str_utils::expand_user(mesh_output_dir);
-    log_file = str_utils::expand_user(log_file);
+    mesh_output_dir = se::str_utils::expand_user(mesh_output_dir);
+    log_file = se::str_utils::expand_user(log_file);
 
     // If the mesh_output_dir or log_file contain relative paths, interpret them as relative to the
     // directory where filename is located.

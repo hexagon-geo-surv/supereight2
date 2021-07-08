@@ -114,6 +114,8 @@ inline std::vector<se::OctantBase*> blocks(std::vector<se::key_t>& unique_voxel_
 
 namespace detail {
 
+
+
 template <typename OctreeT>
 inline bool allocate_key(const se::key_t  key,
                          OctreeT&         octree,

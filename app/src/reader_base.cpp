@@ -24,7 +24,7 @@
 se::ReaderType se::string_to_reader_type(const std::string& s)
 {
   std::string s_lowered (s);
-  str_utils::to_lower(s_lowered);
+  se::str_utils::to_lower(s_lowered);
   if (s_lowered == "openni")
   {
     return se::ReaderType::OPENNI;
@@ -127,8 +127,8 @@ se::ReaderConfig::ReaderConfig(const std::string& yaml_file)
   se::yaml::subnode_as_string(node, "ground_truth_file", ground_truth_file);
 
   // Expand ~ in the paths.
-  sequence_path     = str_utils::expand_user(sequence_path);
-  ground_truth_file = str_utils::expand_user(ground_truth_file);
+  sequence_path     = se::str_utils::expand_user(sequence_path);
+  ground_truth_file = se::str_utils::expand_user(ground_truth_file);
 
   // If the sequence_path or ground_truth_file contain relative paths, interpret them as relative
   // to the directory where filename is located.
@@ -368,7 +368,7 @@ se::ReaderStatus se::Reader::readPose(Eigen::Matrix4f& T_WB, const size_t frame)
       continue;
     }
     // Data line read, split on spaces
-    const std::vector<std::string> line_data = str_utils::split_str(line, ' ');
+    const std::vector<std::string> line_data = se::str_utils::split_str(line, ' ');
     const size_t num_cols = line_data.size();
     if (num_cols < 7) {
       std::cerr << "Error: Invalid ground truth file format. "

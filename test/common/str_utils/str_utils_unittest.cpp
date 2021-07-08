@@ -20,8 +20,8 @@ TEST(StrUtils, isInt) {
   // Test both modes of operation
   for (size_t i = 0; i < s.size(); ++i)
   {
-    EXPECT_EQ(str_utils::is_int(s[i]), r[i]);
-    EXPECT_EQ(str_utils::is_int(s[i], false), r_nonneg[i]);
+    EXPECT_EQ(se::str_utils::is_int(s[i]), r[i]);
+    EXPECT_EQ(se::str_utils::is_int(s[i], false), r_nonneg[i]);
   }
 }
 
@@ -34,8 +34,8 @@ TEST(StrUtils, isFloat) {
   // Test both modes of operation
   for (size_t i = 0; i < s.size(); ++i)
   {
-    EXPECT_EQ(str_utils::is_float(s[i]), r[i]);
-    EXPECT_EQ(str_utils::is_float(s[i], false), r_nonneg[i]);
+    EXPECT_EQ(se::str_utils::is_float(s[i]), r[i]);
+    EXPECT_EQ(se::str_utils::is_float(s[i], false), r_nonneg[i]);
   }
 }
 
@@ -50,7 +50,7 @@ TEST(StrUtils, removePrefix)
   // Remove the prefixes
   for (size_t i = 0; i < s.size(); ++i)
   {
-    str_utils::remove_prefix(s[i], prefix[i]);
+    se::str_utils::remove_prefix(s[i], prefix[i]);
     EXPECT_EQ(s[i], s_np[i]);
   }
 }
@@ -66,7 +66,7 @@ TEST(StrUtils, removeSuffix)
   // Remove the suffixes
   for (size_t i = 0; i < s.size(); ++i)
   {
-    str_utils::remove_suffix(s[i], suffix[i]);
+    se::str_utils::remove_suffix(s[i], suffix[i]);
     EXPECT_EQ(s[i], s_np[i]);
   }
 }

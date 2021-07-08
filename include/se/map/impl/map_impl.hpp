@@ -196,9 +196,9 @@ void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveFieldSlice(const std::str
   Eigen::Vector3i voxel_coord;
   pointToVoxel(point_M, voxel_coord);
 
-  auto get_field_value = [&](int x, int y, int z)
+  auto get_field_value = [&](const Eigen::Vector3i& coord)
   {
-    return se::get_field(se::visitor::getData(*octree_ptr_, Eigen::Vector3i(x, y, z)));
+    return se::get_field(se::visitor::getData(*octree_ptr_, coord));
   };
 
   const std::string file_name_x = (num == std::string("")) ? (file_path + "_x.vtk") : (file_path + "_x_" + num + ".vtk");
@@ -227,12 +227,9 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMaxFieldSlice(const std::strin
   Eigen::Vector3i voxel_coord;
   pointToVoxel(point_M, voxel_coord);
 
-  auto get_max_field_value = [&](int x, int y, int z)
+  auto get_max_field_value = [&](const Eigen::Vector3i& coord)
   {
-//    const DataType max_data  = se::visitor::getMaxData(*octree_ptr_, Eigen::Vector3i(x, y, z), scale);
-//    const field_t  max_field = se::get_field(max_data);
-//    return (max_data.observed) ? max_field : std::max(get_field(DataType()), max_field);
-    return get_field(se::visitor::getMaxData(*octree_ptr_, Eigen::Vector3i(x, y, z), scale));
+    return get_field(se::visitor::getMaxData(*octree_ptr_, coord, scale));
   };
 
   const std::string file_name_x = (num == std::string("")) ? (file_path + "_x.vtk") : (file_path + "_x_" + num + ".vtk");
@@ -263,9 +260,9 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveScaleSlice(const std::string& 
   se::OctantBase* root_ptr = octree_ptr_->getRoot();
   const int max_scale      = octree_ptr_->getMaxScale();
 
-  auto get_scale = [&](int x, int y, int z)
+  auto get_scale = [&](const Eigen::Vector3i& coord)
   {
-    const se::OctantBase* leaf_ptr = se::fetcher::template leaf<OctreeType>(Eigen::Vector3i(x, y, z), root_ptr);
+    const se::OctantBase* leaf_ptr = se::fetcher::template leaf<OctreeType>(coord, root_ptr);
 
     if (!leaf_ptr)
     {

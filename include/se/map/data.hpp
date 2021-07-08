@@ -1,10 +1,16 @@
 #ifndef SE_DATA_HPP
 #define SE_DATA_HPP
 
+
+
 #include "utils/type_util.hpp"
 #include "utils/setup_util.hpp"
 
+
+
 namespace se {
+
+
 
 // Typedefs and defaults
 
@@ -155,39 +161,39 @@ struct FieldDataConfig
 template<>
 struct FieldDataConfig<se::Field::Occupancy>
 {
-    float   k_sigma;
-    float   sigma_min_factor;
-    float   sigma_max_factor;
+  float   k_sigma;
+  float   sigma_min_factor;
+  float   sigma_max_factor;
 
-    float   k_tau;
-    float   tau_min_factor;
-    float   tau_max_factor;
+  float   k_tau;
+  float   tau_min_factor;
+  float   tau_max_factor;
 
-    field_t min_occupancy;
-    field_t max_occupancy;
-    int     max_weight;
-    float   factor;
-    field_t surface_boundary;
+  field_t min_occupancy;
+  field_t max_occupancy;
+  int     max_weight;
+  float   factor;
+  field_t surface_boundary;
 
-    field_t log_odd_min;
-    field_t log_odd_max;
+  field_t log_odd_min;
+  field_t log_odd_max;
 
-    int     fs_integr_scale;
+  int     fs_integr_scale;
 
-    UncertaintyModel uncertainty_model;
+  UncertaintyModel uncertainty_model;
 
-    bool const_surface_thickness;
+  bool const_surface_thickness;
 
-    /** Initializes the config to some sensible defaults.
-     */
-    FieldDataConfig();
+  /** Initializes the config to some sensible defaults.
+   */
+  FieldDataConfig();
 
-    /** Initializes the config from a YAML file. Data not present in the YAML file will be
-     * initialized as in FieldDataConfig<se::Field::Occupancy>::FieldDataConfig().
-     */
-    FieldDataConfig(const std::string& yaml_file);
+  /** Initializes the config from a YAML file. Data not present in the YAML file will be
+   * initialized as in FieldDataConfig<se::Field::Occupancy>::FieldDataConfig().
+   */
+  FieldDataConfig(const std::string& yaml_file);
 
-    static constexpr se::Field FldT = se::Field::Occupancy;
+  static constexpr se::Field FldT = se::Field::Occupancy;
 };
 
 std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::Occupancy>& c);
@@ -195,19 +201,19 @@ std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::Occu
 template<>
 struct FieldDataConfig<se::Field::TSDF>
 {
-    float       truncation_boundary_factor;
-    weight_t    max_weight; // TODO: int or float
+  float       truncation_boundary_factor;
+  weight_t    max_weight; // TODO: int or float
 
-    /** Initializes the config to some sensible defaults.
-     */
-    FieldDataConfig();
+  /** Initializes the config to some sensible defaults.
+   */
+  FieldDataConfig();
 
-    /** Initializes the config from a YAML file. Data not present in the YAML file will be
-     * initialized as in FieldDataConfig<se::Field::TSDF>::FieldDataConfig().
-     */
-    FieldDataConfig(const std::string& yaml_file);
+  /** Initializes the config from a YAML file. Data not present in the YAML file will be
+   * initialized as in FieldDataConfig<se::Field::TSDF>::FieldDataConfig().
+   */
+  FieldDataConfig(const std::string& yaml_file);
 
-    static constexpr se::Field FldT = se::Field::TSDF;
+  static constexpr se::Field FldT = se::Field::TSDF;
 };
 
 std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::TSDF>& c);
@@ -429,7 +435,11 @@ typedef DataConfig<se::Field::TSDF, se::Colour::On,  se::Semantics::Off> TSDFCol
 typedef DataConfig<se::Field::TSDF, se::Colour::Off, se::Semantics::On>  TSDFSemDataConfig;
 typedef DataConfig<se::Field::TSDF, se::Colour::On,  se::Semantics::On>  TSDFColSemDataConfig;
 
+
+
 } // namespace se
+
+
 
 #endif // SE_DATA_HPP
 

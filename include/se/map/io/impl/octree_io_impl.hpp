@@ -1,21 +1,25 @@
 #ifndef SE_OCTREE_IO_IMPL_HPP
 #define SE_OCTREE_IO_IMPL_HPP
 
+
+
 namespace se {
 namespace io {
 
+
+
 template <typename GetValueF>
-int save_3d_slice_vtk(const std::string&     filename,
-                      const Eigen::Vector3i& lower_coord,
-                      const Eigen::Vector3i& upper_coord,
-                      GetValueF&             get_value)
+bool save_3d_slice_vtk(const std::string&     filename,
+                       const Eigen::Vector3i& lower_coord,
+                       const Eigen::Vector3i& upper_coord,
+                       GetValueF&             get_value)
 {
   // Open the file for writing.
   std::ofstream file(filename.c_str());
   if (!file.is_open())
   {
     std::cerr << "Unable to write file " << filename << "\n";
-    return 1;
+    return false;
   }
 
   std::stringstream ss_x_coord, ss_y_coord, ss_z_coord, ss_scalars;
@@ -50,7 +54,7 @@ int save_3d_slice_vtk(const std::string&     filename,
     {
       for (int x = lower_coord.x(); x < upper_coord.x(); x += stride)
       {
-        const auto value = get_value(x, y, z);
+        const auto value = get_value(Eigen::Vector3i(x, y, z));
         ss_scalars << value << std::endl;
       } // x
     } // y
@@ -71,22 +75,22 @@ int save_3d_slice_vtk(const std::string&     filename,
   file << ss_scalars.str() << std::endl;
 
   file.close();
-  return 0;
+  return true;
 }
 
 
 
 
 template <typename OctreeT>
-int save_octree_structure_ply(OctreeT&           octree,
-                              const std::string& filename)
+bool save_octree_structure_ply(OctreeT&           octree,
+                               const std::string& filename)
 {
 
   // Open the file for writing.
   std::ofstream file (filename.c_str());
   if (!file.is_open()) {
     std::cerr << "Unable to write file " << filename << "\n";
-    return 1;
+    return false;
   }
 
   std::stringstream ss_nodes_corners;
@@ -115,7 +119,8 @@ int save_octree_structure_ply(OctreeT&           octree,
     node_corners[6] = (node_coord + Eigen::Vector3i(0, node_size, node_size)).cast<float>();
     node_corners[7] = (node_coord + Eigen::Vector3i(node_size, node_size, node_size)).cast<float>();
 
-    for(int i = 0; i < 8; ++i) {
+    for(int i = 0; i < 8; ++i)
+    {
       ss_nodes_corners << node_corners[i].x() << " "
                        << node_corners[i].y() << " "
                        << node_corners[i].z() << std::endl;
@@ -157,11 +162,13 @@ int save_octree_structure_ply(OctreeT&           octree,
   file << ss_faces.str();
 
   file.close();
-  return 0;
+  return true;
 }
 
-}
-}
+
+
+} // namespace io
+} // namespace se
 
 #endif // SE_OCTREE_IO_IMPL_HPP
 

@@ -304,9 +304,9 @@ namespace se {
  * \return The configuration of the reader to the ostream.
  */
 static std::ostream& operator<<(std::ostream& out, se::Reader* reader) {
-  out << str_utils::header_to_pretty_str("READER") << "\n";
-  out << str_utils::str_to_pretty_str(reader->name(),  "Reader type") << "\n";
-  out << str_utils::str_to_pretty_str(((reader->numFrames() == 0) ? "Unknown" : std::to_string(reader->numFrames())),
+  out << se::str_utils::header_to_pretty_str("READER") << "\n";
+  out << se::str_utils::str_to_pretty_str(reader->name(),  "Reader type") << "\n";
+  out << se::str_utils::str_to_pretty_str(((reader->numFrames() == 0) ? "Unknown" : std::to_string(reader->numFrames())),
                                            "Number frames") << "\n";
   out << "\n";
   return out;

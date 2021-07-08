@@ -58,6 +58,7 @@ struct PerfStats {
      * \brief Compute the mean value of the stats data of an iteration.
      *
      * \param[in] iter_data_vec The vector containing all values to be processed.
+     *
      * \return The mean of the values in the iter_data_vec.
      */
     static double meanIter(const std::vector<double>& iter_data_vec);
@@ -66,6 +67,7 @@ struct PerfStats {
      * \brief Provide the last value of the stats data of an iteration.
      *
      * \param[in] iter_data_vec The vector containing all values to be processed.
+     *
      * \return The last value in the iter_data_vec.
      */
     static double lastIter(const std::vector<double>& iter_data_vec);
@@ -74,6 +76,7 @@ struct PerfStats {
      * \brief Compute the minimum value of the stats data of an iteration.
      *
      * \param[in] iter_data_vec The vector containing all values to be processed.
+     *
      * \return The minimum value of the values in the iter_data_vec.
      */
     static double minIter(const std::vector<double>& iter_data_vec);
@@ -82,6 +85,7 @@ struct PerfStats {
      * \brief Compute the maximum value of the stats data of an iteration.
      *
      * \param[in] iter_data_vec The vector containing all values to be processed.
+     *
      * \return The maximum value of the values in the iter_data_vec.
      */
     static double maxIter(const std::vector<double>& iter_data_vec);
@@ -90,6 +94,7 @@ struct PerfStats {
      * \brief Compute the sum of the values of the stats data of an iteration.
      *
      * \param[in] iter_data_vec The vector containing all values to be processed.
+     *
      * \return The sum of the values in the iter_data_vec.
      */
     static double sumIter(const std::vector<double>& iter_data_vec);
@@ -99,6 +104,7 @@ struct PerfStats {
      *        The merging strategy depends on the PerfStats::Type.
      *
      * \param[in] iter_data_vec The vector containing all values to be processed.
+     *
      * \return The merged scalar value of the values in the iter_data_vec.
      */
     static double mergeIter(const std::vector<double>& iter_data_vec,
@@ -110,6 +116,7 @@ struct PerfStats {
      * \brief Compute the mean value of the stats data of a given iteration.
      *
      * \param[in] iter The iteration to processed.
+     *
      * \return The mean of the values of the given iteration.
      */
     double meanIter(const size_t iter);
@@ -118,6 +125,7 @@ struct PerfStats {
      * \brief Provide the last value of the stats data of a given iteration.
      *
      * \param[in] iter The iteration to processed.
+     *
      * \return The last value of the given iteration.
      */
     double lastIter(const size_t iter);
@@ -126,6 +134,7 @@ struct PerfStats {
      * \brief Compute the minimum value of the stats data of a given iteration.
      *
      * \param[in] iter The iteration to processed.
+     *
      * \return The minimum value of the given iteration.
      */
     double minIter(const size_t iter);
@@ -134,6 +143,7 @@ struct PerfStats {
      * \brief Compute the maximum value of the stats data of a given iteration.
      *
      * \param[in] iter The iteration to processed.
+     *
      * \return The maximum value of the given iteration.
      */
     double maxIter(const size_t iter);
@@ -142,6 +152,7 @@ struct PerfStats {
      * \brief Compute the sum value of the stats data of a given iteration.
      *
      * \param[in] iter The iteration to processed.
+     *
      * \return The sum of the values of the given iteration.
      */
     double sumIter(const size_t iter);
@@ -151,6 +162,7 @@ struct PerfStats {
      *        The merging strategy depends on the PerfStats::Type.
      *
      * \param[in] iter The iteration to processed.
+     *
      * \return The merged scalar value of the values of the given iteration.
      */
     double mergeIter(const size_t iter);
@@ -431,8 +443,13 @@ struct PerfStats {
 #include "impl/perfstats_impl.hpp"
 
 namespace se {
-  extern PerfStats perfstats;
-}
+
+
+
+extern PerfStats perfstats;
+
+
+} // namespace se
 
 #endif // SE_PERFSTATS_HPP
 

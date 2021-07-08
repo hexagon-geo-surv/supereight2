@@ -5,28 +5,52 @@
 #include <iostream>
 #include <sstream>
 
+#include "se/map/octree/octree.hpp"
+
 namespace se {
 namespace io {
 
-#include "se/map/octree/octree.hpp"
-
+/**
+ * \brief Generate a 3D slice of the octree.
+ *
+ * \tparam GetValueF
+ * \param filename      The file name to save the 3D slice to
+ * \param lower_coord   The lower coords of the bounding box
+ * \param upper_coord   The upper coords of the bounding box
+ * \param get_value     The get value function (get_value(const Eigen::Vector3i)) extracting the value
+ *                      for given voxel coordinates
+ *
+ * \return True if the file can be read, false otherwise
+ */
 template <typename GetValueF>
-int save_3d_slice_vtk(const std::string&     filename,
-                      const Eigen::Vector3i& lower_coord,
-                      const Eigen::Vector3i& upper_coord,
-                      GetValueF&             get_value);
+bool save_3d_slice_vtk(const std::string&     filename,
+                       const Eigen::Vector3i& lower_coord,
+                       const Eigen::Vector3i& upper_coord,
+                       GetValueF&             get_value);
 
+/**
+ * \brief Extract the octree structure from the octree.
+ *
+ * \tparam OctreeT
+ * \param octree        The octree to extract the structure from
+ * \param filename      The file name to save the structure to
+ *
+ * \return True if the file can be read, false otherwise
+ */
 template <typename OctreeT>
-int save_octree_structure_ply(OctreeT&           octree_ptr,
-                              const std::string& filename);
-
-}
+bool save_octree_structure_ply(OctreeT&           octree_ptr,
+                               const std::string& filename);
 
 
 
-}
+} // namespace io
+} // namespace se
+
+
 
 #include "impl/octree_io_impl.hpp"
+
+
 
 #endif // SE_OCTREE_IO_HPP
 

@@ -185,7 +185,7 @@ struct BaseTraits<OctreeIterator<OctreeT>> {
 
 // Declare and define a base_traits specialization for the nodes iterator:
 template <typename OctreeT>
-struct BaseTraits<NodesIterator<OctreeT> > {
+struct BaseTraits<NodesIterator<OctreeT> >{
     typedef          OctreeT            OctreeType;
     typedef typename OctreeT::NodeType  NodeType;
     typedef typename OctreeT::BlockType BlockType;

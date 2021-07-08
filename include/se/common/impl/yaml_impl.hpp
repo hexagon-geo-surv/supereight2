@@ -5,6 +5,8 @@
 #ifndef SE_YAML_IMPL_HPP
 #define SE_YAML_IMPL_HPP
 
+
+
 namespace se {
 namespace yaml {
 
@@ -13,15 +15,15 @@ namespace yaml {
 template <typename T>
 void subnode_as_vector(const cv::FileNode& base_node,
                        const std::string&  subnode_name,
-                       std::vector<T>&     v)
+                       std::vector<T>&     eigen_v3)
 {
   const cv::FileNode subnode = base_node[subnode_name];
   if (subnode.isSeq() && subnode.size() >= 1)
   {
-    v.clear();
+    eigen_v3.clear();
     for (const auto& e : subnode)
     {
-      v.push_back(static_cast<T>(e));
+      eigen_v3.push_back(static_cast<T>(e));
     }
   } else
   {
@@ -38,11 +40,11 @@ void subnode_as_vector(const cv::FileNode& base_node,
       std::cerr << "ignoring non-list data in " << subnode_name;
     }
     std::cerr << ", using default value {";
-    for (size_t i = 0; i < v.size() - 1; i++)
+    for (size_t i = 0; i < eigen_v3.size() - 1; i++)
     {
-      std::cerr << v[i] << ", ";
+      std::cerr << eigen_v3[i] << ", ";
     }
-    std::cerr << v.back() << "}\n";
+    std::cerr << eigen_v3.back() << "}\n";
   }
 }
 
