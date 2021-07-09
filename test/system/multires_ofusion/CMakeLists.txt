@@ -7,6 +7,7 @@ set(READER_SRC
   ../../../app/src/reader_openni.cpp
   ../../../app/src/reader_raw.cpp
   ../../../app/src/reader_tum.cpp
+  ../../../app/src/reader_interiornet.cpp
   ../../../app/src/reader.cpp
   ../../../app/src/config.cpp
 )

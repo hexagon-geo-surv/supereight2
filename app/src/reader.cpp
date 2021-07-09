@@ -15,11 +15,14 @@
 #include "reader_openni.hpp"
 #include "reader_raw.hpp"
 #include "reader_tum.hpp"
+#include "reader_interiornet.hpp"
+
+
 
 se::Reader* reader = nullptr;
 
-se::Reader* se::create_reader(const se::ReaderConfig& config) {
-
+se::Reader* se::create_reader(const se::ReaderConfig& config)
+{
   // OpenNI from a camera or a file
   if (    config.reader_type == se::ReaderType::OPENNI
       && (config.sequence_path.empty()
@@ -46,6 +49,11 @@ se::Reader* se::create_reader(const se::ReaderConfig& config) {
            && stdfs::is_directory(config.sequence_path))
   {
     reader = new se::TUMReader(config);
+  } // InteriorNet reader
+  else if (   config.reader_type == se::ReaderType::INTERIORNET
+           && stdfs::is_directory(config.sequence_path))
+  {
+    reader = new se::InteriorNetReader(config);
   }
   else
   {

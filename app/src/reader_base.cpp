@@ -45,6 +45,10 @@ se::ReaderType se::string_to_reader_type(const std::string& s)
   {
     return se::ReaderType::TUM;
   }
+  else if (s_lowered == "interiornet")
+  {
+    return se::ReaderType::INTERIORNET;
+  }
   else
   {
     return se::ReaderType::UNKNOWN;
@@ -74,6 +78,10 @@ std::string se::reader_type_to_string(se::ReaderType t)
   else if (t == se::ReaderType::TUM)
   {
     return "TUM";
+  }
+  else if (t == se::ReaderType::INTERIORNET)
+  {
+    return "InteriorNet";
   }
   else
   {
@@ -415,6 +423,7 @@ se::ReaderStatus se::Reader::readPose(Eigen::Matrix4f& T_WB, const size_t frame)
     T_WB = Eigen::Matrix4f::Identity();
     T_WB.block<3,1>(0,3) = position;
     T_WB.block<3,3>(0,0) = orientation.toRotationMatrix();
+
     return se::ReaderStatus::ok;
   }
 }
