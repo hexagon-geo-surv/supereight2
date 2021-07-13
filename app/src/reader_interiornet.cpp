@@ -361,9 +361,9 @@ se::InteriorNetReader::InteriorNetReader(const se::ReaderConfig& c) : se::Reader
 
   projection_.resize(w * h);
 
-  for (int y = 0; y < h; y++)
+  for (unsigned int y = 0; y < h; y++)
   {
-    for (int x = 0; x < w; x++)
+    for (unsigned int x = 0; x < w; x++)
     {
       projection_[x + y * depth_image_res_.x()] = sqrt((1 + (x - InteriorNetIntrinsics::c_x) * (x - InteriorNetIntrinsics::c_x) /
                                                             (InteriorNetIntrinsics::f_x * InteriorNetIntrinsics::f_x) +
