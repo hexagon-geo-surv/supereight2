@@ -9,13 +9,14 @@
 
  */
 
-#ifndef SE_DRAW_H
-#define SE_DRAW_H
-
-#include <algorithm>
-#include <cstdint>
+#ifndef SE_DRAW_HPP
+#define SE_DRAW_HPP
 
 #include <Eigen/Dense>
+
+#ifdef SE_GLUT
+#include <algorithm>
+#include <cstdint>
 
 #ifdef __APPLE__
 #include <GLUT/glut.h>
@@ -165,5 +166,21 @@ void drawthem(const A* scene_1, const Eigen::Vector2i& res_1,
   glutSwapBuffers();
 }
 
-#endif // SE_DRAW_H
+
+
+#else // SE_GLUT
+
+template<typename T>
+void drawit(const T*, const Eigen::Vector2i&) {
+  // Don't draw anything if GLUT isn't available.
+}
+
+template<typename A, typename B, typename C, typename D>
+void drawthem(const A*, const Eigen::Vector2i&, const B*, const Eigen::Vector2i&,
+              const C*, const Eigen::Vector2i&, const D*, const Eigen::Vector2i&) {
+  // Don't draw anything if GLUT isn't available.
+}
+#endif // SE_GLUT
+
+#endif // SE_DRAW_HPP
 

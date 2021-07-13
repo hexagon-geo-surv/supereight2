@@ -1,7 +1,7 @@
 #include <se/supereight.hpp>
 
 #include "config.hpp"
-#include "draw.h"
+#include "draw.hpp"
 #include "filesystem.hpp"
 #include "reader.hpp"
 
