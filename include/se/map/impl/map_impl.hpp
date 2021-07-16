@@ -59,9 +59,9 @@ template <Field     FldT,
 >
 inline bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::contains(const Eigen::Vector3f& point_M) const
 {
-  return (point_M.x() >= lb_.x() && point_M.x() < ub_.x() &&
-          point_M.y() >= lb_.y() && point_M.y() < ub_.y() &&
-          point_M.z() >= lb_.z() && point_M.z() < ub_.z());
+  return (point_M.x() >= lb_.x() && point_M.x() <= ub_.x() &&
+          point_M.y() >= lb_.y() && point_M.y() <= ub_.y() &&
+          point_M.z() >= lb_.z() && point_M.z() <= ub_.z());
 }
 
 
