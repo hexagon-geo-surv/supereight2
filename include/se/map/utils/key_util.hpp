@@ -33,8 +33,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <parallel/algorithm>
 
-#include "setup_util.hpp"
-#include "type_util.hpp"
+#include "se/map/utils/setup_util.hpp"
+#include "se/map/utils/type_util.hpp"
+
+
 
 namespace se {
 
@@ -164,7 +166,7 @@ inline se::key_t encode_key(const Eigen::Vector3i& coord,
  */
 inline bool encode_key(const se::key_t   code,
                        const se::scale_t scale,
-                       se::key_t&            key);
+                       se::key_t&        key);
 
 /**
  * \brief Encodes given morton code and scale in a key.
@@ -217,6 +219,8 @@ inline se::code_t encode_code(const Eigen::Vector3i& coord);
  */
 inline void decode_code(const se::code_t code,
                         Eigen::Vector3i& coord);
+
+
 
 /**
  * \brief Extracts the child index from a Morton code for a given scale.
