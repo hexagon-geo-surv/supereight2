@@ -50,6 +50,8 @@ inline int scale_to_size(const int scale)
   return 1 << scale;
 }
 
+
+
 template <typename OctreeT>
 inline int octant_to_size(const se::OctantBase* octant_ptr)
 {
@@ -65,6 +67,24 @@ inline int octant_to_size(const se::OctantBase* octant_ptr)
     return node_ptr->getSize();
   }
 }
+
+
+
+template <typename OctreeT>
+inline int octant_to_scale(const se::OctantBase* octant_ptr)
+{
+  return se::octantops::size_to_scale(octant_to_size<OctreeT>(octant_ptr));
+}
+
+
+
+template <typename OctreeT>
+inline se::key_t octant_to_key(const se::OctantBase* octant_ptr)
+{
+  return se::keyops::encode_key(octant_ptr->getCoord(), se::octantops::octant_to_scale<OctreeT>(octant_ptr));
+}
+
+
 
 } // namespace octantops
 } // namespace se

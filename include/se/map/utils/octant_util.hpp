@@ -38,6 +38,8 @@ template <typename BlockT,
 >
 inline typename std::enable_if_t<SortT == se::Sort::LargeToSmall> sort_blocks(std::vector<se::OctantBase*>& block_ptrs);
 
+
+
 /**
  * \brief Convert the size of an octant in [voxel] to its scale in the octree.
  *
@@ -55,7 +57,7 @@ inline int size_to_scale(const int octant_size);
 inline int scale_to_size(const int octant_scale);
 
 /**
- * \brief Get the octants size.
+ * \brief Get the octant's size.
  *
  * \tparam OctreeT
  * \param[in] octant_ptr The pointer to the octant
@@ -64,6 +66,30 @@ inline int scale_to_size(const int octant_scale);
  */
 template <typename OctreeT>
 inline int octant_to_size(const se::OctantBase* octant_ptr);
+
+/**
+ * \brief Get the octant's scale.
+ *
+ * \tparam OctreeT
+ * \param[in] octant_ptr The pointer to the octant
+ *
+ * \return The key of the octant
+ */
+template <typename OctreeT>
+inline int octant_to_scale(const se::OctantBase* octant_ptr);
+
+/**
+ * \brief Get the octant's key.
+ *
+ * \tparam OctreeT
+ * \param[in] octant_ptr The pointer to the octant
+ *
+ * \return The key of the octant
+ */
+template <typename OctreeT>
+inline se::key_t octant_to_key(const se::OctantBase* octant_ptr);
+
+
 
 } // namespace octantops
 } // namespace se
