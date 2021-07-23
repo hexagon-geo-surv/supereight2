@@ -71,19 +71,19 @@ TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
   std::optional<se::field_t> field_value;
 
   // Node neighbours different size
-  const Eigen::Vector3i voxel_coord_free_1(639.5f, 511.5f, 799.5f);
+  const Eigen::Vector3i voxel_coord_free_1(639, 511, 799);
   map.voxelToPoint(voxel_coord_free_1, point_M);
   field_value = map.getFieldInterp(point_M);
   EXPECT_FLOAT_EQ(-5.015, *field_value);
 
   // All inside node
-  const Eigen::Vector3i voxel_coord_free_2(600.5f, 520.5f, 811.5f);
+  const Eigen::Vector3i voxel_coord_free_2(600, 520, 811);
   map.voxelToPoint(voxel_coord_free_2, point_M);
   field_value = map.getFieldInterp(point_M);
   EXPECT_FLOAT_EQ(-5.015, *field_value);
 
   // Node and block neighbours
-  const Eigen::Vector3i voxel_coord_free_3(575.5f, 511.5f, 615.5f);
+  const Eigen::Vector3i voxel_coord_free_3(575, 511, 615);
   map.voxelToPoint(voxel_coord_free_3, point_M);
   field_value = map.getFieldInterp(point_M);
   EXPECT_FLOAT_EQ(-5.015, *field_value);
