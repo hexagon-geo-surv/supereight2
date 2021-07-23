@@ -34,12 +34,12 @@ template<typename MapT,
 >
 class VolumeCarver {
 public:
-  VolumeCarver(MapT&                                 map,
-               const SensorT&                        sensor,
-               const se::Image<float>&               depth_img,
-               const se::DensePoolingImage<SensorT>& depth_pooling_img,
-               const Eigen::Matrix4f&                T_SM,
-               const int                             frame)
+  VolumeCarver(MapT&                                 /* map */,
+               const SensorT&                        /* sensor */,
+               const se::Image<float>&               /* depth_img */,
+               const se::DensePoolingImage<SensorT>& /* depth_pooling_img */,
+               const Eigen::Matrix4f&                /* T_SM */,
+               const int                             /* frame */)
   {
   };
 };

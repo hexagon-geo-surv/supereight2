@@ -104,11 +104,11 @@ template<se::Field FldT,
 template<typename SensorT,
          typename MapT
 >
-void IntegrateDepthImplD<FldT, ResT>::integrate(MapT&                         map,
-                                                const SensorT&                sensor,
-                                                const se::Image<se::depth_t>& depth_img,
-                                                const Eigen::Matrix4f&        T_MS,
-                                                const unsigned int            frame)
+void IntegrateDepthImplD<FldT, ResT>::integrate(MapT&                         /* map */,
+                                                const SensorT&                /* sensor */,
+                                                const se::Image<se::depth_t>& /* depth_img */,
+                                                const Eigen::Matrix4f&        /* T_MS */,
+                                                const unsigned int            /* frame */)
 {
 }
 
