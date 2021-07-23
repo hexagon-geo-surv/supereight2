@@ -70,13 +70,14 @@ clean-doc:
 
 .PHONY: download-icl-nuim
 download-icl-nuim:
-	mkdir -p dataset/ICL_NUIM
-	./dataset/icl-nuim-download.sh dataset/ICL_NUIM
-	cp config/living_room_traj0_frei_png.yaml dataset/ICL_NUIM/living_room_traj0_frei_png/config.yaml
-	cp config/living_room_traj1_frei_png.yaml dataset/ICL_NUIM/living_room_traj1_frei_png/config.yaml
-	cp config/living_room_traj2_frei_png.yaml dataset/ICL_NUIM/living_room_traj2_frei_png/config.yaml
-	cp config/living_room_traj3_frei_png.yaml dataset/ICL_NUIM/living_room_traj3_frei_png/config.yaml
-	mkdir -p dataset/ICL_NUIM/living_room_traj0_frei_png/out
-	mkdir -p dataset/ICL_NUIM/living_room_traj1_frei_png/out
-	mkdir -p dataset/ICL_NUIM/living_room_traj2_frei_png/out
-	mkdir -p dataset/ICL_NUIM/living_room_traj3_frei_png/out
+	mkdir -p datasets/ICL_NUIM
+	./scripts/icl-nuim-download.sh datasets/ICL_NUIM
+	cp config/living_room_traj0_frei_png.yaml datasets/ICL_NUIM/living_room_traj0_frei_png/config.yaml
+	cp config/living_room_traj1_frei_png.yaml datasets/ICL_NUIM/living_room_traj1_frei_png/config.yaml
+	cp config/living_room_traj2_frei_png.yaml datasets/ICL_NUIM/living_room_traj2_frei_png/config.yaml
+	cp config/living_room_traj3_frei_png.yaml datasets/ICL_NUIM/living_room_traj3_frei_png/config.yaml
+	mkdir -p datasets/ICL_NUIM/living_room_traj0_frei_png/out
+	mkdir -p datasets/ICL_NUIM/living_room_traj1_frei_png/out
+	mkdir -p datasets/ICL_NUIM/living_room_traj2_frei_png/out
+	mkdir -p datasets/ICL_NUIM/living_room_traj3_frei_png/out
+
