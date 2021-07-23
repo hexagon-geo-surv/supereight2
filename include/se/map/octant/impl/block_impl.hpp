@@ -423,28 +423,6 @@ template <Colour    ColB,
           int       BlockSize,
           typename  DerivedT
 >
-BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::BlockMultiRes(const Block<se::Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>& block)
-{
-  initFromBlock(block);
-}
-
-
-
-template <Colour    ColB,
-          Semantics SemB,
-          int       BlockSize,
-          typename  DerivedT
->
-inline void BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::operator=(const Block<se::Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>& block)
-{
-  initFromBlock(block);
-}
-
-template <Colour    ColB,
-          Semantics SemB,
-          int       BlockSize,
-          typename  DerivedT
->
 BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::~BlockMultiRes()
 {
   for (auto& data_at_scale : block_data_)

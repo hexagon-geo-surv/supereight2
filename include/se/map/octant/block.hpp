@@ -593,44 +593,6 @@ private:
 
   static constexpr int max_scale_ = math::log2_const(BlockSize);
 
-  // Internal copy helper function
-  void initFromBlock(const BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>& block)
-  {
-//    this->code_          = block.code();
-//    this->size_          = block.size_;
-//    this->children_mask_ = block.children_mask();
-//    this->timestamp_     = block.timestamp();
-//    this->active_        = block.active();
-//    this->coordinates_   = block.coordinates();
-//    this->min_scale_     = block.min_scale();
-//    this->current_scale_ = block.current_scale();
-//    init_data_           = block.initData();
-//    std::copy(block.childrenData(), block.childrenData() + 8, this->children_data_);
-//    if (block.min_scale() != -1)
-//    { // Verify that at least some mip-mapped level has been initialised.
-//      for (int scale = this->max_scale; scale >= block.min_scale(); scale--)
-//      {
-//        int size_at_scale = this->size_li >> scale;
-//        int num_voxels_at_scale = se::math::cu(size_at_scale);
-//        blockData().push_back(new typename T::VoxelData[num_voxels_at_scale]);
-//        std::copy(
-//                block.blockData()[VoxelBlock<T>::max_scale - scale],
-//                block.blockData()[VoxelBlock<T>::max_scale - scale] + num_voxels_at_scale,
-//                blockData()[VoxelBlock<T>::max_scale - scale]);
-//      }
-//      for (int scale = this->max_scale; scale >= block.min_scale() + 1; scale--)
-//      {
-//        int size_at_scale = this->size_li >> scale;
-//        int num_voxels_at_scale = se::math::cu(size_at_scale);
-//        blockMaxData().push_back(new typename T::VoxelData[num_voxels_at_scale]);
-//        std::copy(block.blockMaxData()[VoxelBlock<T>::max_scale - scale],
-//                  block.blockMaxData()[VoxelBlock<T>::max_scale - scale] + num_voxels_at_scale,
-//                  blockMaxData()[VoxelBlock<T>::max_scale - scale]);
-//      }
-//      blockMaxData()[VoxelBlock<T>::max_scale - this->min_scale_] = blockData()[VoxelBlock<T>::max_scale - this->min_scale_];
-//    }
-  }
-
   ///<< Initalise array of data with `init_data_`.
   void initialiseData(DataType* voxel_data,
                       const int num_voxels)
