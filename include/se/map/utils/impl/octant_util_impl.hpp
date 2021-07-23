@@ -8,7 +8,7 @@ namespace octantops {
 
 
 
-template <typename BlockT, se::Sort SortT = se::Sort::SmallToLarge>
+template <typename BlockT, se::Sort SortT>
 inline typename std::enable_if_t<SortT == se::Sort::SmallToLarge> sort_blocks(std::vector<se::OctantBase*>& block_ptrs) {
   auto has_smaller_key = [ ](const se::OctantBase* block_ptr_lhs, const se::OctantBase* block_ptr_rhs )
   {

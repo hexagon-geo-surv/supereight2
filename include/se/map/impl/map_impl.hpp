@@ -128,7 +128,7 @@ template <Field     FldT,
           int       BlockSize
 >
 template<Safe SafeB,
-         Res ResTDummy = ResT
+         Res ResTDummy
 >
 inline typename std::enable_if_t<ResTDummy == Res::Multi, std::optional<se::field_t>>
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getFieldInterp(const Eigen::Vector3f& point_M,
@@ -406,7 +406,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointToVoxel(const Eigen::Vector3f
     voxel_coord = Eigen::Vector3i::Constant(-1);
     return false;
   }
-  voxel_coord = ((point_M + origin_M_) / resolution_).cast<int>();
+  voxel_coord = ((point_M + origin_M_) / resolution_).template cast<int>();
   return true;
 }
 
@@ -423,7 +423,7 @@ inline typename std::enable_if_t<SafeB == se::Safe::Off, bool>
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointToVoxel(const Eigen::Vector3f& point_M,
                                                            Eigen::Vector3i&       voxel_coord) const
 {
-  voxel_coord = ((point_M + origin_M_) / resolution_).cast<int>();
+  voxel_coord = ((point_M + origin_M_) / resolution_).template cast<int>();
   return true;
 }
 

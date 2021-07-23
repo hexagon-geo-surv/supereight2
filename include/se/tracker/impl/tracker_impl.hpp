@@ -344,14 +344,16 @@ void Tracker<MapT, SensorT>::trackKernel(TrackData*                        outpu
   const Eigen::Vector2i input_res( input_point_cloud_C.width(),  input_point_cloud_C.height());
   const Eigen::Vector2i ref_res(surface_point_cloud_M_ref.width(), surface_point_cloud_M_ref.height());
 
+  const int h = input_res.y(); // clang complains if this is inside the for loop
+  const int w = input_res.x(); // clang complains if this is inside the for loop
 #pragma omp parallel for
-  for (int y = 0; y < input_res.y(); y++) {
-    for (int x = 0; x < input_res.x(); x++) {
+  for (int y = 0; y < h; y++) {
+    for (int x = 0; x < w; x++) {
       const Eigen::Vector2i pixel(x, y);
 
       TrackData& row = output_data[pixel.x() + pixel.y() * ref_res.x()];
 
-      if (input_normals_C[pixel.x() + pixel.y() * input_res.x()].x() == INVALID)
+      if (input_normals_C[pixel.x() + pixel.y() * w].x() == INVALID)
       {
         row.result = -1;
         continue;
@@ -359,7 +361,7 @@ void Tracker<MapT, SensorT>::trackKernel(TrackData*                        outpu
 
       // point_M := The input point in map frame
       const Eigen::Vector3f point_M = (T_MS *
-                                       input_point_cloud_C[pixel.x() + pixel.y() * input_res.x()].homogeneous()).head<3>();
+                                       input_point_cloud_C[pixel.x() + pixel.y() * w].homogeneous()).head<3>();
       // point_C_ref := The input point expressed in the camera frame the
       // surface_point_cloud_M_ref and surface_point_cloud_M_ref was raycasted from.
       const Eigen::Vector3f point_C_ref = (T_MS_ref.inverse() * point_M.homogeneous()).head<3>();
@@ -385,7 +387,7 @@ void Tracker<MapT, SensorT>::trackKernel(TrackData*                        outpu
       const Eigen::Vector3f ref_point_M = surface_point_cloud_M_ref[ref_pixel.x() + ref_pixel.y() * ref_res.x()];
       const Eigen::Vector3f diff = ref_point_M - point_M;
       const Eigen::Vector3f input_normal_M = T_MS.topLeftCorner<3, 3>()
-                                             * input_normals_C[pixel.x() + pixel.y() * input_res.x()];
+                                             * input_normals_C[pixel.x() + pixel.y() * w];
 
       if (diff.norm() > dist_threshold)
       {
