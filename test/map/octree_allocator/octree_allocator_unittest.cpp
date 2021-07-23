@@ -92,7 +92,7 @@ TEST(SingleResAllocation, BlockKey)
 
   BlockType0* block_ptr_0 = nullptr;
 
-  for (const auto voxel_coord : voxel_coords)
+  for (const auto& voxel_coord : voxel_coords)
   {
     coord_ought = adapt_to_scale(voxel_coord, octree_ptr_0->max_block_scale);
     se::key_t voxel_key;
@@ -127,7 +127,7 @@ TEST(SingleResAllocation, BlockKey)
 
   BlockType1* block_ptr_1 = nullptr;
 
-  for (const auto voxel_coord : voxel_coords)
+  for (const auto& voxel_coord : voxel_coords)
   {
     coord_ought = adapt_to_scale(voxel_coord, octree_ptr_1->max_block_scale);
     se::key_t voxel_key;
@@ -162,7 +162,7 @@ TEST(SingleResAllocation, BlockKey)
 
   BlockType2* block_ptr_2 = nullptr;
 
-  for (const auto voxel_coord : voxel_coords)
+  for (const auto& voxel_coord : voxel_coords)
   {
     coord_ought = adapt_to_scale(voxel_coord, octree_ptr_2->max_block_scale);
     se::key_t voxel_key;
@@ -197,7 +197,7 @@ TEST(SingleResAllocation, BlockKey)
 
   BlockType3* block_ptr_3 = nullptr;
 
-  for (const auto voxel_coord : voxel_coords)
+  for (const auto& voxel_coord : voxel_coords)
   {
     coord_ought = adapt_to_scale(voxel_coord, octree_ptr_3->max_block_scale);
     se::key_t voxel_key;
@@ -232,7 +232,7 @@ TEST(SingleResAllocation, BlockKey)
 
   BlockType4* block_ptr_4 = nullptr;
 
-  for (const auto voxel_coord : voxel_coords)
+  for (const auto& voxel_coord : voxel_coords)
   {
     coord_ought = adapt_to_scale(voxel_coord, octree_ptr_4->max_block_scale);
     se::key_t voxel_key;
@@ -284,7 +284,7 @@ TEST(SingleResAllocation, BlockCoord)
     Eigen::Vector3i( 33, 104,  55)
   };
 
-  for (const auto voxel_coord : voxel_coords)
+  for (const auto& voxel_coord : voxel_coords)
   {
     coord_ought = adapt_to_scale(voxel_coord, octree_ptr->max_block_scale);
     block_ptr = static_cast<BlockType*>(se::allocator::block(voxel_coord, *octree_ptr, octree_ptr->getRoot()));
@@ -341,7 +341,7 @@ TEST(SingleResAllocation, BlockKeys)
 
   // Sort the returned Blocks based on their coordinates.
   std::sort(block_ptrs.begin(), block_ptrs.end(),
-      [](auto b1, auto b2){ return vector3i_less(b1->getCoord(), b2->getCoord()); });
+      [](const auto& b1, const auto& b2){ return vector3i_less(b1->getCoord(), b2->getCoord()); });
 
   EXPECT_EQ(desired_block_coords.size(), block_ptrs.size());
 
@@ -383,7 +383,7 @@ TEST(SingleResAllocation, BlockKeys)
   // Get the coordinates of the returned Blocks and sort them.
   std::vector<Eigen::Vector3i> actual_block_coords (block_ptrs.size());
   std::transform(block_ptrs.begin(), block_ptrs.end(), actual_block_coords.begin(),
-      [](auto x){ return x->getCoord(); });
+      [](const auto& x){ return x->getCoord(); });
   std::sort(actual_block_coords.begin(), actual_block_coords.end(), vector3i_less);
 
   EXPECT_TRUE(std::equal(desired_block_coords.begin(), desired_block_coords.end(),
@@ -427,7 +427,7 @@ TEST(SingleResAllocation, BlockCoords)
   };
 
   std::vector<se::key_t> voxel_keys;
-  for (const auto voxel_coord : voxel_coords)
+  for (const auto& voxel_coord : voxel_coords)
   {
     se::key_t voxel_key;
     se::keyops::encode_key(voxel_coord, 0, voxel_key);
