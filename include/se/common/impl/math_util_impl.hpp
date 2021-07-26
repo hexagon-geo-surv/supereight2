@@ -179,15 +179,15 @@ static inline void clamp(Eigen::MatrixBase<R>&       res,
 
 
 
-static Eigen::Vector4f plane_normal(const Eigen::Vector4f& p1,
-                                    const Eigen::Vector4f& p2,
-                                    const Eigen::Vector4f& p3)
+static Eigen::Vector3f plane_normal(const Eigen::Vector3f& p1,
+                                    const Eigen::Vector3f& p2,
+                                    const Eigen::Vector3f& p3)
 {
   // Plane tangent vectors
-  const Eigen::Vector3f t1 = p2.head<3>() - p1.head<3>();
-  const Eigen::Vector3f t2 = p3.head<3>() - p2.head<3>();
+  const Eigen::Vector3f t1 = p2 - p1;
+  const Eigen::Vector3f t2 = p3 - p2;
   // Unit normal vector
-  return t1.cross(t2).normalized().homogeneous();
+  return t1.cross(t2).normalized();
 }
 
 

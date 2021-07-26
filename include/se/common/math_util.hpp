@@ -73,9 +73,9 @@ static inline void clamp(Eigen::MatrixBase<R>&       res,
 /*! \brief Compute the normal vector of a plane defined by 3 points.
  * The direction of the normal depends on the order of the points.
  */
-static Eigen::Vector4f plane_normal(const Eigen::Vector4f& p1,
-                                    const Eigen::Vector4f& p2,
-                                    const Eigen::Vector4f& p3);
+static Eigen::Vector3f plane_normal(const Eigen::Vector3f& p1,
+                                    const Eigen::Vector3f& p2,
+                                    const Eigen::Vector3f& p3);
 
 /*! \brief Compute the median of the data in the vector.
  *

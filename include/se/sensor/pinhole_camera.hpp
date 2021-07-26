@@ -87,7 +87,7 @@ public:
 
   static constexpr int num_frustum_vertices_ = 8;
   static constexpr int num_frustum_normals_ = 6;
-  Eigen::Matrix<float, 4, num_frustum_vertices_> frustum_vertices_;
+  Eigen::Matrix<float, 3, num_frustum_vertices_> frustum_vertices_;
   Eigen::Matrix<float, 4, num_frustum_normals_> frustum_normals_;
 };
 

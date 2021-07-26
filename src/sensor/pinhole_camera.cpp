@@ -291,26 +291,26 @@ void se::PinholeCamera::computeFrustumVertices()
   // Back-project the frame corners to get the frustum vertices
   // Top left
   model.backProject(Eigen::Vector2f(0.0f, 0.0f), &point_S);
-  frustum_vertices_.col(0).head<3>() = point_S;
-  frustum_vertices_.col(4).head<3>() = point_S;
+  frustum_vertices_.col(0) = point_S;
+  frustum_vertices_.col(4) = point_S;
   // Top right
   model.backProject(Eigen::Vector2f(model.imageWidth(), 0.0f), &point_S);
-  frustum_vertices_.col(1).head<3>() = point_S;
-  frustum_vertices_.col(5).head<3>() = point_S;
+  frustum_vertices_.col(1) = point_S;
+  frustum_vertices_.col(5) = point_S;
   // Bottom right
   model.backProject(Eigen::Vector2f(model.imageWidth(), model.imageHeight()), &point_S);
-  frustum_vertices_.col(2).head<3>() = point_S;
-  frustum_vertices_.col(6).head<3>() = point_S;
+  frustum_vertices_.col(2) = point_S;
+  frustum_vertices_.col(6) = point_S;
   // Bottom left
   model.backProject(Eigen::Vector2f(0.0f, model.imageHeight()), &point_S);
-  frustum_vertices_.col(3).head<3>() = point_S;
-  frustum_vertices_.col(7).head<3>() = point_S;
+  frustum_vertices_.col(3) = point_S;
+  frustum_vertices_.col(7) = point_S;
   // Scale the frustum vertices with the appropriate depth for near and far
   // plane vertices
   for (int i = 0; i < num_frustum_vertices_ / 2; ++i)
   {
-    frustum_vertices_.col(i).head<3>() *= near_plane;
-    frustum_vertices_.col(num_frustum_vertices_ / 2 + i).head<3>() *= far_plane;
+    frustum_vertices_.col(i) *= near_plane;
+    frustum_vertices_.col(num_frustum_vertices_ / 2 + i) *= far_plane;
   }
 }
 
@@ -321,19 +321,19 @@ void se::PinholeCamera::computeFrustumNormals()
   // The w vector component corresponds to the distance of the plane from the
   // origin. It should be 0 for all planes other than the near and far planes.
   // Left plane vector.
-  frustum_normals_.col(0) = se::math::plane_normal(
+  frustum_normals_.col(0).head<3>() = se::math::plane_normal(
       frustum_vertices_.col(4), frustum_vertices_.col(0), frustum_vertices_.col(3));
   frustum_normals_.col(0).w() = 0.0f;
   // Right plane vector.
-  frustum_normals_.col(1) = se::math::plane_normal(
+  frustum_normals_.col(1).head<3>() = se::math::plane_normal(
       frustum_vertices_.col(1), frustum_vertices_.col(5), frustum_vertices_.col(6));
   frustum_normals_.col(1).w() = 0.0f;
   // Bottom plane vector.
-  frustum_normals_.col(2) = se::math::plane_normal(
+  frustum_normals_.col(2).head<3>() = se::math::plane_normal(
       frustum_vertices_.col(7), frustum_vertices_.col(3), frustum_vertices_.col(2));
   frustum_normals_.col(2).w() = 0.0f;
   // Top plane vector.
-  frustum_normals_.col(3) = se::math::plane_normal(
+  frustum_normals_.col(3).head<3>() = se::math::plane_normal(
       frustum_vertices_.col(5), frustum_vertices_.col(1), frustum_vertices_.col(0));
   frustum_normals_.col(3).w() = 0.0f;
   // Near plane vector.
