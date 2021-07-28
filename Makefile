@@ -52,6 +52,10 @@ test-install:
 doc:
 	doxygen
 
+.PHONY: format
+format:
+	find include src test -regex '.*\.\(cpp\|hpp\|c\|h\)' -exec clang-format -style=file -i {} \;
+
 
 
 .PHONY: clean
