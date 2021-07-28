@@ -1,50 +1,31 @@
 .PHONY: release
 release:
-	mkdir -p build/release
-	cd build/release && cmake -DCMAKE_BUILD_TYPE=Release $(CMAKE_ARGUMENTS) ../..
-	$(MAKE) -C build/release $(MFLAGS)
+	cmake -DCMAKE_BUILD_TYPE=Release -S . -B build/release
+	cmake --build build/release
 
 .PHONY: relwithdebinfo
 relwithdebinfo:
-	mkdir -p build/relwithdebinfo
-	cd build/relwithdebinfo && cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo $(CMAKE_ARGUMENTS) ../..
-	$(MAKE) -C build/relwithdebinfo $(MFLAGS)
+	cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -S . -B build/relwithdebinfo
+	cmake --build build/relwithdebinfo
 
 .PHONY: debug
 debug:
-	mkdir -p build/debug/logs
-	cd build/debug && cmake -DCMAKE_BUILD_TYPE=Debug $(CMAKE_ARGUMENTS) ../..
-	$(MAKE) -C build/debug $(MFLAGS)
-
-.PHONY: install
-install:
-	$(MAKE) -C build/release $(MFLAGS) install
-
-.PHONY: uninstall
-uninstall:
-	$(MAKE) -C build/release $(MFLAGS) uninstall
+	cmake -DCMAKE_BUILD_TYPE=Debug -S . -B build/debug
+	cmake --build build/debug
 
 
 
 .PHONY: test
 test: release
-	$(MAKE) -C build/release $(MFLAGS) test
+	cd build/release && ctest
 
 .PHONY: test-relwithdebinfo
 test-relwithdebinfo: relwithdebinfo
-	$(MAKE) -C build/relwithdebinfo $(MFLAGS) test
+	cd build/relwithdebinfo && ctest
 
 .PHONY: test-debug
 test-debug: debug
-	$(MAKE) -C build/debug $(MFLAGS) test
-
-.PHONY: test-install
-test-install:
-	rm -rf build/testinstall
-	mkdir -p build/testinstall
-	cd build/testinstall && cmake -DCMAKE_BUILD_TYPE=Release $(CMAKE_ARGUMENTS) ../../test/test_install
-	$(MAKE) -C build/testinstall $(MFLAGS)
-	$(MAKE) -C build/testinstall $(MFLAGS) test
+	cd build/debug && ctest
 
 
 
@@ -55,8 +36,6 @@ doc:
 .PHONY: format
 format:
 	find include src test -regex '.*\.\(cpp\|hpp\|c\|h\)' -exec clang-format -style=file -i {} \;
-
-
 
 .PHONY: clean
 clean:
@@ -71,6 +50,8 @@ clean-cmake-cache:
 .PHONY: clean-doc
 clean-doc:
 	rm -rf doc/html
+
+
 
 .PHONY: download-icl-nuim
 download-icl-nuim:
