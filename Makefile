@@ -1,17 +1,17 @@
 .PHONY: release
-release: clean-cache
+release:
 	mkdir -p build/release
 	cd build/release && cmake -DCMAKE_BUILD_TYPE=Release $(CMAKE_ARGUMENTS) ../..
 	$(MAKE) -C build/release $(MFLAGS)
 
 .PHONY: relwithdebinfo
-relwithdebinfo: clean-cache
+relwithdebinfo:
 	mkdir -p build/relwithdebinfo
 	cd build/relwithdebinfo && cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo $(CMAKE_ARGUMENTS) ../..
 	$(MAKE) -C build/relwithdebinfo $(MFLAGS)
 
 .PHONY: debug
-debug: clean-cache
+debug:
 	mkdir -p build/debug/logs
 	cd build/debug && cmake -DCMAKE_BUILD_TYPE=Debug $(CMAKE_ARGUMENTS) ../..
 	$(MAKE) -C build/debug $(MFLAGS)
@@ -62,11 +62,11 @@ format:
 clean:
 	rm -rf build
 
-.PHONY: clean-cache
-clean-cache:
+.PHONY: clean-cmake-cache
+clean-cmake-cache:
+	rm -rf build/debug/CMakeCache.txt
 	rm -rf build/release/CMakeCache.txt
 	rm -rf build/relwithdebinfo/CMakeCache.txt
-	rm -rf build/debug/CMakeCache.txt
 
 .PHONY: clean-doc
 clean-doc:
