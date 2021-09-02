@@ -50,7 +50,21 @@ inline int scale_to_size(const int scale)
   return 1 << scale;
 }
 
-
+template <typename OctreeT>
+inline int octant_to_size(const se::OctantBase* octant_ptr)
+{
+  if (octant_ptr->isBlock())
+  {
+    typedef typename OctreeT::BlockType BlockType;
+    const BlockType* block_ptr = static_cast<const BlockType*>(octant_ptr);
+    return block_ptr->getSize();
+  } else
+  {
+    typedef typename OctreeT::NodeType NodeType;
+    const NodeType* node_ptr = static_cast<const NodeType*>(octant_ptr);
+    return node_ptr->getSize();
+  }
+}
 
 } // namespace octantops
 } // namespace se

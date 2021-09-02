@@ -940,11 +940,13 @@ void marching_cube(OctreeT&                octree,
   TICK("primal-marching-cube")
   typedef typename OctreeT::BlockType BlockType;
 
+  TICK("marching-cube-create-block-list")
   std::vector<BlockType*> block_ptrs;
   for (auto block_ptr_itr = se::BlocksIterator<OctreeT>(&octree); block_ptr_itr != se::BlocksIterator<OctreeT>(); ++block_ptr_itr)
   {
     block_ptrs.push_back(static_cast<BlockType*>(*block_ptr_itr));
   }
+  TOCK("marching-cube-create-block-list")
 
   se::algorithms::marching_cube_kernel(octree, block_ptrs, triangles);
 

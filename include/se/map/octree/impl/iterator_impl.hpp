@@ -19,41 +19,6 @@ BaseIterator<DerivedT>::BaseIterator(OctreeType* octree_ptr) : octree_ptr_(octre
 {
   // Reset to an invalid (end) iterator
   clear();
-  if (octree_ptr_ != nullptr)
-  {
-    NodeType* root = static_cast<NodeType*>((octree_ptr_)->getRoot());
-    if (root != nullptr)
-    {
-      // Push the root's children on the stack
-      for (unsigned int child_idx = 0; child_idx < 8; ++child_idx)
-      {
-        se::OctantBase* child_ptr = root->getChild(child_idx);
-        if (child_ptr)
-        {
-          octant_stack_.push(child_ptr);
-        }
-      }
-
-      // Check if root is part of iterator
-      if constexpr (DerivedT::has_ignore_condition == true)
-      {
-        if (this->underlying().doIgnore(root))
-        {
-          nextData();
-          return;
-        }
-      }
-
-      if (this->underlying().isNext(root))
-      {
-        octant_ = root;
-        return;
-      }
-
-      // Find the next Volume
-      nextData();
-    }
-  }
 }
 
 
@@ -118,6 +83,48 @@ template <typename DerivedT>
 se::OctantBase* BaseIterator<DerivedT>::operator*() const
 {
   return octant_;
+}
+
+
+
+template <typename DerivedT>
+void BaseIterator<DerivedT>::init()
+{
+  if (octree_ptr_ != nullptr)
+  {
+    NodeType* root = static_cast<NodeType*>((octree_ptr_)->getRoot());
+    if (root != nullptr)
+    {
+      // Push the root's children on the stack
+      for (unsigned int child_idx = 0; child_idx < 8; ++child_idx)
+      {
+        se::OctantBase* child_ptr = root->getChild(child_idx);
+        if (child_ptr)
+        {
+          octant_stack_.push(child_ptr);
+        }
+      }
+
+      // Check if root is part of iterator
+      if constexpr (DerivedT::has_ignore_condition == true)
+      {
+        if (this->underlying().doIgnore(root))
+        {
+          nextData();
+          return;
+        }
+      }
+
+      if (this->underlying().isNext(root))
+      {
+        octant_ = root;
+        return;
+      }
+
+      // Find the next Volume
+      nextData();
+    }
+  }
 }
 
 

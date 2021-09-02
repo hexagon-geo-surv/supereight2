@@ -54,7 +54,16 @@ inline int size_to_scale(const int octant_size);
  */
 inline int scale_to_size(const int octant_scale);
 
-
+/**
+ * \brief Get the octants size.
+ *
+ * \tparam OctreeT
+ * \param[in] octant_ptr The pointer to the octant
+ *
+ * \return The size of the octant
+ */
+template <typename OctreeT>
+inline int octant_to_size(const se::OctantBase* octant_ptr);
 
 } // namespace octantops
 } // namespace se

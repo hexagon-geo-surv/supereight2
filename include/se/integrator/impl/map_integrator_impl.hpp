@@ -124,12 +124,16 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(MapT&     
                                                                       const unsigned int            frame)
 {
   // Allocation
+  TICK("allocation")
   se::RaycastCarver raycast_carver(map, sensor, depth_img, T_MS, frame);
   std::vector<OctantBase*> block_ptrs = raycast_carver();
+  TOCK("allocation")
 
   // Update
+  TICK("update")
   se::Updater updater(map, sensor, depth_img, T_MS, frame);
   updater(block_ptrs);
+  TOCK("update")
 }
 
 
@@ -144,12 +148,16 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi>::integrate(MapT&      
                                                                      const unsigned int            frame)
 {
   // Allocation
+  TICK("allocation")
   se::RaycastCarver raycast_carver(map, sensor, depth_img, T_MS, frame);
   std::vector<OctantBase*> block_ptrs = raycast_carver();
+  TOCK("allocation")
 
   // Update
+  TICK("update")
   se::Updater updater(map, sensor, depth_img, T_MS, frame);
   updater(block_ptrs);
+  TOCK("update")
 }
 
 

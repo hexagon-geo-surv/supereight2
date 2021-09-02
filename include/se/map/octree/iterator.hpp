@@ -4,6 +4,7 @@
 #include <stack>
 
 #include "octree.hpp"
+#include "se/map/utils/octant_util.hpp"
 
 
 
@@ -59,6 +60,9 @@ public:
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
+protected:
+    void init();
+
 private:
 
     DerivedT& underlying() { return static_cast<DerivedT&>(*this); }
@@ -86,7 +90,10 @@ class OctreeIterator : public BaseIterator< OctreeIterator<OctreeT> > {
 public:
     OctreeIterator() : BaseIterator< OctreeIterator<OctreeT> > () {};
 
-    OctreeIterator(OctreeT* octree_ptr) : BaseIterator< OctreeIterator<OctreeT> > (octree_ptr) {};
+    OctreeIterator(OctreeT* octree_ptr) : BaseIterator< OctreeIterator<OctreeT> > (octree_ptr)
+    {
+      this->init();
+    };
 
     static constexpr bool has_ignore_condition = false;
 
@@ -103,7 +110,10 @@ class NodesIterator : public BaseIterator<NodesIterator<OctreeT> > {
 public:
     NodesIterator() : BaseIterator< NodesIterator<OctreeT> > () {};
 
-    NodesIterator(OctreeT* octree_ptr) : BaseIterator< NodesIterator<OctreeT> > (octree_ptr) {};
+    NodesIterator(OctreeT* octree_ptr) : BaseIterator< NodesIterator<OctreeT> > (octree_ptr)
+    {
+      this->init();
+    };
 
     static constexpr bool has_ignore_condition = false;
 
@@ -120,7 +130,10 @@ class BlocksIterator : public BaseIterator<BlocksIterator<OctreeT> > {
 public:
     BlocksIterator() : BaseIterator< BlocksIterator<OctreeT> >() {};
 
-    BlocksIterator(OctreeT* octree_ptr) : BaseIterator< BlocksIterator<OctreeT> > (octree_ptr) {};
+    BlocksIterator(OctreeT* octree_ptr) : BaseIterator< BlocksIterator<OctreeT> > (octree_ptr)
+    {
+      this->init();
+    };
 
     static constexpr bool has_ignore_condition = false;
 
@@ -137,7 +150,10 @@ class LeavesIterator : public BaseIterator<LeavesIterator<OctreeT> > {
 public:
     LeavesIterator() : BaseIterator< LeavesIterator<OctreeT> > () {};
 
-    LeavesIterator(OctreeT* octree_ptr) : BaseIterator< LeavesIterator<OctreeT> > (octree_ptr) {};
+    LeavesIterator(OctreeT* octree_ptr) : BaseIterator< LeavesIterator<OctreeT> > (octree_ptr)
+    {
+      this->init();
+    };
 
     static constexpr bool has_ignore_condition = false;
 
@@ -155,8 +171,10 @@ public:
     UpdateIterator() : BaseIterator< UpdateIterator<OctreeT> > (), time_stamp_(0) {};
 
     UpdateIterator(OctreeT*           octree_ptr,
-                   const unsigned int time_stamp) : BaseIterator< UpdateIterator<OctreeT> > (octree_ptr), time_stamp_(time_stamp) {};
-
+                   const unsigned int time_stamp) : BaseIterator< UpdateIterator<OctreeT> > (octree_ptr), time_stamp_(time_stamp)
+    {
+      this->init();
+    };
 
     static constexpr bool has_ignore_condition = true;
 
@@ -171,6 +189,56 @@ protected:
     friend class BaseIterator< UpdateIterator<OctreeT> >;
 };
 
+
+template <typename MapT,
+    typename SensorT
+>
+class FrustumIterator : public BaseIterator< FrustumIterator<MapT, SensorT> > {
+
+public:
+  typedef typename MapT::OctreeType            OctreeType;
+  typedef typename MapT::OctreeType::NodeType  NodeType;
+  typedef typename MapT::OctreeType::BlockType BlockType;
+
+
+  FrustumIterator() : BaseIterator<FrustumIterator<MapT, SensorT>>() {};
+
+  FrustumIterator(MapT&                  map,
+                  const SensorT&         sensor,
+                  const Eigen::Matrix4f& T_SM ) :
+      BaseIterator<FrustumIterator<MapT, SensorT>>(map.getOctree().get()),
+      map_ptr_(&map),
+      sensor_ptr_(&sensor),
+      T_SM_(T_SM)
+  {
+    this->init();
+  }
+
+protected:
+  bool isNext(se::OctantBase* octant_ptr) { return octant_ptr->isBlock(); }
+
+  bool doIgnore(se::OctantBase* octant_ptr)
+  {
+    Eigen::Vector3f octant_centre_point_M;
+    const int octant_size = se::octantops::octant_to_size<typename MapT::OctreeType>(octant_ptr);
+    map_ptr_->voxelToPoint(octant_ptr->getCoord(), octant_size, octant_centre_point_M);
+    // Convert it to the sensor frame.
+    const Eigen::Vector3f octant_centre_point_S
+        = (T_SM_ * octant_centre_point_M.homogeneous()).head<3>();
+
+    float octant_radius = std::sqrt(3.0f) / 2.0f * map_ptr_->getRes() * octant_size;
+    bool do_ignore = !sensor_ptr_->sphereInFrustum(octant_centre_point_S, octant_radius);
+    return do_ignore;
+  }
+
+  static constexpr bool has_ignore_condition = true;
+
+  MapT*                 map_ptr_;
+  const SensorT*        sensor_ptr_;
+  const Eigen::Matrix4f T_SM_; // TODO: Needs to be ref?
+
+  friend class BaseIterator<FrustumIterator<MapT, SensorT>>;
+};
 
 
 // Declare and define a base_traits specialization for the octree iterator:
@@ -219,6 +287,16 @@ struct BaseTraits<UpdateIterator<OctreeT> > {
     typedef          OctreeT            OctreeType;
     typedef typename OctreeT::NodeType  NodeType;
     typedef typename OctreeT::BlockType BlockType;
+};
+
+// Declare and define a base_traits specialization for the update iterator:
+template <typename MapT,
+          typename SensorT
+>
+struct BaseTraits<FrustumIterator<MapT, SensorT> > {
+    typedef typename MapT::OctreeType            OctreeType;
+    typedef typename MapT::OctreeType::NodeType  NodeType;
+    typedef typename MapT::OctreeType::BlockType BlockType;
 };
 
 

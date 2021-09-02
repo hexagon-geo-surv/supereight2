@@ -14,27 +14,14 @@ inline std::vector<se::OctantBase*> frustum(MapT&                   map,
                                             const Eigen::Matrix4f&  T_MS)
 {
   const Eigen::Matrix4f T_SM = se::math::to_inverse_transformation(T_MS);
-  // The edge lengh of Blocks in voxels.
-  constexpr int block_size = MapT::OctreeType::BlockType::getSize();
-  // The radius of Blocks in metres.
-  const float block_radius = std::sqrt(3.0f) / 2.0f * map.getRes() * block_size;
   // Loop over all allocated Blocks.
-  std::vector<se::OctantBase *> fetched_block_ptrs;
-  for (auto block_ptr_itr = BlocksIterator<typename MapT::OctreeType>(map.getOctree().get());
-       block_ptr_itr != BlocksIterator<typename MapT::OctreeType>(); ++block_ptr_itr)
+  std::vector<se::OctantBase*> fetched_block_ptrs;
+
+  for (auto block_ptr_itr = se::FrustumIterator<MapT, SensorT>(map, sensor, T_SM); block_ptr_itr != se::FrustumIterator<MapT, SensorT>(); ++block_ptr_itr)
   {
-    auto &block = **block_ptr_itr;
-    // Get the centre of the Block in the map frame.
-    Eigen::Vector3f block_centre_point_M;
-    map.voxelToPoint(block.getCoord(), block_size, block_centre_point_M);
-    // Convert it to the sensor frame.
-    const Eigen::Vector3f block_centre_point_S
-            = (T_SM * block_centre_point_M.homogeneous()).head<3>();
-    if (sensor.sphereInFrustum(block_centre_point_S, block_radius))
-    {
-      fetched_block_ptrs.push_back(&block);
-    }
+    fetched_block_ptrs.push_back(*block_ptr_itr);
   }
+
   return fetched_block_ptrs;
 }
 
@@ -67,10 +54,13 @@ template<typename MapT,
 >
 std::vector<se::OctantBase*> RaycastCarver<MapT, SensorT>::operator()()
 {
+  TICK("fetch-frustum")
   // Fetch the currently allocated Blocks in the sensor frustum.
   // i.e. the fetched blocks might contain blocks outside the current valid sensor range.
   std::vector<se::OctantBase*> fetched_block_ptrs = se::fetcher::frustum(map_, sensor_, T_MS_);
+  TOCK("fetch-frustum")
 
+  TICK("create-list")
   auto octree_ptr = map_.getOctree();
 
   const int num_steps = ceil(config_.band / map_.getRes());
@@ -118,14 +108,19 @@ std::vector<se::OctantBase*> RaycastCarver<MapT, SensorT>::operator()()
       }
     }
   }
-
   // Allocate the Blocks and get pointers only to the newly-allocated Blocks.
   std::vector<key_t> voxel_keys(voxel_key_set.begin(), voxel_key_set.end());
-  std::vector<se::OctantBase*> allocated_block_ptrs = se::allocator::blocks(voxel_keys, *octree_ptr, octree_ptr->getRoot(), true);
+  TOCK("create-list")
 
+  TICK("allocate-list")
+  std::vector<se::OctantBase*> allocated_block_ptrs = se::allocator::blocks(voxel_keys, *octree_ptr, octree_ptr->getRoot(), true);
+  TOCK("allocate-list")
+
+  TICK("combine-vectors")
   // Merge the previously-allocated and newly-allocated Block pointers.
   allocated_block_ptrs.reserve(allocated_block_ptrs.size() + fetched_block_ptrs.size());
   allocated_block_ptrs.insert(allocated_block_ptrs.end(), fetched_block_ptrs.begin(), fetched_block_ptrs.end());
+  TOCK("combine-vectors")
   return allocated_block_ptrs;
 }
 
