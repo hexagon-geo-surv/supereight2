@@ -63,7 +63,6 @@ class VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
 {
 public:
   typedef Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi> MapType;
-  typedef typename MapType::DataType                                  DataType;
   typedef typename MapType::OctreeType                                OctreeType;
   typedef typename OctreeType::NodeType                               NodeType;
   typedef typename OctreeType::BlockType                              BlockType;
@@ -157,39 +156,35 @@ private:
    * \note se::PinholeCamera implementation
    *
    * \tparam SensorTDummy
-   * \param[in] node_coord      The coordinates of the nodes corner (front, left, bottom) to be evaluated
-   * \param[in] node_size       The size of the node in [voxel]
-   * \param[in] octant_depth    The tree depth of the node
-   * \param[in] rel_step        The relative child step of the node
-   * \param[in] parent_ptr      The pointer to the nodes parent
+   * \param[in] node_coord      The coordinates of the octant corner (front, left, bottom) to be evaluated
+   * \param[in] node_size       The size of the octant in [voxel]
+   * \param[in] octant_depth    The tree depth of the octant
+   * \param[in] parent_ptr      The pointer to the octant
    */
   template<class SensorTDummy = SensorT>
   typename std::enable_if_t<std::is_same<SensorTDummy, se::PinholeCamera>::value, void>
-  operator()(const Eigen::Vector3i& node_coord,
-             const int              node_size,
+  operator()(const Eigen::Vector3i& octant_coord,
+             const int              octant_size,
              const int              octant_depth,
-             const Eigen::Vector3i& rel_step,
-             se::OctantBase*        parent_ptr);
+             se::OctantBase*        octant_ptr);
 
   /**
    * \brief Recursively decide if to allocate or terminate a node.
    *
-   * \note se::PinholeCamera implementation
+   * \note se::OusterLidar implementation
    *
    * \tparam SensorTDummy
-   * \param[in] node_coord      The coordinates of the nodes corner (front, left, bottom) to be evaluated
-   * \param[in] node_size       The size of the node in [voxel]
-   * \param[in] octant_depth    The tree depth of the node
-   * \param[in] rel_step        The relative child step of the node
-   * \param[in] parent_ptr      The pointer to the nodes parent
+   * \param[in] node_coord      The coordinates of the octant corner (front, left, bottom) to be evaluated
+   * \param[in] node_size       The size of the octant in [voxel]
+   * \param[in] octant_depth    The tree depth of the octant
+   * \param[in] parent_ptr      The pointer to the octant
    */
   template<class SensorTDummy = SensorT>
   typename std::enable_if_t<std::is_same<SensorTDummy, se::OusterLidar>::value, void>
-  operator()(const Eigen::Vector3i& node_coord,
-             const int              node_size,
+  operator()(const Eigen::Vector3i& octant_coord,
+             const int              octant_size,
              const int              octant_depth,
-             const Eigen::Vector3i& rel_step,
-             se::OctantBase*        parent_ptr);
+             se::OctantBase*        octant_ptr);
 
   MapType&                             map_;
   OctreeType&                          octree_;

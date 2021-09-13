@@ -45,12 +45,13 @@ VolumeCarverAllocation VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, 
   const int child_size     = octree_.getSize() / 2;
   se::OctantBase* root_ptr = octree_.getRoot();
 
+  octree_.allocateAll(static_cast<NodeType*>(root_ptr), 0); ///< Allocates all 8 children
 #pragma omp parallel for
   for (int child_idx = 0; child_idx < 8; ++child_idx)
   {
     Eigen::Vector3i child_rel_step = Eigen::Vector3i((child_idx & 1) > 0, (child_idx & 2) > 0, (child_idx & 4) > 0);
     Eigen::Vector3i child_coord    = child_rel_step * child_size; // Because, + corner is (0, 0, 0) at root depth
-    (*this)(child_coord, child_size, 1, child_rel_step, root_ptr);
+    (*this)(child_coord, child_size, 1, static_cast<NodeType*>(root_ptr)->getChild(child_idx));
   }
 
   return allocation_list_;
@@ -141,24 +142,23 @@ template<se::Colour    ColB,
 template<class SensorTDummy>
 typename std::enable_if_t<std::is_same<SensorTDummy, PinholeCamera>::value, void>
 VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>, SensorT>::operator()(
-        const Eigen::Vector3i& node_coord,
-        const int              node_size,
-        const int              depth,
-        const Eigen::Vector3i& rel_step,
-        se::OctantBase*        parent_ptr)
+        const Eigen::Vector3i& octant_coord,
+        const int              octant_size,
+        const int              octant_depth,
+        se::OctantBase*        octant_ptr)
 {
   /// Approximate max and min depth to quickly check if the node is behind the camera or maximum depth.
   // Compute the node centre's depth in the camera frame
 
   /// CHANGE: USE voxelToPoint(...)
   Eigen::Vector3f node_centre_point_M;
-  map_.voxelToPoint(node_coord, node_size, node_centre_point_M);
+  map_.voxelToPoint(octant_coord, octant_size, node_centre_point_M);
 
   const Eigen::Vector3f node_centre_point_S = (T_SM_ * node_centre_point_M.homogeneous()).head(3);
 
   // Extend and reduce the depth by the sphere radius covering the entire cube
-  const float approx_depth_value_max = node_centre_point_S.z() + node_size * size_to_radius_ * map_res_;
-  const float approx_depth_value_min = node_centre_point_S.z() - node_size * size_to_radius_ * map_res_;
+  const float approx_depth_value_max = node_centre_point_S.z() + octant_size * size_to_radius_ * map_res_;
+  const float approx_depth_value_min = node_centre_point_S.z() - octant_size * size_to_radius_ * map_res_;
 
   /// CASE 0.1 (OUT OF BOUNDS): Block is behind the camera or behind the maximum depth value
   if (approx_depth_value_min > max_depth_value_ ||
@@ -171,7 +171,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
   // Compute the 8 corners of the node to be evaluated
   /// CHANGE: USE voxelToCornerPoints(...)
   Eigen::Matrix<float, 3, 8> node_corner_points_M;
-  map_.voxelToCornerPoints(node_coord, node_size, node_corner_points_M);
+  map_.voxelToCornerPoints(octant_coord, octant_size, node_corner_points_M);
   Eigen::Matrix<float, 3, 8> node_corner_points_S =
           (T_SM_  * node_corner_points_M.colwise().homogeneous()).topRows(3);
 
@@ -205,12 +205,12 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
   se::VarianceState variance_state = se::VarianceState::Gradient; ///<< -1 := low variance infront of the surface, 0 := high variance, 1 = low_variance behind the surface.
   se::Pixel pooling_pixel = se::Pixel::crossingUnknownPixel(); ///<< min, max pixel batch depth + crossing frustum state + contains unknown values state.
 
-  if (depth < octree_.getBlockDepth() + 1)
+  if (octant_depth < octree_.getBlockDepth() + 1)
   {
     if (num_node_corners_infront < 8)
     {
       /// CASE 1 (CAMERA IN NODE):
-      if (cameraInNode(node_coord, node_size, se::math::to_inverse_transformation(T_SM_)))
+      if (cameraInNode(octant_coord, octant_size, se::math::to_inverse_transformation(T_SM_)))
       {
         should_split = true;
         /// CASE 2 (FRUSTUM BOUNDARY): Node partly behind the camera and crosses the the frustum boundary
@@ -218,7 +218,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
       {
         should_split = true;
         /// CASE 2 (FRUSTUM BOUNDARY): Node partly behind the camera and crosses the the frustum boundary without a corner reprojecting
-      } else if (sensor_.sphereInFrustumInf(node_centre_point_S, node_size * size_to_radius_ * map_res_))
+      } else if (sensor_.sphereInFrustumInf(node_centre_point_S, octant_size * size_to_radius_ * map_res_))
       {
         should_split = true;
       } else
@@ -252,16 +252,11 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
       variance_state = computeVariance(pooling_pixel.min, pooling_pixel.max,
                                        node_dist_min_m, node_dist_max_m);
 
-      const int node_scale = octree_.getMaxScale() - depth;
-      const se::code_t node_code = se::keyops::encode_code(node_coord); // TODO: Might be correct now
-      const unsigned int child_idx = se::keyops::code_to_child_idx(node_code, node_scale); // TODO: Might be correct now
-
       /// CASE 1 (REDUNDANT DATA): Depth values in the bounding box are far away from the node or unknown (1).
       ///                          The node to be evaluated is free (2) and fully observed (3),
-      se::OctantBase* child_ptr = static_cast<NodeType*>(parent_ptr)->getChild(child_idx);
-      if (variance_state != se::VarianceState::Gradient && child_ptr)
+      if (variance_state != se::VarianceState::Gradient)
       {
-        typename OctreeType::DataType child_data = (child_ptr->isBlock()) ? static_cast<BlockType*>(child_ptr)->getMaxData() : static_cast<NodeType*>(child_ptr)->getData();
+        typename OctreeType::DataType child_data = (octant_ptr->isBlock()) ? static_cast<BlockType*>(octant_ptr)->getMaxData() : static_cast<NodeType*>(octant_ptr)->getData();
 
         if (   child_data.observed  // Check if the child is fully observed (i.e. all children are observed) // TODO: incooperate MAX occupancy
             && child_data.occupancy * child_data.weight <= 0.95 * map_.getDataConfig().min_occupancy)
@@ -292,13 +287,6 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
     }
   }
 
-  // Once we reach this point the node is either updated or split.
-  // In either case the node needs to be allocated.
-  const int octant_idx = rel_step.x() + rel_step.y() * 2 + rel_step.z() * 4;
-  
-  DataType init_data = static_cast<NodeType*>(parent_ptr)->getData();
-  se::OctantBase* octant_ptr = octree_.allocate(static_cast<NodeType*>(parent_ptr), octant_idx, init_data);
-
   if (should_split)
   {
     // Returns a pointer to the according node if it has previously been allocated.
@@ -315,19 +303,20 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
     } else
     {
       // Split! Start recursive process
+      octree_.allocateAll(static_cast<NodeType*>(octant_ptr), 0); ///< Allocates all 8 children
 #pragma omp parallel for
       for (int child_idx = 0; child_idx < 8; ++child_idx)
       {
-        int child_size = node_size / 2;
+        int child_size = octant_size / 2;
         const Eigen::Vector3i child_rel_step =
                 Eigen::Vector3i((child_idx & 1) > 0, (child_idx & 2) > 0, (child_idx & 4) > 0);
-        const Eigen::Vector3i child_coord = node_coord + child_rel_step * child_size;
-        (*this)(child_coord, child_size, depth + 1, child_rel_step, octant_ptr);
+        const Eigen::Vector3i child_coord = octant_coord + child_rel_step * child_size;
+        (*this)(child_coord, child_size, octant_depth + 1, static_cast<NodeType*>(octant_ptr)->getChild(child_idx));
       }
     }
   } else
   {
-    assert(depth);
+    assert(octant_depth);
 
     if (octant_ptr->isBlock())
     {
@@ -358,24 +347,23 @@ template<se::Colour    ColB,
 template<class SensorTDummy>
 typename std::enable_if_t<std::is_same<SensorTDummy, se::OusterLidar>::value, void>
 VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>, SensorT>::operator()(
-        const Eigen::Vector3i& node_coord,
-        const int              node_size,
-        const int              depth,
-        const Eigen::Vector3i& rel_step,
-        se::OctantBase*        parent_ptr)
+        const Eigen::Vector3i& octant_coord,
+        const int              octant_size,
+        const int              octant_depth,
+        se::OctantBase*        octant_ptr)
 {
   /// Approximate max and min depth to quickly check if the node is behind the camera or maximum depth.
   // Compute the node centre's depth in the camera frame
 
   /// CHANGE: USE voxelToPoint(...)
   Eigen::Vector3f node_centre_point_M;
-  map_.voxelToPoint(node_coord, node_size, node_centre_point_M);
+  map_.voxelToPoint(octant_coord, octant_size, node_centre_point_M);
 
   const Eigen::Vector3f node_centre_point_S = (T_SM_ * node_centre_point_M.homogeneous()).head(3);
 
   // Extend and reduce the depth by the sphere radius covering the entire cube
-  const float approx_depth_value_max = node_centre_point_S.norm() + node_size * size_to_radius_ * map_res_;
-  const float approx_depth_value_min = node_centre_point_S.norm() - node_size * size_to_radius_ * map_res_;
+  const float approx_depth_value_max = node_centre_point_S.norm() + octant_size * size_to_radius_ * map_res_;
+  const float approx_depth_value_min = node_centre_point_S.norm() - octant_size * size_to_radius_ * map_res_;
 
   /// CASE 0.1 (OUT OF BOUNDS): Block is behind the camera or behind the maximum depth value
   if (approx_depth_value_min > max_depth_value_)
@@ -389,10 +377,10 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
   se::VarianceState variance_state = se::VarianceState::Gradient; ///<< -1 := low variance infront of the surface, 0 := high variance, 1 = low_variance behind the surface.
   se::Pixel pooling_pixel = se::Pixel::crossingUnknownPixel(); ///<< min, max pixel batch depth + crossing frustum state + contains unknown values state.
 
-  if (depth < octree_.getBlockDepth() + 1)
+  if (octant_depth < octree_.getBlockDepth() + 1)
   {
     /// CASE 1 (CAMERA IN NODE):
-    if (cameraInNode(node_coord, node_size, se::math::to_inverse_transformation(T_SM_)))
+    if (cameraInNode(octant_coord, octant_size, se::math::to_inverse_transformation(T_SM_)))
     {
       should_split = true;
       /// CASE 2 (FRUSTUM BOUNDARY): Node partly behind the camera and crosses the the frustum boundary
@@ -400,7 +388,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
     {
       // Compute the 8 corners of the node to be evaluated
       Eigen::Matrix<float, 3, 8> node_corner_points_M;
-      map_.voxelToCornerPoints(node_coord, node_size, node_corner_points_M);
+      map_.voxelToCornerPoints(octant_coord, octant_size, node_corner_points_M);
       Eigen::Matrix<float, 3, 8> node_corner_points_S =
               (T_SM_  * node_corner_points_M.colwise().homogeneous()).topRows(3);
 
@@ -466,16 +454,13 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
       variance_state = computeVariance(pooling_pixel.min, pooling_pixel.max,
                                        approx_depth_value_min, approx_depth_value_max);
 
-      const int node_scale = octree_.getMaxScale() - depth;
-      const se::code_t node_code = se::keyops::encode_code(node_coord); // TODO: Might be correct now
-      const unsigned int child_idx = se::keyops::code_to_child_idx(node_code, node_scale); // TODO: Might be correct now
+      const int node_scale = octree_.getMaxScale() - octant_depth;
 
       /// CASE 1 (REDUNDANT DATA): Depth values in the bounding box are far away from the node or unknown (1).
-      ///                          The node to be evaluated is free (2) and fully observed (3),
-      se::OctantBase* child_ptr = static_cast<NodeType*>(parent_ptr)->getChild(child_idx);
-      if (variance_state != se::VarianceState::Gradient && child_ptr)
+      ///                          The node to be evaluated is free (2) and fully observed (3)
+      if (variance_state != se::VarianceState::Gradient)
       {
-        typename OctreeType::DataType child_data = (child_ptr->isBlock()) ? static_cast<BlockType*>(child_ptr)->getMaxData() : static_cast<NodeType*>(child_ptr)->getData();
+        typename OctreeType::DataType child_data = (octant_ptr->isBlock()) ? static_cast<BlockType*>(octant_ptr)->getMaxData() : static_cast<NodeType*>(octant_ptr)->getData();
 
         if (   child_data.observed  // Check if the child is fully observed (i.e. all children are observed) // TODO: incooperate MAX occupancy
                && child_data.occupancy * child_data.weight <= 0.95 * map_.getDataConfig().min_occupancy)
@@ -512,11 +497,6 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
   {
   }
 
-  // Once we reach this point the node is either updated or split.
-  // In either case the node needs to be allocated.
-  const int octant_idx = rel_step.x() + rel_step.y() * 2 + rel_step.z() * 4;
-  se::OctantBase* octant_ptr = octree_.allocate(static_cast<NodeType*>(parent_ptr), octant_idx);
-
   if (should_split)
   {
     // Returns a pointer to the according node if it has previously been allocated.
@@ -533,19 +513,20 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
     } else
     {
       // Split! Start recursive process
+      octree_.allocateAll(static_cast<NodeType*>(octant_ptr), 0); ///< Allocates all 8 children
 #pragma omp parallel for
       for (int child_idx = 0; child_idx < 8; ++child_idx)
       {
-        int child_size = node_size / 2;
+        int child_size = octant_size / 2;
         const Eigen::Vector3i child_rel_step =
                 Eigen::Vector3i((child_idx & 1) > 0, (child_idx & 2) > 0, (child_idx & 4) > 0);
-        const Eigen::Vector3i child_coord = node_coord + child_rel_step * child_size;
-        (*this)(child_coord, child_size, depth + 1, child_rel_step, octant_ptr);
+        const Eigen::Vector3i child_coord = octant_coord + child_rel_step * child_size;
+        (*this)(child_coord, child_size, octant_depth + 1, static_cast<NodeType*>(octant_ptr)->getChild(child_idx));
       }
     }
   } else
   {
-    assert(depth);
+    assert(octant_depth);
 
     if (octant_ptr->isBlock())
     {

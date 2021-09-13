@@ -409,11 +409,16 @@ template <Colour    ColB,
           typename  DerivedT
 >
 BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::BlockMultiRes(const DataType init_data) :
-        curr_scale_(0),
+        curr_scale_(max_scale_),
         min_scale_(-1),
         buffer_scale_(-1),
         init_data_(init_data)
 {
+  const int num_voxels_at_scale = 1;
+  DataType* data_at_scale = new DataType[num_voxels_at_scale];
+  initialiseData(data_at_scale, num_voxels_at_scale);
+  block_data_.push_back(data_at_scale);
+  block_max_data_.push_back(data_at_scale);
 }
 
 
@@ -794,6 +799,14 @@ inline void BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize,
 {
   if (max_scale_ - (block_data_.size() - 1) != 0)
   {
+    block_max_data_.pop_back();
+    int size_at_scale = BlockSize >> (max_scale_ - (block_data_.size() - 1));
+    int num_voxels_at_scale = se::math::cu(size_at_scale);
+    DataType* max_data_at_scale = new DataType[num_voxels_at_scale];
+    DataType* data_at_scale     = block_data_[block_data_.size() - 1];
+    std::copy(data_at_scale, data_at_scale + num_voxels_at_scale, max_data_at_scale); ///<< Copy init content.
+    block_max_data_.push_back(max_data_at_scale);
+
     for (int scale = max_scale_ - block_data_.size(); scale >= 0; scale --)
     {
       int size_at_scale = BlockSize >> scale;
@@ -833,6 +846,13 @@ inline void BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize,
 {
   if (max_scale_ - (block_data_.size() - 1) > static_cast<size_t>(new_min_scale))
   {
+    block_max_data_.pop_back();
+    int size_at_scale = BlockSize >> (max_scale_ - (block_data_.size() - 1));
+    int num_voxels_at_scale = se::math::cu(size_at_scale);
+    DataType* max_data_at_scale = new DataType[num_voxels_at_scale];
+    DataType* data_at_scale     = block_data_[block_data_.size() - 1];
+    std::copy(data_at_scale, data_at_scale + num_voxels_at_scale, max_data_at_scale); ///<< Copy init content.
+    block_max_data_.push_back(max_data_at_scale);
 
     for (int scale = max_scale_ - block_data_.size(); scale >= new_min_scale; scale--)
     {

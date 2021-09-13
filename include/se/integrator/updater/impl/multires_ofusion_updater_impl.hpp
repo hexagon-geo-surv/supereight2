@@ -111,7 +111,7 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
 
   /// Compute the integration scale
   // The last integration scale
-  const int last_scale = block_ptr->getCurrentScale();
+  const int last_scale = (block_ptr->getMinScale() == -1) ? 0 : block_ptr->getCurrentScale();
 
   // The recommended integration scale
   const int computed_integration_scale =
@@ -272,7 +272,7 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
 
   /// Compute the integration scale
   // The last integration scale
-  const int last_scale = block_ptr->getCurrentScale();
+  const int last_scale = (block_ptr->getMinScale() == -1) ? 0 : block_ptr->getCurrentScale();
 
   // The recommended integration scale
   const int computed_integration_scale =
@@ -480,7 +480,6 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
         int             depth)
 {
   NodeType* node_ptr = static_cast<NodeType*>(octant_ptr);
-  DataType init_data = node_ptr->getData();
 
   if (node_ptr->getChildrenMask() == 0)
   {
@@ -499,7 +498,7 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
       se::OctantBase* child_ptr = node_ptr->getChild(child_idx);
       if (!child_ptr)
       {
-        child_ptr = octree_.allocate(node_ptr, child_idx, init_data);
+        child_ptr = octree_.allocateAll(node_ptr, child_idx); // TODO: Can be optimised
       }
 
       if (child_ptr->isBlock())

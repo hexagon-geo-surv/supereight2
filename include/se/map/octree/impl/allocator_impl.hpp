@@ -134,8 +134,7 @@ inline bool allocate_key(const se::key_t  key,
   for (; child_scale >= min_scale; --child_scale)
   {
     se::idx_t child_idx = se::keyops::code_to_child_idx(code, child_scale);
-    typename OctreeT::DataType init_data = parent_ptr->getData();
-    did_allocation = octree.allocate(parent_ptr, child_idx, child_ptr, init_data);
+    did_allocation = octree.allocate(parent_ptr, child_idx, child_ptr);
     parent_ptr = static_cast<typename OctreeT::NodeType*>(child_ptr);
   }
   allocated_octant = child_ptr;

@@ -372,25 +372,25 @@ public:
    *
    * \warning The function does not return a reference to the data.
    *
-   * \return The block's data at the coarsest scale. Default value if the block doesn't contain any data
+   * \return The block's data at the coarsest scale
    */
-  inline const DataType getData() const     { return (min_scale_ != -1) ? block_data_[0][0]     : DataType(); }
+  inline const DataType getData() const     { return block_data_[0][0]; }
 
   /**
    * \brief Get the block's max data at the coarsest scale.
    *
    * \warning The function does not return a reference to the data.
    *
-   * \return The block's max data at the coarsest scale. Default data if the block doesn't contain any data
+   * \return The block's max data at the coarsest scale
    */
-  inline const DataType getMaxData() const  { return (min_scale_ != -1) ? block_max_data_[0][0] : DataType(); }
+  inline const DataType getMaxData() const  { return block_max_data_[0][0]; }
 
   /**
    * \brief Get the block's value at the coarsest scale.
    *
    * \warning The function does not return a reference to the value.
    *
-   * \return The block's value at the coarsest scale. Default value if the block doesn't contain any data
+   * \return The block's value at the coarsest scale
    */
   se::field_t meanValue() { return get_field(getData()); }
 
@@ -399,7 +399,7 @@ public:
    *
    * \warning The function does not return a reference to the value.
    *
-   * \return The block's max value at the coarsest scale. Default value if the block doesn't contain any data
+   * \return The block's max value at the coarsest scale
    */
   se::field_t maxValue()  { return get_field(getMaxData()); }
 
