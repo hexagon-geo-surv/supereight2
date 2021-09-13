@@ -109,16 +109,29 @@ public:
    *
    * \param[in] parent_ptr  The parent of the node to be allocated
    * \param[in] child_idx   The child index of the node to be allocated
-   * \param[out] child_ptr     The pointer ot the allocated node
+   * \param[out] child_ptr  The pointer ot the allocated octant
    *
    * \return Ture if the node has been newly allocated, False if it has already been allocated
    */
   inline bool allocate(NodeType*        parent_ptr,
-                       const unsigned   child_idx,
-                       se::OctantBase*& child_ptr);     ///< Allocate child
+                       const int        child_idx,
+                       se::OctantBase*& child_ptr,   ///< Allocated child
+                       const DataT      init_data);
 
-  inline se::OctantBase* allocate(NodeType*        parent_ptr,
-                                  const unsigned   child_idx);     ///< Allocate child
+  /**
+   * \brief Allocate a node for a given parent node.
+   *
+   * \warning The returned pointer is of type OctantBase as child might be a node or block.
+   *
+   * \param[in] parent_ptr  The parent of the node to be allocated
+   * \param[in] child_idx   The child index of the node to be allocated
+   * \param[out] child_ptr  The pointer ot the allocated octant
+   *
+   * \return The pointer ot the allocated / fetched octant
+   */
+  inline se::OctantBase* allocate(NodeType*   parent_ptr,
+                                  const int   child_idx,
+                                  const DataT init_data);
 
   /**
    * \brief Recursively delete all children of a given node pointer.

@@ -480,6 +480,7 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
         int             depth)
 {
   NodeType* node_ptr = static_cast<NodeType*>(octant_ptr);
+  DataType init_data = node_ptr->getData();
 
   if (node_ptr->getChildrenMask() == 0)
   {
@@ -498,7 +499,7 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
       se::OctantBase* child_ptr = node_ptr->getChild(child_idx);
       if (!child_ptr)
       {
-        child_ptr = octree_.allocate(node_ptr, child_idx);
+        child_ptr = octree_.allocate(node_ptr, child_idx, init_data);
       }
 
       if (child_ptr->isBlock())

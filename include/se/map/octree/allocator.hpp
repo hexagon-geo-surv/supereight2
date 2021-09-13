@@ -78,6 +78,9 @@ namespace detail {
 /**
  * \brief Allocate a given key in the octree.
  *
+ * \warning Initialises each child with it's parents value.
+ *          I.e. default value for TSDF but might differ for occupancy.
+ *
  * \tparam OctreeT
  * \param[in] key               The key to be allocated
  * \param[in] octree            The octree to allocate the key in

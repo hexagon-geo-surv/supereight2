@@ -29,11 +29,12 @@ template <typename DataT,
           Res      ResT
 >
 Node<DataT, ResT>::Node(const Eigen::Vector3i& coord,
-                        const int              size) :
+                        const int              size,
+                        const DataT            init_data) :
     OctantBase(false, coord, nullptr),
     std::conditional<ResT == Res::Single,
         NodeSingleRes<DataT>,
-        NodeMultiRes<DataT,Node<DataT, ResT>>>::type(DataT()),
+        NodeMultiRes<DataT,Node<DataT, ResT>>>::type(init_data),
     size_(size)
 {
   children_ptr_.fill(nullptr);
@@ -44,14 +45,15 @@ Node<DataT, ResT>::Node(const Eigen::Vector3i& coord,
 template <typename DataT,
           Res      ResT
 >
-Node<DataT, ResT>::Node(Node*     parent_ptr,
-                        const int child_idx) :
+Node<DataT, ResT>::Node(Node*       parent_ptr,
+                        const int   child_idx,
+                        const DataT init_data) :
     OctantBase(false,
                parent_ptr->coord_ + (parent_ptr->size_ >> 1) * Eigen::Vector3i((1 & child_idx) > 0, (2 & child_idx) > 0, (4 & child_idx) > 0),
                parent_ptr),
     std::conditional<ResT == Res::Single,
         NodeSingleRes<DataT>,
-        NodeMultiRes<DataT,Node<DataT, ResT>>>::type(parent_ptr->getData()),
+        NodeMultiRes<DataT,Node<DataT, ResT>>>::type(init_data),
     size_(parent_ptr->size_ >> 1)
 {
   children_ptr_.fill(nullptr);

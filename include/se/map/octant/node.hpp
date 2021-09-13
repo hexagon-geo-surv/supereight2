@@ -168,7 +168,8 @@ public:
    * \param[in] size    The size in [voxel] of the node
    */
   Node(const Eigen::Vector3i& coord,
-       const int              size);
+       const int              size,
+       const DataT            init_data);
 
   /**
    * \brief Setup a node via its parent and child index.
@@ -176,8 +177,9 @@ public:
    * \param[in] parent_ptr  The pointer to the parent node
    * \param[in] child_idx   The child index of the node
    */
-  Node(Node*     parent_ptr,
-       const int child_idx);
+  Node(Node*       parent_ptr,
+       const int   child_idx,
+       const DataT init_data);
 
   /**
    * \brief Get the size in [voxel] of the node.

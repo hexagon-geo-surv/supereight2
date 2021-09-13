@@ -672,11 +672,12 @@ public:
    * \brief Initialise block via parent node
    *
    * \param[in] parent        The shared pointer to the parent node
-   * \param[in] child_id      The child id {0,...,7} in relation to the parent
+   * \param[in] child_idx      The child id {0,...,7} in relation to the parent
    * \param[in] init_data     The initial data of the block
    */
-  Block(se::Node<DataT, ResT>* parent_ptr = nullptr,
-        const unsigned         child_id   = 0);
+  Block(se::Node<DataT, ResT>* parent_ptr,
+        const int              child_idx,
+        const DataT            init_data);
 
   static constexpr unsigned int getSize() { return BlockSize; }
 

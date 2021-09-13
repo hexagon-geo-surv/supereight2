@@ -11,7 +11,6 @@ Octree<DataT, ResT, BlockSize>::Octree(const int size) : size_(size)
 {
   assert(math::is_power_of_two(size)); // Verify that the octree size is a multiple of 2.
   assert(BlockSize < size);           // Verify that the block size is smaller than the root.
-
   root_ptr_ = static_cast<se::OctantBase*>(memory_pool_.allocateNode(Eigen::Vector3i(0,0,0), size_));
 }
 
@@ -56,9 +55,10 @@ template <typename DataT,
           Res      ResT,
           int      BlockSize
 >
-inline bool Octree<DataT, ResT, BlockSize>::allocate(NodeType*          parent_ptr,
-                                                     const unsigned int child_idx,
-                                                     OctantBase*&       child_ptr)
+inline bool Octree<DataT, ResT, BlockSize>::allocate(NodeType*    parent_ptr,
+                                                     const int    child_idx,
+                                                     OctantBase*& child_ptr,
+                                                     const DataT  init_data)
 {
   assert(!parent_ptr->isBlock()); // Verify that the parent is not a block
   assert(parent_ptr);             // Verify that the parent is not a nullptr
@@ -73,13 +73,13 @@ inline bool Octree<DataT, ResT, BlockSize>::allocate(NodeType*          parent_p
   {
 #pragma omp critical
     {
-      child_ptr = memory_pool_.allocateBlock(parent_ptr, child_idx);
+      child_ptr = memory_pool_.allocateBlock(parent_ptr, child_idx, init_data);
     }
   } else                                        // Allocate Node
   {
 #pragma omp critical
     {
-      child_ptr = memory_pool_.allocateNode(parent_ptr, child_idx);
+      child_ptr = memory_pool_.allocateNode(parent_ptr, child_idx, init_data);
     }
   }
   parent_ptr->setChild(child_idx, child_ptr); // Update parent
@@ -92,8 +92,9 @@ template <typename DataT,
           Res      ResT,
           int      BlockSize
 >
-inline OctantBase* Octree<DataT, ResT, BlockSize>::allocate(NodeType*          parent_ptr,
-                                                            const unsigned int child_idx)
+inline OctantBase* Octree<DataT, ResT, BlockSize>::allocate(NodeType*   parent_ptr,
+                                                            const int   child_idx,
+                                                            const DataT init_data)
 {
   assert(!parent_ptr->isBlock()); // Verify that the parent is not a block
   assert(parent_ptr);             // Verify that the parent is not a nullptr
@@ -108,13 +109,13 @@ inline OctantBase* Octree<DataT, ResT, BlockSize>::allocate(NodeType*          p
   {
 #pragma omp critical
     {
-      child_ptr = memory_pool_.allocateBlock(parent_ptr, child_idx);
+      child_ptr = memory_pool_.allocateBlock(parent_ptr, child_idx, init_data);
     }
   } else                                        // Allocate Node
   {
 #pragma omp critical
     {
-      child_ptr = memory_pool_.allocateNode(parent_ptr, child_idx);
+      child_ptr = memory_pool_.allocateNode(parent_ptr, child_idx, init_data);
     }
   }
   parent_ptr->setChild(child_idx, child_ptr);   // Update parent

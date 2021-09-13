@@ -432,9 +432,12 @@ BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::
   block_data_.clear();
 
   block_max_data_.pop_back(); ///<< Avoid double free as the min scale data points to the same data.
-  for (auto& max_data_at_scale : block_max_data_)
+  if (!block_max_data_.empty())
   {
-    delete[] max_data_at_scale;
+    for (auto& max_data_at_scale : block_max_data_)
+    {
+      delete[] max_data_at_scale;
+    }
   }
   block_max_data_.clear();
 
@@ -1166,13 +1169,14 @@ template <typename DataT,
           typename PolicyT
 >
 Block<DataT, ResT, BlockSize, PolicyT>::Block(se::Node<DataT, ResT>* parent_ptr,
-                                              const unsigned         child_id) :
+                                              const int              child_idx,
+                                              const DataT            init_data) :
     OctantBase(true,
-               parent_ptr->getCoord() + BlockSize * Eigen::Vector3i((1 & child_id) > 0, (2 & child_id) > 0, (4 & child_id) > 0),
+               parent_ptr->getCoord() + BlockSize * Eigen::Vector3i((1 & child_idx) > 0, (2 & child_idx) > 0, (4 & child_idx) > 0),
                parent_ptr),
     std::conditional<ResT == Res::Single,
         BlockSingleRes<Block<DataT, ResT, BlockSize>, DataT, BlockSize>,
-        BlockMultiRes<DataT, BlockSize, Block<DataT, ResT, BlockSize>>>::type(parent_ptr->getData())
+        BlockMultiRes<DataT, BlockSize, Block<DataT, ResT, BlockSize>>>::type(init_data)
 {
   assert(BlockSize == (parent_ptr->getSize() >> 1));
 }

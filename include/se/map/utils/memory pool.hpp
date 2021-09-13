@@ -13,6 +13,8 @@ template <typename NodeT, typename BlockT>
 class BoostMemoryPool
 {
 public:
+  typedef typename NodeT::DataType DataType;
+
   /**
    * \brief Allocate a node using its coordinates and size.
    *
@@ -21,25 +23,39 @@ public:
   inline NodeT* allocateNode(const Eigen::Vector3i& node_coord,
                              const unsigned int     node_size)
   {
-    return node_buffer_.construct(node_coord, node_size);
+    return node_buffer_.construct(node_coord, node_size, DataType());
   }
 
   /**
    * \brief Allocate a node using its parent and child index.
+   *
+   * \param[in] parent_ptr The pointer to the parent node
+   * \param[in] child_idx  The index of the child to be allocated
+   * \param[in] init_data  The data to initialise the child node with
+   *
+   * \return The pointer to the child node.
    */
-  inline NodeT* allocateNode(NodeT*             parent_ptr,
-                             const unsigned int child_idx)
+  inline NodeT* allocateNode(NodeT*         parent_ptr,
+                             const int      child_idx,
+                             const DataType init_data)
   {
-    return node_buffer_.construct(parent_ptr, child_idx);
+    return node_buffer_.construct(parent_ptr, child_idx, init_data);
   }
 
   /**
    * \brief Allocate a block using its parent and child index.
+   *
+   * \param[in] parent_ptr The pointer to the parent node
+   * \param[in] child_idx  The index of the child to be allocated
+   * \param[in] init_data  The data to initialise the child node with
+   *
+   * \return The pointer to the child block.
    */
-  inline BlockT* allocateBlock(NodeT*             parent_ptr,
-                               const unsigned int child_idx)
+  inline BlockT* allocateBlock(NodeT*         parent_ptr,
+                               const int      child_idx,
+                               const DataType init_data)
   {
-    return block_buffer_.construct(parent_ptr, child_idx);
+    return block_buffer_.construct(parent_ptr, child_idx, init_data);
   }
 
   /**

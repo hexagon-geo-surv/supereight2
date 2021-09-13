@@ -295,7 +295,9 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
   // Once we reach this point the node is either updated or split.
   // In either case the node needs to be allocated.
   const int octant_idx = rel_step.x() + rel_step.y() * 2 + rel_step.z() * 4;
-  se::OctantBase* octant_ptr = octree_.allocate(static_cast<NodeType*>(parent_ptr), octant_idx);
+  
+  DataType init_data = static_cast<NodeType*>(parent_ptr)->getData();
+  se::OctantBase* octant_ptr = octree_.allocate(static_cast<NodeType*>(parent_ptr), octant_idx, init_data);
 
   if (should_split)
   {

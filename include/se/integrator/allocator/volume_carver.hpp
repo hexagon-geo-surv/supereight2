@@ -63,6 +63,7 @@ class VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
 {
 public:
   typedef Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi> MapType;
+  typedef typename MapType::DataType                                  DataType;
   typedef typename MapType::OctreeType                                OctreeType;
   typedef typename OctreeType::NodeType                               NodeType;
   typedef typename OctreeType::BlockType                              BlockType;
