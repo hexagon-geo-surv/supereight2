@@ -50,7 +50,7 @@ RaycastCarver<MapT, SensorT>::RaycastCarver(MapT&                   map,
 
 
 template<typename MapT,
-        typename SensorT
+         typename SensorT
 >
 std::vector<se::OctantBase*> RaycastCarver<MapT, SensorT>::operator()()
 {
@@ -61,9 +61,10 @@ std::vector<se::OctantBase*> RaycastCarver<MapT, SensorT>::operator()()
   TOCK("fetch-frustum")
 
   TICK("create-list")
-  auto octree_ptr = map_.getOctree();
+  typename MapT::OctreeType* octree_ptr = map_.getOctree().get();
+  se::OctantBase*            root_ptr   = octree_ptr->getRoot();
 
-  const int num_steps = ceil(config_.band / map_.getRes());
+  const int num_steps = ceil(config_.band / (2 * map_.getRes()));
 
   const Eigen::Vector3f t_MS = T_MS_.topRightCorner<3, 1>();
 
@@ -100,9 +101,13 @@ std::vector<se::OctantBase*> RaycastCarver<MapT, SensorT>::operator()()
 
         if (map_.template pointToVoxel<se::Safe::On>(ray_pos_M, voxel_coord))
         {
-          se::key_t voxel_key;
-          se::keyops::encode_key(voxel_coord, octree_ptr->max_block_scale, voxel_key);
-          voxel_key_set.insert(voxel_key);
+          const se::OctantBase* octant_ptr = se::fetcher::block<typename MapT::OctreeType>(voxel_coord, root_ptr);
+          if (octant_ptr == nullptr)
+          {
+            se::key_t voxel_key;
+            se::keyops::encode_key(voxel_coord, octree_ptr->max_block_scale, voxel_key);
+            voxel_key_set.insert(voxel_key);
+          }
         }
         ray_pos_M += step;
       }
