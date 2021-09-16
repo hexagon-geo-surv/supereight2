@@ -498,8 +498,8 @@ TEST(KeyOps, UniqueAtScale) {
 
   std::vector<Eigen::Vector3i> coords_ought =
   {
-    {0, 0, 0},
-    {128, 128,  128},
+    {32, 0, 32},
+    {128, 128,  160},
     {512, 512, 1024},
   };
 
