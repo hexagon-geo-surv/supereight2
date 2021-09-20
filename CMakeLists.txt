@@ -11,6 +11,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Find dependencies
 find_package(Eigen3 3.3 REQUIRED)
+find_package(OpenCV REQUIRED COMPONENTS imgproc core)
 
 # Find OpenMP, warn if disabled
 if(SE_OPENMP)
@@ -65,10 +66,12 @@ target_include_directories(${LIB_NAME}
     PUBLIC
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
       $<INSTALL_INTERFACE:include>
+      ${OpenCV_INCLUDE_DIRS}
 )
 target_link_libraries(${LIB_NAME}
     PUBLIC
       Eigen3::Eigen
+      ${OpenCV_LIBS}
       SRL::Projection
 )
 # Add an alias so that the library can be used inside the build tree, e.g. when

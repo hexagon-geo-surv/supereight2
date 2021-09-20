@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.5...3.16)
 
 find_package(GLUT)
 find_package(OpenGL)
-find_package(OpenCV REQUIRED COMPONENTS highgui imgproc core features2d)
 
 # Compile the reader as a library so that it isn't recompiled for each app.
 set(LIB_NAME reader)
@@ -17,8 +16,8 @@ add_library(${LIB_NAME} STATIC
   "src/reader_tum.cpp"
   "src/reader_interiornet.cpp"
 )
-target_include_directories(${LIB_NAME} PRIVATE include ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(${LIB_NAME} PRIVATE SE::Supereight stdc++fs ${OpenCV_LIBS})
+target_include_directories(${LIB_NAME} PRIVATE include)
+target_link_libraries(${LIB_NAME} PRIVATE SE::Supereight stdc++fs)
 
 
 
