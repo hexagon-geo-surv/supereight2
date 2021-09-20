@@ -346,7 +346,7 @@ se::InteriorNetReader::InteriorNetReader(const se::ReaderConfig& c) : se::Reader
   if (!depth_filenames_.empty())
   {
     const std::string first_depth_filename = sequence_path_ + "/depth0/data/" + depth_filenames_[0];
-    cv::Mat image_data = cv::imread(first_depth_filename.c_str(), CV_LOAD_IMAGE_UNCHANGED );
+    cv::Mat image_data = cv::imread(first_depth_filename.c_str(), cv::IMREAD_UNCHANGED);
 
     if (image_data.data == NULL) {
       std::cerr << "Error: Could not read depth image " << first_depth_filename << "\n";
@@ -376,7 +376,7 @@ se::InteriorNetReader::InteriorNetReader(const se::ReaderConfig& c) : se::Reader
   if (!rgb_filenames_.empty())
   {
     const std::string first_rgb_filename = sequence_path_ + "/cam0/data/" + rgb_filenames_[0];
-    cv::Mat image_data = cv::imread(first_rgb_filename.c_str(), CV_LOAD_IMAGE_COLOR );
+    cv::Mat image_data = cv::imread(first_rgb_filename.c_str(), cv::IMREAD_COLOR);
 
     if (image_data.data == NULL) {
       std::cerr << "Error: Could not read RGB image " << first_rgb_filename << "\n";
@@ -426,7 +426,7 @@ se::ReaderStatus se::InteriorNetReader::nextDepth(se::Image<float>& depth_image)
   // Read the image data.
 
   // Read the image data.
-  cv::Mat image_data = cv::imread(filename.c_str(), CV_LOAD_IMAGE_UNCHANGED );
+  cv::Mat image_data = cv::imread(filename.c_str(), cv::IMREAD_UNCHANGED);
   cv::Mat depth_data;
   image_data.convertTo(depth_data, CV_32F, inverse_scale_);
 
@@ -455,7 +455,7 @@ se::ReaderStatus se::InteriorNetReader::nextRGBA(se::Image<uint32_t>& rgba_image
   }
   const std::string filename = sequence_path_ + "/cam0/data/" + rgb_filenames_[frame_];
 
-  cv::Mat image_data = cv::imread(filename.c_str(), CV_LOAD_IMAGE_COLOR );
+  cv::Mat image_data = cv::imread(filename.c_str(), cv::IMREAD_COLOR);
 
   if (image_data.data == NULL) {
     return se::ReaderStatus::error;

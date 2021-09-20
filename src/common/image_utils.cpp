@@ -80,7 +80,7 @@ int se::load_depth_png(uint16_t**         depth_image_data,
                        const std::string& filename) {
 
   // Load the image.
-  cv::Mat depth_cv_image = cv::imread(filename.c_str(), CV_LOAD_IMAGE_UNCHANGED );
+  cv::Mat depth_cv_image = cv::imread(filename.c_str(), cv::IMREAD_UNCHANGED);
 
   if (depth_cv_image.data == NULL) {
     return 1;

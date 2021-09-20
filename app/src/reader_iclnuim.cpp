@@ -119,7 +119,7 @@ se::ReaderStatus se::ICLNUIMReader::nextRGBA(se::Image<uint32_t>& rgba_image) {
   basename << "scene_00_" << std::setfill('0') << std::setw(4) << frame_;
   const std::string filename (sequence_path_ + "/" + basename.str() + ".png");
 
-  cv::Mat image_data = cv::imread(filename.c_str(), CV_LOAD_IMAGE_COLOR );
+  cv::Mat image_data = cv::imread(filename.c_str(), cv::IMREAD_COLOR);
 
   if (image_data.data == NULL) {
     return se::ReaderStatus::error;
