@@ -1,8 +1,0 @@
-get_filename_component(LODEPNG_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
-
-if(NOT TARGET Lode::PNG)
-  include("${LODEPNG_CMAKE_DIR}/LodePNGTargets.cmake")
-endif()
-
-set(LODEPNG_LIBRARIES Lode::PNG)
-

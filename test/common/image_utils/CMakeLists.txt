@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.9...3.16)
+
+add_executable(image-utils-io-unittest "image_utils_io_unittest.cpp")
+target_link_libraries(image-utils-io-unittest PRIVATE ${GTEST_MAIN_LIBRARIES})
+add_test(NAME image-utils-io-unittest COMMAND image-utils-io-unittest)
+

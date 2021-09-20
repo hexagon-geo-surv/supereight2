@@ -18,7 +18,7 @@ add_library(${LIB_NAME} STATIC
   "src/reader_interiornet.cpp"
 )
 target_include_directories(${LIB_NAME} PRIVATE include ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(${LIB_NAME} PRIVATE SE::Supereight Lode::PNG stdc++fs ${OpenCV_LIBS})
+target_link_libraries(${LIB_NAME} PRIVATE SE::Supereight stdc++fs ${OpenCV_LIBS})
 
 
 

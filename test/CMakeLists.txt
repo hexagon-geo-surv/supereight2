@@ -9,6 +9,7 @@ find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 link_libraries(SE::Supereight ${GTEST_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
+add_subdirectory(common/image_utils)
 add_subdirectory(common/str_utils)
 add_subdirectory(map/keyops)
 add_subdirectory(map/map)

@@ -9,7 +9,9 @@
 #include <iostream>
 #include <memory>
 
-#include "lodepng.h"
+#include <opencv2/core.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui.hpp>
 
 
 
@@ -34,29 +36,15 @@ int se::save_depth_png(const uint16_t*        depth_image_data,
                        const Eigen::Vector2i& depth_image_res,
                        const std::string&     filename) {
 
-  // Allocate a new image buffer to use for changing the image data from little
-  // endian (used in x86 and ARM CPUs) to big endian order (used in PNG).
-  const size_t num_pixels = depth_image_res.prod();
-  std::unique_ptr<uint16_t[]> depth_big_endian (new uint16_t[num_pixels]);
-#pragma omp parallel for
-  for (size_t i = 0; i < num_pixels; ++i) {
-    // Swap the byte order.
-    const uint16_t depth_value = depth_image_data[i];
-    const uint16_t low_byte = depth_value & 0x00FF;
-    const uint16_t high_byte = (depth_value & 0xFF00) >> 8;
-    depth_big_endian.get()[i] = low_byte << 8 | high_byte;
+  cv::Mat depth_image(depth_image_res.y(), depth_image_res.x(), CV_16U);
+  for (int x = 0; x < depth_image_res.x(); x++) {
+    for (int y = 0; y < depth_image_res.y(); y++) {
+      depth_image.at<uint16_t>(y, x) = depth_image_data[x + depth_image_res.x() * y];
+    }
   }
+  cv::imwrite(filename.c_str(),depth_image);
 
-  // Save the image to file.
-  const unsigned ret = lodepng_encode_file(
-      filename.c_str(),
-      reinterpret_cast<const unsigned char*>(depth_big_endian.get()),
-      depth_image_res.x(),
-      depth_image_res.y(),
-      LCT_GREY,
-      16);
-
-  return ret;
+  return 0;
 }
 
 
@@ -76,7 +64,7 @@ int se::load_depth_png(float**            depth_image_data,
   }
   // Remove the scaling from the 16-bit depth data and convert to float
   const size_t num_pixels = depth_image_res.prod();
-  *depth_image_data = static_cast<float*>(malloc(num_pixels * sizeof(float)));
+  *depth_image_data = new float[num_pixels];
 #pragma omp parallel for
   for (size_t i = 0; i < num_pixels; ++i) {
     (*depth_image_data)[i] = inverse_scale * depth_image_data_scaled[i];
@@ -92,27 +80,20 @@ int se::load_depth_png(uint16_t**         depth_image_data,
                        const std::string& filename) {
 
   // Load the image.
-  const unsigned ret = lodepng_decode_file(
-      reinterpret_cast<unsigned char**>(depth_image_data),
-      reinterpret_cast<unsigned int*>(&(depth_image_res.x())),
-      reinterpret_cast<unsigned int*>(&(depth_image_res.y())),
-      filename.c_str(),
-      LCT_GREY,
-      16);
+  cv::Mat depth_cv_image = cv::imread(filename.c_str(), CV_LOAD_IMAGE_UNCHANGED );
 
-  // Change the image data from little endian (used in x86 and ARM CPUs) to big
-  // endian order (used in PNG).
-  const size_t num_pixels = depth_image_res.prod();
-#pragma omp parallel for
-  for (size_t i = 0; i < num_pixels; ++i) {
-    // Swap the byte order.
-    const uint16_t depth_value = (*depth_image_data)[i];
-    const uint16_t low_byte = depth_value & 0x00FF;
-    const uint16_t high_byte = (depth_value & 0xFF00) >> 8;
-    (*depth_image_data)[i] = low_byte << 8 | high_byte;
+  if (depth_cv_image.data == NULL) {
+    return 1;
   }
 
-  return ret;
+  depth_image_res =  Eigen::Vector2i(depth_cv_image.cols, depth_cv_image.rows);
+
+  *depth_image_data = new uint16_t [depth_image_res.x() * depth_image_res.y()];
+
+  cv::Mat img (depth_cv_image.rows, depth_cv_image.cols, CV_16U, *depth_image_data);
+  depth_cv_image.copyTo(img);
+
+  return 0;
 }
 
 
@@ -186,7 +167,7 @@ int se::load_depth_pgm(float**            depth_image_data,
   }
   // Remove the scaling from the 16-bit depth data and convert to float
   const size_t num_pixels = depth_image_res.prod();
-  *depth_image_data = static_cast<float*>(malloc(num_pixels * sizeof(float)));
+  *depth_image_data = new float [num_pixels];
 #pragma omp parallel for
   for (size_t i = 0; i < num_pixels; ++i) {
     (*depth_image_data)[i] = inverse_scale * depth_image_data_scaled[i];
@@ -219,7 +200,7 @@ int se::load_depth_pgm(uint16_t**         depth_image_data,
   // Read the image size and allocate memory for the image.
   file >> depth_image_res.x() >> depth_image_res.y();
   const size_t num_pixels = depth_image_res.x() * depth_image_res.y();
-  *depth_image_data = static_cast<uint16_t*>(malloc(num_pixels  * sizeof(uint16_t)));
+  *depth_image_data = new uint16_t [num_pixels];
 
   // Read the maximum pixel value.
   size_t max_value;

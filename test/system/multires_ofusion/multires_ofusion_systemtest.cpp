@@ -1,7 +1,10 @@
 #include <gtest/gtest.h>
 
+#include <opencv2/opencv.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/core/core.hpp>
+
 #include "config.hpp"
-#include "lodepng.h"
 #include "se/map/map.hpp"
 #include "se/integrator/map_integrator.hpp"
 
@@ -366,7 +369,9 @@ TEST(MultiResOFusionSystemTest, Raycasting)
   map.saveFieldSlice(config.app.mesh_output_dir + "/test-raycasting-slice-field", se::math::to_translation(T_MS), std::to_string(frame));
   map.saveMesh(config.app.mesh_output_dir + "/test-raycasting-mesh", std::to_string(frame));
 
-  lodepng_encode32_file((config.app.mesh_output_dir + "/test-raycasting-img.png").c_str(), reinterpret_cast<const unsigned char*>(output_volume_img_data), processed_img_res.x(), processed_img_res.y());
+  cv::Mat depth_cv_image(processed_img_res.y(), processed_img_res.x(), CV_8UC4, output_volume_img_data);
+  cv::cvtColor(depth_cv_image, depth_cv_image, cv::COLOR_RGBA2BGRA);
+  cv::imwrite((config.app.mesh_output_dir + "/test-raycasting-img.png").c_str(), depth_cv_image);
 
   delete[] output_rgba_img_data;
   delete[] output_depth_img_data;

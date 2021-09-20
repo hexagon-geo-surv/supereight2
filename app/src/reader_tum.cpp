@@ -12,7 +12,6 @@
 #include <iostream>
 
 #include <Eigen/StdVector>
-#include "lodepng.h"
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/core/core.hpp>
@@ -468,8 +467,7 @@ se::TUMReader::TUMReader(const se::ReaderConfig& c)
   if (!rgb_filenames_.empty()) {
     const std::string first_rgb_filename = sequence_path_ + "/" + rgb_filenames_[0];
 
-    // lodepng_decode32_file
-    cv::Mat image_data = cv::imread(first_rgb_filename.c_str(), CV_LOAD_IMAGE_UNCHANGED );
+    cv::Mat image_data = cv::imread(first_rgb_filename.c_str(), CV_LOAD_IMAGE_COLOR );
 
     if (image_data.data == NULL) {
       std::cerr << "Error: Could not read RGB image " << first_rgb_filename << "\n";

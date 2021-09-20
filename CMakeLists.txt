@@ -70,8 +70,6 @@ target_link_libraries(${LIB_NAME}
     PUBLIC
       Eigen3::Eigen
       SRL::Projection
-    PRIVATE
-      Lode::PNG
 )
 # Add an alias so that the library can be used inside the build tree, e.g. when
 # testing.

@@ -12,7 +12,9 @@
 #include <iostream>
 
 #include <Eigen/StdVector>
-#include "lodepng.h"
+#include <opencv2/opencv.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/core/core.hpp>
 
 #include "se/common/image_utils.hpp"
 #include "filesystem.hpp"
@@ -341,29 +343,27 @@ se::InteriorNetReader::InteriorNetReader(const se::ReaderConfig& c) : se::Reader
   // Get the total number of frames.
   num_frames_ = depth_filenames_.size();
   // Set the depth image resolution to that of the first depth image.
-  unsigned w = 0;
-  unsigned h = 0;
   if (!depth_filenames_.empty())
   {
     const std::string first_depth_filename = sequence_path_ + "/depth0/data/" + depth_filenames_[0];
-    unsigned char* image_data = nullptr;
-    if (lodepng_decode_file(&image_data, &w, &h, first_depth_filename.c_str(), LCT_GREY, 16))
-    {
-      free(image_data);
+    cv::Mat image_data = cv::imread(first_depth_filename.c_str(), CV_LOAD_IMAGE_UNCHANGED );
+
+    if (image_data.data == NULL) {
       std::cerr << "Error: Could not read depth image " << first_depth_filename << "\n";
       status_ = se::ReaderStatus::error;
       camera_active_ = false;
       camera_open_ = false;
       return;
     }
-    depth_image_res_ = Eigen::Vector2i(w, h);
+
+    depth_image_res_ = Eigen::Vector2i(image_data.cols, image_data.rows);
   }
 
-  projection_.resize(w * h);
+  projection_.resize(depth_image_res_.x() * depth_image_res_.y());
 
-  for (unsigned int y = 0; y < h; y++)
+  for (int y = 0; y < depth_image_res_.y(); y++)
   {
-    for (unsigned int x = 0; x < w; x++)
+    for (int x = 0; x < depth_image_res_.x(); x++)
     {
       projection_[x + y * depth_image_res_.x()] = sqrt((1 + (x - InteriorNetIntrinsics::c_x) * (x - InteriorNetIntrinsics::c_x) /
                                                             (InteriorNetIntrinsics::f_x * InteriorNetIntrinsics::f_x) +
@@ -373,22 +373,19 @@ se::InteriorNetReader::InteriorNetReader(const se::ReaderConfig& c) : se::Reader
   }
 
   // Set the RGBA image resolution to that of the first RGBA image.
-  w = 0;
-  h = 0;
   if (!rgb_filenames_.empty())
   {
     const std::string first_rgb_filename = sequence_path_ + "/cam0/data/" + rgb_filenames_[0];
-    unsigned char* image_data = nullptr;
-    if (lodepng_decode32_file(&image_data, &w, &h, first_rgb_filename.c_str()))
-    {
-      free(image_data);
+    cv::Mat image_data = cv::imread(first_rgb_filename.c_str(), CV_LOAD_IMAGE_COLOR );
+
+    if (image_data.data == NULL) {
       std::cerr << "Error: Could not read RGB image " << first_rgb_filename << "\n";
       status_ = se::ReaderStatus::error;
       camera_active_ = false;
       camera_open_ = false;
       return;
     }
-    rgba_image_res_  = Eigen::Vector2i(w, h);
+    rgba_image_res_  = Eigen::Vector2i(image_data.cols, image_data.rows);
   }
 }
 
@@ -427,37 +424,25 @@ se::ReaderStatus se::InteriorNetReader::nextDepth(se::Image<float>& depth_image)
   }
   const std::string filename = sequence_path_ + "/depth0/data/" + depth_filenames_[frame_];
   // Read the image data.
-  unsigned w = 0;
-  unsigned h = 0;
-  unsigned char* image_data = nullptr;
-  if (lodepng_decode_file(&image_data, &w, &h, filename.c_str(), LCT_GREY, 16))
-  {
-    free(image_data);
+
+  // Read the image data.
+  cv::Mat image_data = cv::imread(filename.c_str(), CV_LOAD_IMAGE_UNCHANGED );
+  cv::Mat depth_data;
+  image_data.convertTo(depth_data, CV_32F, inverse_scale_);
+
+  if (image_data.data == NULL) {
     return se::ReaderStatus::error;
   }
-  assert(depth_image_res_.x() == static_cast<int>(w));
-  assert(depth_image_res_.y() == static_cast<int>(h));
+
+  assert(depth_image_res_.x() == static_cast<int>(image_data.cols));
+  assert(depth_image_res_.y() == static_cast<int>(image_data.rows));
   // Resize the output image if needed.
-  if ((   depth_image.width()  != depth_image_res_.x())
-      || (depth_image.height() != depth_image_res_.y()))
-  {
+  if ((    depth_image.width()  != depth_image_res_.x())
+      || (depth_image.height() != depth_image_res_.y())) {
     depth_image = se::Image<float>(depth_image_res_.x(), depth_image_res_.y());
   }
-  // Change from big endian to little endiad, scale and copy into the provided
-  // image.
-#pragma omp parallel for
-  for (size_t i = 0; i < w * h; ++i)
-  {
-    // Swap the byte order.
-    const uint16_t depth_value = reinterpret_cast<uint16_t*>(image_data)[i];
-    const uint16_t low_byte = depth_value & 0x00FF;
-    const uint16_t high_byte = (depth_value & 0xFF00) >> 8;
-    const uint16_t depth_value_unscaled = (low_byte << 8 | high_byte);
 
-    depth_image[i] = inverse_scale_ / projection_[i] * depth_value_unscaled;
-  }
-
-  free(image_data);
+  depth_image.getData().assign((float*) depth_data.datastart, (float*) depth_data.dataend);
   return se::ReaderStatus::ok;
 }
 
@@ -465,30 +450,28 @@ se::ReaderStatus se::InteriorNetReader::nextDepth(se::Image<float>& depth_image)
 
 se::ReaderStatus se::InteriorNetReader::nextRGBA(se::Image<uint32_t>& rgba_image)
 {
-  if (frame_ >= num_frames_)
-  {
+  if (frame_ >= num_frames_) {
     return se::ReaderStatus::error;
   }
   const std::string filename = sequence_path_ + "/cam0/data/" + rgb_filenames_[frame_];
-  // Read the image data.
-  unsigned w = 0;
-  unsigned h = 0;
-  unsigned char* image_data = nullptr;
-  if (lodepng_decode32_file(&image_data, &w, &h, filename.c_str()))
-  {
-    free(image_data);
+
+  cv::Mat image_data = cv::imread(filename.c_str(), CV_LOAD_IMAGE_COLOR );
+
+  if (image_data.data == NULL) {
     return se::ReaderStatus::error;
   }
-  assert(rgba_image_res_.x() == static_cast<int>(w));
-  assert(rgba_image_res_.y() == static_cast<int>(h));
+
+  cv::Mat rgba_data;
+  cv::cvtColor(image_data, rgba_data, cv::COLOR_BGR2RGBA);
+
+  assert(rgba_image_res_.x() == static_cast<int>(rgba_data.cols));
+  assert(rgba_image_res_.y() == static_cast<int>(rgba_data.rows));
   // Resize the output image if needed.
-  if ((   rgba_image.width()  != rgba_image_res_.x())
-      || (rgba_image.height() != rgba_image_res_.y()))
-  {
+  if ((    rgba_image.width()  != rgba_image_res_.x())
+      || (rgba_image.height() != rgba_image_res_.y())) {
     rgba_image = se::Image<uint32_t>(rgba_image_res_.x(), rgba_image_res_.y());
   }
-  // Copy into the provided image.
-  std::memcpy(rgba_image.data(), image_data, w * h * sizeof(uint32_t));
-  free(image_data);
+
+  rgba_image.getData().assign((uint32_t*) rgba_data.datastart, (uint32_t*) rgba_data.dataend);
   return se::ReaderStatus::ok;
 }

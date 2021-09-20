@@ -15,7 +15,9 @@
 #include <iostream>
 #include <regex>
 
-#include "lodepng.h"
+#include <opencv2/opencv.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/core/core.hpp>
 
 #include "se/common/image_utils.hpp"
 #include "filesystem.hpp"
@@ -116,24 +118,26 @@ se::ReaderStatus se::ICLNUIMReader::nextRGBA(se::Image<uint32_t>& rgba_image) {
   std::ostringstream basename;
   basename << "scene_00_" << std::setfill('0') << std::setw(4) << frame_;
   const std::string filename (sequence_path_ + "/" + basename.str() + ".png");
-  // Read the image data.
-  unsigned w = 0;
-  unsigned h = 0;
-  unsigned char* image_data = nullptr;
-  if (lodepng_decode32_file(&image_data, &w, &h, filename.c_str())) {
-    free(image_data);
+
+  cv::Mat image_data = cv::imread(filename.c_str(), CV_LOAD_IMAGE_COLOR );
+
+  if (image_data.data == NULL) {
     return se::ReaderStatus::error;
   }
-  assert(rgba_image_res_.x() == static_cast<int>(w));
-  assert(rgba_image_res_.y() == static_cast<int>(h));
+
+  cv::Mat rgba_data;
+  cv::cvtColor(image_data, rgba_data, cv::COLOR_BGR2RGBA);
+
+  assert(rgba_image_res_.x() == static_cast<int>(rgba_data.cols));
+  assert(rgba_image_res_.y() == static_cast<int>(rgba_data.rows));
   // Resize the output image if needed.
-  if ((   rgba_image.width()  != rgba_image_res_.x())
+  if ((    rgba_image.width()  != rgba_image_res_.x())
       || (rgba_image.height() != rgba_image_res_.y())) {
     rgba_image = se::Image<uint32_t>(rgba_image_res_.x(), rgba_image_res_.y());
   }
-  // Copy into the provided image.
-  std::memcpy(rgba_image.data(), image_data, w * h * sizeof(uint32_t));
-  free(image_data);
+
+  rgba_image.getData().assign((uint32_t*) rgba_data.datastart, (uint32_t*) rgba_data.dataend);
+
   return se::ReaderStatus::ok;
 }
 
