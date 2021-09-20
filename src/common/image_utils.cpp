@@ -36,7 +36,7 @@ int se::save_depth_png(const uint16_t*        depth_image_data,
                        const Eigen::Vector2i& depth_image_res,
                        const std::string&     filename) {
 
-  cv::Mat depth_image(depth_image_res.y(), depth_image_res.x(), CV_16U);
+  cv::Mat depth_image(depth_image_res.y(), depth_image_res.x(), CV_16UC1);
   for (int x = 0; x < depth_image_res.x(); x++) {
     for (int y = 0; y < depth_image_res.y(); y++) {
       depth_image.at<uint16_t>(y, x) = depth_image_data[x + depth_image_res.x() * y];
@@ -90,7 +90,7 @@ int se::load_depth_png(uint16_t**         depth_image_data,
 
   *depth_image_data = new uint16_t [depth_image_res.x() * depth_image_res.y()];
 
-  cv::Mat img (depth_cv_image.rows, depth_cv_image.cols, CV_16U, *depth_image_data);
+  cv::Mat img (depth_cv_image.rows, depth_cv_image.cols, CV_16UC1, *depth_image_data);
   depth_cv_image.copyTo(img);
 
   return 0;

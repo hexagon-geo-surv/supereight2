@@ -512,7 +512,7 @@ se::ReaderStatus se::TUMReader::nextDepth(se::Image<float>& depth_image) {
   // Read the image data.
   cv::Mat image_data = cv::imread(filename.c_str(), cv::IMREAD_UNCHANGED);
   cv::Mat depth_data;
-  image_data.convertTo(depth_data, CV_32F, inverse_scale_);
+  image_data.convertTo(depth_data, CV_32FC1, inverse_scale_);
 
   if (image_data.data == NULL) {
     return se::ReaderStatus::error;
