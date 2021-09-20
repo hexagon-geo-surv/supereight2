@@ -526,7 +526,8 @@ se::ReaderStatus se::TUMReader::nextDepth(se::Image<float>& depth_image) {
     depth_image = se::Image<float>(depth_image_res_.x(), depth_image_res_.y());
   }
 
-  depth_image.getData().assign((float*) depth_data.datastart, (float*) depth_data.dataend);
+  cv::Mat wrapper_mat(depth_data.rows, depth_data.cols, CV_32FC1, depth_image.data());
+  depth_data.copyTo(wrapper_mat);
   return se::ReaderStatus::ok;
 }
 
@@ -555,7 +556,8 @@ se::ReaderStatus se::TUMReader::nextRGBA(se::Image<uint32_t>& rgba_image) {
     rgba_image = se::Image<uint32_t>(rgba_image_res_.x(), rgba_image_res_.y());
   }
 
-  rgba_image.getData().assign((uint32_t*) rgba_data.datastart, (uint32_t*) rgba_data.dataend);
+  cv::Mat wrapper_mat(rgba_data.rows, rgba_data.cols, CV_8UC4, rgba_image.data());
+  rgba_data.copyTo(wrapper_mat);
 
   return se::ReaderStatus::ok;
 }

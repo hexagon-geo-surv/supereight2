@@ -42,9 +42,6 @@ public:
   T* data()             { return data_.data(); }
   const T* data() const { return data_.data(); }
 
-  std::vector<T, Eigen::aligned_allocator<T> >& getData()             { return data_; }
-  const std::vector<T, Eigen::aligned_allocator<T> >& getData() const { return data_; }
-
 private:
   int width_;
   int height_;
