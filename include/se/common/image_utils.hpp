@@ -63,7 +63,7 @@ namespace se {
    * \return                     0 on success, nonzero on error.
    *
    * \warning The memory for the image buffer is allocated inside this
-   * function. free(*depth_image_data) must be called to free the memory.
+   * function. `delete[] *depth_image_data` must be called to free the memory.
    * width * height * sizeof(float) bytes are allocated.
    */
   int load_depth_png(float**            depth_image_data,
@@ -83,7 +83,7 @@ namespace se {
    * \return                     0 on success, nonzero on error.
    *
    * \warning The memory for the image buffer is allocated inside this
-   * function. free(*depth_image_data) must be called to free the memory.
+   * function. `delete[] *depth_image_data` must be called to free the memory.
    * width * height * sizeof(uint16_t) bytes are allocated.
    */
   int load_depth_png(uint16_t**         depth_image_data,
@@ -149,7 +149,7 @@ namespace se {
    * \return                     0 on success, nonzero on error.
    *
    * \warning The memory for the image buffer is allocated inside this
-   * function. free(*depth_image_data) must be called to free the memory.
+   * function. `delete[] *depth_image_data` must be called to free the memory.
    * width * height * sizeof(float) bytes are allocated.
    */
   int load_depth_pgm(float**            depth_image_data,
@@ -169,7 +169,7 @@ namespace se {
    * \return                     0 on success, nonzero on error.
    *
    * \warning The memory for the image buffer is allocated inside this
-   * function. free(*depth_image_data) must be called to free the memory.
+   * function. `delete[] *depth_image_data` must be called to free the memory.
    * width * height * sizeof(uint16_t) bytes are allocated.
    */
   int load_depth_pgm(uint16_t**         depth_image_data,
