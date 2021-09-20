@@ -121,7 +121,7 @@ se::ReaderStatus se::ICLNUIMReader::nextRGBA(se::Image<uint32_t>& rgba_image) {
 
   cv::Mat image_data = cv::imread(filename.c_str(), cv::IMREAD_COLOR);
 
-  if (image_data.data == NULL) {
+  if (image_data.empty()) {
     return se::ReaderStatus::error;
   }
 

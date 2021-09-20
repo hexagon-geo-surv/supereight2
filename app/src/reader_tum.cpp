@@ -453,7 +453,7 @@ se::TUMReader::TUMReader(const se::ReaderConfig& c)
 
     cv::Mat image_data = cv::imread(first_depth_filename.c_str(), cv::IMREAD_UNCHANGED);
 
-    if (image_data.data == NULL) {
+    if (image_data.empty()) {
       std::cerr << "Error: Could not read depth image " << first_depth_filename << "\n";
       status_ = se::ReaderStatus::error;
       camera_active_ = false;
@@ -469,7 +469,7 @@ se::TUMReader::TUMReader(const se::ReaderConfig& c)
 
     cv::Mat image_data = cv::imread(first_rgb_filename.c_str(), cv::IMREAD_COLOR);
 
-    if (image_data.data == NULL) {
+    if (image_data.empty()) {
       std::cerr << "Error: Could not read RGB image " << first_rgb_filename << "\n";
       status_ = se::ReaderStatus::error;
       camera_active_ = false;
@@ -514,7 +514,7 @@ se::ReaderStatus se::TUMReader::nextDepth(se::Image<float>& depth_image) {
   cv::Mat depth_data;
   image_data.convertTo(depth_data, CV_32FC1, inverse_scale_);
 
-  if (image_data.data == NULL) {
+  if (image_data.empty()) {
     return se::ReaderStatus::error;
   }
 
@@ -540,7 +540,7 @@ se::ReaderStatus se::TUMReader::nextRGBA(se::Image<uint32_t>& rgba_image) {
 
   cv::Mat image_data = cv::imread(filename.c_str(), cv::IMREAD_COLOR);
 
-  if (image_data.data == NULL) {
+  if (image_data.empty()) {
     return se::ReaderStatus::error;
   }
 

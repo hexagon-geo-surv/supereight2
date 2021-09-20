@@ -430,7 +430,7 @@ se::ReaderStatus se::InteriorNetReader::nextDepth(se::Image<float>& depth_image)
   cv::Mat depth_data;
   image_data.convertTo(depth_data, CV_32FC1, inverse_scale_);
 
-  if (image_data.data == NULL) {
+  if (image_data.empty()) {
     return se::ReaderStatus::error;
   }
 
@@ -457,7 +457,7 @@ se::ReaderStatus se::InteriorNetReader::nextRGBA(se::Image<uint32_t>& rgba_image
 
   cv::Mat image_data = cv::imread(filename.c_str(), cv::IMREAD_COLOR);
 
-  if (image_data.data == NULL) {
+  if (image_data.empty()) {
     return se::ReaderStatus::error;
   }
 
