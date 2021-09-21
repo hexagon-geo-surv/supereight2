@@ -2,7 +2,7 @@
 
 #include "config.hpp"
 #include "draw.hpp"
-#include "filesystem.hpp"
+#include "se/common/filesystem.hpp"
 #include "reader.hpp"
 
 int main(int argc, char** argv)

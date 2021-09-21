@@ -5,7 +5,7 @@
 
 #include "config.hpp"
 
-#include "filesystem.hpp"
+#include "se/common/filesystem.hpp"
 #include "se/common/yaml.hpp"
 
 namespace se {

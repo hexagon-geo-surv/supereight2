@@ -14,7 +14,7 @@
 #include <Eigen/StdVector>
 
 #include "se/common/image_utils.hpp"
-#include "filesystem.hpp"
+#include "se/common/filesystem.hpp"
 
 struct InteriorNetIntrinsics
 {
