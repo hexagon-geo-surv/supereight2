@@ -435,7 +435,6 @@ inline double PerfStats::sampleDurationEnd(const std::string& key) {
 
 inline void PerfStats::setFilestream(std::ofstream* filestream) {
   filestream_     = filestream;
-  *filestream_ << "RESULT DATA" << std::endl;
   filestream_pos_ = filestream_->tellp();
 }
 
