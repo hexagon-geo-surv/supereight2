@@ -150,7 +150,8 @@ int main(int argc, char** argv)
     TOCK("draw")
 
     TOCK("total")
-    if (config.app.enable_meshing && (frame % config.app.meshing_rate == 0))
+    const bool last_frame = frame == config.app.max_frames || static_cast<size_t>(frame) == reader->numFrames();
+    if (config.app.enable_meshing && ((config.app.meshing_rate > 0 && frame % config.app.meshing_rate == 0) || last_frame))
     {
       map.saveMesh(config.app.mesh_output_dir + "/mesh", std::to_string(frame));
       if (config.app.enable_slice_meshing)
