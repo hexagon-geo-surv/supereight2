@@ -1,19 +1,19 @@
 .PHONY: release
 release:
 	mkdir -p build/release
-	cmake -DCMAKE_BUILD_TYPE=Release -S . -B build/release
+	cd build/release && cmake -DCMAKE_BUILD_TYPE=Release ../..
 	cmake --build build/release
 
 .PHONY: relwithdebinfo
 relwithdebinfo:
 	mkdir -p build/relwithdebinfo
-	cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -S . -B build/relwithdebinfo
+	cd build/relwithdebinfo && cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ../..
 	cmake --build build/relwithdebinfo
 
 .PHONY: debug
 debug:
 	mkdir -p build/debug
-	cmake -DCMAKE_BUILD_TYPE=Debug -S . -B build/debug
+	cd build/debug && cmake -DCMAKE_BUILD_TYPE=Debug ../..
 	cmake --build build/debug
 
 
