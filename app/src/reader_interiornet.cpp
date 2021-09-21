@@ -36,7 +36,7 @@ struct InteriorNetImageEntry
   InteriorNetImageEntry()
           : timestamp(NAN) {}
 
-  /** Initialize using a single-line string from a InteriorNet depth.txt or rgb.txt.
+  /** Initialize using a single-line string from a InteriorNet data.csv.
    * \warning No error checking is performed in this function, it should be
    * performed by the caller.
    */
@@ -120,7 +120,7 @@ struct InteriorNetPoseEntry
 
 
 
-/** Read a InteriorNet depth.txt or rgb.txt into an std::vector of InteriorNetImageEntry.
+/** Read a InteriorNet data.csv into an std::vector of InteriorNetImageEntry.
  * Return an empty std::vector if the file was not in the correct format.
  */
 std::vector<InteriorNetImageEntry> read_interiornet_image_list(const std::string& filename)
@@ -138,7 +138,7 @@ std::vector<InteriorNetImageEntry> read_interiornet_image_list(const std::string
     if (line[0] == '#') {
       continue;
     }
-    // Data line read, split on spaces
+    // Data line read, split on commas
     std::replace(line.begin(), line.end(), ',', ' ');
     const std::vector<std::string> columns = se::str_utils::split_str(line, ' ', true);
     // Ensure it has the expected number of columns
@@ -146,8 +146,8 @@ std::vector<InteriorNetImageEntry> read_interiornet_image_list(const std::string
     {
       std::cerr << "Error: Invalid format in data line " << images.size() + 1 << " of "
                 << filename << "\n";
-      std::cerr << "Error: The format of each line in a InteriorNet depth.txt/rgb.txt file must be: "
-                << "timestamp filename\n";
+      std::cerr << "Error: The format of each line in an InteriorNet data.csv file must be: "
+                << "timestamp,filename\n";
       images.clear();
       return images;
     }
@@ -294,10 +294,10 @@ se::InteriorNetReader::InteriorNetReader(const se::ReaderConfig& c) : se::Reader
     camera_active_ = false;
     camera_open_ = false;
     std::cerr << "Error: The InteriorNet sequence path must be a directory that contains"
-              << " depth and rgb subdirectories and depth.txt and rgb.txt files\n";
+              << " depth0/data and cam0/data subdirectories and depth0/data.csv and cam0/data.csv files\n";
     return;
   }
-  // Read the image information from depth.txt and rgb.txt.
+  // Read the image information from the data.csv.
   std::vector<InteriorNetImageEntry> depth_images = read_interiornet_image_list(sequence_path_ + "/depth0/data.csv");
   std::vector<InteriorNetImageEntry> rgb_images   = read_interiornet_image_list(sequence_path_ + "/cam0/data.csv");
   // Read and associate the ground truth file if needed
