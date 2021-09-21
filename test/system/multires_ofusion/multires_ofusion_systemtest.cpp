@@ -7,12 +7,14 @@
 #include "config.hpp"
 #include "se/map/map.hpp"
 #include "se/integrator/map_integrator.hpp"
+#include <se/common/filesystem.hpp>
 
 extern int my_argc;
 extern char** my_argv;
 
 int my_argc;
 char** my_argv;
+std::string tmp;
 
 int main(int argc, char** argv)
 {
@@ -23,6 +25,11 @@ int main(int argc, char** argv)
     std::cerr << "Usage: " << argv[0] << " YAML_FILE\n";
     exit(2);
   }
+
+  // Create a temporary directory for all the tests.
+  tmp = stdfs::temp_directory_path() / stdfs::path("supereight_test_results");
+  stdfs::create_directories(tmp);
+
   return RUN_ALL_TESTS();
 }
 
@@ -31,8 +38,13 @@ int main(int argc, char** argv)
 TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
 {
   const std::string config_filename (my_argv[1]);
-  const se::Config<se::OccupancyDataConfig, se::PinholeCameraConfig> config (config_filename);
+  se::Config<se::OccupancyDataConfig, se::PinholeCameraConfig> config (config_filename);
   se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
+
+  // Output files in a temporary directory.
+  config.app.mesh_output_dir = std::string(tmp + "/meshes");
+  config.app.log_file = std::string(tmp + "/log.tsv");
+  stdfs::create_directories(config.app.mesh_output_dir);
 
   // Create a pinhole camera and downsample the intrinsics
   const se::PinholeCamera sensor(config.sensor, config.app.sensor_downsampling_factor);
@@ -97,8 +109,13 @@ TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
 TEST(MultiResOFusionSystemTest, GetField)
 {
   const std::string config_filename (my_argv[1]);
-  const se::Config<se::OccupancyDataConfig, se::PinholeCameraConfig> config (config_filename);
+  se::Config<se::OccupancyDataConfig, se::PinholeCameraConfig> config (config_filename);
   se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
+
+  // Output files in a temporary directory.
+  config.app.mesh_output_dir = std::string(tmp + "/meshes");
+  config.app.log_file = std::string(tmp + "/log.tsv");
+  stdfs::create_directories(config.app.mesh_output_dir);
 
   // Create a pinhole camera and downsample the intrinsics
   const se::PinholeCamera sensor(config.sensor, config.app.sensor_downsampling_factor);
@@ -167,8 +184,13 @@ TEST(MultiResOFusionSystemTest, GetField)
 TEST(MultiResOFusionSystemTest, GetMaxField)
 {
   const std::string config_filename (my_argv[1]);
-  const se::Config<se::OccupancyDataConfig, se::PinholeCameraConfig> config (config_filename);
+  se::Config<se::OccupancyDataConfig, se::PinholeCameraConfig> config (config_filename);
   se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
+
+  // Output files in a temporary directory.
+  config.app.mesh_output_dir = std::string(tmp + "/meshes");
+  config.app.log_file = std::string(tmp + "/log.tsv");
+  stdfs::create_directories(config.app.mesh_output_dir);
 
   // Create a pinhole camera and downsample the intrinsics
   const se::PinholeCamera sensor(config.sensor, config.app.sensor_downsampling_factor);
@@ -237,8 +259,13 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
 TEST(MultiResOFusionSystemTest, DeleteChildren)
 {
   const std::string config_filename (my_argv[1]);
-  const se::Config<se::OccupancyDataConfig, se::PinholeCameraConfig> config (config_filename);
+  se::Config<se::OccupancyDataConfig, se::PinholeCameraConfig> config (config_filename);
   se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
+
+  // Output files in a temporary directory.
+  config.app.mesh_output_dir = std::string(tmp + "/meshes");
+  config.app.log_file = std::string(tmp + "/log.tsv");
+  stdfs::create_directories(config.app.mesh_output_dir);
 
   // Create a pinhole camera and downsample the intrinsics
   const se::PinholeCamera sensor(config.sensor, config.app.sensor_downsampling_factor);
@@ -301,8 +328,13 @@ TEST(MultiResOFusionSystemTest, Raycasting)
 {
   // Read the configuration
   const std::string config_filename (my_argv[1]);
-  const se::Config<se::OccupancyDataConfig, se::PinholeCameraConfig> config (config_filename);
+  se::Config<se::OccupancyDataConfig, se::PinholeCameraConfig> config (config_filename);
   std::cout << config;
+
+  // Output files in a temporary directory.
+  config.app.mesh_output_dir = std::string(tmp + "/meshes");
+  config.app.log_file = std::string(tmp + "/log.tsv");
+  stdfs::create_directories(config.app.mesh_output_dir);
 
   // Setup log stream
   std::ofstream log_file_stream;
