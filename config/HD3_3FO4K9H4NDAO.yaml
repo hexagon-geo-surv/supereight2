@@ -56,12 +56,12 @@ app:
   enable_meshing:             true
   enable_slice_meshing:       true
   enable_structure_meshing:   true
-  mesh_output_dir:            "./out"
+  mesh_output_dir:            "meshes"
   sensor_downsampling_factor: 2
   tracking_rate:              1
   integration_rate:           1
   rendering_rate:             1
-  meshing_rate:               200
+  meshing_rate:               0
   max_frames:                 -1
-  log_file:                   "./out/log.txt"
+  log_file:                   "log.tsv"
 
