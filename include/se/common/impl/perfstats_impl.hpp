@@ -391,6 +391,22 @@ inline double PerfStats::sample(const std::string& key,
 
 
 
+inline double PerfStats::sampleT_WB(const Eigen::Matrix4f& T_WB,
+                                    const bool             detailed) {
+  const Eigen::Vector3f t_WS = T_WB.topRightCorner<3,1>();
+  const Eigen::Quaternionf q_WS(T_WB.topLeftCorner<3,3>());
+  sample("tx", t_WS.x(), POSITION, detailed);
+  sample("ty", t_WS.y(), POSITION, detailed);
+  sample("tz", t_WS.z(), POSITION, detailed);
+  sample("qx", q_WS.x(), ORIENTATION, detailed);
+  sample("qy", q_WS.y(), ORIENTATION, detailed);
+  sample("qz", q_WS.z(), ORIENTATION, detailed);
+  sample("qw", q_WS.w(), ORIENTATION, detailed);
+  return getTime();
+}
+
+
+
 inline double PerfStats::sampleDurationStart(const std::string& key,
                                              const bool         detailed) {
 

@@ -27,6 +27,8 @@
 #include <string>
 #include <vector>
 
+#include <Eigen/Dense>
+
 struct PerfStats {
   enum Type {
     BOOL,
@@ -348,6 +350,9 @@ struct PerfStats {
                 const double       value,
                 const Type         type = COUNT,
                 const bool         detailed = false);
+
+  double sampleT_WB(const Eigen::Matrix4f& T_WB,
+                    const bool             detailed = false);
 
   /**
    * \brief

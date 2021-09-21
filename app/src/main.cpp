@@ -112,6 +112,7 @@ int main(int argc, char** argv)
     {
       tracker.track(processed_depth_img, T_MS, surface_point_cloud_M, surface_normals_M);
     }
+    se::perfstats.sampleT_WB(T_MS);
     TOCK("tracking")
 
     TICK("integration")
