@@ -12,6 +12,9 @@
 #include <string>
 
 #include <Eigen/Dense>
+#include <opencv2/opencv.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/core/core.hpp>
 
 #include "se/image/image.hpp"
 #include "reader_base.hpp"
@@ -56,7 +59,7 @@ private:
 
   static constexpr double max_interp_timestamp_dist_ = 10.0 * max_match_timestamp_dist_;
 
-  std::vector<float> projection_;
+  cv::Mat projection_inv_;
 
   std::vector<std::string> depth_filenames_;
 

@@ -12,9 +12,6 @@
 #include <iostream>
 
 #include <Eigen/StdVector>
-#include <opencv2/opencv.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/core/core.hpp>
 
 #include "se/common/image_utils.hpp"
 #include "filesystem.hpp"
@@ -359,16 +356,16 @@ se::InteriorNetReader::InteriorNetReader(const se::ReaderConfig& c) : se::Reader
     depth_image_res_ = Eigen::Vector2i(image_data.cols, image_data.rows);
   }
 
-  projection_.resize(depth_image_res_.x() * depth_image_res_.y());
+  projection_inv_ = cv::Mat(depth_image_res_.y(), depth_image_res_.x(), CV_32FC1);
 
   for (int y = 0; y < depth_image_res_.y(); y++)
   {
     for (int x = 0; x < depth_image_res_.x(); x++)
     {
-      projection_[x + y * depth_image_res_.x()] = sqrt((1 + (x - InteriorNetIntrinsics::c_x) * (x - InteriorNetIntrinsics::c_x) /
-                                                            (InteriorNetIntrinsics::f_x * InteriorNetIntrinsics::f_x) +
-                                                            (y - InteriorNetIntrinsics::c_y) * (y - InteriorNetIntrinsics::c_y) /
-                                                            (InteriorNetIntrinsics::f_x * InteriorNetIntrinsics::f_x)));
+      projection_inv_.at<float>(y, x) = 1 / sqrt((1 + (x - InteriorNetIntrinsics::c_x) * (x - InteriorNetIntrinsics::c_x) /
+                                                 (InteriorNetIntrinsics::f_x * InteriorNetIntrinsics::f_x) +
+                                                 (y - InteriorNetIntrinsics::c_y) * (y - InteriorNetIntrinsics::c_y) /
+                                                 (InteriorNetIntrinsics::f_x * InteriorNetIntrinsics::f_x)));
     }
   }
 
@@ -429,6 +426,7 @@ se::ReaderStatus se::InteriorNetReader::nextDepth(se::Image<float>& depth_image)
   cv::Mat image_data = cv::imread(filename.c_str(), cv::IMREAD_UNCHANGED);
   cv::Mat depth_data;
   image_data.convertTo(depth_data, CV_32FC1, inverse_scale_);
+  depth_data = depth_data.mul(projection_inv_);
 
   if (image_data.empty()) {
     return se::ReaderStatus::error;
