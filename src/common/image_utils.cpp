@@ -51,11 +51,10 @@ int se::load_depth_png(float**            depth_image_data,
                        const float        inverse_scale) {
   // Load the 16-bit depth data
   uint16_t* depth_image_data_scaled = nullptr;
-  const int err = se::load_depth_png(&depth_image_data_scaled, depth_image_res,
-      filename);
+  const int err = se::load_depth_png(&depth_image_data_scaled, depth_image_res, filename);
   // Return on error
   if (err) {
-    free(depth_image_data_scaled);
+    delete[] depth_image_data_scaled;
     return err;
   }
   // Remove the scaling from the 16-bit depth data and convert to float
@@ -65,7 +64,7 @@ int se::load_depth_png(float**            depth_image_data,
   for (size_t i = 0; i < num_pixels; ++i) {
     (*depth_image_data)[i] = inverse_scale * depth_image_data_scaled[i];
   }
-  free(depth_image_data_scaled);
+  delete[] depth_image_data_scaled;
   return 0;
 }
 
@@ -77,15 +76,13 @@ int se::load_depth_png(uint16_t**         depth_image_data,
 
   // Load the image.
   cv::Mat depth_cv_image = cv::imread(filename.c_str(), cv::IMREAD_UNCHANGED);
-
-  if (depth_cv_image.data == NULL) {
+  if (depth_cv_image.empty()) {
+    *depth_image_data = nullptr;
     return 1;
   }
 
   depth_image_res =  Eigen::Vector2i(depth_cv_image.cols, depth_cv_image.rows);
-
   *depth_image_data = new uint16_t [depth_image_res.x() * depth_image_res.y()];
-
   cv::Mat img (depth_cv_image.rows, depth_cv_image.cols, CV_16UC1, *depth_image_data);
   depth_cv_image.copyTo(img);
 
@@ -154,11 +151,10 @@ int se::load_depth_pgm(float**            depth_image_data,
                        const float        inverse_scale) {
   // Load the 16-bit depth data
   uint16_t* depth_image_data_scaled = nullptr;
-  const int err = se::load_depth_pgm(&depth_image_data_scaled, depth_image_res,
-      filename);
+  const int err = se::load_depth_pgm(&depth_image_data_scaled, depth_image_res, filename);
   // Return on error
   if (err) {
-    free(depth_image_data_scaled);
+    delete[] depth_image_data_scaled;
     return err;
   }
   // Remove the scaling from the 16-bit depth data and convert to float
@@ -168,7 +164,7 @@ int se::load_depth_pgm(float**            depth_image_data,
   for (size_t i = 0; i < num_pixels; ++i) {
     (*depth_image_data)[i] = inverse_scale * depth_image_data_scaled[i];
   }
-  free(depth_image_data_scaled);
+  delete[] depth_image_data_scaled;
   return 0;
 }
 
