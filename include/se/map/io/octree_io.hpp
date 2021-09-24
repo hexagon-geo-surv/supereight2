@@ -28,21 +28,6 @@ bool save_3d_slice_vtk(const std::string&     filename,
                        const Eigen::Vector3i& upper_coord,
                        GetValueF&             get_value);
 
-/**
- * \brief Extract the octree structure from the octree.
- *
- * \tparam OctreeT
- * \param octree        The octree to extract the structure from
- * \param filename      The file name to save the structure to
- *
- * \return True if the file can be read, false otherwise
- */
-template <typename OctreeT>
-bool save_octree_structure_ply(OctreeT&           octree_ptr,
-                               const std::string& filename);
-
-
-
 } // namespace io
 } // namespace se
 

@@ -79,7 +79,7 @@ TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
   map.saveFieldSlice(config.app.mesh_output_dir + "/test-field-interp-slice",
                      se::math::to_translation(T_MS),
                      std::to_string(max_frame));
-  map.saveStrucutre(config.app.mesh_output_dir + "/test-field-interp-structure",
+  map.saveStructure(config.app.mesh_output_dir + "/test-field-interp-structure",
                     std::to_string(max_frame));
 
   Eigen::Vector3f       point_M;
@@ -159,7 +159,7 @@ TEST(MultiResOFusionSystemTest, GetField)
                      se::math::to_translation(T_MS),
                      std::to_string(max_frame));
 
-  map.saveStrucutre(config.app.mesh_output_dir + "/test-field-structure",
+  map.saveStructure(config.app.mesh_output_dir + "/test-field-structure",
                     std::to_string(max_frame));
 
   map.voxelToPoint(voxel_coord_unknown_1, point_M);
@@ -250,7 +250,7 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
                           std::to_string(max_frame));
   }
 
-  map.saveStrucutre(config.app.mesh_output_dir + "/test-max-field-structure",
+  map.saveStructure(config.app.mesh_output_dir + "/test-max-field-structure",
                     std::to_string(max_frame));
 }
 
@@ -317,7 +317,7 @@ TEST(MultiResOFusionSystemTest, DeleteChildren)
                        se::math::to_translation(T_MS),
                        std::to_string(frame));
 
-    map.saveStrucutre(config.app.mesh_output_dir + "/test-delete-child-structure",
+    map.saveStructure(config.app.mesh_output_dir + "/test-delete-child-structure",
                       std::to_string(frame));
   }
 }
@@ -397,7 +397,7 @@ TEST(MultiResOFusionSystemTest, Raycasting)
   convert_to_output_depth_img(processed_depth_img, output_depth_img_data);
   se::raycaster::renderVolumeKernel(output_volume_img_data, processed_img_res, se::math::to_translation(T_MS), ambient, surface_point_cloud_M, surface_normals_M, surface_scale);
 
-  map.saveStrucutre(config.app.mesh_output_dir + "/test-raycasting-structure", std::to_string(frame));
+  map.saveStructure(config.app.mesh_output_dir + "/test-raycasting-structure", std::to_string(frame));
   map.saveFieldSlice(config.app.mesh_output_dir + "/test-raycasting-slice-field", se::math::to_translation(T_MS), std::to_string(frame));
   map.saveMesh(config.app.mesh_output_dir + "/test-raycasting-mesh_" + std::to_string(frame) + ".ply");
   map.saveMesh(config.app.mesh_output_dir + "/test-raycasting-mesh_" + std::to_string(frame) + ".vtk");

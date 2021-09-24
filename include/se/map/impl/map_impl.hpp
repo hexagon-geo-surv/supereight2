@@ -2,6 +2,7 @@
 #define SE_MAP_IMPL_HPP
 
 #include "se/common/str_utils.hpp"
+#include "se/map/algorithms/structure_meshing.hpp"
 
 namespace se {
 
@@ -296,11 +297,11 @@ template <Field     FldT,
           Res       ResT,
           int       BlockSize
 >
-void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveStrucutre(const std::string& file_path,
+void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveStructure(const std::string& file_path,
                                                                  const std::string& num) const
 {
   const std::string file_name = (num == std::string("")) ? (file_path + ".ply") : (file_path + "_" + num + ".ply");
-  se::io::save_octree_structure_ply(*octree_ptr_, file_name);
+  io::save_mesh_ply(octree_structure_mesh(*octree_ptr_), file_name, Eigen::Matrix4f::Identity());
 }
 
 

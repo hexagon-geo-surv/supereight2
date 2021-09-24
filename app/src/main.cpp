@@ -161,7 +161,7 @@ int main(int argc, char** argv)
       }
       if (config.app.enable_structure_meshing)
       {
-        map.saveStrucutre(config.app.mesh_output_dir + "/struct", std::to_string(frame));
+        map.saveStructure(config.app.mesh_output_dir + "/struct", std::to_string(frame));
       }
     }
 

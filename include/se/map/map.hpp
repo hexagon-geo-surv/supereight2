@@ -239,7 +239,7 @@ public:
    * \param[in] file_path   The path to store the structure at (without .vtk file ending)
    * \param[in] num         The structure number, e.g. frame number (OPTIONAL)
    */
-  void saveStrucutre(const std::string& file_path,
+  void saveStructure(const std::string& file_path,
                      const std::string& num = "") const;
 
   /**
