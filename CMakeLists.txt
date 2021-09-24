@@ -70,6 +70,7 @@ target_include_directories(${LIB_NAME}
 )
 target_link_libraries(${LIB_NAME}
     PUBLIC
+      stdc++fs
       Eigen3::Eigen
       ${OpenCV_LIBS}
       SRL::Projection

@@ -17,7 +17,7 @@ add_library(${LIB_NAME} STATIC
   "src/reader_interiornet.cpp"
 )
 target_include_directories(${LIB_NAME} PRIVATE include)
-target_link_libraries(${LIB_NAME} PRIVATE SE::Supereight stdc++fs)
+target_link_libraries(${LIB_NAME} PRIVATE SE::Supereight)
 
 
 
