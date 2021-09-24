@@ -454,8 +454,6 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
       variance_state = computeVariance(pooling_pixel.min, pooling_pixel.max,
                                        approx_depth_value_min, approx_depth_value_max);
 
-      const int node_scale = octree_.getMaxScale() - octant_depth;
-
       /// CASE 1 (REDUNDANT DATA): Depth values in the bounding box are far away from the node or unknown (1).
       ///                          The node to be evaluated is free (2) and fully observed (3)
       if (variance_state != se::VarianceState::Gradient)
