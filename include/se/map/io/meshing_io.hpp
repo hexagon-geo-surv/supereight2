@@ -6,22 +6,16 @@
 #ifndef SE_MESHING_IO_HPP
 #define SE_MESHING_IO_HPP
 
-
-
-#include <fstream>
-#include <sstream>
-#include <iostream>
 #include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 
 #include "se/common/colour_utils.hpp"
 #include "se/map/algorithms/marching_cube.hpp"
 
-
-
 namespace se {
 namespace io {
-
-
 
 /**
  * \brief Save a mesh as a VTK file.
@@ -39,11 +33,12 @@ namespace io {
  * \param[in] cell_data  The scalar values of the cells/faces.
  * \return 0 on success, nonzero on error.
  */
-static int save_mesh_vtk(const std::vector<Triangle>& mesh,
-                         const std::string&           filename,
-                         const Eigen::Matrix4f&       T_WM,
-                         const float*                 point_data = nullptr,
-                         const float*                 cell_data = nullptr);
+template<typename FaceT>
+int save_mesh_vtk(const Mesh<FaceT>&     mesh,
+                  const std::string&     filename,
+                  const Eigen::Matrix4f& T_WM,
+                  const float*           point_data = nullptr,
+                  const float*           cell_data = nullptr);
 
 /**
  * \brief Save a mesh as a PLY file.
@@ -61,23 +56,23 @@ static int save_mesh_vtk(const std::vector<Triangle>& mesh,
  * \param[in] cell_data  The scalar values of the cells/faces.
  * \return 0 on success, nonzero on error.
  */
-static int save_mesh_ply(const std::vector<Triangle>& mesh,
-                         const std::string&           filename,
-                         const Eigen::Matrix4f&       T_WM,
-                         const float*                 point_data = nullptr,
-                         const float*                 cell_data = nullptr);
+template<typename FaceT>
+int save_mesh_ply(const Mesh<FaceT>&     mesh,
+                  const std::string&     filename,
+                  const Eigen::Matrix4f& T_WM,
+                  const float*           point_data = nullptr,
+                  const float*           cell_data = nullptr);
 
 /**
- * \brief Save a mesh as a OBJ file.
+ * \brief Save a mesh as an OBJ file.
  *
  * \param[in] mesh     The mesh to be saved.
  * \param[in] filename The output filename.
  * \return 0 on success, nonzero on error.
  */
-static int save_mesh_obj(const std::vector<Triangle>& mesh,
-                         const std::string&           filename);
-
-
+template<typename FaceT>
+int save_mesh_obj(const Mesh<FaceT>& mesh,
+                  const std::string& filename);
 
 } // namespace io
 } // namespace se
