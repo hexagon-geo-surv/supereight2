@@ -796,12 +796,10 @@ namespace algorithms {
 
 
 
-template <typename OctreeT,
-          typename TriangleT
->
+template <typename OctreeT>
 void marching_cube_kernel(OctreeT&                                   octree,
                           std::vector<typename OctreeT::BlockType*>& block_ptrs,
-                          std::vector<TriangleT>&                    triangles)
+                          TriangleMesh&                              triangles)
 {
   using namespace meshing;
   typedef typename OctreeT::BlockType BlockType;
@@ -857,12 +855,10 @@ void marching_cube_kernel(OctreeT&                                   octree,
 
 
 
-template <typename OctreeT,
-          typename TriangleT
->
+template <typename OctreeT>
 void dual_marching_cube_kernel(OctreeT&                                   octree,
                                std::vector<typename OctreeT::BlockType*>& block_ptrs,
-                               std::vector<TriangleT>&                    triangles)
+                               TriangleMesh&                              triangles)
 {
   using namespace meshing;
   typedef typename OctreeT::BlockType BlockType;
@@ -931,11 +927,9 @@ void dual_marching_cube_kernel(OctreeT&                                   octree
 
 
 
-template <typename OctreeT,
-          typename TriangleT
->
-void marching_cube(OctreeT&                octree,
-                   std::vector<TriangleT>& triangles)
+template <typename OctreeT>
+void marching_cube(OctreeT&      octree,
+                   TriangleMesh& triangles)
 {
   TICK("primal-marching-cube")
   typedef typename OctreeT::BlockType BlockType;
@@ -955,12 +949,10 @@ void marching_cube(OctreeT&                octree,
 
 
 
-template <typename OctreeT,
-          typename TriangleT
->
-void marching_cube(OctreeT&                octree,
-                   std::vector<TriangleT>& triangles,
-                   const int               time_stamp)
+template <typename OctreeT>
+void marching_cube(OctreeT&      octree,
+                   TriangleMesh& triangles,
+                   const int     time_stamp)
 {
   TICK("primal-marching-cube")
   typedef typename OctreeT::BlockType BlockType;
@@ -978,11 +970,9 @@ void marching_cube(OctreeT&                octree,
 
 
 
-template <typename OctreeT,
-          typename TriangleT
->
-void dual_marching_cube(OctreeT&                octree,
-                        std::vector<TriangleT>& triangles)
+template <typename OctreeT>
+void dual_marching_cube(OctreeT&      octree,
+                        TriangleMesh& triangles)
 {
   TICK("dual-marching-cube")
   typedef typename OctreeT::BlockType BlockType;
@@ -1000,12 +990,10 @@ void dual_marching_cube(OctreeT&                octree,
 
 
 
-template <typename OctreeT,
-          typename TriangleT
->
-void dual_marching_cube(OctreeT&                octree,
-                        std::vector<TriangleT>& triangles,
-                        const int               time_stamp)
+template <typename OctreeT>
+void dual_marching_cube(OctreeT&      octree,
+                        TriangleMesh& triangles,
+                        const int     time_stamp)
 {
   TICK("dual-marching-cube")
   typedef typename OctreeT::BlockType BlockType;
