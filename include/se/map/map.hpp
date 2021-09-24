@@ -234,13 +234,17 @@ public:
                  const std::string&     num = "") const;
 
   /**
-   * \brief Save octree structure to a file.
+   * \brief Save the octree structure to a file.
    *
-   * \param[in] file_path   The path to store the structure at (without .vtk file ending)
-   * \param[in] num         The structure number, e.g. frame number (OPTIONAL)
+   * \param[in] filename The file where the mesh will be saved. The file format will be selected
+   *                     based on the file extension. Allowed file extensions are `.ply`, `.vtk` and
+   *                     `.obj`.
+   * \param[in] T_WM     Transformation from the map frame where the mesh is generated to the world
+   *                     frame. Defaults to identity.
+   * \return Zero on success and non-zero on error.
    */
-  void saveStructure(const std::string& file_path,
-                     const std::string& num = "") const;
+  int saveStructure(const std::string&     filename,
+                    const Eigen::Matrix4f& T_WM = Eigen::Matrix4f::Identity()) const;
 
   /**
    * \brief Extract the mesh from the map using a marching cube algorithm and save it to a file.

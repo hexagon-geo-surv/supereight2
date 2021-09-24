@@ -297,11 +297,20 @@ template <Field     FldT,
           Res       ResT,
           int       BlockSize
 >
-void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveStructure(const std::string& file_path,
-                                                                 const std::string& num) const
+int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveStructure(const std::string&     filename,
+                                                                const Eigen::Matrix4f& T_WM) const
 {
-  const std::string file_name = (num == std::string("")) ? (file_path + ".ply") : (file_path + "_" + num + ".ply");
-  io::save_mesh_ply(octree_structure_mesh(*octree_ptr_), file_name, Eigen::Matrix4f::Identity());
+  const QuadMesh mesh = octree_structure_mesh(*octree_ptr_);
+  if (str_utils::ends_with(filename, ".ply")) {
+      return io::save_mesh_ply(mesh, filename, T_WM);
+  } else if (str_utils::ends_with(filename, ".vtk")) {
+      return io::save_mesh_vtk(mesh, filename, T_WM);
+  } else if (str_utils::ends_with(filename, ".obj")) {
+      return io::save_mesh_obj(mesh, filename, T_WM);
+  } else {
+      std::cerr << "Error saving mesh: unknown file extension in " << filename << "\n";
+      return 2;
+  }
 }
 
 
