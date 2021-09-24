@@ -154,7 +154,7 @@ int main(int argc, char** argv)
     const bool last_frame = frame == config.app.max_frames || static_cast<size_t>(frame) == reader->numFrames();
     if (config.app.enable_meshing && ((config.app.meshing_rate > 0 && frame % config.app.meshing_rate == 0) || last_frame))
     {
-      map.saveMesh(config.app.mesh_output_dir + "/mesh", std::to_string(frame));
+      map.saveMesh(config.app.mesh_output_dir + "/mesh_" + std::to_string(frame) + ".ply");
       if (config.app.enable_slice_meshing)
       {
         map.saveFieldSlice(config.app.mesh_output_dir + "/slice", se::math::to_translation(T_MS), std::to_string(frame));

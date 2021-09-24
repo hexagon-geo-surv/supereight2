@@ -399,7 +399,9 @@ TEST(MultiResOFusionSystemTest, Raycasting)
 
   map.saveStrucutre(config.app.mesh_output_dir + "/test-raycasting-structure", std::to_string(frame));
   map.saveFieldSlice(config.app.mesh_output_dir + "/test-raycasting-slice-field", se::math::to_translation(T_MS), std::to_string(frame));
-  map.saveMesh(config.app.mesh_output_dir + "/test-raycasting-mesh", std::to_string(frame));
+  map.saveMesh(config.app.mesh_output_dir + "/test-raycasting-mesh_" + std::to_string(frame) + ".ply");
+  map.saveMesh(config.app.mesh_output_dir + "/test-raycasting-mesh_" + std::to_string(frame) + ".vtk");
+  map.saveMesh(config.app.mesh_output_dir + "/test-raycasting-mesh_" + std::to_string(frame) + ".obj");
 
   cv::Mat depth_cv_image(processed_img_res.y(), processed_img_res.x(), CV_8UC4, output_volume_img_data);
   cv::cvtColor(depth_cv_image, depth_cv_image, cv::COLOR_RGBA2BGRA);
