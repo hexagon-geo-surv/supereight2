@@ -224,7 +224,7 @@ protected:
     map_ptr_->voxelToPoint(octant_ptr->getCoord(), octant_size, octant_centre_point_M);
     // Convert it to the sensor frame.
     const Eigen::Vector3f octant_centre_point_S
-        = (T_SM_ * octant_centre_point_M.homogeneous()).head<3>();
+        = (T_SM_ * octant_centre_point_M.homogeneous()).template head<3>();
 
     float octant_radius = std::sqrt(3.0f) / 2.0f * map_ptr_->getRes() * octant_size;
     bool do_ignore = !sensor_ptr_->sphereInFrustum(octant_centre_point_S, octant_radius);

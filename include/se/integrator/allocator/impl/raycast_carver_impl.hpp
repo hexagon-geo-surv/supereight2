@@ -87,7 +87,7 @@ std::vector<se::OctantBase*> RaycastCarver<MapT, SensorT>::operator()()
       Eigen::Vector3f ray_dir_C;
       const Eigen::Vector2f pixel_f = pixel.cast<float>();
       sensor_.model.backProject(pixel_f, &ray_dir_C);
-      const Eigen::Vector3f point_M = (T_MS_ * (depth_value * ray_dir_C).homogeneous()).head<3>();
+      const Eigen::Vector3f point_M = (T_MS_ * (depth_value * ray_dir_C).homogeneous()).template head<3>();
 
       const Eigen::Vector3f reverse_ray_dir_M = (t_MS - point_M).normalized();
 
