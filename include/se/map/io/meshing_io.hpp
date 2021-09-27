@@ -68,11 +68,13 @@ int save_mesh_ply(const Mesh<FaceT>&     mesh,
  *
  * \param[in] mesh     The mesh to be saved.
  * \param[in] filename The output filename.
+ * \param[in] T_WM     The transformation from map to world frame.
  * \return 0 on success, nonzero on error.
  */
 template<typename FaceT>
-int save_mesh_obj(const Mesh<FaceT>& mesh,
-                  const std::string& filename);
+int save_mesh_obj(const Mesh<FaceT>&     mesh,
+                  const std::string&     filename,
+                  const Eigen::Matrix4f& T_WM);
 
 } // namespace io
 } // namespace se

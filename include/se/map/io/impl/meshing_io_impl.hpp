@@ -167,8 +167,9 @@ int save_mesh_ply(const Mesh<FaceT>&     mesh,
 
 
 template<typename FaceT>
-int save_mesh_obj(const Mesh<FaceT>& mesh,
-                  const std::string& filename) {
+int save_mesh_obj(const Mesh<FaceT>&     mesh,
+                  const std::string&     filename,
+                  const Eigen::Matrix4f& T_WM) {
   // Open the file for writing.
   std::ofstream file(filename.c_str());
   if (!file.is_open()) {
@@ -187,8 +188,8 @@ int save_mesh_obj(const Mesh<FaceT>& mesh,
   // Write the vertices.
   for (size_t f = 0; f < num_faces; ++f) {
     for (size_t v = 0; v < FaceT::num_vertexes; ++v) {
-      const Eigen::Vector3f vertex_M = mesh[f].vertexes[v];
-      file << "v " << vertex_M.x() << " " << vertex_M.y() << " " << vertex_M.z() << "\n";
+      const Eigen::Vector3f vertex_W = (T_WM * mesh[f].vertexes[v].homogeneous()).template head<3>();
+      file << "v " << vertex_W.x() << " " << vertex_W.y() << " " << vertex_W.z() << "\n";
     }
   }
 
