@@ -10,7 +10,6 @@
 
 #include "se/common/filesystem.hpp"
 #include "se/common/str_utils.hpp"
-#include "reader_iclnuim.hpp"
 #include "reader_newercollege.hpp"
 #include "reader_openni.hpp"
 #include "reader_raw.hpp"
@@ -29,11 +28,6 @@ se::Reader* se::create_reader(const se::ReaderConfig& config)
       || (stdfs::path(config.sequence_path).extension() == ".oni")))
   {
     reader = new se::OpenNIReader(config);
-  } // ICL-NUIM reader
-  else if (   config.reader_type == se::ReaderType::ICLNUIM
-           && stdfs::is_directory(config.sequence_path))
-  {
-    reader = new se::ICLNUIMReader(config);
   } // Slambench 1.0 .raw reader
   else if (   config.reader_type == se::ReaderType::RAW
            && stdfs::path(config.sequence_path).extension() == ".raw")

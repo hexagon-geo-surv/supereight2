@@ -23,7 +23,7 @@
 
 namespace se {
 
-  enum class ReaderType { OPENNI, ICLNUIM, RAW, TUM, INTERIORNET, NEWERCOLLEGE, UNKNOWN };
+  enum class ReaderType { OPENNI, RAW, TUM, INTERIORNET, NEWERCOLLEGE, UNKNOWN };
 
   ReaderType string_to_reader_type(const std::string& s);
 

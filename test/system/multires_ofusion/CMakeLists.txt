@@ -4,15 +4,14 @@
 cmake_minimum_required(VERSION 3.5...3.16)
 
 set(READER_SRC
+  ../../../app/src/config.cpp
+  ../../../app/src/reader.cpp
   ../../../app/src/reader_base.cpp
-  ../../../app/src/reader_iclnuim.cpp
+  ../../../app/src/reader_interiornet.cpp
   ../../../app/src/reader_newercollege.cpp
   ../../../app/src/reader_openni.cpp
   ../../../app/src/reader_raw.cpp
   ../../../app/src/reader_tum.cpp
-  ../../../app/src/reader_interiornet.cpp
-  ../../../app/src/reader.cpp
-  ../../../app/src/config.cpp
 )
 
 get_filename_component(CONFIG_FILE "config.yaml" ABSOLUTE)

@@ -58,12 +58,6 @@ post_process_tum() {
 	generate_filename_list "$dir/depth" "$dir/depth.txt"
 }
 
-post_process_iclnuim() {
-	dir="$1"
-	# Fix the file permissions.
-	chmod 644 "$dir"/*
-}
-
 
 
 sequence_urls_tum='https://www.doc.ic.ac.uk/~ahanda/living_room_traj0_frei_png.tar.gz
@@ -71,22 +65,11 @@ https://www.doc.ic.ac.uk/~ahanda/living_room_traj1_frei_png.tar.gz
 https://www.doc.ic.ac.uk/~ahanda/living_room_traj2_frei_png.tar.gz
 https://www.doc.ic.ac.uk/~ahanda/living_room_traj3_frei_png.tar.gz'
 
-sequence_urls_iclnuim='https://www.doc.ic.ac.uk/~ahanda/living_room_traj0_loop.tgz
-https://www.doc.ic.ac.uk/~ahanda/living_room_traj1_loop.tgz
-https://www.doc.ic.ac.uk/~ahanda/living_room_traj2_loop.tgz
-https://www.doc.ic.ac.uk/~ahanda/living_room_traj3_loop.tgz'
-
 
 
 # Parse the options.
-sequence_urls="$sequence_urls_tum"
-postprocess=post_process_tum
 while getopts 'ih' opt_name ; do
 	case "$opt_name" in
-		i) # Download the datasets in the ICL-NUIM instead of the TUM format.
-			sequence_urls="$sequence_urls_iclnuim"
-			postprocess=post_process_iclnuim
-			;;
 		h) # Display this help message and exit.
 			usage
 			exit 0
@@ -122,7 +105,7 @@ log_file="$output_dir/$(basename "$0").log"
 rm -f "$log_file"
 
 # Download each sequence.
-for url in $sequence_urls; do
+for url in $sequence_urls_tum; do
 	filename="$output_dir/$(basename "$url")"
 	sequence_name="$(basename "$url")"
 	sequence_name="${sequence_name%%.*}"
@@ -147,7 +130,7 @@ for url in $sequence_urls; do
 
 	# Post-process the sequence.
 	printf "Post-processing %s\n" "$sequence_dir"
-	$postprocess "$sequence_dir"
+	post_process_tum "$sequence_dir"
 
 	# Remove the downloaded file.
 	rm "$filename"

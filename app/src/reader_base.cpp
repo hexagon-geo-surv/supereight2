@@ -29,10 +29,6 @@ se::ReaderType se::string_to_reader_type(const std::string& s)
   {
     return se::ReaderType::OPENNI;
   }
-  else if (s_lowered == "iclnuim")
-  {
-    return se::ReaderType::ICLNUIM;
-  }
   else if (s_lowered == "raw")
   {
     return se::ReaderType::RAW;
@@ -62,10 +58,6 @@ std::string se::reader_type_to_string(se::ReaderType t)
   if (t == se::ReaderType::OPENNI)
   {
     return "OpenNI";
-  }
-  else if (t == se::ReaderType::ICLNUIM)
-  {
-    return "ICLNUIM";
   }
   else if (t == se::ReaderType::RAW)
   {

@@ -12,12 +12,11 @@ add_library(${LIB_NAME} STATIC
   "src/config.cpp"
   "src/reader.cpp"
   "src/reader_base.cpp"
-  "src/reader_iclnuim.cpp"
+  "src/reader_interiornet.cpp"
   "src/reader_newercollege.cpp"
   "src/reader_openni.cpp"
   "src/reader_raw.cpp"
   "src/reader_tum.cpp"
-  "src/reader_interiornet.cpp"
 )
 target_include_directories(${LIB_NAME} PRIVATE include)
 target_link_libraries(${LIB_NAME} PRIVATE SE::Supereight)
