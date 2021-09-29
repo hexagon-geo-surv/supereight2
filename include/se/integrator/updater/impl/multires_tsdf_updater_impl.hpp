@@ -75,7 +75,7 @@ void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>, 
           se::field_t delta_tsdf = parent_data_union.data.tsdf - parent_data_union.prop_data.delta_tsdf;
 
           if (child_data_union.data.weight != 0) {
-            child_data_union.data.tsdf = std::max(child_data_union.data.tsdf + delta_tsdf, -1.f);
+            child_data_union.data.tsdf = std::max(child_data_union.data.tsdf + delta_tsdf, -se::field_t(1));
             child_data_union.data.weight = fminf(
                     child_data_union.data.weight + parent_data_union.prop_data.delta_weight,
                     map_.getDataConfig().max_weight);;
@@ -131,7 +131,7 @@ void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>, 
 
           // Update the TSDF
           const float m = sensor_.measurementFromPoint(point_S);
-          const float sdf_value = (depth_value - m) / m * point_S.norm();
+          const se::field_t sdf_value = (depth_value - m) / m * point_S.norm();
 
           typename BlockType::DataUnion data_union = block_ptr->getDataUnion(voxel_coord, block_ptr->getCurrentScale());
           updateVoxel(data_union, sdf_value);
@@ -144,26 +144,26 @@ void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>, 
     auto parent_up_funct = [](typename BlockType::DataUnion &parent_data_union,
                               typename BlockType::DataType &data_tmp,
                               const int sample_count) {
-        if (sample_count != 0) {
-          data_tmp.tsdf /= sample_count;
-          data_tmp.weight /= sample_count;
-          parent_data_union.data.tsdf = data_tmp.tsdf;
-          parent_data_union.prop_data.delta_tsdf = data_tmp.tsdf;
-          parent_data_union.data.weight = ceil(data_tmp.weight);
-          parent_data_union.prop_data.delta_weight = 0;
-        } else {
-          parent_data_union.data = typename BlockType::DataType();
-          parent_data_union.prop_data = typename BlockType::PropDataType();
-        }
+      if (sample_count != 0) {
+        data_tmp.tsdf /= sample_count;
+        data_tmp.weight /= sample_count;
+        parent_data_union.data.tsdf = data_tmp.tsdf;
+        parent_data_union.prop_data.delta_tsdf = data_tmp.tsdf;
+        parent_data_union.data.weight = ceil(data_tmp.weight);
+        parent_data_union.prop_data.delta_weight = 0;
+      } else {
+        parent_data_union.data = typename BlockType::DataType();
+        parent_data_union.prop_data = typename BlockType::PropDataType();
+      }
     };
 
     auto child_up_funct = [](typename BlockType::DataUnion &child_data_union, typename BlockType::DataType &data_tmp) {
-        if (child_data_union.data.weight != 0) {
-          data_tmp.tsdf += child_data_union.data.tsdf;
-          data_tmp.weight += child_data_union.data.weight;
-          return 1;
-        }
-        return 0;
+      if (child_data_union.data.weight != 0) {
+        data_tmp.tsdf += child_data_union.data.tsdf;
+        data_tmp.weight += child_data_union.data.weight;
+        return 1;
+      }
+      return 0;
     };
 
     se::propagator::propagateBlockUp(*map_.getOctree(), static_cast<se::OctantBase *>(block_ptr), curr_scale,
@@ -186,11 +186,11 @@ void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>, 
 {
   if (sdf_value > -config_.truncation_boundary)
   {
-    const float tsdf_value = std::min(1.f, sdf_value / config_.truncation_boundary);
+    const se::field_t tsdf_value = std::min(se::field_t(1), sdf_value / config_.truncation_boundary);
     data_union.data.tsdf =
-            (data_union.data.tsdf * data_union.data.weight + tsdf_value) / (data_union.data.weight + 1.f);
-    data_union.data.tsdf = se::math::clamp(data_union.data.tsdf, -1.f, 1.f);
-    data_union.data.weight = std::min(data_union.data.weight + 1, map_.getDataConfig().max_weight);
+            (data_union.data.tsdf * data_union.data.weight + tsdf_value) / (data_union.data.weight + se::weight_t(1));
+    data_union.data.tsdf = se::math::clamp(data_union.data.tsdf, -se::field_t(1), se::field_t(1));
+    data_union.data.weight = std::min(data_union.data.weight + se::weight_t(1), map_.getDataConfig().max_weight);
     data_union.prop_data.delta_weight++;
   }
 }

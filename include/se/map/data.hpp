@@ -12,23 +12,18 @@ namespace se {
 
 
 
-// Typedefs and defaults
+// Defaults
+static const se::field_t      dflt_tsdf       = 1.f;
 
-static const se::field_t  dflt_tsdf       = 1.f;
+static const se::field_t      dflt_occupancy  = 0.f;
 
-typedef int weight_t;
-static const weight_t     dflt_weight     = 0;
+static const se::weight_t     dflt_weight     = 0;
 
-static const se::field_t  dflt_occupancy  = 0.f;
+static const se::time_stamp_t dflt_time_stamp = -1.f;
 
-typedef float time_stamp_t;
-static const time_stamp_t dflt_time_stamp = -1.f;
+static const se::rgba_t       dflt_rgba       = 0xFFFFFFFF; // White
 
-typedef uint32_t rgba_t;
-static const rgba_t       dflt_rgba       = 0xFFFFFFFF; // White
-
-typedef short semantics_t;
-static const semantics_t  dflt_semantics  = 0;
+static const se::semantics_t  dflt_semantics  = 0;
 
 template<se::Field FieldT>
 struct FieldData
@@ -39,10 +34,10 @@ template<>
 struct FieldData<se::Field::Occupancy>
 {
     FieldData() : occupancy(dflt_occupancy), weight(dflt_weight), observed(false), time_stamp(dflt_time_stamp) {}
-    se::field_t  occupancy;
-    weight_t     weight;
-    bool         observed;
-    time_stamp_t time_stamp;
+    se::field_t      occupancy;
+    se::weight_t     weight;
+    bool             observed;
+    se::time_stamp_t time_stamp;
     static constexpr bool invert_normals = false;
 };
 
@@ -50,8 +45,8 @@ template<>
 struct FieldData<se::Field::TSDF>
 {
     FieldData() : tsdf(dflt_tsdf), weight(dflt_weight) {}
-    se::field_t tsdf;
-    weight_t    weight; // TODO: int or float
+    se::field_t  tsdf;
+    se::weight_t weight; // TODO: int or float
     static constexpr bool invert_normals = true;
 };
 
@@ -65,7 +60,7 @@ template<>
 struct ColourData<se::Colour::On>
 {
     ColourData() : rgba(dflt_rgba) {}
-    rgba_t rgba;
+    se::rgba_t rgba;
 };
 
 // Semantic data
@@ -79,7 +74,7 @@ template<>
 struct SemanticData<se::Semantics::On>
 {
     SemanticData() : sem(dflt_semantics) {}
-    semantics_t sem;
+    se::semantics_t sem;
 };
 
 template <se::Field     FldT = se::Field::TSDF,
@@ -115,8 +110,8 @@ template<>
 struct FieldDeltaData<se::Field::TSDF>
 {
     FieldDeltaData() : delta_tsdf(0), delta_weight(0) {}
-    se::field_t delta_tsdf;
-    weight_t    delta_weight; // TODO: int or float
+    se::field_t  delta_tsdf;
+    se::weight_t delta_weight; // TODO: int or float
 };
 
 // Colour data
@@ -129,14 +124,14 @@ template<>
 struct ColourDeltaData<se::Colour::On>
 {
     ColourDeltaData() : delta_rgba(0) {}
-    rgba_t delta_rgba;
+    se::rgba_t delta_rgba;
 };
 
 
 
 template <se::Field     FldT = se::Field::TSDF,
-        se::Colour    ColB = se::Colour::Off,
-        se::Semantics SemB = se::Semantics::Off
+          se::Colour    ColB = se::Colour::Off,
+          se::Semantics SemB = se::Semantics::Off
 >
 struct DeltaData : public FieldDeltaData<FldT>, ColourDeltaData<ColB>
 {
@@ -169,14 +164,14 @@ struct FieldDataConfig<se::Field::Occupancy>
   float   tau_min_factor;
   float   tau_max_factor;
 
-  field_t min_occupancy;
-  field_t max_occupancy;
-  int     max_weight;
-  float   factor;
-  field_t surface_boundary;
+  se::field_t  min_occupancy;
+  se::field_t  max_occupancy;
+  se::weight_t max_weight;
+  se::weight_t factor;
+  se::field_t  surface_boundary;
 
-  field_t log_odd_min;
-  field_t log_odd_max;
+  se::field_t  log_odd_min;
+  se::field_t  log_odd_max;
 
   int     fs_integr_scale;
 
@@ -201,8 +196,8 @@ std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::Occu
 template<>
 struct FieldDataConfig<se::Field::TSDF>
 {
-  float       truncation_boundary_factor;
-  weight_t    max_weight; // TODO: int or float
+  se::field_t  truncation_boundary_factor;
+  se::weight_t max_weight;
 
   /** Initializes the config to some sensible defaults.
    */
@@ -388,7 +383,7 @@ template <se::Colour    ColB,
 inline float get_field(const Data<se::Field::TSDF, ColB, SemB> data) { return data.tsdf; }
 
 template <se::Colour    ColB,
-        se::Semantics SemB
+          se::Semantics SemB
 >
 inline float get_field(const Data<se::Field::Occupancy, ColB, SemB> data) { return data.occupancy; }
 

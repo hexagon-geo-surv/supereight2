@@ -185,7 +185,7 @@ inline typename NodeT::DataType propagateToNoteAtCoarserScale(se::OctantBase*   
   node_ptr->setTimeStamp(frame);
 
   float max_mean_occupancy = 0;
-  short max_weight = 0;
+  se::weight_t max_weight = 0;
   float max_occupancy = -std::numeric_limits<float>::max();
   unsigned int observed_count = 0;
   unsigned int data_count = 0;
@@ -255,7 +255,7 @@ inline void propagateBlockToCoarsestScale(se::OctantBase* octant_ptr)
   unsigned int size_at_child_scale_sq = se::math::sq(size_at_child_scale_li);
 
   DataType min_data;
-  float o_min;
+  se::field_t o_min;
 
   if (block_ptr->buffer_scale() > block_ptr->getCurrentScale())
   {
@@ -275,7 +275,7 @@ inline void propagateBlockToCoarsestScale(se::OctantBase* octant_ptr)
           auto& target_max_data = max_data_at_target_scale[target_max_data_idx];
 
           float max_mean_occupancy = 0;
-          short max_weight = 0;
+          se::weight_t max_weight = 0;
           float max_occupancy = -std::numeric_limits<float>::max();
 
           int observed_count = 0;
@@ -351,12 +351,12 @@ inline void propagateBlockToCoarsestScale(se::OctantBase* octant_ptr)
           auto& target_data     = data_at_target_scale[target_data_idx];
           auto& target_max_data = max_data_at_target_scale[target_data_idx];
 
-          float mean_occupancy = 0;
-          short mean_weight = 0;
+          se::field_t mean_occupancy = 0;
+          se::weight_t mean_weight = 0;
 
-          float max_mean_occupancy = 0;
-          short max_weight = 0;
-          float max_occupancy = -std::numeric_limits<float>::max();
+          se::field_t max_mean_occupancy = 0;
+          se::weight_t max_weight = 0;
+          se::field_t max_occupancy = -std::numeric_limits<se::field_t>::max();
 
           int observed_count = 0;
           int data_count = 0;
@@ -478,12 +478,12 @@ inline void propagateBlockToCoarsestScale(se::OctantBase* octant_ptr)
           auto& target_data     = data_at_target_scale[target_data_idx];
           auto& target_max_data = max_data_at_target_scale[target_data_idx];
 
-          float mean_occupancy = 0;
-          short mean_weight = 0;
+          se::field_t mean_occupancy = 0;
+          se::weight_t mean_weight = 0;
 
-          float max_mean_occupancy = 0;
-          short max_weight = 0;
-          float max_occupancy = -std::numeric_limits<float>::max();
+          se::field_t max_mean_occupancy = 0;
+          se::weight_t max_weight = 0;
+          se::field_t max_occupancy = -std::numeric_limits<float>::max();
 
           int observed_count = 0;
           int data_count = 0;
@@ -589,9 +589,9 @@ inline void maxCoarsePropagation(const se::OctantBase*      octant_ptr,
 {
   BlockT* block_ptr = static_cast<BlockT*>(octant_ptr);
 
-  float max_mean_occupancy = -std::numeric_limits<float>::max();
-  short max_weight = 0;
-  float max_occupancy = -std::numeric_limits<float>::max();
+  se::field_t max_mean_occupancy = -std::numeric_limits<se::field_t>::max();
+  se::weight_t max_weight = 0;
+  se::field_t max_occupancy = -std::numeric_limits<se::field_t>::max();
   unsigned int observed_count = 0;
   unsigned int data_count = 0;
 
@@ -646,8 +646,8 @@ inline void meanCoarsePropagation(const se::OctantBase*      octant_ptr,
 {
   BlockT* block_ptr = static_cast<BlockT*>(octant_ptr);
 
-  float mean_occupancy        = 0;
-  short mean_weight           = 0;
+  se::field_t mean_occupancy  = 0;
+  se::weight_t mean_weight    = 0;
   unsigned int observed_count = 0;
   unsigned int data_count     = 0;
 

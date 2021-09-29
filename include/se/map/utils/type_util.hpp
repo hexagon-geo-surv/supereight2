@@ -46,6 +46,14 @@ typedef float field_t;        ///< The type of the stored field (e.g. TSDF, ESDF
 
 typedef Eigen::Matrix<field_t, 3, 1> field_vec_t;
 
+typedef se::field_t weight_t; ///< The type of the field type weight
+
+typedef float time_stamp_t;   ///< The type of the time stamp
+
+typedef uint32_t rgba_t;      ///< The type of the colour
+
+typedef short semantics_t;    ///< The type of the semantic class
+
 } // namespace se
 
 #endif // SE_TYPE_UTIL_HPP

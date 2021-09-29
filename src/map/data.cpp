@@ -141,7 +141,7 @@ namespace se {
     }
 
     se::yaml::subnode_as_float(node, "truncation_boundary_factor", truncation_boundary_factor);
-    se::yaml::subnode_as_int(node, "max_weight", max_weight);
+    se::yaml::subnode_as_float(node, "max_weight", max_weight);
   }
 
 
