@@ -33,13 +33,13 @@ int main(int argc, char** argv)
 
   // Setup input images
   const Eigen::Vector2i input_img_res(config.sensor.width, config.sensor.height);
-  se::Image<se::depth_t> input_depth_img(input_img_res.x(), input_img_res.y());
-  se::Image<uint32_t>    input_rgba_img(input_img_res.x(), input_img_res.y());
+  se::Image<float>      input_depth_img(input_img_res.x(), input_img_res.y());
+  se::Image<uint32_t>   input_rgba_img(input_img_res.x(), input_img_res.y());
 
   // Setup processed images
   const Eigen::Vector2i processed_img_res = input_img_res / config.app.sensor_downsampling_factor;
-  se::Image<se::depth_t> processed_depth_img(processed_img_res.x(), processed_img_res.y());
-  se::Image<uint32_t>    processed_rgba_img(processed_img_res.x(), processed_img_res.y());
+  se::Image<float>      processed_depth_img(processed_img_res.x(), processed_img_res.y());
+  se::Image<uint32_t>   processed_rgba_img(processed_img_res.x(), processed_img_res.y());
 
   // Setup surface pointcloud, normals and scale
   se::Image<Eigen::Vector3f> surface_point_cloud_M(processed_img_res.x(), processed_img_res.y());

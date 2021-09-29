@@ -30,11 +30,11 @@ struct IntegrateDepthImplD
   template<typename SensorT,
            typename MapT
   >
-  static void integrate(MapT&                         map,
-                        const SensorT&                sensor,
-                        const se::Image<se::depth_t>& depth_img,
-                        const Eigen::Matrix4f&        T_MS,
-                        const unsigned int            frame); // TODO:
+  static void integrate(MapT&                   map,
+                        const SensorT&          sensor,
+                        const se::Image<float>& depth_img,
+                        const Eigen::Matrix4f&  T_MS,
+                        const unsigned int      frame); // TODO:
 };
 
 
@@ -48,11 +48,11 @@ struct IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>
   template<typename SensorT,
            typename MapT
   >
-  static void integrate(MapT&                         map,
-                        const SensorT&                sensor,
-                        const se::Image<se::depth_t>& depth_img,
-                        const Eigen::Matrix4f&        T_MS,
-                        const unsigned int            frame);
+  static void integrate(MapT&                   map,
+                        const SensorT&          sensor,
+                        const se::Image<float>& depth_img,
+                        const Eigen::Matrix4f&  T_MS,
+                        const unsigned int      frame);
 };
 
 
@@ -66,11 +66,11 @@ struct IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi>
   template<typename SensorT,
            typename MapT
   >
-  static void integrate(MapT&                         map,
-                        const SensorT&                sensor,
-                        const se::Image<se::depth_t>& depth_img,
-                        const Eigen::Matrix4f&        T_MS,
-                        const unsigned int            frame);
+  static void integrate(MapT&                   map,
+                        const SensorT&          sensor,
+                        const se::Image<float>& depth_img,
+                        const Eigen::Matrix4f&  T_MS,
+                        const unsigned int      frame);
 };
 
 
@@ -84,11 +84,11 @@ struct IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>
   template<typename SensorT,
            typename MapT
   >
-  static void integrate(MapT&                         map,
-                        const SensorT&                sensor,
-                        const se::Image<se::depth_t>& depth_img,
-                        const Eigen::Matrix4f&        T_MS,
-                        const unsigned int            frame);
+  static void integrate(MapT&                   map,
+                        const SensorT&          sensor,
+                        const se::Image<float>& depth_img,
+                        const Eigen::Matrix4f&  T_MS,
+                        const unsigned int      frame);
 };
 
 
@@ -104,11 +104,11 @@ template<se::Field FldT,
 template<typename SensorT,
          typename MapT
 >
-void IntegrateDepthImplD<FldT, ResT>::integrate(MapT&                         /* map */,
-                                                const SensorT&                /* sensor */,
-                                                const se::Image<se::depth_t>& /* depth_img */,
-                                                const Eigen::Matrix4f&        /* T_MS */,
-                                                const unsigned int            /* frame */)
+void IntegrateDepthImplD<FldT, ResT>::integrate(MapT&                   /* map */,
+                                                const SensorT&          /* sensor */,
+                                                const se::Image<float>& /* depth_img */,
+                                                const Eigen::Matrix4f&  /* T_MS */,
+                                                const unsigned int      /* frame */)
 {
 }
 
@@ -117,35 +117,11 @@ void IntegrateDepthImplD<FldT, ResT>::integrate(MapT&                         /*
 template<typename SensorT,
          typename MapT
 >
-void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(MapT&                         map,
-                                                                      const SensorT&                sensor,
-                                                                      const se::Image<se::depth_t>& depth_img,
-                                                                      const Eigen::Matrix4f&        T_MS,
-                                                                      const unsigned int            frame)
-{
-  // Allocation
-  TICK("allocation")
-  se::RaycastCarver raycast_carver(map, sensor, depth_img, T_MS, frame);
-  std::vector<OctantBase*> block_ptrs = raycast_carver();
-  TOCK("allocation")
-
-  // Update
-  TICK("update")
-  se::Updater updater(map, sensor, depth_img, T_MS, frame);
-  updater(block_ptrs);
-  TOCK("update")
-}
-
-
-
-template<typename SensorT,
-         typename MapT
->
-void IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi>::integrate(MapT&                         map,
-                                                                     const SensorT&                sensor,
-                                                                     const se::Image<se::depth_t>& depth_img,
-                                                                     const Eigen::Matrix4f&        T_MS,
-                                                                     const unsigned int            frame)
+void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(MapT&                   map,
+                                                                      const SensorT&          sensor,
+                                                                      const se::Image<float>& depth_img,
+                                                                      const Eigen::Matrix4f&  T_MS,
+                                                                      const unsigned int      frame)
 {
   // Allocation
   TICK("allocation")
@@ -165,11 +141,35 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi>::integrate(MapT&      
 template<typename SensorT,
          typename MapT
 >
-void IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>::integrate(MapT&                         map,
-                                                                          const SensorT&                sensor,
-                                                                          const se::Image<se::depth_t>& depth_img,
-                                                                          const Eigen::Matrix4f&        T_MS,
-                                                                          const unsigned int            frame)
+void IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi>::integrate(MapT&                   map,
+                                                                     const SensorT&          sensor,
+                                                                     const se::Image<float>& depth_img,
+                                                                     const Eigen::Matrix4f&  T_MS,
+                                                                     const unsigned int      frame)
+{
+  // Allocation
+  TICK("allocation")
+  se::RaycastCarver raycast_carver(map, sensor, depth_img, T_MS, frame);
+  std::vector<OctantBase*> block_ptrs = raycast_carver();
+  TOCK("allocation")
+
+  // Update
+  TICK("update")
+  se::Updater updater(map, sensor, depth_img, T_MS, frame);
+  updater(block_ptrs);
+  TOCK("update")
+}
+
+
+
+template<typename SensorT,
+         typename MapT
+>
+void IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>::integrate(MapT&                   map,
+                                                                          const SensorT&          sensor,
+                                                                          const se::Image<float>& depth_img,
+                                                                          const Eigen::Matrix4f&  T_MS,
+                                                                          const unsigned int      frame)
 {
   // Allocation
   VolumeCarver<MapT, SensorT> volume_carver(map, sensor, depth_img, T_MS, frame); //< process based on variance state and project inside
@@ -196,10 +196,10 @@ MapIntegrator<MapT>::MapIntegrator(MapT& map)
 
 template<typename MapT>
 template<typename SensorT>
-void MapIntegrator<MapT>::integrateDepth(const SensorT&                sensor,
-                                         const se::Image<se::depth_t>& depth_img,
-                                         const Eigen::Matrix4f&        T_MS,
-                                         const unsigned int            frame)
+void MapIntegrator<MapT>::integrateDepth(const SensorT&          sensor,
+                                         const se::Image<float>& depth_img,
+                                         const Eigen::Matrix4f&  T_MS,
+                                         const unsigned int      frame)
 {
   se::details::IntegrateDepthImpl<MapT>::integrate(map_, sensor, depth_img, T_MS, frame);
 }

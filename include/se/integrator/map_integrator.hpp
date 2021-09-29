@@ -30,11 +30,11 @@ namespace allocator {
 template<typename MapT,
          typename SensorT
 >
-std::vector<se::OctantBase*> frustum(MapT&                      map,
-                                     SensorT&                   sensor,
-                                     const se::Image<depth_t>& depth_img,
-                                     const Eigen::Matrix4f&     T_MS,
-                                     const float                band);
+std::vector<se::OctantBase*> frustum(MapT&                   map,
+                                     SensorT&                sensor,
+                                     const se::Image<float>& depth_img,
+                                     const Eigen::Matrix4f&  T_MS,
+                                     const float             band);
 
 } // namespace allocator
 
@@ -95,10 +95,10 @@ public:
    * \param[in] frame       The frame number to be integrated
    */
   template <typename SensorT>
-  void integrateDepth(const SensorT&                sensor,
-                      const se::Image<se::depth_t>& depth_img,
-                      const Eigen::Matrix4f&        T_MS,
-                      const unsigned int            frame);
+  void integrateDepth(const SensorT&          sensor,
+                      const se::Image<float>& depth_img,
+                      const Eigen::Matrix4f&  T_MS,
+                      const unsigned int      frame);
 
 private:
   MapT&            map_;

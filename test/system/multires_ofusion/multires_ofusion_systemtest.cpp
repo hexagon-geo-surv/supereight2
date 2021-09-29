@@ -49,10 +49,10 @@ TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
   // Create a pinhole camera and downsample the intrinsics
   const se::PinholeCamera sensor(config.sensor, config.app.sensor_downsampling_factor);
 
-  const Eigen::Vector2i  input_img_res(config.sensor.width, config.sensor.height);
-  se::Image<se::depth_t> input_depth_img(input_img_res.x(), input_img_res.y());
+  const Eigen::Vector2i input_img_res(config.sensor.width, config.sensor.height);
+  se::Image<float>      input_depth_img(input_img_res.x(), input_img_res.y());
   const Eigen::Vector2i processed_img_res = input_img_res / config.app.sensor_downsampling_factor;
-  se::Image<se::depth_t> processed_depth_img(processed_img_res.x(), processed_img_res.y());
+  se::Image<float>      processed_depth_img(processed_img_res.x(), processed_img_res.y());
 
   // Set pose to identity
   Eigen::Matrix4f T_MS = Eigen::Matrix4f::Identity();
@@ -120,10 +120,10 @@ TEST(MultiResOFusionSystemTest, GetField)
   // Create a pinhole camera and downsample the intrinsics
   const se::PinholeCamera sensor(config.sensor, config.app.sensor_downsampling_factor);
 
-  const Eigen::Vector2i  input_img_res(config.sensor.width, config.sensor.height);
-  se::Image<se::depth_t> input_depth_img(input_img_res.x(), input_img_res.y());
+  const Eigen::Vector2i input_img_res(config.sensor.width, config.sensor.height);
+  se::Image<float>      input_depth_img(input_img_res.x(), input_img_res.y());
   const Eigen::Vector2i processed_img_res = input_img_res / config.app.sensor_downsampling_factor;
-  se::Image<se::depth_t> processed_depth_img(processed_img_res.x(), processed_img_res.y());
+  se::Image<float>      processed_depth_img(processed_img_res.x(), processed_img_res.y());
 
   // Set pose to identity
   Eigen::Matrix4f T_MS = Eigen::Matrix4f::Identity();
@@ -195,10 +195,10 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
   // Create a pinhole camera and downsample the intrinsics
   const se::PinholeCamera sensor(config.sensor, config.app.sensor_downsampling_factor);
 
-  const Eigen::Vector2i  input_img_res(config.sensor.width, config.sensor.height);
-  se::Image<se::depth_t> input_depth_img(input_img_res.x(), input_img_res.y());
+  const Eigen::Vector2i input_img_res(config.sensor.width, config.sensor.height);
+  se::Image<float>      input_depth_img(input_img_res.x(), input_img_res.y());
   const Eigen::Vector2i processed_img_res = input_img_res / config.app.sensor_downsampling_factor;
-  se::Image<se::depth_t> processed_depth_img(processed_img_res.x(), processed_img_res.y());
+  se::Image<float>      processed_depth_img(processed_img_res.x(), processed_img_res.y());
 
   // Set pose to identity
   Eigen::Matrix4f T_MS = Eigen::Matrix4f::Identity();
@@ -270,11 +270,11 @@ TEST(MultiResOFusionSystemTest, DeleteChildren)
   // Create a pinhole camera and downsample the intrinsics
   const se::PinholeCamera sensor(config.sensor, config.app.sensor_downsampling_factor);
 
-  const Eigen::Vector2i  input_img_res(config.sensor.width, config.sensor.height);
-  se::Image<se::depth_t> input_depth_img(input_img_res.x(), input_img_res.y());
-  se::Image<se::depth_t> input_noise_depth_img(input_img_res.x(), input_img_res.y());
+  const Eigen::Vector2i input_img_res(config.sensor.width, config.sensor.height);
+  se::Image<float>      input_depth_img(input_img_res.x(), input_img_res.y());
+  se::Image<float>      input_noise_depth_img(input_img_res.x(), input_img_res.y());
   const Eigen::Vector2i processed_img_res = input_img_res / config.app.sensor_downsampling_factor;
-  se::Image<se::depth_t> processed_depth_img(processed_img_res.x(), processed_img_res.y());
+  se::Image<float>      processed_depth_img(processed_img_res.x(), processed_img_res.y());
 
   // Set pose to identity
   Eigen::Matrix4f T_MS = Eigen::Matrix4f::Identity();
@@ -346,13 +346,13 @@ TEST(MultiResOFusionSystemTest, Raycasting)
 
   // Setup input images
   const Eigen::Vector2i input_img_res(config.sensor.width, config.sensor.height);
-  se::Image<se::depth_t> input_depth_img(input_img_res.x(), input_img_res.y());
-  se::Image<uint32_t>    input_rgba_img(input_img_res.x(), input_img_res.y());
+  se::Image<float>      input_depth_img(input_img_res.x(), input_img_res.y());
+  se::Image<uint32_t>   input_rgba_img(input_img_res.x(), input_img_res.y());
 
   // Setup processed images
   const Eigen::Vector2i processed_img_res = input_img_res / config.app.sensor_downsampling_factor;
-  se::Image<se::depth_t> processed_depth_img(processed_img_res.x(), processed_img_res.y());
-  se::Image<uint32_t>    processed_rgba_img(processed_img_res.x(), processed_img_res.y());
+  se::Image<float>      processed_depth_img(processed_img_res.x(), processed_img_res.y());
+  se::Image<uint32_t>   processed_rgba_img(processed_img_res.x(), processed_img_res.y());
 
   // Setup output images / renders
   uint32_t* output_rgba_img_data     =  new uint32_t[processed_img_res.x() * processed_img_res.y()];

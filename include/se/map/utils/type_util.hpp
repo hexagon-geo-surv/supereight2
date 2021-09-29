@@ -40,8 +40,6 @@ typedef uint64_t scale_t;     ///< The type of the scale in the morton code
 
 typedef unsigned int idx_t;   ///< Child or voxel index type
 
-typedef float depth_t;        ///< The type of the processed depth measurements
-
 typedef float field_t;        ///< The type of the stored field (e.g. TSDF, ESDF or occupancy)
 
 typedef Eigen::Matrix<field_t, 3, 1> field_vec_t;
