@@ -93,11 +93,11 @@ void subnode_as_vector(const cv::FileNode& base_node,
  *
  * \param[in]  base_node    The reference to the base node
  * \param[in]  subnode_name The name of the sub node
- * \param[out] v            The Eigen::Vector3f value of the sub node
+ * \param[out] eigen_v3f    The Eigen::Vector3f value of the sub node
  */
-void subnode_as_vector3f(const cv::FileNode& base_node,
-                         const std::string&  subnode_name,
-                         Eigen::Vector3f&    eigen_v3);
+void subnode_as_eigen_vector3f(const cv::FileNode& base_node,
+                               const std::string&  subnode_name,
+                               Eigen::Vector3f&    eigen_v3f);
 
 /**
  * \brief   Interprets the data in the subnode of base_node named subnode_name as an Eigen::Vector3f and saves it in v.
@@ -106,12 +106,38 @@ void subnode_as_vector3f(const cv::FileNode& base_node,
  *
  * \param[in]  base_node    The reference to the base node
  * \param[in]  subnode_name The name of the sub node
- * \param[out] eigen_v      The Eigen::Vector3f value of the sub node
+ * \param[out] eigen_v      The Eigen::Matrix<T, Eigen::Dynamic, 1> value of the sub node
  */
 template <typename T>
 void subnode_as_eigen_vector_x(const cv::FileNode&                  base_node,
                                const std::string&                   subnode_name,
                                Eigen::Matrix<T, Eigen::Dynamic, 1>& eigen_v);
+
+/**
+ * \brief   Interprets the data in the subnode of base_node named subnode_name as an Eigen::Vector3f and saves it in v.
+ *          Shows a warning message on standard error and doesn't modify eigen_v3 if the YAML
+ *          data is not a list or doesn't exist.
+ *
+ * \param[in]  base_node    The reference to the base node
+ * \param[in]  subnode_name The name of the sub node
+ * \param[out] eigen_m3f    The Eigen::Matrix4f value of the sub node
+ */
+void subnode_as_eigen_matrix3f(const cv::FileNode& base_node,
+                               const std::string&  subnode_name,
+                               Eigen::Matrix3f&    eigen_m3f);
+
+/**
+ * \brief   Interprets the data in the subnode of base_node named subnode_name as an Eigen::Vector3f and saves it in v.
+ *          Shows a warning message on standard error and doesn't modify eigen_v3 if the YAML
+ *          data is not a list or doesn't exist.
+ *
+ * \param[in]  base_node    The reference to the base node
+ * \param[in]  subnode_name The name of the sub node
+ * \param[out] eigen_m4f    The Eigen::Matrix4f value of the sub node
+ */
+void subnode_as_eigen_matrix4f(const cv::FileNode& base_node,
+                               const std::string&  subnode_name,
+                               Eigen::Matrix4f&    eigen_m4f);
 
 
 

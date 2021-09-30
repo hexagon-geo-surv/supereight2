@@ -90,13 +90,13 @@ void subnode_as_string(const cv::FileNode& base_node,
 
 
 
-void subnode_as_vector3f(const cv::FileNode& base_node,
-                         const std::string&  subnode_name,
-                         Eigen::Vector3f&    v)
+void subnode_as_eigen_vector3f(const cv::FileNode& base_node,
+                               const std::string&  subnode_name,
+                               Eigen::Vector3f&    eigen_v3f)
 {
   const cv::FileNode subnode = base_node[subnode_name];
   if (subnode.isSeq() && subnode.size() == 3) {
-    v = Eigen::Vector3f(subnode[0], subnode[1], subnode[2]);
+    eigen_v3f = Eigen::Vector3f(subnode[0], subnode[1], subnode[2]);
   } else {
     // Show warnings on invalid data
     std::cerr << "Warning: ";
@@ -108,10 +108,62 @@ void subnode_as_vector3f(const cv::FileNode& base_node,
     } else {
       std::cerr << "ignoring non-list data in " << subnode_name;
     }
-    std::cerr << ", using default value [" << v.x() << ", " << v.y() << ", " << v.z() << "]\n";
+    std::cerr << ", using default value [" << eigen_v3f.x() << ", " << eigen_v3f.y() << ", " << eigen_v3f.z() << "]\n";
   }
 }
 
+
+
+
+
+void subnode_as_eigen_matrix3f(const cv::FileNode& base_node,
+                               const std::string&  subnode_name,
+                               Eigen::Matrix3f&    eigen_m3f)
+{
+  const cv::FileNode subnode = base_node[subnode_name];
+  if (subnode.isSeq() && subnode.size() == 9) {
+    eigen_m3f << subnode[0], subnode[1], subnode[2],
+                 subnode[3], subnode[4], subnode[5],
+                 subnode[6], subnode[7], subnode[8];
+  } else {
+    // Show warnings on invalid data
+    std::cerr << "Warning: ";
+    if (subnode.isSeq() && subnode.size() != 3) {
+      std::cerr << "expected list of length 3 for " << subnode_name
+                << " but got length " << subnode.size();
+    } else if (subnode.isNone()) {
+      std::cerr << "no data for " << subnode_name;
+    } else {
+      std::cerr << "ignoring non-list data in " << subnode_name;
+    }
+  }
+}
+
+
+
+void subnode_as_eigen_matrix4f(const cv::FileNode& base_node,
+                               const std::string&  subnode_name,
+                               Eigen::Matrix4f&    eigen_m4f)
+{
+  const cv::FileNode subnode = base_node[subnode_name];
+  if (subnode.isSeq() && subnode.size() == 16) {
+    eigen_m4f << subnode[ 0], subnode[ 1], subnode[ 2], subnode[ 3],
+                 subnode[ 4], subnode[ 5], subnode[ 6], subnode[ 7],
+                 subnode[ 8], subnode[ 9], subnode[10], subnode[11],
+                 subnode[12], subnode[13], subnode[14], subnode[15];
+  } else {
+    // Show warnings on invalid data
+    std::cerr << "Warning: ";
+    if (subnode.isSeq() && subnode.size() != 3) {
+      std::cerr << "expected list of length 3 for " << subnode_name
+                << " but got length " << subnode.size();
+    } else if (subnode.isNone()) {
+      std::cerr << "no data for " << subnode_name;
+    } else {
+      std::cerr << "ignoring non-list data in " << subnode_name;
+    }
+  }
+}
 
 
 } // namespace yaml

@@ -41,15 +41,26 @@ namespace se {
     }
 
     // Read the config parameters.
-    se::yaml::subnode_as_vector3f(node, "dim", dim);
+    se::yaml::subnode_as_eigen_vector3f(node, "dim", dim);
     se::yaml::subnode_as_float(node, "res", res);
-    if (node["origin"].isNone()) {
-      // Don't show a warning if origin is not available, set it to dim / 2.
-      T_MW = se::math::to_transformation(dim / 2);
-    } else {
+
+    // Don't show a warning if origin is not available, set it to dim / 2.
+    T_MW = se::math::to_transformation(dim / 2);
+
+    if (!node["T_MW"].isNone()) {
+      se::yaml::subnode_as_eigen_matrix4f(node, "T_MW", T_MW);
+    }
+
+    if (!node["t_MW"].isNone()) {
       Eigen::Vector3f t_MW;
-      se::yaml::subnode_as_vector3f(node, "t_MW", t_MW);
-      T_MW = se::math::to_transformation(t_MW);
+      se::yaml::subnode_as_eigen_vector3f(node, "t_MW", t_MW);
+      T_MW.topRightCorner<3, 1>() = t_MW;
+    }
+
+    if (!node["R_MW"].isNone()) {
+      Eigen::Matrix3f R_MW;
+      se::yaml::subnode_as_eigen_matrix3f(node, "R_MW", R_MW);
+      T_MW.topLeftCorner<3, 3>() = R_MW;
     }
   }
 

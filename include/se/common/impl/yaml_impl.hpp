@@ -15,15 +15,15 @@ namespace yaml {
 template <typename T>
 void subnode_as_vector(const cv::FileNode& base_node,
                        const std::string&  subnode_name,
-                       std::vector<T>&     eigen_v3)
+                       std::vector<T>&     v)
 {
   const cv::FileNode subnode = base_node[subnode_name];
   if (subnode.isSeq() && subnode.size() >= 1)
   {
-    eigen_v3.clear();
+    v.clear();
     for (const auto& e : subnode)
     {
-      eigen_v3.push_back(static_cast<T>(e));
+      v.push_back(static_cast<T>(e));
     }
   } else
   {
@@ -40,11 +40,11 @@ void subnode_as_vector(const cv::FileNode& base_node,
       std::cerr << "ignoring non-list data in " << subnode_name;
     }
     std::cerr << ", using default value {";
-    for (size_t i = 0; i < eigen_v3.size() - 1; i++)
+    for (size_t i = 0; i < v.size() - 1; i++)
     {
-      std::cerr << eigen_v3[i] << ", ";
+      std::cerr << v[i] << ", ";
     }
-    std::cerr << eigen_v3.back() << "}\n";
+    std::cerr << v.back() << "}\n";
   }
 }
 
