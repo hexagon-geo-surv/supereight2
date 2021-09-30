@@ -17,7 +17,7 @@ template<typename MapT,
 >
 inline std::vector<se::OctantBase *> frustum(MapT&                  map,
                                              const SensorT&         sensor,
-                                             const Eigen::Matrix4f& T_MS);
+                                             const Eigen::Matrix4f& T_WS);
 
 
 
@@ -56,13 +56,13 @@ public:
    * \param[in]  map                  The reference to the map to be updated.
    * \param[in]  sensor               The sensor model.
    * \param[in]  depth_img            The depth image to be integrated.
-   * \param[in]  T_MS                 The transformation from map to camera frame.
+   * \param[in]  T_WS                 The transformation from sensor to world frame.
    * \param[in]  frame                The frame number to be integrated.
    */
   RaycastCarver(MapT&                   map,
                 const SensorT&          sensor,
                 const se::Image<float>& depth_img,
-                const Eigen::Matrix4f&  T_MS,
+                const Eigen::Matrix4f&  T_WS,
                 const int               frame);
 
   /**
@@ -76,7 +76,7 @@ public:
   OctreeType&               octree_;
   const SensorT&            sensor_;
   const se::Image<float>&   depth_img_;
-  const Eigen::Matrix4f&    T_MS_;
+  const Eigen::Matrix4f&    T_WS_;
   const int                 frame_;
   const RaycastCarverConfig config_;
 };

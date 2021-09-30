@@ -129,25 +129,27 @@ public:
    * \brief Track the current pose using ICP.
    *
    * \param[in]     depth_image_    The depth image fitting the sensor model
-   * \param[in,out] T_MS            [in] The previous best pose estimate, [out] The new best pose estimate
+   * \param[in,out] T_WS            [in] The previous best pose estimate, [out] The new best pose estimate
    *
    * \return The tracking success.
    */
   bool track(const se::Image<float>& depth_img,
-             Eigen::Matrix4f&        T_MS);
+             Eigen::Matrix4f&        T_WS);
 
   /**
    * \brief Track the current pose using ICP.
    *
-   * \param[in]     depth_image_    The depth image fitting the sensor model
-   * \param[in,out] T_MS            [in] The previous best pose estimate T_MS_ref, [out] The new best pose estimate T_MS
+   * \param[in]     depth_image_            The depth image fitting the sensor model
+   * \param[in,out] T_WS                    [in] The previous best pose estimate T_WS_ref, [out] The new best pose estimate T_WS
+   * \param[in]     surface_point_cloud_W   Surface point cloud in world frame
+   * \param[in]     surface_normals_W       Surface normals in world frame
    *
    * \return The tracking success.
    */
   bool track(const se::Image<float>&     depth_img,
-             Eigen::Matrix4f&            T_MS,
-             se::Image<Eigen::Vector3f>& surface_point_cloud_M,
-             se::Image<Eigen::Vector3f>& surface_normals_M);
+             Eigen::Matrix4f&            T_WS,
+             se::Image<Eigen::Vector3f>& surface_point_cloud_W,
+             se::Image<Eigen::Vector3f>& surface_normals_W);
 
   void renderTrackingResult(uint32_t* tracking_img_data);
 
@@ -164,21 +166,21 @@ private:
                     const Eigen::Vector2i& J_res);
 
   void trackKernel(TrackData*                        output_data,
-                   const se::Image<Eigen::Vector3f>& input_point_cloud_C,
-                   const se::Image<Eigen::Vector3f>& input_normals_C,
+                   const se::Image<Eigen::Vector3f>& input_point_cloud_S,
+                   const se::Image<Eigen::Vector3f>& input_normals_S,
                    const se::Image<Eigen::Vector3f>& surface_point_cloud_M_ref,
                    const se::Image<Eigen::Vector3f>& surface_normals_M_ref,
-                   const Eigen::Matrix4f&            T_MS,
-                   const Eigen::Matrix4f&            T_MS_ref,
+                   const Eigen::Matrix4f&            T_WS,
+                   const Eigen::Matrix4f&            T_WS_ref,
                    const float                       dist_threshold,
                    const float                       normal_threshold);
 
-  bool updatePoseKernel(Eigen::Matrix4f& T_MS,
+  bool updatePoseKernel(Eigen::Matrix4f& T_WS,
                         const float*     reduction_output_data,
                         const float      icp_threshold);
 
-  bool checkPoseKernel(Eigen::Matrix4f&       T_MS,
-                       Eigen::Matrix4f&       previous_T_MS,
+  bool checkPoseKernel(Eigen::Matrix4f&       T_WS,
+                       Eigen::Matrix4f&       previous_T_WS,
                        const float*           reduction_output_data,
                        const Eigen::Vector2i& reduction_output_res,
                        const float            track_threshold);

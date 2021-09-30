@@ -16,12 +16,12 @@ Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>, Senso
         MapType &map,
         const SensorT &sensor,
         const se::Image<float> &depth_img,
-        const Eigen::Matrix4f &T_MS,
+        const Eigen::Matrix4f &T_WS,
         const int frame) :
     map_(map),
     sensor_(sensor),
     depth_img_(depth_img),
-    T_MS_(T_MS),
+    T_WS_(T_WS),
     frame_(frame),
     config_(map)
 {
@@ -38,7 +38,7 @@ void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>, 
         std::vector<se::OctantBase *> &block_ptrs)
 {
   unsigned int block_size = BlockType::getSize();
-  const Eigen::Matrix4f T_SM = se::math::to_inverse_transformation(T_MS_);
+  const Eigen::Matrix4f T_SW = se::math::to_inverse_transformation(T_WS_);
 
   auto valid_predicate = [&](float depth_value) { return depth_value >= sensor_.near_plane; };
 
@@ -47,9 +47,9 @@ void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>, 
     BlockType *block_ptr = static_cast<BlockType *>(block_ptrs[i]);
     block_ptr->setTimeStamp(frame_);
     Eigen::Vector3i block_coord = block_ptr->getCoord();
-    Eigen::Vector3f block_centre_point_M;
-    map_.voxelToPoint(block_coord, block_ptr->getSize(), block_centre_point_M);
-    const Eigen::Vector3f block_centre_point_S = (T_SM * block_centre_point_M.homogeneous()).head(3);
+    Eigen::Vector3f block_centre_point_W;
+    map_.voxelToPoint(block_coord, block_ptr->getSize(), block_centre_point_W);
+    const Eigen::Vector3f block_centre_point_S = (T_SW * block_centre_point_W.homogeneous()).head(3);
     const int last_curr_scale = block_ptr->getCurrentScale();
     const int lower_curr_scale_limit = last_curr_scale - 1;
 
@@ -104,10 +104,10 @@ void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>, 
     block_ptr->setCurrentScale(curr_scale);
     const int stride = 1 << curr_scale;
 
-    Eigen::Vector3f point_base_M;
-    map_.voxelToPoint(block_coord, stride, point_base_M);
-    const Eigen::Vector3f point_base_S = (T_SM * point_base_M.homogeneous()).head(3);
-    const Eigen::Matrix3f point_delta_matrix_S = (se::math::to_rotation(T_SM) * map_.getRes() *
+    Eigen::Vector3f point_base_W;
+    map_.voxelToPoint(block_coord, stride, point_base_W);
+    const Eigen::Vector3f point_base_S = (T_SW * point_base_W.homogeneous()).head(3);
+    const Eigen::Matrix3f point_delta_matrix_S = (se::math::to_rotation(T_SW) * map_.getRes() *
                                                   Eigen::Matrix3f::Identity());
 
     for (unsigned int i = 0; i < block_size; i += stride) {

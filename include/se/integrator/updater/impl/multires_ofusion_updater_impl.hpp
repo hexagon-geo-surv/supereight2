@@ -17,13 +17,13 @@ Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>, 
             MapType&                               map,
             const SensorT&                         sensor,
             const se::Image<float>&                depth_img,
-            const Eigen::Matrix4f&                 T_MS,
+            const Eigen::Matrix4f&                 T_WS,
             const int                              frame) :
     map_(map),
     octree_(*(map.getOctree())),
     sensor_(sensor),
     depth_img_(depth_img),
-    T_SM_(se::math::to_inverse_transformation(T_MS)),
+    T_SW_(se::math::to_inverse_transformation(T_WS)),
     frame_(frame),
     map_res_(map.getRes()),
     config_(map),
@@ -104,10 +104,10 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
   // Compute the point of the block centre in the sensor frame
   const unsigned int block_size = BlockType::size;
   const Eigen::Vector3i block_coord = block_ptr->getCoord();
-  Eigen::Vector3f block_centre_point_M;
+  Eigen::Vector3f block_centre_point_W;
   /// CHANGED
-  map_.voxelToPoint(block_coord, block_size, block_centre_point_M);
-  const Eigen::Vector3f block_centre_point_C = (T_SM_ * (block_centre_point_M).homogeneous()).head(3);
+  map_.voxelToPoint(block_coord, block_size, block_centre_point_W);
+  const Eigen::Vector3f block_centre_point_C = (T_SW_ * (block_centre_point_W).homogeneous()).head(3);
 
   /// Compute the integration scale
   // The last integration scale
@@ -259,9 +259,9 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
   const int block_size = BlockType::size;
   const Eigen::Vector3i block_coord = block_ptr->getCoord();
 
-  Eigen::Vector3f block_centre_point_M;
-  map_.voxelToPoint(block_coord, block_size, block_centre_point_M);
-  const Eigen::Vector3f block_centre_point_S = (T_SM_ * (block_centre_point_M).homogeneous()).head(3);
+  Eigen::Vector3f block_centre_point_W;
+  map_.voxelToPoint(block_coord, block_size, block_centre_point_W);
+  const Eigen::Vector3f block_centre_point_S = (T_SW_ * (block_centre_point_W).homogeneous()).head(3);
 
   // Convert block centre to measurement >> PinholeCamera -> .z() | OusterLidar -> .norm()
   const float block_point_C_m = sensor_.measurementFromPoint(block_centre_point_S);
@@ -359,11 +359,11 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
     const unsigned int size_at_recommended_scale_sq = se::math::sq(size_at_recommended_scale_li);
 
     const Eigen::Vector3i voxel_coord_base = block_ptr->getCoord();
-    Eigen::Vector3f sample_point_base_M;
-    map_.voxelToPoint(voxel_coord_base, recommended_stride, sample_point_base_M);
-    const Eigen::Vector3f sample_point_base_S = (T_SM_ * (sample_point_base_M).homogeneous()).head(3);
+    Eigen::Vector3f sample_point_base_W;
+    map_.voxelToPoint(voxel_coord_base, recommended_stride, sample_point_base_W);
+    const Eigen::Vector3f sample_point_base_S = (T_SW_ * (sample_point_base_W).homogeneous()).head(3);
 
-    const Eigen::Matrix3f sample_point_delta_matrix_S = (se::math::to_rotation(T_SM_) *
+    const Eigen::Matrix3f sample_point_delta_matrix_S = (se::math::to_rotation(T_SW_) *
                                                          (map_res_ * (Eigen::Matrix3f() << recommended_stride, 0, 0,
                                                                                            0, recommended_stride, 0,
                                                                                            0, 0, recommended_stride).finished()));
@@ -421,11 +421,11 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
   const unsigned int size_at_integration_scale_sq = se::math::sq(size_at_integration_scale_li);
 
   const Eigen::Vector3i voxel_coord_base = block_ptr->getCoord();
-  Eigen::Vector3f sample_point_base_M;
-  map_.voxelToPoint(voxel_coord_base, integration_stride, sample_point_base_M);
-  const Eigen::Vector3f sample_point_base_S = (T_SM_ * (sample_point_base_M).homogeneous()).head(3);
+  Eigen::Vector3f sample_point_base_W;
+  map_.voxelToPoint(voxel_coord_base, integration_stride, sample_point_base_W);
+  const Eigen::Vector3f sample_point_base_S = (T_SW_ * (sample_point_base_W).homogeneous()).head(3);
 
-  const Eigen::Matrix3f sample_point_delta_matrix_S = (se::math::to_rotation(T_SM_) *
+  const Eigen::Matrix3f sample_point_delta_matrix_S = (se::math::to_rotation(T_SW_) *
                                                        (map_res_ * (Eigen::Matrix3f() << integration_stride, 0, 0,
                                                                                          0, integration_stride, 0,
                                                                                          0, 0, integration_stride).finished()));

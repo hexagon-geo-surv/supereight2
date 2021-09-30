@@ -49,6 +49,8 @@ static inline Eigen::Matrix3f to_rotation(const Eigen::Matrix4f& T);
 
 static inline Eigen::Matrix4f to_transformation(const Eigen::Vector3f& t);
 
+//static inline Eigen::Matrix4f to_transformation(const Eigen::Matrix3f& R);
+
 static inline Eigen::Matrix4f to_transformation(const Eigen::Matrix3f& R, const Eigen::Vector3f& t);
 
 static inline Eigen::Vector3f to_inverse_translation(const Eigen::Matrix4f& T);

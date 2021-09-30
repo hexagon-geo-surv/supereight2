@@ -38,7 +38,7 @@ public:
                const SensorT&                        /* sensor */,
                const se::Image<float>&               /* depth_img */,
                const se::DensePoolingImage<SensorT>& /* depth_pooling_img */,
-               const Eigen::Matrix4f&                /* T_SM */,
+               const Eigen::Matrix4f&                /* T_SW */,
                const int                             /* frame */)
   {
   };
@@ -95,13 +95,13 @@ public:
    * \param[in]  map                  The reference to the map to be updated.
    * \param[in]  sensor               The sensor model.
    * \param[in]  depth_img            The depth image to be integrated.
-   * \param[in]  T_MS                 The transformation from map to camera frame.
+   * \param[in]  T_WS                 The transformation from sensor to world frame.
    * \param[in]  frame                The frame number to be integrated.
    */
   VolumeCarver(MapType&                map,
                const SensorT&          sensor,
                const se::Image<float>& depth_img,
-               const Eigen::Matrix4f&  T_MS,
+               const Eigen::Matrix4f&  T_WS,
                const int               frame);
 
   /**
@@ -126,13 +126,13 @@ private:
    *
    * \param[in] node_coord  The coordinates of the node in voxel coordinates.
    * \param[in] node_size   The size of the node in voxel units.
-   * \param[in] T_MC        The transformation from camera to map frame.
+   * \param[in] T_WS        The transformation from sensor to world frame.
    *
    * \return True/false statement if the camera is inside the node.
    */
   bool cameraInNode(const Eigen::Vector3i& node_coord,
                     const int              node_size,
-                    const Eigen::Matrix4f& T_MC);
+                    const Eigen::Matrix4f& T_WS);
 
   /**
    * \brief Return a conservative meassure of the expected variance of a sensor model inside a voxel
@@ -190,7 +190,7 @@ private:
   OctreeType&                          octree_;
   const SensorT&                       sensor_;
   const se::DensePoolingImage<SensorT> depth_pooling_img_;
-  const Eigen::Matrix4f                T_SM_;
+  const Eigen::Matrix4f                T_SW_;
   const int                            frame_;
   const float                          map_res_;
   VolumeCarverConfig                   config_;

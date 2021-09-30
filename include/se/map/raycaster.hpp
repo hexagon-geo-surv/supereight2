@@ -20,8 +20,8 @@ void point_cloud_to_normal(se::Image<Eigen::Vector3f>&       normals,
 template <typename MapT>
 inline typename std::enable_if_t<MapT::fld_ == se::Field::Occupancy, std::optional<Eigen::Vector4f>>
 raycast(MapT&                  map,
-        const Eigen::Vector3f& ray_origin_M,
-        const Eigen::Vector3f& ray_dir_M,
+        const Eigen::Vector3f& ray_origin_W,
+        const Eigen::Vector3f& ray_dir_W,
         const float            t_near,
         const float            t_far,
         const float            mu,
@@ -31,8 +31,8 @@ raycast(MapT&                  map,
 template <typename MapT>
 inline typename std::enable_if_t<MapT::fld_ == se::Field::TSDF, std::optional<Eigen::Vector4f>>
 raycast(MapT&                  map,
-        const Eigen::Vector3f& ray_origin_M,
-        const Eigen::Vector3f& ray_dir_M,
+        const Eigen::Vector3f& ray_origin_W,
+        const Eigen::Vector3f& ray_dir_W,
         const float            t_near,
         const float            t_far,
         const float            mu,
@@ -41,18 +41,18 @@ raycast(MapT&                  map,
 
 template<typename MapT, typename SensorT>
 void raycastVolume(const MapT&                 map,
-                   se::Image<Eigen::Vector3f>& surface_point_cloud_M,
-                   se::Image<Eigen::Vector3f>& surface_normals_M,
+                   se::Image<Eigen::Vector3f>& surface_point_cloud_W,
+                   se::Image<Eigen::Vector3f>& surface_normals_W,
                    se::Image<int8_t>&          surface_scale,
-                   const Eigen::Matrix4f&      T_MS,
+                   const Eigen::Matrix4f&      T_WS,
                    const SensorT&              sensor);
 
 void renderVolumeKernel(uint32_t*                         volume_RGBA_image_data,
                         const Eigen::Vector2i&            volume_RGBA_image_res,
-                        const Eigen::Vector3f&            light_M,
-                        const Eigen::Vector3f&            ambient_M,
-                        const se::Image<Eigen::Vector3f>& surface_point_cloud_M,
-                        const se::Image<Eigen::Vector3f>& surface_normals_M,
+                        const Eigen::Vector3f&            light_W,
+                        const Eigen::Vector3f&            ambient_W,
+                        const se::Image<Eigen::Vector3f>& surface_point_cloud_W,
+                        const se::Image<Eigen::Vector3f>& surface_normals_W,
                         const se::Image<int8_t>&          surface_scale);
 
 

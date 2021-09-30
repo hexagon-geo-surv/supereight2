@@ -2,50 +2,38 @@
 #define SE_TRACKER_IMPL_HPP
 
 namespace se {
-/**
- * \brief Track the current pose using ICP.
- *
- * \param[in]     depth_image_    The depth image fitting the sensor model
- * \param[in,out] T_MS            [in] The previous best pose estimate, [out] The new best pose estimate
- *
- * \return The tracking success.
- */
+
+
+
 template <typename MapT, typename SensorT>
 bool Tracker<MapT, SensorT>::track(const se::Image<float>& depth_img,
-                                   Eigen::Matrix4f&        T_MS)
+                                   Eigen::Matrix4f&        T_WS)
 {
   se::Image<Eigen::Vector3f> surface_point_cloud_M(depth_img.width(), depth_img.height(), Eigen::Vector3f::Zero());
   se::Image<Eigen::Vector3f> surface_normals_M(depth_img.width(), depth_img.height(), Eigen::Vector3f::Zero());
-  se::raycaster::raycastVolume(map_, surface_point_cloud_M, surface_normals_M, T_MS, sensor_);
-  return track(depth_img, T_MS, surface_point_cloud_M, surface_normals_M);
+  se::raycaster::raycastVolume(map_, surface_point_cloud_M, surface_normals_M, T_WS, sensor_);
+  return track(depth_img, T_WS, surface_point_cloud_M, surface_normals_M);
 }
 
 
-/**
- * \brief Track the current pose using ICP.
- *
- * \param[in]     depth_image_    The depth image fitting the sensor model
- * \param[in,out] T_MS            [in] The previous best pose estimate T_MS_ref, [out] The new best pose estimate T_MS
- *
- * \return The tracking success.
- */
+
 template <typename MapT, typename SensorT>
 bool Tracker<MapT, SensorT>::track(const se::Image<float>&     depth_img,
-                                   Eigen::Matrix4f&            T_MS,
-                                   se::Image<Eigen::Vector3f>& surface_point_cloud_M,
-                                   se::Image<Eigen::Vector3f>& surface_normals_M)
+                                   Eigen::Matrix4f&            T_WS,
+                                   se::Image<Eigen::Vector3f>& surface_point_cloud_W,
+                                   se::Image<Eigen::Vector3f>& surface_normals_W)
 {
-  assert(depth_img.width() == surface_point_cloud_M.width() && depth_img.height() == surface_point_cloud_M.height());
-  assert(depth_img.width() == surface_normals_M.width()     && depth_img.height() == surface_normals_M.height());
+  assert(depth_img.width() == surface_point_cloud_W.width() && depth_img.height() == surface_point_cloud_W.height());
+  assert(depth_img.width() == surface_normals_W.width()     && depth_img.height() == surface_normals_W.height());
 
-  Eigen::Matrix4f T_MS_ref = T_MS; // Camera pose of the previous image in map frame
+  Eigen::Matrix4f T_WS_ref = T_WS; // Camera pose of the previous image in world frame
 
   Eigen::Vector2i depth_img_res = Eigen::Vector2i(depth_img.width(), depth_img.height());
 
   std::vector<se::Image<float> >           scaled_depth_img;
   std::vector<float>                       reduction_output(8 * 32, 0.0f);
-  std::vector<se::Image<Eigen::Vector3f> > input_point_cloud_C;
-  std::vector<se::Image<Eigen::Vector3f> > input_normals_C;
+  std::vector<se::Image<Eigen::Vector3f> > input_point_cloud_S; //< Point cloud in sensor frame
+  std::vector<se::Image<Eigen::Vector3f> > input_normals_S;     //< Normals in sensor frame
 
   // Initialize the scaled images
   for (unsigned int i = 0; i < config_.iterations.size(); ++i)
@@ -53,31 +41,31 @@ bool Tracker<MapT, SensorT>::track(const se::Image<float>&     depth_img,
     const int downsample = 1 << i;
     const Eigen::Vector2i scaled_res = Eigen::Vector2i(sensor_.model.imageWidth(), sensor_.model.imageHeight()) / downsample;
     scaled_depth_img.emplace_back(scaled_res.x(), scaled_res.y(), 0.0f);
-    input_point_cloud_C.emplace_back(scaled_res.x(), scaled_res.y(), Eigen::Vector3f::Zero());
-    input_normals_C.emplace_back(scaled_res.x(), scaled_res.y(), Eigen::Vector3f::Zero());
+    input_point_cloud_S.emplace_back(scaled_res.x(), scaled_res.y(), Eigen::Vector3f::Zero());
+    input_normals_S.emplace_back(scaled_res.x(), scaled_res.y(), Eigen::Vector3f::Zero());
   }
 
   std::memcpy(scaled_depth_img[0].data(), depth_img.data(), sizeof(float) * depth_img.width() * depth_img.height());
 
-  // half sample the input depth maps into the pyramid levels
+  // Half sample the input depth maps into the pyramid levels
   for (unsigned int i = 1; i < config_.iterations.size(); ++i)
   {
     se::preprocessor::half_sample_robust_image(scaled_depth_img[i], scaled_depth_img[i - 1], e_delta * 3, 1);
   }
 
-  // prepare the 3D information from the input depth maps
+  // Prepare the 3D information from the input depth maps
   for (unsigned int i = 0; i < config_.iterations.size(); ++i)
   {
     const float scaling_factor = 1 << i;
     const SensorT scaled_sensor(sensor_, scaling_factor);
-    se::preprocessor::depth_to_point_cloud(input_point_cloud_C[i], scaled_depth_img[i], scaled_sensor);
+    se::preprocessor::depth_to_point_cloud(input_point_cloud_S[i], scaled_depth_img[i], scaled_sensor);
     if(sensor_.left_hand_frame)
     {
-      se::preprocessor::point_cloud_to_normal<true>(input_normals_C[i], input_point_cloud_C[i]);
+      se::preprocessor::point_cloud_to_normal<true>(input_normals_S[i], input_point_cloud_S[i]);
     }
     else
     {
-      se::preprocessor::point_cloud_to_normal<false>(input_normals_C[i], input_point_cloud_C[i]);
+      se::preprocessor::point_cloud_to_normal<false>(input_normals_S[i], input_point_cloud_S[i]);
     }
   }
 
@@ -90,24 +78,24 @@ bool Tracker<MapT, SensorT>::track(const se::Image<float>&     depth_img,
     for (int i = 0; i < config_.iterations[level]; ++i)
     {
       trackKernel(tracking_result.data(),
-                  input_point_cloud_C[level],
-                  input_normals_C[level],
-                  surface_point_cloud_M,
-                  surface_normals_M,
-                  T_MS, T_MS_ref,
+                  input_point_cloud_S[level],
+                  input_normals_S[level],
+                  surface_point_cloud_W,
+                  surface_normals_W,
+                  T_WS, T_WS_ref,
                   config_.dist_threshold,
                   config_.normal_threshold);
 
       reduceKernel(reduction_output.data(), reduction_output_res, tracking_result.data(), depth_img_res);
 
-      if (updatePoseKernel(T_MS, reduction_output.data(), config_.icp_threshold))
+      if (updatePoseKernel(T_WS, reduction_output.data(), config_.icp_threshold))
       {
         break;
       }
 
     }
   }
-  return checkPoseKernel(T_MS, T_MS_ref, reduction_output.data(),
+  return checkPoseKernel(T_WS, T_WS_ref, reduction_output.data(),
                          depth_img_res, config_.track_threshold);
 }
 
@@ -332,17 +320,17 @@ void Tracker<MapT, SensorT>::reduceKernel(float*                 output_data,
 
 template <typename MapT, typename SensorT>
 void Tracker<MapT, SensorT>::trackKernel(TrackData*                        output_data,
-                                         const se::Image<Eigen::Vector3f>& input_point_cloud_C,
-                                         const se::Image<Eigen::Vector3f>& input_normals_C,
-                                         const se::Image<Eigen::Vector3f>& surface_point_cloud_M_ref,
-                                         const se::Image<Eigen::Vector3f>& surface_normals_M_ref,
-                                         const Eigen::Matrix4f&            T_MS,
-                                         const Eigen::Matrix4f&            T_MS_ref,
+                                         const se::Image<Eigen::Vector3f>& input_point_cloud_S,
+                                         const se::Image<Eigen::Vector3f>& input_normals_S,
+                                         const se::Image<Eigen::Vector3f>& surface_point_cloud_W_ref,
+                                         const se::Image<Eigen::Vector3f>& surface_normals_W_ref,
+                                         const Eigen::Matrix4f&            T_WS,
+                                         const Eigen::Matrix4f&            T_WS_ref,
                                          const float                       dist_threshold,
                                          const float                       normal_threshold)
 {
-  const Eigen::Vector2i input_res( input_point_cloud_C.width(),  input_point_cloud_C.height());
-  const Eigen::Vector2i ref_res(surface_point_cloud_M_ref.width(), surface_point_cloud_M_ref.height());
+  const Eigen::Vector2i input_res( input_point_cloud_S.width(),  input_point_cloud_S.height());
+  const Eigen::Vector2i ref_res(surface_point_cloud_W_ref.width(), surface_point_cloud_W_ref.height());
 
   const int h = input_res.y(); // clang complains if this is inside the for loop
   const int w = input_res.x(); // clang complains if this is inside the for loop
@@ -353,59 +341,59 @@ void Tracker<MapT, SensorT>::trackKernel(TrackData*                        outpu
 
       TrackData& row = output_data[pixel.x() + pixel.y() * ref_res.x()];
 
-      if (input_normals_C[pixel.x() + pixel.y() * w].x() == INVALID)
+      if (input_normals_S[pixel.x() + pixel.y() * w].x() == INVALID)
       {
         row.result = -1;
         continue;
       }
 
-      // point_M := The input point in map frame
-      const Eigen::Vector3f point_M = (T_MS *
-                                       input_point_cloud_C[pixel.x() + pixel.y() * w].homogeneous()).head<3>();
-      // point_C_ref := The input point expressed in the camera frame the
-      // surface_point_cloud_M_ref and surface_point_cloud_M_ref was raycasted from.
-      const Eigen::Vector3f point_C_ref = (T_MS_ref.inverse() * point_M.homogeneous()).head<3>();
+      // point_W := The input point in world frame
+      const Eigen::Vector3f point_W = (T_WS *
+                                       input_point_cloud_S[pixel.x() + pixel.y() * w].homogeneous()).head<3>();
+      // point_S_ref := The input point expressed in the sensor frame the
+      // surface_point_cloud_W_ref and surface_point_cloud_W_ref was raycasted from.
+      const Eigen::Vector3f point_S_ref = (T_WS_ref.inverse() * point_W.homogeneous()).head<3>();
 
       // ref_pixel_f := The pixel in the surface_point_cloud_M_ref and surface_point_cloud_M_ref image.
       Eigen::Vector2f ref_pixel_f;
-      if (sensor_.model.project(point_C_ref, &ref_pixel_f) != srl::projection::ProjectionStatus::Successful)
+      if (sensor_.model.project(point_S_ref, &ref_pixel_f) != srl::projection::ProjectionStatus::Successful)
       {
         row.result = -2;
         continue;
       }
 
       const Eigen::Vector2i ref_pixel = se::round_pixel(ref_pixel_f);
-      const Eigen::Vector3f ref_normal_M
-              = surface_normals_M_ref[ref_pixel.x() + ref_pixel.y() * ref_res.x()];
+      const Eigen::Vector3f ref_normal_W
+              = surface_normals_W_ref[ref_pixel.x() + ref_pixel.y() * ref_res.x()];
 
-      if (ref_normal_M.x() == INVALID)
+      if (ref_normal_W.x() == INVALID)
       {
         row.result = -3;
         continue;
       }
 
-      const Eigen::Vector3f ref_point_M = surface_point_cloud_M_ref[ref_pixel.x() + ref_pixel.y() * ref_res.x()];
-      const Eigen::Vector3f diff = ref_point_M - point_M;
-      const Eigen::Vector3f input_normal_M = T_MS.topLeftCorner<3, 3>()
-                                             * input_normals_C[pixel.x() + pixel.y() * w];
+      const Eigen::Vector3f ref_point_W = surface_point_cloud_W_ref[ref_pixel.x() + ref_pixel.y() * ref_res.x()];
+      const Eigen::Vector3f diff = ref_point_W - point_W;
+      const Eigen::Vector3f input_normal_W = T_WS.topLeftCorner<3, 3>()
+                                             * input_normals_S[pixel.x() + pixel.y() * w];
 
       if (diff.norm() > dist_threshold)
       {
         row.result = -4;
         continue;
       }
-      if (input_normal_M.dot(ref_normal_M) < normal_threshold)
+      if (input_normal_W.dot(ref_normal_W) < normal_threshold)
       {
         row.result = -5;
         continue;
       }
       row.result = 1;
-      row.error = ref_normal_M.dot(diff);
-      row.J[0] = ref_normal_M.x();
-      row.J[1] = ref_normal_M.y();
-      row.J[2] = ref_normal_M.z();
+      row.error = ref_normal_W.dot(diff);
+      row.J[0] = ref_normal_W.x();
+      row.J[1] = ref_normal_W.y();
+      row.J[2] = ref_normal_W.z();
 
-      const Eigen::Vector3f cross_prod = point_M.cross(ref_normal_M);
+      const Eigen::Vector3f cross_prod = point_W.cross(ref_normal_W);
       row.J[3] = cross_prod.x();
       row.J[4] = cross_prod.y();
       row.J[5] = cross_prod.z();
@@ -416,7 +404,7 @@ void Tracker<MapT, SensorT>::trackKernel(TrackData*                        outpu
 
 
 template <typename MapT, typename SensorT>
-bool Tracker<MapT, SensorT>::updatePoseKernel(Eigen::Matrix4f& T_MS,
+bool Tracker<MapT, SensorT>::updatePoseKernel(Eigen::Matrix4f& T_WS,
                                               const float*     reduction_output_data,
                                               const float      icp_threshold)
 {
@@ -424,7 +412,7 @@ bool Tracker<MapT, SensorT>::updatePoseKernel(Eigen::Matrix4f& T_MS,
   Eigen::Map<const Eigen::Matrix<float, 8, 32, Eigen::RowMajor> > values(reduction_output_data);
   Eigen::Matrix<float, 6, 1> x = solve(values.row(0).segment(1, 27));
   Eigen::Matrix4f delta = se::math::exp(x);
-  T_MS = delta * T_MS;
+  T_WS = delta * T_WS;
 
   if (x.norm() < icp_threshold)
   {
@@ -437,8 +425,8 @@ bool Tracker<MapT, SensorT>::updatePoseKernel(Eigen::Matrix4f& T_MS,
 
 
 template <typename MapT, typename SensorT>
-bool Tracker<MapT, SensorT>::checkPoseKernel(Eigen::Matrix4f&       T_MS,
-                                             Eigen::Matrix4f&       previous_T_MS,
+bool Tracker<MapT, SensorT>::checkPoseKernel(Eigen::Matrix4f&       T_WS,
+                                             Eigen::Matrix4f&       previous_T_WS,
                                              const float*           reduction_output_data,
                                              const Eigen::Vector2i& reduction_output_res,
                                              const float            track_threshold)
@@ -450,7 +438,7 @@ bool Tracker<MapT, SensorT>::checkPoseKernel(Eigen::Matrix4f&       T_MS,
   if ((std::sqrt(values(0, 0) / values(0, 28)) > 2e-2)
       || (values(0, 28) / (reduction_output_res.x() * reduction_output_res.y()) < track_threshold))
   {
-    T_MS = previous_T_MS;
+    T_WS = previous_T_WS;
     return false;
   } else
   {

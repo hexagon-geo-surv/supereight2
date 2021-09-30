@@ -55,7 +55,7 @@ TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
   se::Image<float>      processed_depth_img(processed_img_res.x(), processed_img_res.y());
 
   // Set pose to identity
-  Eigen::Matrix4f T_MS = Eigen::Matrix4f::Identity();
+  Eigen::Matrix4f T_WS = Eigen::Matrix4f::Identity();
 
   // Set depth image
   for (int y = 0; y < input_img_res.y(); y++)
@@ -73,34 +73,34 @@ TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
   const int max_frame = 1;
   for (int frame = 0; frame < max_frame; frame++)
   {
-    integrator.integrateDepth(sensor, processed_depth_img, T_MS, frame);
+    integrator.integrateDepth(sensor, processed_depth_img, T_WS, frame);
   }
 
   map.saveFieldSlice(config.app.mesh_output_dir + "/test-field-interp-slice",
-                     se::math::to_translation(T_MS),
+                     se::math::to_translation(T_WS),
                      std::to_string(max_frame));
   map.saveStructure(config.app.mesh_output_dir + "/test-field-interp-structure_"
                     + std::to_string(max_frame) + ".ply");
 
-  Eigen::Vector3f       point_M;
+  Eigen::Vector3f point_W;
   std::optional<se::field_t> field_value;
 
   // Node neighbours different size
   const Eigen::Vector3i voxel_coord_free_1(639, 511, 799);
-  map.voxelToPoint(voxel_coord_free_1, point_M);
-  field_value = map.getFieldInterp(point_M);
+  map.voxelToPoint(voxel_coord_free_1, point_W);
+  field_value = map.getFieldInterp(point_W);
   EXPECT_FLOAT_EQ(-5.015, *field_value);
 
   // All inside node
   const Eigen::Vector3i voxel_coord_free_2(600, 520, 811);
-  map.voxelToPoint(voxel_coord_free_2, point_M);
-  field_value = map.getFieldInterp(point_M);
+  map.voxelToPoint(voxel_coord_free_2, point_W);
+  field_value = map.getFieldInterp(point_W);
   EXPECT_FLOAT_EQ(-5.015, *field_value);
 
   // Node and block neighbours
   const Eigen::Vector3i voxel_coord_free_3(575, 511, 615);
-  map.voxelToPoint(voxel_coord_free_3, point_M);
-  field_value = map.getFieldInterp(point_M);
+  map.voxelToPoint(voxel_coord_free_3, point_W);
+  field_value = map.getFieldInterp(point_W);
   EXPECT_FLOAT_EQ(-5.015, *field_value);
 }
 
@@ -126,7 +126,7 @@ TEST(MultiResOFusionSystemTest, GetField)
   se::Image<float>      processed_depth_img(processed_img_res.x(), processed_img_res.y());
 
   // Set pose to identity
-  Eigen::Matrix4f T_MS = Eigen::Matrix4f::Identity();
+  Eigen::Matrix4f T_WS = Eigen::Matrix4f::Identity();
 
   // Set depth image
   for (int y = 0; y < input_img_res.y(); y++)
@@ -144,38 +144,38 @@ TEST(MultiResOFusionSystemTest, GetField)
   const int max_frame = 1;
   for (int frame = 0; frame < max_frame; frame++)
   {
-    integrator.integrateDepth(sensor, processed_depth_img, T_MS, frame);
+    integrator.integrateDepth(sensor, processed_depth_img, T_WS, frame);
   }
 
   const Eigen::Vector3i voxel_coord_unknown_1(688, 500, 933);
   const Eigen::Vector3i voxel_coord_unknown_2(256, 166, 338);
   const Eigen::Vector3i voxel_coord_free_1(578, 500, 737);
   const Eigen::Vector3i voxel_coord_free_2(477, 500, 618);
-  Eigen::Vector3f       point_M;
+  Eigen::Vector3f point_W;
 
   se::OccupancyData data;
 
   map.saveFieldSlice(config.app.mesh_output_dir + "/test-field-slice",
-                     se::math::to_translation(T_MS),
+                     se::math::to_translation(T_WS),
                      std::to_string(max_frame));
 
   map.saveStructure(config.app.mesh_output_dir + "/test-field-structure_"
                     + std::to_string(max_frame) + ".ply");
 
-  map.voxelToPoint(voxel_coord_unknown_1, point_M);
-  data = map.getData(point_M);
+  map.voxelToPoint(voxel_coord_unknown_1, point_W);
+  data = map.getData(point_W);
   EXPECT_EQ(se::OccupancyData().occupancy, data.occupancy);
 
-  map.voxelToPoint(voxel_coord_unknown_2, point_M);
-  data = map.getData(point_M);
+  map.voxelToPoint(voxel_coord_unknown_2, point_W);
+  data = map.getData(point_W);
   EXPECT_EQ(se::OccupancyData().occupancy, data.occupancy);
 
-  map.voxelToPoint(voxel_coord_free_1, point_M);
-  data = map.getData(point_M);
+  map.voxelToPoint(voxel_coord_free_1, point_W);
+  data = map.getData(point_W);
   EXPECT_FLOAT_EQ(-5.015, data.occupancy);
 
-  map.voxelToPoint(voxel_coord_free_2, point_M);
-  data = map.getData(point_M);
+  map.voxelToPoint(voxel_coord_free_2, point_W);
+  data = map.getData(point_W);
   EXPECT_FLOAT_EQ(-5.015, data.occupancy);
 }
 
@@ -201,7 +201,7 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
   se::Image<float>      processed_depth_img(processed_img_res.x(), processed_img_res.y());
 
   // Set pose to identity
-  Eigen::Matrix4f T_MS = Eigen::Matrix4f::Identity();
+  Eigen::Matrix4f T_WS = Eigen::Matrix4f::Identity();
 
   // Set depth image
   for (int y = 0; y < input_img_res.y(); y++)
@@ -219,24 +219,24 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
   const int max_frame = 1;
   for (int frame = 0; frame < max_frame; frame++)
   {
-    integrator.integrateDepth(sensor, processed_depth_img, T_MS, frame);
+    integrator.integrateDepth(sensor, processed_depth_img, T_WS, frame);
   }
 
   const Eigen::Vector3i voxel_coord(640, 512, 896);
   const int             scale_5 = 5;
-  Eigen::Vector3f       point_M;
+  Eigen::Vector3f       point_W;
 
   se::OccupancyData data;
 
-  map.voxelToPoint(voxel_coord, point_M);
-  data = map.getMaxData(point_M, scale_5);
+  map.voxelToPoint(voxel_coord, point_W);
+  data = map.getMaxData(point_W, scale_5);
 
   map.saveFieldSlice(config.app.mesh_output_dir + "/test-max-field-slice-field",
-                     se::math::to_translation(T_MS),
+                     se::math::to_translation(T_WS),
                      std::to_string(max_frame));
 
   map.saveScaleSlice(config.app.mesh_output_dir + "/test-max-field-slice-scale",
-                     se::math::to_translation(T_MS),
+                     se::math::to_translation(T_WS),
                      std::to_string(max_frame));
 
 
@@ -245,7 +245,7 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
   for (int scale = 0; scale < map.getOctree()->getMaxScale(); scale++)
   {
     map.saveMaxFieldSlice(config.app.mesh_output_dir + "/test-max-field-slice-max-field-scale-" + std::to_string(scale),
-                          se::math::to_translation(T_MS),
+                          se::math::to_translation(T_WS),
                           scale,
                           std::to_string(max_frame));
   }
@@ -277,7 +277,7 @@ TEST(MultiResOFusionSystemTest, DeleteChildren)
   se::Image<float>      processed_depth_img(processed_img_res.x(), processed_img_res.y());
 
   // Set pose to identity
-  Eigen::Matrix4f T_MS = Eigen::Matrix4f::Identity();
+  Eigen::Matrix4f T_WS = Eigen::Matrix4f::Identity();
 
   // Set depth image
   for (int y = 0; y < input_img_res.y(); y++)
@@ -303,18 +303,18 @@ TEST(MultiResOFusionSystemTest, DeleteChildren)
   {
     std::cout << "FRAME = " << frame << std::endl;
     se::preprocessor::downsample_depth((frame == 0) ? input_noise_depth_img : input_depth_img, processed_depth_img);
-    integrator.integrateDepth(sensor, processed_depth_img, T_MS, frame);
+    integrator.integrateDepth(sensor, processed_depth_img, T_WS, frame);
 
     const Eigen::Vector3i voxel_coord(471, 512, 807);
-    Eigen::Vector3f       point_M;
+    Eigen::Vector3f       point_W;
 
     se::OccupancyData data;
 
-    map.voxelToPoint(voxel_coord, point_M);
-    data = map.getData(point_M);
+    map.voxelToPoint(voxel_coord, point_W);
+    data = map.getData(point_W);
 
     map.saveFieldSlice(config.app.mesh_output_dir + "/test-delete-child-slice",
-                       se::math::to_translation(T_MS),
+                       se::math::to_translation(T_WS),
                        std::to_string(frame));
 
     map.saveStructure(config.app.mesh_output_dir + "/test-delete-child-structure_"
@@ -376,31 +376,31 @@ TEST(MultiResOFusionSystemTest, Raycasting)
 
   int frame = 0;
 
-  se::Image<Eigen::Vector3f> surface_point_cloud_M(processed_img_res.x(), processed_img_res.y());
-  se::Image<Eigen::Vector3f> surface_normals_M(processed_img_res.x(), processed_img_res.y());
+  se::Image<Eigen::Vector3f> surface_point_cloud_W(processed_img_res.x(), processed_img_res.y());
+  se::Image<Eigen::Vector3f> surface_normals_W(processed_img_res.x(), processed_img_res.y());
   se::Image<int8_t>          surface_scale(processed_img_res.x(), processed_img_res.y());
 
-  Eigen::Matrix4f T_MS;
-  reader->nextData(input_depth_img, input_rgba_img, T_MS);
+  Eigen::Matrix4f T_WS;
+  reader->nextData(input_depth_img, input_rgba_img, T_WS);
 
   // Preprocess depth
   se::preprocessor::downsample_depth(input_depth_img, processed_depth_img);
   se::preprocessor::downsample_rgba(input_rgba_img,  processed_rgba_img);
 
   se::MapIntegrator integrator(map);
-  integrator.integrateDepth(sensor, processed_depth_img, T_MS, frame);
+  integrator.integrateDepth(sensor, processed_depth_img, T_WS, frame);
 
-  se::raycaster::raycastVolume(map, surface_point_cloud_M, surface_normals_M, surface_scale, T_MS, sensor);
+  se::raycaster::raycastVolume(map, surface_point_cloud_W, surface_normals_W, surface_scale, T_WS, sensor);
 
   const Eigen::Vector3f ambient{0.1, 0.1, 0.1};
   convert_to_output_rgba_img(processed_rgba_img, output_rgba_img_data);
   convert_to_output_depth_img(processed_depth_img, output_depth_img_data);
-  se::raycaster::renderVolumeKernel(output_volume_img_data, processed_img_res, se::math::to_translation(T_MS), ambient, surface_point_cloud_M, surface_normals_M, surface_scale);
+  se::raycaster::renderVolumeKernel(output_volume_img_data, processed_img_res, se::math::to_translation(T_WS), ambient, surface_point_cloud_W, surface_normals_W, surface_scale);
 
   map.saveStructure(config.app.mesh_output_dir + "/test-raycasting-structure_" + std::to_string(frame) + ".ply");
   map.saveStructure(config.app.mesh_output_dir + "/test-raycasting-structure_" + std::to_string(frame) + ".vtk");
   map.saveStructure(config.app.mesh_output_dir + "/test-raycasting-structure_" + std::to_string(frame) + ".obj");
-  map.saveFieldSlice(config.app.mesh_output_dir + "/test-raycasting-slice-field", se::math::to_translation(T_MS), std::to_string(frame));
+  map.saveFieldSlice(config.app.mesh_output_dir + "/test-raycasting-slice-field", se::math::to_translation(T_WS), std::to_string(frame));
   map.saveMesh(config.app.mesh_output_dir + "/test-raycasting-mesh_" + std::to_string(frame) + ".ply");
   map.saveMesh(config.app.mesh_output_dir + "/test-raycasting-mesh_" + std::to_string(frame) + ".vtk");
   map.saveMesh(config.app.mesh_output_dir + "/test-raycasting-mesh_" + std::to_string(frame) + ".obj");

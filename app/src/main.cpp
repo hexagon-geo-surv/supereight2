@@ -41,11 +41,6 @@ int main(int argc, char** argv)
   se::Image<float>      processed_depth_img(processed_img_res.x(), processed_img_res.y());
   se::Image<uint32_t>   processed_rgba_img(processed_img_res.x(), processed_img_res.y());
 
-  // Setup surface pointcloud, normals and scale
-  se::Image<Eigen::Vector3f> surface_point_cloud_M(processed_img_res.x(), processed_img_res.y());
-  se::Image<Eigen::Vector3f> surface_normals_M(processed_img_res.x(), processed_img_res.y());
-  se::Image<int8_t>          surface_scale(processed_img_res.x(), processed_img_res.y());
-
   // Setup output images / renders
   uint32_t* output_rgba_img_data     =  new uint32_t[processed_img_res.x() * processed_img_res.y()];
   uint32_t* output_depth_img_data    =  new uint32_t[processed_img_res.x() * processed_img_res.y()];
@@ -75,10 +70,12 @@ int main(int argc, char** argv)
 
   // Setup input, processed and output imgs
   se::ReaderStatus read_ok = se::ReaderStatus::ok;
+  Eigen::Matrix4f T_WB = Eigen::Matrix4f::Identity(); //< Body to world transformation
+  Eigen::Matrix4f T_BS = Eigen::Matrix4f::Identity(); //< Sensor to body transformation
+  Eigen::Matrix4f T_WS = T_WB * T_BS;                 //< Sensor to world transformation
 
   // ========= Tracker & Pose INITIALIZATION  =========
   se::Tracker tracker(map, sensor, config.tracker);
-  Eigen::Matrix4f T_MS;
 
   // ========= Integrator INITIALIZATION  =========
   // The integrator uses a field dependent allocation (TSDF: ray-casting; occupancy: volume-carving)
@@ -87,6 +84,11 @@ int main(int argc, char** argv)
 
   int frame = 0;
 
+  // Setup surface pointcloud, normals and scale
+  se::Image<Eigen::Vector3f> surface_point_cloud_W(processed_img_res.x(), processed_img_res.y());
+  se::Image<Eigen::Vector3f> surface_normals_W(processed_img_res.x(), processed_img_res.y());
+  se::Image<int8_t>          surface_scale(processed_img_res.x(), processed_img_res.y());
+
   while (read_ok == se::ReaderStatus::ok)
   {
     se::perfstats.setIter(frame++);
@@ -94,18 +96,13 @@ int main(int argc, char** argv)
     TICK("total")
 
     TICK("read")
-    if (config.app.enable_ground_truth)
+    if (config.app.enable_ground_truth || frame == 1)
     {
-      read_ok = reader->nextData(input_depth_img, input_rgba_img, T_MS);
+      read_ok = reader->nextData(input_depth_img, input_rgba_img, T_WB);
+      T_WS = T_WB * T_BS;
     } else
     {
-      if (frame == 1)
-      {
-        read_ok = reader->nextData(input_depth_img, input_rgba_img, T_MS);
-      } else
-      {
-        read_ok = reader->nextData(input_depth_img, input_rgba_img);
-      }
+      read_ok = reader->nextData(input_depth_img, input_rgba_img);
     }
     TOCK("read")
 
@@ -122,22 +119,22 @@ int main(int argc, char** argv)
     TICK("tracking")
     if (!config.app.enable_ground_truth && frame > 1 && (frame % config.app.tracking_rate == 0))
     {
-      tracker.track(processed_depth_img, T_MS, surface_point_cloud_M, surface_normals_M);
+      tracker.track(processed_depth_img, T_WS, surface_point_cloud_W, surface_normals_W);
     }
-    se::perfstats.sampleT_WB(T_MS);
+    se::perfstats.sampleT_WB(T_WB);
     TOCK("tracking")
 
     // Integrate depth for a given sensor, depth image, pose and frame number
     TICK("integration")
     if (frame % config.app.integration_rate == 0)
     {
-      integrator.integrateDepth(sensor, processed_depth_img, T_MS, frame);
+      integrator.integrateDepth(sensor, processed_depth_img, T_WS, frame);
     }
     TOCK("integration")
 
     // Raycast from T_MS
     TICK("raycast")
-    se::raycaster::raycastVolume(map, surface_point_cloud_M, surface_normals_M, surface_scale, T_MS, sensor);
+    se::raycaster::raycastVolume(map, surface_point_cloud_W, surface_normals_W, surface_scale, T_WS, sensor);
     TOCK("raycast")
 
     // Convert rgba, depth and render the volume (if enabled)
@@ -151,7 +148,7 @@ int main(int argc, char** argv)
       tracker.renderTrackingResult(output_tracking_img_data);
       if (frame % config.app.rendering_rate == 0)
       {
-        se::raycaster::renderVolumeKernel(output_volume_img_data, processed_img_res, se::math::to_translation(T_MS), ambient, surface_point_cloud_M, surface_normals_M, surface_scale);
+        se::raycaster::renderVolumeKernel(output_volume_img_data, processed_img_res, se::math::to_translation(T_WS), ambient, surface_point_cloud_W, surface_normals_W, surface_scale);
       }
     }
     TOCK("render")
@@ -175,7 +172,7 @@ int main(int argc, char** argv)
       map.saveMesh(config.app.mesh_output_dir + "/mesh_" + std::to_string(frame) + ".ply");
       if (config.app.enable_slice_meshing)
       {
-        map.saveFieldSlice(config.app.mesh_output_dir + "/slice", se::math::to_translation(T_MS), std::to_string(frame));
+        map.saveFieldSlice(config.app.mesh_output_dir + "/slice", se::math::to_translation(T_WS), std::to_string(frame));
       }
       if (config.app.enable_structure_meshing)
       {

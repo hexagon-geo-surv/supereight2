@@ -17,12 +17,12 @@ Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Single, BlockSize>, Sens
         MapType&                               map,
         const SensorT&                         sensor,
         const se::Image<float>&                depth_img,
-        const Eigen::Matrix4f&                 T_MS,
+        const Eigen::Matrix4f&                 T_WS,
         const int                              frame) :
     map_(map),
     sensor_(sensor),
     depth_img_(depth_img),
-    T_MS_(T_MS),
+    T_WS_(T_WS),
     frame_(frame),
     config_(map)
 {
@@ -38,7 +38,7 @@ template<se::Colour    ColB,
 void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Single, BlockSize>, SensorT>::operator()(std::vector<se::OctantBase*>& block_ptrs)
 {
   unsigned int block_size = BlockType::getSize();
-  const Eigen::Matrix4f T_SM = se::math::to_inverse_transformation(T_MS_);
+  const Eigen::Matrix4f T_SW = se::math::to_inverse_transformation(T_WS_);
 
   auto valid_predicate = [&](float depth_value) { return depth_value >= sensor_.near_plane; };
 
@@ -48,10 +48,10 @@ void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Single, BlockSize>,
     BlockType* block_ptr = static_cast<BlockType*>(block_ptrs[i]);
     block_ptr->setTimeStamp(frame_);
     Eigen::Vector3i block_coord = block_ptr->getCoord();
-    Eigen::Vector3f point_base_M;
-    map_.voxelToPoint(block_coord, point_base_M);
-    const Eigen::Vector3f point_base_S = (T_SM * point_base_M.homogeneous()).head(3);
-    const Eigen::Matrix3f point_delta_matrix_S = (se::math::to_rotation(T_SM) * map_.getRes() *
+    Eigen::Vector3f point_base_W;
+    map_.voxelToPoint(block_coord, point_base_W);
+    const Eigen::Vector3f point_base_S = (T_SW * point_base_W.homogeneous()).head(3);
+    const Eigen::Matrix3f point_delta_matrix_S = (se::math::to_rotation(T_SW) * map_.getRes() *
                                                   Eigen::Matrix3f::Identity());
 
     for (unsigned int i = 0; i < block_size; ++i)

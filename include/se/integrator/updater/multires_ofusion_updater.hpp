@@ -47,13 +47,13 @@ public:
    * \param[in]  map                  The reference to the map to be updated.
    * \param[in]  sensor               The sensor model.
    * \param[in]  depth_img            The depth image to be integrated.
-   * \param[in]  T_MS                 The transformation from camera to map frame.
+   * \param[in]  T_WS                 The transformation from sensor to world frame.
    * \param[in]  frame                The frame number to be integrated.
    */
   Updater(MapType&                               map,
           const SensorT&                         sensor,
           const se::Image<float>&                depth_img,
-          const Eigen::Matrix4f&                 T_MS,
+          const Eigen::Matrix4f&                 T_WS,
           const int                              frame);
 
   void operator()(se::VolumeCarverAllocation& allocation_list)
@@ -123,7 +123,7 @@ private:
   OctreeType&                            octree_;
   const SensorT&                         sensor_;
   const se::Image<float>&                depth_img_;
-  const Eigen::Matrix4f                  T_SM_;
+  const Eigen::Matrix4f                  T_SW_;
   const int                              frame_;
   const float                            map_res_;
   const UpdaterConfig                    config_;

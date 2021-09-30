@@ -7,8 +7,10 @@
 #include "se/common/yaml.hpp"
 
 namespace se {
-  MapConfig::MapConfig()
-    : dim(10, 10, 3), res(0.1), origin(dim / 2.0f)
+  MapConfig::MapConfig() :
+      dim(10, 10, 3),
+      res(0.1),
+      T_MW(se::math::to_transformation(dim / 2))
   {
   }
 
@@ -43,9 +45,11 @@ namespace se {
     se::yaml::subnode_as_float(node, "res", res);
     if (node["origin"].isNone()) {
       // Don't show a warning if origin is not available, set it to dim / 2.
-      origin = dim / 2.0f;
+      T_MW = se::math::to_transformation(dim / 2);
     } else {
-      se::yaml::subnode_as_vector3f(node, "origin", origin);
+      Eigen::Vector3f t_MW;
+      se::yaml::subnode_as_vector3f(node, "t_MW", t_MW);
+      T_MW = se::math::to_transformation(t_MW);
     }
   }
 
@@ -55,7 +59,9 @@ namespace se {
   {
     os << "dim:     " << c.dim.x() << " x " << c.dim.y() << " x " << c.dim.z() << " m\n";
     os << "res:     " << c.res << " m\n";
-    os << "origin:  [" << c.origin.x() << ", " << c.origin.y() << ", " << c.origin.z() << "] m\n";
+    os << "t_MW:    [" << se::math::to_translation(c.T_MW).x() << ", "
+                       << se::math::to_translation(c.T_MW).y() << ", "
+                       << se::math::to_translation(c.T_MW).z() << "] m\n";
     return os;
   }
 } // namespace se

@@ -17,7 +17,7 @@ struct MapConfig
 {
   Eigen::Vector3f dim;
   float           res;
-  Eigen::Vector3f origin;
+  Eigen::Matrix4f T_MW; //< World to map transformation
 
   /** Initializes the config to a 10m x 10m x 3m map with a 10cm resolution and the origin at the
    * centre of the volume.
@@ -82,10 +82,52 @@ public:
   /**
    * \brief Verify if a point is inside the map.
    *
-   * \param[in] point_M         The point to be verified
+   * \param[in] point_W         The point to be verified
    * \return True if the point is inside the map, false otherwise
    */
-  inline bool contains(const Eigen::Vector3f& point_M) const;
+  inline bool contains(const Eigen::Vector3f& point_W) const;
+
+  /**
+   * \brief Get the transformation from world to map frame
+   *
+   * \return T_MW
+   */
+  inline Eigen::Matrix4f getTMW() const { return T_MW_; };
+
+  /**
+   * \brief Get the transformation from map to world frame
+   *
+   * \return T_WM
+   */
+  Eigen::Matrix4f getTWM() const { return se::math::to_inverse_transformation(T_MW_); };
+
+  /**
+   * \brief Get the translation from world to map frame
+   *
+   * \return t_MW
+   */
+  inline Eigen::Vector3f gettMW() const { return se::math::to_translation(T_MW_); }
+
+  /**
+   * \brief Get the translation from map to world frame
+   *
+   * \return t_WM
+   */
+  inline Eigen::Vector3f gettWM() const { return se::math::to_translation(se::math::to_inverse_transformation(T_MW_));}
+
+  /**
+   * \brief Get the rotation from world to map frame
+   *
+   * \return R_MW
+   */
+  inline Eigen::Matrix3f getRMW() const { return se::math::to_rotation(T_MW_); }
+
+  /**
+   * \brief Get the rotation from map to world frame
+   *
+   * \return R_WM
+   */
+  inline Eigen::Matrix3f getRWM() const { return se::math::to_rotation(se::math::to_inverse_transformation(T_MW_)); }
 
   /**
    * \brief Get the dimensions of the map in [meter] (length x width x height)
@@ -102,13 +144,6 @@ public:
   inline float getRes() const { return resolution_; }
 
   /**
-   * \brief Get the origin of the map in [meter]
-   *
-   * \return The origin of the map
-   */
-  inline Eigen::Vector3f getOrigin() const { return origin_M_; }
-
-  /**
    * \brief Get the data configuration of the map.
    *
    * \return The data configuration of the map
@@ -119,18 +154,18 @@ public:
    * \brief Get the stored data at the provided coordinates in [meter].
    *
    * \tparam SafeB          The parameter turning "contains point" verification on and off (Off by default)
-   * \param[in]  point_M    The coordinates of the point in map frame [meter] to evaluate
+   * \param[in]  point_W    The coordinates of the point in world frame [meter] to evaluate
    * \return The data at the provided coordinates
    */
   template<Safe SafeB = Safe::Off>
-  inline const DataType getData (const Eigen::Vector3f& point_M) const;
+  inline const DataType getData (const Eigen::Vector3f& point_W) const;
 
   /**
    * \brief Get the stored max data at the provided coordinates in [meter] for a given scale.
    *
    * \tparam SafeB          The parameter turning "contains point" verification on and off (Off by default)
    * \tparam ResTDummy      The dummy parameter disabling the function off for single res and TSDF maps // TODO: Clean up with C++20 using required
-   * \param point_M         The coordinates of the point in map frame [meter] to accessed
+   * \param point_W         The coordinates of the point in world frame [meter] to accessed
    * \param scale_desired   The scale to be accessed
    * \return The max data at the provided coordinates and scale
    */
@@ -138,17 +173,17 @@ public:
            Res ResTDummy = ResT
   >
   inline typename std::enable_if_t<ResTDummy == Res::Multi, DataType>
-  getMaxData(const Eigen::Vector3f& point_M,
+  getMaxData(const Eigen::Vector3f& point_W,
              const int              scale_desired) const
   {
     Eigen::Vector3i voxel_coord;
 
     if constexpr(SafeB == Safe::Off) // Evaluate at compile time
     {
-      pointToVoxel<Safe::Off>(point_M, voxel_coord);
+      pointToVoxel<Safe::Off>(point_W, voxel_coord);
     } else
     {
-      if (!pointToVoxel<Safe::On>(point_M, voxel_coord))
+      if (!pointToVoxel<Safe::On>(point_W, voxel_coord))
       {
         return DataType();
       }
@@ -162,18 +197,18 @@ public:
    * \brief Get the interpolated field value at the provided coordinates.
    *
    * \tparam SafeB          The parameter turning "contains point" verification on and off (Off by default)
-   * \param[in] point_M     The coordinates of the point in map frame [meter] to accessed
+   * \param[in] point_W     The coordinates of the point in world frame [meter] to accessed
    * \return                The interpolated field value at the coordinates
    */
   template<Safe SafeB = Safe::Off>
-  inline std::optional<se::field_t> getFieldInterp(const Eigen::Vector3f& point_M) const;
+  inline std::optional<se::field_t> getFieldInterp(const Eigen::Vector3f& point_W) const;
 
   /**
    * \brief Get the interpolated field value at the provided coordinates and the scale it is stored at.
    *
    * \tparam SafeB              The parameter turning "contains point" verification on and off (Off by default)
    * \tparam ResTDummy          The dummy parameter disabling the function off for single res maps // TODO: Clean up with C++20 using required
-   * \param[in] point_M         The coordinates of the point in map frame [meter] to accessed
+   * \param[in] point_W         The coordinates of the point in world frame [meter] to accessed
    * \param[out] returned_scale The scale the data is stored at
    * \return                    The interpolated field value at the coordinates
    */
@@ -181,42 +216,42 @@ public:
            Res ResTDummy = ResT
   >
   inline typename std::enable_if_t<ResTDummy == Res::Multi, std::optional<se::field_t>>
-  getFieldInterp(const Eigen::Vector3f& point_M,
+  getFieldInterp(const Eigen::Vector3f& point_W,
                  int&                   returned_scale) const;
 
   /**
    * \brief Get the field gradient at the provided coordinates.
    *
    * \tparam SafeB          The parameter turning "contains point" verification on and off (Off by default)
-   * \param[in] point_M     The coordinates of the point in map frame [meter] to accessed
+   * \param[in] point_W     The coordinates of the point in world frame [meter] to accessed
    * \return                The filed gradient at the coordinates
    */
   template<Safe SafeB = Safe::Off>
-  inline std::optional<se::field_vec_t> getFieldGrad(const Eigen::Vector3f& point_M) const;
+  inline std::optional<se::field_vec_t> getFieldGrad(const Eigen::Vector3f& point_W) const;
 
   /**
    * \brief Save three axis aligned slices field value (x, y and z) at the provided coordinates to a file.
    *
    * \param[in] file_path   The path to store the slices at (without .vtk file ending)
-   * \param[in] point_M     The coordinates of the point in map frame [meter] to extract the slices from
+   * \param[in] point_W     The coordinates of the point in world frame [meter] to extract the slices from
    * \param[in] num         The slice number, e.g. frame number (OPTIONAL)
    */
   void saveFieldSlice(const std::string&     file_path,
-                      const Eigen::Vector3f& point_M,
+                      const Eigen::Vector3f& point_W,
                       const std::string&     num = "") const;
 
   /**
    * \brief Save three axis aligned max field value slices (x, y and z) at the provided coordinates to a file.
    *
    * \param[in] file_path   The path to store the slices at (without .vtk file ending)
-   * \param[in] point_M     The coordinates of the point in map frame [meter] to extract the slices from
+   * \param[in] point_W     The coordinates of the point in world frame [meter] to extract the slices from
    * \param[in] scale       The min scale at which to extract the max field data from
    * \param[in] num         The slice number, e.g. frame number (OPTIONAL)
    */
   template<se::Field FldTDummy = FldT>
   typename std::enable_if_t<FldTDummy == se::Field::Occupancy, void>
   saveMaxFieldSlice(const std::string&     file_path,
-                    const Eigen::Vector3f& point_M,
+                    const Eigen::Vector3f& point_W,
                     const int              scale,
                     const std::string&     num = "") const;
 
@@ -224,13 +259,13 @@ public:
    * \brief Save three axis aligned integration scale slices (x, y and z) at the provided coordinates to a file.
    *
    * \param[in] file_path   The path to store the slices at (without .vtk file ending)
-   * \param[in] point_M     The coordinates of the point in map frame [meter] to extract the slices from
+   * \param[in] point_W     The coordinates of the point in world frame [meter] to extract the slices from
    * \param[in] num         The slice number, e.g. frame number (OPTIONAL)
    */
   template<Res ResTDummy = ResT>
   typename std::enable_if_t<ResTDummy == Res::Multi, void>
   saveScaleSlice(const std::string&     file_path,
-                 const Eigen::Vector3f& point_M,
+                 const Eigen::Vector3f& point_W,
                  const std::string&     num = "") const;
 
   /**
@@ -239,7 +274,7 @@ public:
    * \param[in] filename The file where the mesh will be saved. The file format will be selected
    *                     based on the file extension. Allowed file extensions are `.ply`, `.vtk` and
    *                     `.obj`.
-   * \param[in] T_WM     Transformation from the map frame where the mesh is generated to the world
+   * \param[in] T_WM     Transformation from the world frame where the mesh is generated to the world
    *                     frame. Defaults to identity.
    * \return Zero on success and non-zero on error.
    */
@@ -252,7 +287,7 @@ public:
    * \param[in] filename The file where the mesh will be saved. The file format will be selected
    *                     based on the file extension. Allowed file extensions are `.ply`, `.vtk` and
    *                     `.obj`.
-   * \param[in] T_WM     Transformation from the map frame where the mesh is generated to the world
+   * \param[in] T_WM     Transformation from the world frame where the mesh is generated to the world
    *                     frame. Defaults to identity.
    * \return Zero on success and non-zero on error.
    */
@@ -265,21 +300,21 @@ public:
    * \warning The function assumes the voxel has size 1 (i.e. scale 0).
    *
    * \param[in]  voxel_coord    The voxel coordinates in [voxel] to be converted
-   * \param[out] point_M        The converted centre point coordinates in [meter]
+   * \param[out] point_W        The converted centre point coordinates in [meter]
    */
   inline void voxelToPoint(const Eigen::Vector3i& voxel_coord,
-                           Eigen::Vector3f&       point_M) const;
+                           Eigen::Vector3f&       point_W) const;
 
   /**
    * \brief Convert voxel coordinates in [voxel] for a given voxel size to its centre point coordinates in [meter].
    *
    * \param[in]  voxel_coord    The voxel coordinates in [voxel] to be converted
    * \param[in]  voxel_size     The size of the voxel in [voxel]
-   * \param[out] point_M        The converted centre point coordinates in [meter]
+   * \param[out] point_W        The converted centre point coordinates in [meter]
    */
   inline void voxelToPoint(const Eigen::Vector3i& voxel_coord,
                            const int              voxel_size,
-                           Eigen::Vector3f&       point_M) const;
+                           Eigen::Vector3f&       point_W) const;
 
   /**
    * \brief Convert voxel coordinates in [voxel] for a given voxel size to its eight corner point coordinates in [meter].
@@ -287,21 +322,21 @@ public:
    * \warning The function assumes the voxel has size 1 (i.e. scale 0).
    *
    * \param[in]  voxel_coord        The voxel coordinates in [voxel] to be converted
-   * \param[out] corner_points_M    The converted centre point coordinates in [meter]
+   * \param[out] corner_points_W    The converted centre point coordinates in [meter]
    */
   inline void voxelToCornerPoints(const Eigen::Vector3i&      voxel_coord,
-                                  Eigen::Matrix<float, 3, 8>& corner_points_M) const;
+                                  Eigen::Matrix<float, 3, 8>& corner_points_W) const;
 
   /**
    * \brief Convert voxel coordinates in [voxel] for a given voxel size to its eight corner point coordinates in [meter].
    *
    * \param[in]  voxel_coord        The voxel coordinates in [voxel] to be converted
    * \param[in]  voxel_size         The size of the voxel in [voxel]
-   * \param[out] corner_points_M    The converted centre point coordinates in [meter]
+   * \param[out] corner_points_W    The converted centre point coordinates in [meter]
    */
   inline void voxelToCornerPoints(const Eigen::Vector3i&      voxel_coord,
                                   const int                   voxel_size,
-                                  Eigen::Matrix<float, 3, 8>& corner_points_M) const;
+                                  Eigen::Matrix<float, 3, 8>& corner_points_W) const;
 
   /**
    * \brief Convert point coordinates in [meter] to its voxel coordinates (bottom, front, left corner) in [voxel]
@@ -309,78 +344,78 @@ public:
    * \note Use as `map. template pointToVoxel<se::Safe::Off>(...)
    *
    * \tparam SafeB              The parameter turning "contains point" verification on and off (On by default)
-   * \param[in]  point_M        The point coordinates in [meter] to be converted
+   * \param[in]  point_W        The point coordinates in [meter] to be converted
    * \param[out] voxel_coord    The converted voxel coordinates (bottom, front, left corner) in [voxel]
    * \return True if the point inside the map, false otherwise
    */
   template<se::Safe SafeB = se::Safe::On>
   inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
-  pointToVoxel(const Eigen::Vector3f& point_M,
+  pointToVoxel(const Eigen::Vector3f& point_W,
                Eigen::Vector3i&       voxel_coord) const;
 
   /**
    * \brief Convert point coordinates in [meter] to its voxel coordinates (bottom, front, left corner) in [voxel]
    *
    * \tparam SafeB              The parameter turning "contains point" verification on and off (On by default)
-   * \param[in]  point_M        The point coordinates in [meter] to be converted
+   * \param[in]  point_W        The point coordinates in [meter] to be converted
    * \param[out] voxel_coord    The converted voxel coordinates (bottom, front, left corner) in [voxel]
    * \return True
    */
   template<se::Safe SafeB>
   inline typename std::enable_if_t<SafeB == se::Safe::Off, bool>
-  pointToVoxel(const Eigen::Vector3f& point_M,
+  pointToVoxel(const Eigen::Vector3f& point_W,
                Eigen::Vector3i&       voxel_coord) const;
 
   /**
    * \brief Convert point coordinates in [meter] to its voxel coordinates in [voxel]
    *
    * \tparam SafeB              The parameter turning "contains point" verification on and off (On by default)
-   * \param[in]  point_M        The point coordinates in [meter] to be converted
+   * \param[in]  point_W        The point coordinates in [meter] to be converted
    * \param[out] voxel_coord_f  The converted voxel coordinates in [voxel]
    * \return True if the point inside the map, false otherwise
    */
   template<se::Safe SafeB = se::Safe::On>
   inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
-  pointToVoxel(const Eigen::Vector3f& point_M,
+  pointToVoxel(const Eigen::Vector3f& point_W,
                Eigen::Vector3f&       voxel_coord_f) const;
 
   /**
    * \brief Convert point coordinates in [meter] to its voxel coordinates in [voxel]
    *
    * \tparam SafeB              The parameter turning "contains point" verification on and off (On by default)
-   * \param[in]  point_M        The point coordinates in [meter] to be converted
+   * \param[in]  point_W        The point coordinates in [meter] to be converted
    * \param[out] voxel_coord_f  The converted voxel coordinates in [voxel]
    * \return True
    */
   template<se::Safe SafeB>
   inline typename std::enable_if_t<SafeB == se::Safe::Off, bool>
-  pointToVoxel(const Eigen::Vector3f& point_M,
+  pointToVoxel(const Eigen::Vector3f& point_W,
                Eigen::Vector3f&       voxel_coord_f) const;
 
   /**
    * \brief Convert a vector of point coordinates in [meter] to its voxel coordinates in [voxel]
    *
    * \tparam SafeB              The parameter turning "contains point" verification on and off (On by default)
-   * \param[in]  points_M       The vector of point coordinates in [meter] to be converted
+   * \param[in]  points_W       The vector of point coordinates in [meter] to be converted
    * \param[out] voxel_coords   The vector of converted voxel coordinates in [voxel]
    * \return True if all points are inside the map, false otherwise
    */
   template<se::Safe SafeB = se::Safe::On>
   inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
-  pointsToVoxels(const std::vector<Eigen::Vector3f>& points_M,
+  pointsToVoxels(const std::vector<Eigen::Vector3f>& points_W,
                  std::vector<Eigen::Vector3i>&       voxel_coords) const;
 
   /**
    * \brief Convert a vector of point coordinates in [meter] to its voxel coordinates in [voxel]
    *
    * \tparam SafeB              The parameter turning "contains point" verification on and off (On by default)
-   * \param[in]  points_M       The vector of point coordinates in [meter] to be converted
+   * \param[in]  points_W       The vector of point coordinates in [meter] to be converted
    * \param[out] voxel_coords   The vector of converted voxel coordinates in [voxel]
    * \return True
    */
   template<se::Safe SafeB>
   inline typename std::enable_if_t<SafeB == se::Safe::Off, bool>
-  pointsToVoxels(const std::vector<Eigen::Vector3f>& points_M,
+  pointsToVoxels(const std::vector<Eigen::Vector3f>& points_W,
                  std::vector<Eigen::Vector3i>&       voxel_coords) const;
 
   /**
@@ -425,12 +460,12 @@ protected:
    */
   bool initialiseOctree();
 
-  const Eigen::Vector3f dimension_;    ///< The dimensions of the map
-  const float           resolution_;   ///< The resolution of the map
-  const Eigen::Vector3f origin_M_;     ///< The origin of the map frame
+  const Eigen::Vector3f dimension_;  ///< The dimensions of the map
+  const float           resolution_; ///< The resolution of the map
+  const Eigen::Matrix4f T_MW_;       ///< The transformation from world ot world frame
 
-  const Eigen::Vector3f lb_;           ///< The lower map bound
-  const Eigen::Vector3f ub_;           ///< The upper map bound
+  const Eigen::Vector3f lb_M_;         ///< The lower map bound
+  const Eigen::Vector3f ub_M_;         ///< The upper map bound
 
   std::shared_ptr<OctreeType> octree_ptr_ = nullptr;
 

@@ -11,9 +11,9 @@ template<typename MapT,
 >
 inline std::vector<se::OctantBase*> frustum(MapT&                   map,
                                             const SensorT&          sensor,
-                                            const Eigen::Matrix4f&  T_MS)
+                                            const Eigen::Matrix4f&  T_WS)
 {
-  const Eigen::Matrix4f T_SM = se::math::to_inverse_transformation(T_MS);
+  const Eigen::Matrix4f T_SM = se::math::to_inverse_transformation(T_WS);
   // Loop over all allocated Blocks.
   std::vector<se::OctantBase*> fetched_block_ptrs;
 
@@ -35,13 +35,13 @@ template<typename MapT,
 RaycastCarver<MapT, SensorT>::RaycastCarver(MapT&                   map,
                                             const SensorT&          sensor,
                                             const se::Image<float>& depth_img,
-                                            const Eigen::Matrix4f&  T_MS,
+                                            const Eigen::Matrix4f&  T_WS,
                                             const int               frame) :
     map_(map),
     octree_(*(map_.getOctree())),
     sensor_(sensor),
     depth_img_(depth_img),
-    T_MS_(T_MS),
+    T_WS_(T_WS),
     frame_(frame),
     config_(map)
 {
@@ -57,7 +57,7 @@ std::vector<se::OctantBase*> RaycastCarver<MapT, SensorT>::operator()()
   TICK("fetch-frustum")
   // Fetch the currently allocated Blocks in the sensor frustum.
   // i.e. the fetched blocks might contain blocks outside the current valid sensor range.
-  std::vector<se::OctantBase*> fetched_block_ptrs = se::fetcher::frustum(map_, sensor_, T_MS_);
+  std::vector<se::OctantBase*> fetched_block_ptrs = se::fetcher::frustum(map_, sensor_, T_WS_);
   TOCK("fetch-frustum")
 
   TICK("create-list")
@@ -66,7 +66,7 @@ std::vector<se::OctantBase*> RaycastCarver<MapT, SensorT>::operator()()
 
   const int num_steps = ceil(config_.band / (2 * map_.getRes()));
 
-  const Eigen::Vector3f t_MS = T_MS_.topRightCorner<3, 1>();
+  const Eigen::Vector3f t_WS = T_WS_.topRightCorner<3, 1>();
 
 #pragma omp declare reduction (merge : std::set<se::key_t> : omp_out.insert(omp_in.begin(), omp_in.end()))
   std::set<se::key_t> voxel_key_set;
@@ -87,19 +87,19 @@ std::vector<se::OctantBase*> RaycastCarver<MapT, SensorT>::operator()()
       Eigen::Vector3f ray_dir_C;
       const Eigen::Vector2f pixel_f = pixel.cast<float>();
       sensor_.model.backProject(pixel_f, &ray_dir_C);
-      const Eigen::Vector3f point_M = (T_MS_ * (depth_value * ray_dir_C).homogeneous()).template head<3>();
+      const Eigen::Vector3f point_W = (T_WS_ * (depth_value * ray_dir_C).homogeneous()).template head<3>();
 
-      const Eigen::Vector3f reverse_ray_dir_M = (t_MS - point_M).normalized();
+      const Eigen::Vector3f reverse_ray_dir_W = (t_WS - point_W).normalized();
 
-      const Eigen::Vector3f ray_origin_M = point_M - (config_.band * 0.5f) * reverse_ray_dir_M;
-      const Eigen::Vector3f step = (reverse_ray_dir_M * config_.band) / num_steps;
+      const Eigen::Vector3f ray_origin_W = point_W - (config_.band * 0.5f) * reverse_ray_dir_W;
+      const Eigen::Vector3f step = (reverse_ray_dir_W * config_.band) / num_steps;
 
-      Eigen::Vector3f ray_pos_M = ray_origin_M;
+      Eigen::Vector3f ray_pos_W = ray_origin_W;
       for (int i = 0; i < num_steps; i++)
       {
         Eigen::Vector3i voxel_coord;
 
-        if (map_.template pointToVoxel<se::Safe::On>(ray_pos_M, voxel_coord))
+        if (map_.template pointToVoxel<se::Safe::On>(ray_pos_W, voxel_coord))
         {
           const se::OctantBase* octant_ptr = se::fetcher::block<typename MapT::OctreeType>(voxel_coord, root_ptr);
           if (octant_ptr == nullptr)
@@ -109,7 +109,7 @@ std::vector<se::OctantBase*> RaycastCarver<MapT, SensorT>::operator()()
             voxel_key_set.insert(voxel_key);
           }
         }
-        ray_pos_M += step;
+        ray_pos_W += step;
       }
     }
   }
