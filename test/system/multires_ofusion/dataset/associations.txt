@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+# SPDX-License-Identifier: CC0-1.0
 1 depth/1.png 1 rgb/1.png
 2 depth/2.png 2 rgb/2.png
 3 depth/3.png 3 rgb/3.png

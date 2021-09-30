@@ -1,4 +1,7 @@
 %YAML:1.2
+# SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+# SPDX-License-Identifier: CC0-1.0
+
 map:
   dim:                        [10.24, 10.24, 10.24]
   res:                        0.01

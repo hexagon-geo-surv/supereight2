@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+# SPDX-License-Identifier: CC0-1.0
 # timestamp filename
 1 depth/1.png
 2 depth/2.png
