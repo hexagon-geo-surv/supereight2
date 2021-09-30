@@ -77,6 +77,8 @@ public:
   /** \brief The vertical field of view in radians. */
   float vertical_fov;
 
+  Eigen::Matrix4f T_BS;
+
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 

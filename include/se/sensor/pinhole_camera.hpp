@@ -73,6 +73,7 @@ public:
   float near_plane;
   float far_plane;
   float scaled_pixel;
+  Eigen::Matrix4f T_BS;
 
   /** \brief The horizontal field of view in radians. */
   float horizontal_fov;

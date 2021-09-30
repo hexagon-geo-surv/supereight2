@@ -10,7 +10,8 @@ se::SensorConfigBase::SensorConfigBase() :
     height(0),
     near_plane(0.0f),
     far_plane(INFINITY),
-    left_hand_frame(false)
+    left_hand_frame(false),
+    T_BS(Eigen::Matrix4f::Identity())
 {
 }
 
@@ -45,4 +46,22 @@ se::SensorConfigBase::SensorConfigBase(const std::string& yaml_file) : se::Senso
   se::yaml::subnode_as_float(node, "near_plane",      near_plane);
   se::yaml::subnode_as_float(node, "far_plane",       far_plane);
   se::yaml::subnode_as_bool(node,  "left_hand_frame", left_hand_frame);
+
+  T_BS = Eigen::Matrix4f::Identity();
+
+  if (!node["T_BS"].isNone()) {
+    se::yaml::subnode_as_eigen_matrix4f(node, "T_BS", T_BS);
+  }
+
+  if (!node["t_BS"].isNone()) {
+    Eigen::Vector3f t_BS;
+    se::yaml::subnode_as_eigen_vector3f(node, "t_BS", t_BS);
+    T_BS.topRightCorner<3, 1>() = t_BS;
+  }
+
+  if (!node["R_BS"].isNone()) {
+    Eigen::Matrix3f R_BS;
+    se::yaml::subnode_as_eigen_matrix3f(node, "R_BS", R_BS);
+    T_BS.topLeftCorner<3, 3>() = R_BS;
+  }
 }

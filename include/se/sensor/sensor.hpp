@@ -19,11 +19,12 @@ namespace se {
 struct SensorConfigBase
 {
   // General
-  int   width;
-  int   height;
-  float near_plane;
-  float far_plane;
-  bool  left_hand_frame;
+  int             width;
+  int             height;
+  float           near_plane;
+  float           far_plane;
+  bool            left_hand_frame;
+  Eigen::Matrix4f T_BS;
 
   /** Initializes the config to an invalid sensor model with 0 and NaN parameters.
    */

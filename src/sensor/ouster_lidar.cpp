@@ -44,7 +44,8 @@ se::OusterLidar::OusterLidar(const OusterLidarConfig& c) :
     model(c.width, c.height,
           c.beam_azimuth_angles, c.beam_elevation_angles),
     left_hand_frame(c.left_hand_frame),
-    near_plane(c.near_plane), far_plane(c.far_plane)
+    near_plane(c.near_plane), far_plane(c.far_plane),
+    T_BS(c.T_BS)
 {
   assert(c.width  > 0);
   assert(c.height > 0);
@@ -75,7 +76,8 @@ se::OusterLidar::OusterLidar(const OusterLidarConfig& c,
     model(c.width / dsf, c.height / dsf,
           c.beam_azimuth_angles, c.beam_elevation_angles),
     left_hand_frame(c.left_hand_frame),
-    near_plane(c.near_plane), far_plane(c.far_plane)
+    near_plane(c.near_plane), far_plane(c.far_plane),
+    T_BS(c.T_BS)
 {
   assert(c.width  > 0);
   assert(c.height > 0);
@@ -106,7 +108,9 @@ se::OusterLidar::OusterLidar(const OusterLidar& ol,
     model(ol.model.imageWidth() / dsf, ol.model.imageHeight() / dsf,
           ol.model.beamAzimuthAngles(), ol.model.beamElevationAngles()), // TODO: Does the beam need to be scaled too?
     left_hand_frame(ol.left_hand_frame),
-    near_plane(ol.near_plane), far_plane(ol.far_plane) {
+    near_plane(ol.near_plane), far_plane(ol.far_plane),
+    T_BS(ol.T_BS)
+{
 }
 
 
