@@ -61,14 +61,12 @@ constexpr int se::PinholeCamera::num_frustum_normals_;
 
 
 se::PinholeCamera::PinholeCamera(const PinholeCameraConfig& c) :
+    se::SensorBase<se::PinholeCamera>(c),
     model(c.width, c.height,
           c.fx, c.fy,
           c.cx, c.cy,
           _distortion),
-    left_hand_frame(c.left_hand_frame),
-    near_plane(c.near_plane), far_plane(c.far_plane),
-    scaled_pixel(1 / c.fx),
-    T_BS(c.T_BS)
+    scaled_pixel(1 / c.fx)
 {
   computeFrustumVertices();
   computeFrustumNormals();
@@ -90,14 +88,12 @@ se::PinholeCamera::PinholeCamera(const PinholeCameraConfig& c) :
 
 se::PinholeCamera::PinholeCamera(const PinholeCameraConfig& c,
                                  const float         dsf) :
+    se::SensorBase<se::PinholeCamera>(c),
     model(c.width / dsf, c.height / dsf,
           c.fx / dsf, c.fy / dsf,
           (c.cx + 0.5f) / dsf - 0.5f, (c.cy + 0.5f) / dsf - 0.5f,
           _distortion),
-    left_hand_frame(c.left_hand_frame),
-    near_plane(c.near_plane), far_plane(c.far_plane),
-    scaled_pixel(1 / (c.fx / dsf)),
-    T_BS(c.T_BS)
+    scaled_pixel(1 / (c.fx / dsf))
 {
   computeFrustumVertices();
   computeFrustumNormals();
@@ -119,14 +115,13 @@ se::PinholeCamera::PinholeCamera(const PinholeCameraConfig& c,
 
 se::PinholeCamera::PinholeCamera(const PinholeCamera& pc,
                                  const float          dsf) :
+    se::SensorBase<se::PinholeCamera>(pc),
     model(pc.model.imageWidth() / dsf, pc.model.imageHeight() / dsf,
           pc.model.focalLengthU() / dsf, pc.model.focalLengthV() / dsf,
           ((pc.model.imageCenterU() + 0.5f) / dsf - 0.5f),
           ((pc.model.imageCenterV() + 0.5f) / dsf - 0.5f),
           _distortion),
-    left_hand_frame(pc.left_hand_frame),
-    near_plane(pc.near_plane), far_plane(pc.far_plane),
-    T_BS(pc.T_BS)
+    scaled_pixel(1 / (pc.model.focalLengthU() / dsf))
 {
 
   computeFrustumVertices();

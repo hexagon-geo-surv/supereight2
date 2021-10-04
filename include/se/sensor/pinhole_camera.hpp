@@ -69,11 +69,7 @@ public:
   static std::string type() { return "pinholecamera"; }
 
   srl::projection::PinholeCamera<srl::projection::NoDistortion> model;
-  bool  left_hand_frame;
-  float near_plane;
-  float far_plane;
   float scaled_pixel;
-  Eigen::Matrix4f T_BS;
 
   /** \brief The horizontal field of view in radians. */
   float horizontal_fov;

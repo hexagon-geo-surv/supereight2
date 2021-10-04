@@ -44,6 +44,23 @@ template <typename DerivedT>
 class SensorBase
 {
 public:
+  template <typename ConfigT>
+  SensorBase(const ConfigT& c) :
+      left_hand_frame(c.left_hand_frame),
+      near_plane(c.near_plane),
+      far_plane(c.far_plane),
+      T_BS(c.T_BS)
+  {
+  }
+
+  SensorBase(const DerivedT& d) :
+      left_hand_frame(d.left_hand_frame),
+      near_plane(d.near_plane),
+      far_plane(d.far_plane),
+      T_BS(d.T_BS)
+  {
+  }
+
 
   /**
    * \brief Project a point in sensor frame to its image value.
@@ -206,7 +223,13 @@ public:
 //      return this->underlying().typeImpl(); // TODO:
 //    }
 
+  bool            left_hand_frame;
+  float           near_plane;
+  float           far_plane;
+  Eigen::Matrix4f T_BS;
+
 private:
+
   // Make sure the derived class and the template parameter are the same (i.e. prevent class D1 : Base<D2>)
   SensorBase(){};
   friend DerivedT;

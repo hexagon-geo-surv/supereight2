@@ -68,16 +68,12 @@ public:
   static std::string type() { return "ousterlidar"; }
 
   srl::projection::OusterLidar model;
-  bool  left_hand_frame;
-  float near_plane;
-  float far_plane;
   float min_ray_angle;
+
   /** \brief The horizontal field of view in radians. */
   float horizontal_fov;
   /** \brief The vertical field of view in radians. */
   float vertical_fov;
-
-  Eigen::Matrix4f T_BS;
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
