@@ -1,6 +1,27 @@
 # Supereight 2.0
 
+Supereight 2.0 is a complete rewrite of the
+[original supereight](https://github.com/emanuelev/supereight). It adds
+[state-of-the-art mapping features](https://arxiv.org/abs/2010.07929) while also
+making the library more flexible and easier to use.
 
+If you use supereight 2.0 in your work, please cite
+
+``` bibtex
+@Article{Funk_RAL2021,
+  author  = {Nils Funk and Juan Tarrio and Sotiris Papatheodorou and Marija Popovi\'{c} and Pablo F. Alcantarilla and Stefan Leutenegger},
+  title   = {Multi-Resolution {3D} Mapping with Explicit Free Space Representation for Fast and Accurate Mobile Robot Motion Planning},
+  journal = {IEEE Robotics and Automation Letters},
+  year    = {2021},
+  volume  = {6},
+  number  = {2},
+  pages   = {3553--3560},
+  month   = apr,
+  issn    = {2377-3766},
+}
+```
+
+Supereight 2.0 follows [semantic versioning](https://semver.org/).
 
 ## Build
 
