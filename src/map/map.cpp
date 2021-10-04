@@ -5,6 +5,9 @@
 #include "se/map/map.hpp"
 
 #include "se/common/yaml.hpp"
+#include "se/common/str_utils.hpp"
+
+
 
 namespace se {
   MapConfig::MapConfig() :
@@ -68,11 +71,9 @@ namespace se {
 
   std::ostream& operator<<(std::ostream& os, const MapConfig& c)
   {
-    os << "dim:     " << c.dim.x() << " x " << c.dim.y() << " x " << c.dim.z() << " m\n";
-    os << "res:     " << c.res << " m\n";
-    os << "t_MW:    [" << se::math::to_translation(c.T_MW).x() << ", "
-                       << se::math::to_translation(c.T_MW).y() << ", "
-                       << se::math::to_translation(c.T_MW).z() << "] m\n";
+    os << str_utils::volume_to_pretty_str(c.dim,        "dim")  << " m\n";
+    os << str_utils::value_to_pretty_str(c.res,         "res")  << " m/voxel\n";
+    os << str_utils::eigen_matrix_to_pretty_str(c.T_MW, "T_MW") << "\n";
     return os;
   }
 } // namespace se

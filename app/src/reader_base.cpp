@@ -147,12 +147,12 @@ se::ReaderConfig::ReaderConfig(const std::string& yaml_file)
 
 std::ostream& se::operator<<(std::ostream& os, const se::ReaderConfig& c)
 {
-  os << "reader_type:        " << se::reader_type_to_string(c.reader_type) << "\n";
-  os << "sequence_path:      " << c.sequence_path << "\n";
-  os << "ground_truth_file:  " << c.ground_truth_file << "\n";
-  os << "fps:                " << c.fps << "\n";
-  os << "drop_frames:        " << (c.drop_frames ? "yes" : "no") << "\n";
-  os << "verbose:            " << c.verbose << "\n";
+  os << str_utils::str_to_pretty_str(se::reader_type_to_string(c.reader_type), "reader_type") << "\n";
+  os << str_utils::str_to_pretty_str(c.sequence_path,     "sequence_path")     << "\n";
+  os << str_utils::str_to_pretty_str(c.ground_truth_file, "ground_truth_file") << "\n";
+  os << str_utils::value_to_pretty_str(c.fps,             "fps")               << "\n";
+  os << str_utils::bool_to_pretty_str(c.drop_frames,      "drop_frames")       << "\n";
+  os << str_utils::value_to_pretty_str(c.verbose,         "verbose")           << "\n";
   return os;
 }
 

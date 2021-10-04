@@ -5,6 +5,7 @@
 #include "se/map/data.hpp"
 
 #include "se/common/yaml.hpp"
+#include "se/common/str_utils.hpp"
 
 namespace se {
   FieldDataConfig<Field::Occupancy>::FieldDataConfig() :
@@ -89,21 +90,21 @@ namespace se {
 
   std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::Occupancy>& c)
   {
-    os << "k_sigma:                 " << c.k_sigma << "\n";
-    os << "sigma_min_factor:        " << c.sigma_min_factor << "\n";
-    os << "sigma_max_factor:        " << c.sigma_max_factor << "\n";
-    os << "k_tau:                   " << c.k_tau << "\n";
-    os << "tau_min_factor:          " << c.tau_min_factor << "\n";
-    os << "tau_max_factor:          " << c.tau_max_factor << "\n";
-    os << "min_occupancy:           " << c.min_occupancy << " log-odds\n";
-    os << "max_occupancy:           " << c.max_occupancy << " log-odds\n";
-    os << "surface_boundary:        " << c.surface_boundary << " log-odds\n";
-    os << "log_odd_min:             " << c.log_odd_min << " log-odds\n";
-    os << "log_odd_max:             " << c.log_odd_max << " log-odds\n";
-    os << "max_weight:              " << c.max_weight << "\n";
-    os << "fs_integr_scale:         " << c.fs_integr_scale << "\n";
-    os << "uncertainty_model:       " << ((c.uncertainty_model == UncertaintyModel::Linear) ? "linear" : "quadratic") << "\n";
-    os << "const_surface_thickness: " << c.const_surface_thickness << "\n";
+    os << str_utils::value_to_pretty_str(c.k_sigma,          "k_sigma")          << "\n";
+    os << str_utils::value_to_pretty_str(c.sigma_min_factor, "sigma_min_factor") << "\n";
+    os << str_utils::value_to_pretty_str(c.sigma_max_factor, "sigma_max_factor") << "\n";
+    os << str_utils::value_to_pretty_str(c.k_tau,            "k_tau")            << "\n";
+    os << str_utils::value_to_pretty_str(c.tau_min_factor,   "tau_min_factor")   << "\n";
+    os << str_utils::value_to_pretty_str(c.tau_max_factor,   "tau_max_factor")   << "\n";
+    os << str_utils::value_to_pretty_str(c.min_occupancy,    "min_occupancy")    << "\n";
+    os << str_utils::value_to_pretty_str(c.max_occupancy,    "max_occupancy")    << "\n";
+    os << str_utils::value_to_pretty_str(c.surface_boundary, "surface_boundary") << "\n";
+    os << str_utils::value_to_pretty_str(c.log_odd_min,      "log_odd_min")      << "\n";
+    os << str_utils::value_to_pretty_str(c.log_odd_max,      "log_odd_max")      << "\n";
+    os << str_utils::value_to_pretty_str(c.max_weight,       "max_weight")       << "\n";
+    os << str_utils::value_to_pretty_str(c.fs_integr_scale,  "fs_integr_scale")  << "\n";
+    os << str_utils::str_to_pretty_str(((c.uncertainty_model == UncertaintyModel::Linear) ? "linear" : "quadratic"), "uncertainty_model") << "\n";
+    os << str_utils::bool_to_pretty_str(c.const_surface_thickness, "const_surface_thickness") << "\n";
     return os;
   }
 
@@ -148,8 +149,8 @@ namespace se {
 
   std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::TSDF>& c)
   {
-    os << "truncation_boundary_factor:  " << c.truncation_boundary_factor << "x\n";
-    os << "max_weight:                  " << c.max_weight << "\n";
+    os << str_utils::value_to_pretty_str(c.truncation_boundary_factor,     "truncation_boundary_factor") << "x\n";
+    os << str_utils::value_to_pretty_str(c.max_weight,                     "max_weight")                 << "\n";
     return os;
   }
 

@@ -8,10 +8,10 @@ namespace str_utils {
 
 
 
-template<typename MatrixT>
-std::string matrix_to_pretty_str(const MatrixT&     M,
-                                 const std::string& M_name,
-                                 const int          width)
+template<typename EigenMatrixT>
+std::string eigen_matrix_to_pretty_str(const EigenMatrixT& M,
+                                       const std::string&  M_name,
+                                       const int           width)
 {
   const std::string name = (M_name != "") ? M_name + ":\n" : "";
   std::string l_side = "";
@@ -29,11 +29,11 @@ std::string matrix_to_pretty_str(const MatrixT&     M,
 
 
 
-template<typename VectorT>
-std::string vector_to_pretty_str(const VectorT&                  v,
-                                 const std::string&              v_name,
-                                 const std::vector<std::string>& e_names,
-                                 const int                       width)
+template<typename EigenVectorT>
+std::string eigen_vector_to_pretty_str(const EigenVectorT&             v,
+                                       const std::string&              v_name,
+                                       const std::vector<std::string>& e_names,
+                                       const int                       width)
 {
   std::string l_side = (v_name != "") ? v_name + ":" : "";
   int padding = (width - 1) - v_name.length();
@@ -71,7 +71,6 @@ std::string vector_to_pretty_str(const VectorT&                  v,
 template<typename Vector3T>
 std::string volume_to_pretty_str(const Vector3T&    vol,
                                  const std::string& vol_name,
-                                 const std::string& vol_unit,
                                  const int width)
 {
   std::string l_side = (vol_name != "") ? vol_name + ":" : "";
@@ -83,12 +82,40 @@ std::string volume_to_pretty_str(const Vector3T&    vol,
 
   Eigen::IOFormat VolumeFmt(6, Eigen::DontAlignCols,
                             "", " x ", "", "",
-                            l_side, " " + vol_unit);
+                            l_side);
 
   std::stringstream ss;
   ss << vol.format(VolumeFmt);
   return ss.str();
 }
+
+
+
+template<typename T>
+std::string vector_to_pretty_str(const std::vector<T>& v,
+                                 const std::string&    v_name,
+                                 const int             width)
+{
+  std::string l_side = (v_name != "") ? v_name + ":" : "";
+  int padding = (width - 1) - v_name.length();
+  if (padding > 0)
+  {
+    l_side.append(padding, ' ');
+  }
+
+  std::stringstream ss;
+  ss << l_side << "[";
+  if (v.size() > 1)
+  {
+    for (size_t i = 0; i < v.size() - 1; ++i) {
+      ss << v[i] << ", ";
+    }
+  }
+  ss << v.back() << "]\n";
+
+  return ss.str();
+}
+
 
 
 template<typename ValueT>

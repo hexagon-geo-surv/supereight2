@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include "se/sensor/sensor.hpp"
+#include "se/common/str_utils.hpp"
 
 
 
@@ -30,11 +31,12 @@ se::OusterLidarConfig::OusterLidarConfig(const std::string& yaml_file) :
 
 std::ostream& se::operator<<(std::ostream& os, const se::OusterLidarConfig& c)
 {
-  os << "width:            " << c.width << " px\n";
-  os << "height:           " << c.height << " px\n";
-  os << "near_plane:       " << c.near_plane << " m\n";
-  os << "far_plane:        " << c.far_plane << " m\n";
-  os << "left_hand_frame:  " << (c.left_hand_frame ? "yes" : "no") << "\n";
+  os << str_utils::value_to_pretty_str(c.width,       "width")      << " px\n";
+  os << str_utils::value_to_pretty_str(c.height,      "height")     << " px\n";
+  os << str_utils::value_to_pretty_str(c.near_plane,  "near_plane") << " m\n";
+  os << str_utils::value_to_pretty_str(c.far_plane,   "far_plane")  << " m\n";
+  os << str_utils::str_to_pretty_str((c.left_hand_frame ? "yes" : "no"),  "left_hand_frame") << "\n";
+  os << str_utils::eigen_matrix_to_pretty_str(c.T_BS, "T_BS")       << "\n";
   return os;
 }
 

@@ -111,10 +111,10 @@ static constexpr int default_width = 33;
  *
  * \return The pretty string
  */
-template<typename MatrixT>
-std::string matrix_to_pretty_str(const MatrixT&     M,
-                                 const std::string& M_name = "",
-                                 const int          width = default_width);
+template<typename EigenMatrixT>
+std::string eigen_matrix_to_pretty_str(const EigenMatrixT& M,
+                                       const std::string&  M_name = "",
+                                       const int           width = default_width);
 
 /**
  * \brief Convert a matrix name and Eigen::Vector value to a standardised string output.
@@ -127,11 +127,26 @@ std::string matrix_to_pretty_str(const MatrixT&     M,
  *
  * \return The pretty string
  */
-template<typename VectorT>
-std::string vector_to_pretty_str(const VectorT&                  v,
-                                 const std::string&              v_name = "",
-                                 const std::vector<std::string>& e_names = {},
-                                 const int                       width = default_width);
+template<typename EigenVectorT>
+std::string eigen_vector_to_pretty_str(const EigenVectorT&             v,
+                                       const std::string&              v_name = "",
+                                       const std::vector<std::string>& e_names = {},
+                                       const int                       width = default_width);
+
+/**
+ * \brief Convert a matrix name and Eigen::Vector value to a standardised string output.
+ *
+ * \tparam T vector type
+ * \param[in] v         The standard vector
+ * \param[in] v_name    The displayed name of the vector
+ * \param[in] width     The starting position of the value in the string (default = default_width)
+ *
+ * \return The pretty string
+ */
+template<typename T>
+std::string vector_to_pretty_str(const std::vector<T>& v,
+                                 const std::string&    v_name = "",
+                                 const int             width = default_width);
 
 /**
  * \brief Convert a volume name and value to a standardised string output (values seperated by 'x').
@@ -144,10 +159,9 @@ std::string vector_to_pretty_str(const VectorT&                  v,
  *
  * \return The pretty string
  */
-template<typename Vector3T>
-std::string volume_to_pretty_str(const Vector3T&    vol,
+template<typename EigenVector3T>
+std::string volume_to_pretty_str(const EigenVector3T&    vol,
                                  const std::string& vol_name = "",
-                                 const std::string& vol_unit = "",
                                  const int          width = default_width);
 
 /**
