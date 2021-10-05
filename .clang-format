@@ -5,7 +5,7 @@
 # Available options:
 # https://releases.llvm.org/6.0.0/tools/clang/docs/ClangFormatStyleOptions.html
 AccessModifierOffset: 0
-AlignAfterOpenBracket: AlwaysBreak
+AlignAfterOpenBracket: Align
 AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false
 AlignEscapedNewlines: Left
@@ -17,7 +17,7 @@ AllowShortCaseLabelsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: None
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
-AlwaysBreakAfterReturnType: AllDefinitions
+AlwaysBreakAfterReturnType: None
 AlwaysBreakBeforeMultilineStrings: true
 AlwaysBreakTemplateDeclarations: true
 BinPackArguments: false
@@ -74,7 +74,7 @@ MacroBlockEnd:   ''
 MaxEmptyLinesToKeep: 3
 NamespaceIndentation: None
 PointerAlignment: Left
-ReflowComments: true
+ReflowComments: false
 SortIncludes: true
 SortUsingDeclarations: true
 SpaceAfterCStyleCast: true
