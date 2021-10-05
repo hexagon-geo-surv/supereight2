@@ -32,9 +32,7 @@ namespace yaml {
  * \param[in]  subnode_name The name of the sub node
  * \param[out] b            The bool value of the sub node
  */
-void subnode_as_bool(const cv::FileNode& base_node,
-                     const std::string&  subnode_name,
-                     bool&               b);
+void subnode_as_bool(const cv::FileNode& base_node, const std::string& subnode_name, bool& b);
 
 /**
  * \brief   Interprets the data in the subnode of base_node named subnode_name as an int and saves it in i.
@@ -45,9 +43,7 @@ void subnode_as_bool(const cv::FileNode& base_node,
  * \param[in]  subnode_name The name of the sub node
  * \param[out] i            The int value of the sub node
  */
-void subnode_as_int(const cv::FileNode& base_node,
-                    const std::string&  subnode_name,
-                    int&                i);
+void subnode_as_int(const cv::FileNode& base_node, const std::string& subnode_name, int& i);
 
 /**
  * \brief   Interprets the data in the subnode of base_node named subnode_name as a float and saves it in f.
@@ -58,9 +54,7 @@ void subnode_as_int(const cv::FileNode& base_node,
  * \param[in]  subnode_name The name of the sub node
  * \param[out] f            The float value of the sub node
  */
-void subnode_as_float(const cv::FileNode& base_node,
-                      const std::string&  subnode_name,
-                      float&              f);
+void subnode_as_float(const cv::FileNode& base_node, const std::string& subnode_name, float& f);
 
 /**
  * \brief   Interprets the data in the subnode of base_node named subnode_name as a string and saves it in s.
@@ -72,8 +66,8 @@ void subnode_as_float(const cv::FileNode& base_node,
  * \param[out] s            The string value of the sub node
  */
 void subnode_as_string(const cv::FileNode& base_node,
-                       const std::string&  subnode_name,
-                       std::string&        s);
+                       const std::string& subnode_name,
+                       std::string& s);
 
 /**
  * \brief   Interprets the data in the subnode of base_node named subnode_name as an std::vector and saves it in v.
@@ -86,8 +80,8 @@ void subnode_as_string(const cv::FileNode& base_node,
  */
 template<typename T>
 void subnode_as_vector(const cv::FileNode& base_node,
-                       const std::string&  subnode_name,
-                       std::vector<T>&     v);
+                       const std::string& subnode_name,
+                       std::vector<T>& v);
 
 /**
  * \brief   Interprets the data in the subnode of base_node named subnode_name as an Eigen::Vector3f and saves it in v.
@@ -99,8 +93,8 @@ void subnode_as_vector(const cv::FileNode& base_node,
  * \param[out] eigen_v3f    The Eigen::Vector3f value of the sub node
  */
 void subnode_as_eigen_vector3f(const cv::FileNode& base_node,
-                               const std::string&  subnode_name,
-                               Eigen::Vector3f&    eigen_v3f);
+                               const std::string& subnode_name,
+                               Eigen::Vector3f& eigen_v3f);
 
 /**
  * \brief   Interprets the data in the subnode of base_node named subnode_name as an Eigen::Vector3f and saves it in v.
@@ -111,9 +105,9 @@ void subnode_as_eigen_vector3f(const cv::FileNode& base_node,
  * \param[in]  subnode_name The name of the sub node
  * \param[out] eigen_v      The Eigen::Matrix<T, Eigen::Dynamic, 1> value of the sub node
  */
-template <typename T>
-void subnode_as_eigen_vector_x(const cv::FileNode&                  base_node,
-                               const std::string&                   subnode_name,
+template<typename T>
+void subnode_as_eigen_vector_x(const cv::FileNode& base_node,
+                               const std::string& subnode_name,
                                Eigen::Matrix<T, Eigen::Dynamic, 1>& eigen_v);
 
 /**
@@ -126,8 +120,8 @@ void subnode_as_eigen_vector_x(const cv::FileNode&                  base_node,
  * \param[out] eigen_m3f    The Eigen::Matrix4f value of the sub node
  */
 void subnode_as_eigen_matrix3f(const cv::FileNode& base_node,
-                               const std::string&  subnode_name,
-                               Eigen::Matrix3f&    eigen_m3f);
+                               const std::string& subnode_name,
+                               Eigen::Matrix3f& eigen_m3f);
 
 /**
  * \brief   Interprets the data in the subnode of base_node named subnode_name as an Eigen::Vector3f and saves it in v.
@@ -139,8 +133,8 @@ void subnode_as_eigen_matrix3f(const cv::FileNode& base_node,
  * \param[out] eigen_m4f    The Eigen::Matrix4f value of the sub node
  */
 void subnode_as_eigen_matrix4f(const cv::FileNode& base_node,
-                               const std::string&  subnode_name,
-                               Eigen::Matrix4f&    eigen_m4f);
+                               const std::string& subnode_name,
+                               Eigen::Matrix4f& eigen_m4f);
 
 
 
@@ -154,4 +148,3 @@ void subnode_as_eigen_matrix4f(const cv::FileNode& base_node,
 
 
 #endif // SE_YAML_HPP
-

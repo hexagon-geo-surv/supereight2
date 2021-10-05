@@ -38,15 +38,12 @@ namespace propagator {
  * \param[in] child_funct   The function for the child update
  * \param[in] parent_funct  The function for the parent update
  */
-template <typename OctreeT,
-          typename ChildF,
-          typename ParentF
->
-void propagateBlockUp(const OctreeT&  /* octree */,
+template<typename OctreeT, typename ChildF, typename ParentF>
+void propagateBlockUp(const OctreeT& /* octree */,
                       se::OctantBase* octant_ptr,
-                      const int       init_scale,
-                      ChildF          child_funct,
-                      ParentF         parent_funct);
+                      const int init_scale,
+                      ChildF child_funct,
+                      ParentF parent_funct);
 
 /**
  * \brief Propagate the block values from the current scale to a lower target scale.
@@ -60,15 +57,12 @@ void propagateBlockUp(const OctreeT&  /* octree */,
  * \param[in] child_funct   The function for the child update
  * \param[in] parent_funct  The function for the parent update
  */
-template <typename OctreeT,
-          typename ChildF,
-          typename ParentF
->
-void propagateBlockDown(const OctreeT&  octree,
+template<typename OctreeT, typename ChildF, typename ParentF>
+void propagateBlockDown(const OctreeT& octree,
                         se::OctantBase* octant_ptr,
-                        const int       target_scale,
-                        ChildF          child_funct,
-                        ParentF         parent_funct);
+                        const int target_scale,
+                        ChildF child_funct,
+                        ParentF parent_funct);
 
 /**
  * \brief Propagate all nodes to the root using a given up-propagation function.
@@ -77,9 +71,8 @@ void propagateBlockDown(const OctreeT&  octree,
  * \param[in] octant_ptrs       The pointers to the leaf nodes.
  * \param[in] propagate_funct   The function used for the up-propagation
  */
-template <typename PropagateF>
-void propagateBlocksToRoot(std::vector<se::OctantBase*>& octant_ptrs,
-                           PropagateF&                   propagate_funct);
+template<typename PropagateF>
+void propagateBlocksToRoot(std::vector<se::OctantBase*>& octant_ptrs, PropagateF& propagate_funct);
 
 /**
  * \brief Propagate all node time stamps to the root.
@@ -97,4 +90,3 @@ void propagateBlockTimeStampsToRoot(std::vector<se::OctantBase*>& octant_ptrs);
 #include "impl/propagator_impl.hpp"
 
 #endif // SE_PROPAGATOR_HPP
-

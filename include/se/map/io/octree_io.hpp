@@ -30,11 +30,11 @@ namespace io {
  *
  * \return True if the file can be read, false otherwise
  */
-template <typename GetValueF>
-bool save_3d_slice_vtk(const std::string&     filename,
+template<typename GetValueF>
+bool save_3d_slice_vtk(const std::string& filename,
                        const Eigen::Vector3i& lower_coord,
                        const Eigen::Vector3i& upper_coord,
-                       GetValueF&             get_value);
+                       GetValueF& get_value);
 
 } // namespace io
 } // namespace se
@@ -46,4 +46,3 @@ bool save_3d_slice_vtk(const std::string&     filename,
 
 
 #endif // SE_OCTREE_IO_HPP
-

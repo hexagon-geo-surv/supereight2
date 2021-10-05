@@ -9,14 +9,13 @@
 #define __READER_TUM_HPP
 
 
+#include <Eigen/Dense>
 #include <cstdint>
 #include <fstream>
 #include <string>
 
-#include <Eigen/Dense>
-
-#include "se/image/image.hpp"
 #include "reader_base.hpp"
+#include "se/image/image.hpp"
 
 
 
@@ -26,46 +25,45 @@ namespace se {
 
 /** Reader for TUM RGBD datasets. */
 
-class TUMReader: public Reader {
-
-public:
-  /** Construct a TUMReader from a ReaderConfig.
-   *
-   * \param[in] c The configuration struct to use.
-   */
-  TUMReader(const ReaderConfig& c);
-
-
-  /** Restart reading from the beginning. */
-  void restart();
+class TUMReader : public Reader {
+    public:
+    /** Construct a TUMReader from a ReaderConfig.
+     *
+     * \param[in] c The configuration struct to use.
+     */
+    TUMReader(const ReaderConfig& c);
 
 
-  /** The name of the reader.
-   *
-   * \return The string `"TUMReader"`.
-   */
-  std::string name() const;
+    /** Restart reading from the beginning. */
+    void restart();
 
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-private:
-  static constexpr float tum_inverse_scale_ = 1.0f / 5000.0f;
-  float inverse_scale_;
+    /** The name of the reader.
+     *
+     * \return The string `"TUMReader"`.
+     */
+    std::string name() const;
 
-  // TODO Allow setting the max_match_timestamp_dist_ and
-  // max_interp_timestamp_dist_ at runtime from the YAML file. Not sure how
-  // to handle this yet since they only apply to the TUM dataset reader.
-  static constexpr double max_match_timestamp_dist_ = 0.02;
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  static constexpr double max_interp_timestamp_dist_ = 10.0 * max_match_timestamp_dist_;
+    private:
+    static constexpr float tum_inverse_scale_ = 1.0f / 5000.0f;
+    float inverse_scale_;
 
-  std::vector<std::string> depth_filenames_;
+    // TODO Allow setting the max_match_timestamp_dist_ and
+    // max_interp_timestamp_dist_ at runtime from the YAML file. Not sure how
+    // to handle this yet since they only apply to the TUM dataset reader.
+    static constexpr double max_match_timestamp_dist_ = 0.02;
 
-  std::vector<std::string> rgb_filenames_;
+    static constexpr double max_interp_timestamp_dist_ = 10.0 * max_match_timestamp_dist_;
 
-  ReaderStatus nextDepth(Image<float>& depth_image);
+    std::vector<std::string> depth_filenames_;
 
-  ReaderStatus nextRGBA(Image<uint32_t>& rgba_image);
+    std::vector<std::string> rgb_filenames_;
+
+    ReaderStatus nextDepth(Image<float>& depth_image);
+
+    ReaderStatus nextRGBA(Image<uint32_t>& rgba_image);
 };
 
 

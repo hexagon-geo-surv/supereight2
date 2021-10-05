@@ -18,4 +18,3 @@
 #define TOCK(str) se::perfstats.sampleDurationEnd(str);
 
 #endif // SE_TIMINGS_HPP
-

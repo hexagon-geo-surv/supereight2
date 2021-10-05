@@ -15,48 +15,42 @@ namespace se {
 
 
 
-template<typename DataConfigT,
-         typename SensorConfigT
->
+template<typename DataConfigT, typename SensorConfigT>
 Config<DataConfigT, SensorConfigT>::Config()
 {
 }
 
 
 
-template<typename DataConfigT,
-         typename SensorConfigT
->
+template<typename DataConfigT, typename SensorConfigT>
 Config<DataConfigT, SensorConfigT>::Config(const std::string& yaml_file) :
-    map(yaml_file),
-    data(yaml_file),
-    sensor(yaml_file),
-    tracker(yaml_file),
-    reader(yaml_file),
-    app(yaml_file)
+        map(yaml_file),
+        data(yaml_file),
+        sensor(yaml_file),
+        tracker(yaml_file),
+        reader(yaml_file),
+        app(yaml_file)
 {
 }
 
 
 
-template<typename DataConfigT,
-         typename SensorConfigT
->
+template<typename DataConfigT, typename SensorConfigT>
 std::ostream& operator<<(std::ostream& os, const Config<DataConfigT, SensorConfigT>& c)
 {
-  os << "Data config -----------------------\n";
-  os << c.data;
-  os << "Map config ------------------------\n";
-  os << c.map;
-  os << "Sensor config ---------------------\n";
-  os << c.sensor;
-  os << "Tracker config --------------------\n";
-  os << c.tracker;
-  os << "Reader config ---------------------\n";
-  os << c.reader;
-  os << "App config ------------------------\n";
-  os << c.app;
-  return os;
+    os << "Data config -----------------------\n";
+    os << c.data;
+    os << "Map config ------------------------\n";
+    os << c.map;
+    os << "Sensor config ---------------------\n";
+    os << c.sensor;
+    os << "Tracker config --------------------\n";
+    os << c.tracker;
+    os << "Reader config ---------------------\n";
+    os << c.reader;
+    os << "App config ------------------------\n";
+    os << c.app;
+    return os;
 }
 
 
@@ -66,4 +60,3 @@ std::ostream& operator<<(std::ostream& os, const Config<DataConfigT, SensorConfi
 
 
 #endif // SE_CONFIG_IMPL_HPP
-

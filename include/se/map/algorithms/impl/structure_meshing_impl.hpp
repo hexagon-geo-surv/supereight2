@@ -12,8 +12,7 @@
 namespace se {
 
 template<typename OctreeT>
-QuadMesh
-octree_structure_mesh(OctreeT& octree)
+QuadMesh octree_structure_mesh(OctreeT& octree)
 {
     QuadMesh mesh;
 

@@ -9,9 +9,8 @@
 #ifndef SE_OCTANT_UTIL_HPP
 #define SE_OCTANT_UTIL_HPP
 
-#include "se/common/math_util.hpp"
 #include "key_util.hpp"
-
+#include "se/common/math_util.hpp"
 #include "se/map/octant/octant.hpp"
 
 
@@ -28,10 +27,9 @@ namespace octantops {
  * \param[in] block_ptrs    The vector of block pointers
  * \return The sorted vector of block pointers from large to small according to their morton code.
  */
-template <typename BlockT,
-          se::Sort SortT = se::Sort::SmallToLarge
->
-inline typename std::enable_if_t<SortT == se::Sort::SmallToLarge> sort_blocks(std::vector<se::OctantBase*>& block_ptrs);
+template<typename BlockT, se::Sort SortT = se::Sort::SmallToLarge>
+inline typename std::enable_if_t<SortT == se::Sort::SmallToLarge>
+sort_blocks(std::vector<se::OctantBase*>& block_ptrs);
 
 /**
  * \brief Sort a vector of blocks according to its morton code from large to small.
@@ -41,10 +39,9 @@ inline typename std::enable_if_t<SortT == se::Sort::SmallToLarge> sort_blocks(st
  * \param[in] block_ptrs    The vector of block pointers
  * \return The sorted vector of block pointers from large to small according to their morton code.
  */
-template <typename BlockT,
-          se::Sort SortT
->
-inline typename std::enable_if_t<SortT == se::Sort::LargeToSmall> sort_blocks(std::vector<se::OctantBase*>& block_ptrs);
+template<typename BlockT, se::Sort SortT>
+inline typename std::enable_if_t<SortT == se::Sort::LargeToSmall>
+sort_blocks(std::vector<se::OctantBase*>& block_ptrs);
 
 
 
@@ -72,7 +69,7 @@ inline int scale_to_size(const int octant_scale);
  *
  * \return The size of the octant
  */
-template <typename OctreeT>
+template<typename OctreeT>
 inline int octant_to_size(const se::OctantBase* octant_ptr);
 
 /**
@@ -83,7 +80,7 @@ inline int octant_to_size(const se::OctantBase* octant_ptr);
  *
  * \return The key of the octant
  */
-template <typename OctreeT>
+template<typename OctreeT>
 inline int octant_to_scale(const se::OctantBase* octant_ptr);
 
 /**
@@ -94,7 +91,7 @@ inline int octant_to_scale(const se::OctantBase* octant_ptr);
  *
  * \return The key of the octant
  */
-template <typename OctreeT>
+template<typename OctreeT>
 inline se::key_t octant_to_key(const se::OctantBase* octant_ptr);
 
 
@@ -105,4 +102,3 @@ inline se::key_t octant_to_key(const se::OctantBase* octant_ptr);
 #include "impl/octant_util_impl.hpp"
 
 #endif // SE_OCTANT_UTIL_HPP
-

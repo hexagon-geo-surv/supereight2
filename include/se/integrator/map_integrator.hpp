@@ -11,9 +11,9 @@
 #include <cstddef>
 #include <iterator>
 
+#include "se/common/math_util.hpp"
 #include "se/integrator/allocator/raycast_carver.hpp"
 #include "se/integrator/allocator/volume_carver.hpp"
-#include "se/common/math_util.hpp"
 #include "se/map/octree/fetcher.hpp"
 #include "se/map/octree/integrator.hpp"
 #include "se/map/utils/setup_util.hpp"
@@ -34,39 +34,34 @@ namespace allocator {
  *
  * \return The allocated and fetched notes in the band around the surface measurements
  */
-template<typename MapT,
-         typename SensorT
->
-std::vector<se::OctantBase*> frustum(MapT&                   map,
-                                     SensorT&                sensor,
+template<typename MapT, typename SensorT>
+std::vector<se::OctantBase*> frustum(MapT& map,
+                                     SensorT& sensor,
                                      const se::Image<float>& depth_img,
-                                     const Eigen::Matrix4f&  T_WS,
-                                     const float             band);
+                                     const Eigen::Matrix4f& T_WS,
+                                     const float band);
 
 } // namespace allocator
 
 
 
 namespace fetcher {
-  /**
-   * \brief Return the currently allocated Blocks that intersect the camera frustum.
-   * Some false positives might be returned since Blocks are approximated by their bounding spheres
-   * and because sphereInFrustum() may return false positives in rare cases.
-   *
-   * \tparam MapT    The map type.
-   * \tparam SensorT The sensor type.
-   * \param map      The map to fetch Blocks from.
-   * \param sensor   The sensor whose frustum is used for the test.
-   * \param T_WS     The pose of the sensor in the world frame.
-   *
-   * \return A vector of pointers to Blocks that intersect the sensor frustum.
-   */
-  template<typename MapT,
-           typename SensorT
-  >
-  inline std::vector<se::OctantBase*> frustum(MapT&                  map,
-                                              const SensorT&         sensor,
-                                              const Eigen::Matrix4f& T_WS);
+/**
+ * \brief Return the currently allocated Blocks that intersect the camera frustum.
+ * Some false positives might be returned since Blocks are approximated by their bounding spheres
+ * and because sphereInFrustum() may return false positives in rare cases.
+ *
+ * \tparam MapT    The map type.
+ * \tparam SensorT The sensor type.
+ * \param map      The map to fetch Blocks from.
+ * \param sensor   The sensor whose frustum is used for the test.
+ * \param T_WS     The pose of the sensor in the world frame.
+ *
+ * \return A vector of pointers to Blocks that intersect the sensor frustum.
+ */
+template<typename MapT, typename SensorT>
+inline std::vector<se::OctantBase*>
+frustum(MapT& map, const SensorT& sensor, const Eigen::Matrix4f& T_WS);
 } // namespace fetcher
 
 
@@ -82,33 +77,32 @@ namespace fetcher {
  * \return The octant sample coordinates
  */
 static inline Eigen::Vector3f get_sample_coord(const Eigen::Vector3i& octant_coord,
-                                               const int              octant_size);
+                                               const int octant_size);
 
 
 
-template <typename MapT>
-class MapIntegrator
-{
-public:
-  MapIntegrator(MapT& map);
+template<typename MapT>
+class MapIntegrator {
+    public:
+    MapIntegrator(MapT& map);
 
-  /**
-   * \brief Integrate depth image into the maps field representation.
-   *
-   * \tparam SensorT
-   * \param[in] depth_img   The sensor depth image
-   * \param[in] sensor      The sensor use for the projection
-   * \param[in] T_WS        The transformation from sensor to world frame
-   * \param[in] frame       The frame number to be integrated
-   */
-  template <typename SensorT>
-  void integrateDepth(const SensorT&          sensor,
-                      const se::Image<float>& depth_img,
-                      const Eigen::Matrix4f&  T_WS,
-                      const unsigned int      frame);
+    /**
+     * \brief Integrate depth image into the maps field representation.
+     *
+     * \tparam SensorT
+     * \param[in] depth_img   The sensor depth image
+     * \param[in] sensor      The sensor use for the projection
+     * \param[in] T_WS        The transformation from sensor to world frame
+     * \param[in] frame       The frame number to be integrated
+     */
+    template<typename SensorT>
+    void integrateDepth(const SensorT& sensor,
+                        const se::Image<float>& depth_img,
+                        const Eigen::Matrix4f& T_WS,
+                        const unsigned int frame);
 
-private:
-  MapT&            map_;
+    private:
+    MapT& map_;
 };
 
 
@@ -118,4 +112,3 @@ private:
 #include "impl/map_integrator_impl.hpp"
 
 #endif // SE_MAP_INTEGRATOR_HPP
-

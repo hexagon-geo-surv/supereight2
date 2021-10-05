@@ -35,8 +35,8 @@ namespace visitor {
  * \return The data in the voxel to be accessed
  *         Returns init data if block is not allocated
  */
-template <typename OctreeT>
-inline typename OctreeT::DataType getData(const OctreeT&         octree,
+template<typename OctreeT>
+inline typename OctreeT::DataType getData(const OctreeT& octree,
                                           const Eigen::Vector3i& voxel_coord);
 
 /**
@@ -53,12 +53,9 @@ inline typename OctreeT::DataType getData(const OctreeT&         octree,
  * \return The data in the voxel to be accessed
  *         Returns init data if block is not allocated
  */
-template <typename OctreeT,
-          typename BlockT
->
-inline typename OctreeT::DataType getData(const OctreeT&         octree,
-                                          BlockT*                block_ptr,
-                                          const Eigen::Vector3i& voxel_coord);
+template<typename OctreeT, typename BlockT>
+inline typename OctreeT::DataType
+getData(const OctreeT& octree, BlockT* block_ptr, const Eigen::Vector3i& voxel_coord);
 
 
 
@@ -76,12 +73,12 @@ inline typename OctreeT::DataType getData(const OctreeT&         octree,
  *
  * \return The data in octant at the returned scale
  */
-template <typename OctreeT>
+template<typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, typename OctreeT::DataType>
-getData(const OctreeT&              octree,
-        const Eigen::Vector3i&      voxel_coord,
-        const int                   scale_desired,
-        int&                        scale_returned);
+getData(const OctreeT& octree,
+        const Eigen::Vector3i& voxel_coord,
+        const int scale_desired,
+        int& scale_returned);
 
 /**
  * \brief Get the voxel data for a given coordinate and desired scale.
@@ -98,15 +95,13 @@ getData(const OctreeT&              octree,
  *
  * \return The data in octant at the returned scale
  */
-template <typename OctreeT,
-          typename BlockT
->
+template<typename OctreeT, typename BlockT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, typename OctreeT::DataType>
-getData(const OctreeT&              octree,
-        BlockT*                     block_ptr,
-        const Eigen::Vector3i&      voxel_coord,
-        const int                   scale_desired,
-        int&                        scale_returned);
+getData(const OctreeT& octree,
+        BlockT* block_ptr,
+        const Eigen::Vector3i& voxel_coord,
+        const int scale_desired,
+        int& scale_returned);
 
 /**
  * \brief Get the max occupancy data at a given scale.
@@ -117,11 +112,10 @@ getData(const OctreeT&              octree,
  * \param scale_desired The scale to be accessed
  * \return The max data at the requested scale.
  */
-template <typename OctreeT>
-inline typename std::enable_if_t<OctreeT::DataType::fld_ == se::Field::Occupancy, typename OctreeT::DataType>
-getMaxData(const OctreeT&         octree,
-           const Eigen::Vector3i& voxel_coord,
-           const int              scale_desired);
+template<typename OctreeT>
+inline typename std::enable_if_t<OctreeT::DataType::fld_ == se::Field::Occupancy,
+                                 typename OctreeT::DataType>
+getMaxData(const OctreeT& octree, const Eigen::Vector3i& voxel_coord, const int scale_desired);
 
 // TODO: Reduce getField functions for single and multi-res to one
 
@@ -137,8 +131,8 @@ getMaxData(const OctreeT&         octree,
  *
  * \return The field value to be accessed if the data is valid, {}/invalid otherwise
  */
-template <typename OctreeT>
-inline std::optional<se::field_t> getField(const OctreeT&         octree,
+template<typename OctreeT>
+inline std::optional<se::field_t> getField(const OctreeT& octree,
                                            const Eigen::Vector3i& voxel_coord);
 
 /**
@@ -154,10 +148,9 @@ inline std::optional<se::field_t> getField(const OctreeT&         octree,
  *
  * \return The field value to be accessed if the data is valid, {}/invalid otherwise
  */
-template <typename OctreeT, typename BlockT>
-inline std::optional<se::field_t> getField(const OctreeT&         octree,
-                                           BlockT*                block_ptr,
-                                           const Eigen::Vector3i& voxel_coord);
+template<typename OctreeT, typename BlockT>
+inline std::optional<se::field_t>
+getField(const OctreeT& octree, BlockT* block_ptr, const Eigen::Vector3i& voxel_coord);
 
 
 
@@ -175,12 +168,12 @@ inline std::optional<se::field_t> getField(const OctreeT&         octree,
  *
  * \return The field value at the returned scale if the data is valid, {}/invalid otherwise
  */
-template <typename OctreeT>
+template<typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
-getField(const OctreeT&         octree,
+getField(const OctreeT& octree,
          const Eigen::Vector3i& voxel_coord,
-         const int              scale_desired,
-         int&                   scale_returned);
+         const int scale_desired,
+         int& scale_returned);
 
 /**
  * \brief Get the field value for a given coordinate and desired scale.
@@ -197,15 +190,13 @@ getField(const OctreeT&         octree,
  *
  * \return The field value at the returned scale if the data is valid, {}/invalid otherwise
  */
-template <typename OctreeT,
-          typename BlockT
->
+template<typename OctreeT, typename BlockT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
-getField(const OctreeT&         octree,
-         BlockT*                block_ptr,
+getField(const OctreeT& octree,
+         BlockT* block_ptr,
          const Eigen::Vector3i& voxel_coord,
-         const int              scale_desired,
-         int&                   scale_returned);
+         const int scale_desired,
+         int& scale_returned);
 
 
 
@@ -221,10 +212,9 @@ getField(const OctreeT&         octree,
  *
  * \return The interpolated field value if the data is valid, {}/invalid otherwise
  */
-template <typename OctreeT>
+template<typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, std::optional<se::field_t>>
-getFieldInterp(const OctreeT&         octree,
-               const Eigen::Vector3f& voxel_coord_f);
+getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f);
 
 
 
@@ -241,10 +231,9 @@ getFieldInterp(const OctreeT&         octree,
  *
  * \return The interpolated field value if the data is valid, {}/invalid otherwise
  */
-template <typename OctreeT>
+template<typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
-getFieldInterp(const OctreeT&         octree,
-               const Eigen::Vector3f& voxel_coord_f);
+getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f);
 
 /**
  * \brief Get the interplated field value for a given coordinate [float voxel coordinates].
@@ -258,11 +247,9 @@ getFieldInterp(const OctreeT&         octree,
  *
  * \return The interpolated field value at the returned scale if the data is valid, {}/invalid otherwise
  */
-template <typename OctreeT>
+template<typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
-getFieldInterp(const OctreeT&         octree,
-               const Eigen::Vector3f& voxel_coord_f,
-               int&                   scale_returned);
+getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, int& scale_returned);
 
 /**
  * \brief Get the interplated field value for a given coordinate [float voxel coordinates] and desired scale.
@@ -277,13 +264,14 @@ getFieldInterp(const OctreeT&         octree,
  *
  * \return The interpolated field value at the returned scale if the data is valid, {}/invalid otherwise
  */
-template <typename OctreeT>
-inline typename std::enable_if_t<(OctreeT::fld_ == se::Field::TSDF &&
-                                  OctreeT::res_ == se::Res::Multi), std::optional<se::field_t>>
-getFieldInterp(const OctreeT&         octree,
-               const Eigen::Vector3f& voxel_coord_f,
-               const int              scale_desired,
-               int&                   scale_returned);
+template<typename OctreeT>
+inline
+    typename std::enable_if_t<(OctreeT::fld_ == se::Field::TSDF && OctreeT::res_ == se::Res::Multi),
+                              std::optional<se::field_t>>
+    getFieldInterp(const OctreeT& octree,
+                   const Eigen::Vector3f& voxel_coord_f,
+                   const int scale_desired,
+                   int& scale_returned);
 
 /**
  * \brief Get the interplated field value for a given coordinate [float voxel coordinates] and desired scale.
@@ -298,13 +286,14 @@ getFieldInterp(const OctreeT&         octree,
  *
  * \return The interpolated field value at the returned scale if the data is valid, {}/invalid otherwise
  */
-template <typename OctreeT>
-inline typename std::enable_if_t<OctreeT::fld_ == se::Field::Occupancy &&
-                                 OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
-getFieldInterp(const OctreeT&         octree,
+template<typename OctreeT>
+inline typename std::enable_if_t<OctreeT::fld_ == se::Field::Occupancy
+                                     && OctreeT::res_ == se::Res::Multi,
+                                 std::optional<se::field_t>>
+getFieldInterp(const OctreeT& octree,
                const Eigen::Vector3f& voxel_coord_f,
-               const int              scale_desired,
-               int&                   scale_returned);
+               const int scale_desired,
+               int& scale_returned);
 
 
 
@@ -320,10 +309,9 @@ getFieldInterp(const OctreeT&         octree,
  *
  * \return The field gradient if the gradient is valid, {}/invalid otherwise
  */
-template <typename OctreeT>
+template<typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, std::optional<se::field_vec_t>>
-getFieldGrad(const OctreeT&         octree,
-             const Eigen::Vector3f& voxel_coord_f);
+getFieldGrad(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f);
 
 
 
@@ -339,10 +327,9 @@ getFieldGrad(const OctreeT&         octree,
  *
  * \return The field gradient if the gradient is valid, {}/invalid otherwise
  */
-template <typename OctreeT>
+template<typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_vec_t>>
-getFieldGrad(const OctreeT&         octree,
-             const Eigen::Vector3f& voxel_coord_f);
+getFieldGrad(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f);
 
 /**
  * \brief Get the field gradient for a given coordinate [float voxel coordinates].
@@ -355,11 +342,9 @@ getFieldGrad(const OctreeT&         octree,
  *
  * \return The field gradient if the gradient is valid, {}/invalid otherwise
  */
-template <typename OctreeT>
+template<typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_vec_t>>
-getFieldGrad(const OctreeT&         octree,
-             const Eigen::Vector3f& voxel_coord_f,
-             int&                   scale_returned);
+getFieldGrad(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, int& scale_returned);
 
 /**
  * \brief Get the field gradient for a given coordinate [float voxel coordinates] and desired scale.
@@ -373,12 +358,12 @@ getFieldGrad(const OctreeT&         octree,
  *
  * \return The field gradient if the gradient is valid, {}/invalid otherwise
  */
-template <typename OctreeT>
+template<typename OctreeT>
 inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_vec_t>>
-getFieldGrad(const OctreeT&         octree,
+getFieldGrad(const OctreeT& octree,
              const Eigen::Vector3f& voxel_coord_f,
-             const int              scale_desired,
-             int&                   scale_returned);
+             const int scale_desired,
+             int& scale_returned);
 
 } // namespace visitor
 } // namespace se
@@ -386,4 +371,3 @@ getFieldGrad(const OctreeT&         octree,
 #include "impl/visitor_impl.hpp"
 
 #endif // SE_VISITOR_HPP
-

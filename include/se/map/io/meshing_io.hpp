@@ -37,11 +37,11 @@ namespace io {
  * \return 0 on success, nonzero on error.
  */
 template<typename FaceT>
-int save_mesh_vtk(const Mesh<FaceT>&     mesh,
-                  const std::string&     filename,
+int save_mesh_vtk(const Mesh<FaceT>& mesh,
+                  const std::string& filename,
                   const Eigen::Matrix4f& T_WM,
-                  const float*           point_data = nullptr,
-                  const float*           cell_data = nullptr);
+                  const float* point_data = nullptr,
+                  const float* cell_data = nullptr);
 
 /**
  * \brief Save a mesh as a PLY file.
@@ -60,11 +60,11 @@ int save_mesh_vtk(const Mesh<FaceT>&     mesh,
  * \return 0 on success, nonzero on error.
  */
 template<typename FaceT>
-int save_mesh_ply(const Mesh<FaceT>&     mesh,
-                  const std::string&     filename,
+int save_mesh_ply(const Mesh<FaceT>& mesh,
+                  const std::string& filename,
                   const Eigen::Matrix4f& T_WM,
-                  const float*           point_data = nullptr,
-                  const float*           cell_data = nullptr);
+                  const float* point_data = nullptr,
+                  const float* cell_data = nullptr);
 
 /**
  * \brief Save a mesh as an OBJ file.
@@ -75,8 +75,8 @@ int save_mesh_ply(const Mesh<FaceT>&     mesh,
  * \return 0 on success, nonzero on error.
  */
 template<typename FaceT>
-int save_mesh_obj(const Mesh<FaceT>&     mesh,
-                  const std::string&     filename,
+int save_mesh_obj(const Mesh<FaceT>& mesh,
+                  const std::string& filename,
                   const Eigen::Matrix4f& T_WM);
 
 } // namespace io

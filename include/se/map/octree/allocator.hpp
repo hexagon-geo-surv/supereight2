@@ -32,15 +32,13 @@ namespace allocator {
  *
  * \return A block pointer to the allocated block
  */
-template <typename OctreeT>
-inline se::OctantBase* block(const Eigen::Vector3i& voxel_coord,
-                             OctreeT&               octree,
-                             se::OctantBase*        base_parent_ptr);
+template<typename OctreeT>
+inline se::OctantBase*
+block(const Eigen::Vector3i& voxel_coord, OctreeT& octree, se::OctantBase* base_parent_ptr);
 
-template <typename OctreeT>
-inline se::OctantBase* block(const se::key_t voxel_key,
-                             OctreeT&        octree,
-                             se::OctantBase* base_parent_ptr);
+template<typename OctreeT>
+inline se::OctantBase*
+block(const se::key_t voxel_key, OctreeT& octree, se::OctantBase* base_parent_ptr);
 
 /**
  * \brief Allocate Blocks at the provided voxel coordinates.
@@ -55,11 +53,11 @@ inline se::OctantBase* block(const se::key_t voxel_key,
  *
  * \return Pointers to the allocated Octants.
  */
-template <typename OctreeT>
+template<typename OctreeT>
 std::vector<se::OctantBase*> blocks(const std::vector<Eigen::Vector3i>& voxel_coord,
-                                    OctreeT&                            octree,
-                                    se::OctantBase*                     base_parent_ptr,
-                                    const bool                          only_allocated = false);
+                                    OctreeT& octree,
+                                    se::OctantBase* base_parent_ptr,
+                                    const bool only_allocated = false);
 
 /**
  * \brief Allocate Blocks at the provided voxel Morton codes.
@@ -74,11 +72,11 @@ std::vector<se::OctantBase*> blocks(const std::vector<Eigen::Vector3i>& voxel_co
  *
  * \return Pointers to the allocated Octants.
  */
-template <typename OctreeT>
+template<typename OctreeT>
 std::vector<se::OctantBase*> blocks(std::vector<se::key_t>& voxel_keys,
-                                    OctreeT&                octree,
-                                    se::OctantBase*         base_parent_ptr,
-                                    const bool              only_allocated = false);
+                                    OctreeT& octree,
+                                    se::OctantBase* base_parent_ptr,
+                                    const bool only_allocated = false);
 
 namespace detail {
 
@@ -97,19 +95,18 @@ namespace detail {
  *
  * \return True if the octant has been allocated, false if it already was
  */
-template <typename OctreeT>
-inline bool allocate_key(const se::key_t  key,
-                         OctreeT&         octree,
-                         se::OctantBase*  base_parent_ptr,
+template<typename OctreeT>
+inline bool allocate_key(const se::key_t key,
+                         OctreeT& octree,
+                         se::OctantBase* base_parent_ptr,
                          se::OctantBase*& allocated_octant);
 
 
 
 } // namespace detail
-} // struct allocator
+} // namespace allocator
 } // namespace se
 
 #include "impl/allocator_impl.hpp"
 
 #endif // SE_ALLOCATOR_HPP
-

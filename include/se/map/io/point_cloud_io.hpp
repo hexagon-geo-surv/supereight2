@@ -26,12 +26,11 @@
  * \return 0 on success, nonzero on error.
  */
 int save_point_cloud_vtk(se::Image<Eigen::Vector3f>& point_cloud,
-                         const std::string&          filename,
-                         const Eigen::Matrix4f&      T_WC);
+                         const std::string& filename,
+                         const Eigen::Matrix4f& T_WC);
 
 
 
 #include "impl/point_cloud_io_impl.hpp"
 
 #endif // SE_POINT_CLOUD_IO_HPP
-

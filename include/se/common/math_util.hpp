@@ -21,7 +21,7 @@ namespace math {
 
 
 
-template <typename T>
+template<typename T>
 constexpr bool is_power_of_two(T);
 
 template<>
@@ -31,25 +31,23 @@ constexpr int log2_const(int n);
 
 static inline unsigned power_two_up(const float x);
 
-template <typename T>
+template<typename T>
 static inline T fracf(const T& v);
 
-template <typename T>
+template<typename T>
 static inline T floorf(const T& v);
 
-template <typename T>
+template<typename T>
 static inline T fabs(const T& v);
 
-template <typename Scalar>
+template<typename Scalar>
 static constexpr inline Scalar sq(Scalar a);
 
-template <typename Scalar>
+template<typename Scalar>
 static constexpr inline Scalar cu(Scalar a);
 
-template <typename Scalar>
-static inline bool in(const Scalar v,
-                      const Scalar a,
-                      const Scalar b);
+template<typename Scalar>
+static inline bool in(const Scalar v, const Scalar a, const Scalar b);
 
 static inline Eigen::Vector3f to_translation(const Eigen::Matrix4f& T);
 
@@ -67,25 +65,23 @@ static inline Eigen::Matrix3f to_inverse_rotation(const Eigen::Matrix4f& T);
 
 static inline Eigen::Matrix4f to_inverse_transformation(const Eigen::Matrix4f& T);
 
-template <typename T>
+template<typename T>
 static inline typename std::enable_if<std::is_arithmetic<T>::value, T>::type
 clamp(const T& f, const T& a, const T& b);
 
-static inline void clamp(Eigen::Ref<Eigen::VectorXf>             res,
+static inline void clamp(Eigen::Ref<Eigen::VectorXf> res,
                          const Eigen::Ref<const Eigen::VectorXf> a,
-                         const Eigen::Ref<Eigen::VectorXf>       b);
+                         const Eigen::Ref<Eigen::VectorXf> b);
 
-template <typename R, typename A, typename B>
-static inline void clamp(Eigen::MatrixBase<R>&       res,
-                         const Eigen::MatrixBase<A>& a,
-                         const Eigen::MatrixBase<B>& b);
+template<typename R, typename A, typename B>
+static inline void
+clamp(Eigen::MatrixBase<R>& res, const Eigen::MatrixBase<A>& a, const Eigen::MatrixBase<B>& b);
 
 /*! \brief Compute the normal vector of a plane defined by 3 points.
  * The direction of the normal depends on the order of the points.
  */
-static Eigen::Vector3f plane_normal(const Eigen::Vector3f& p1,
-                                    const Eigen::Vector3f& p2,
-                                    const Eigen::Vector3f& p3);
+static Eigen::Vector3f
+plane_normal(const Eigen::Vector3f& p1, const Eigen::Vector3f& p2, const Eigen::Vector3f& p3);
 
 /*! \brief Compute the median of the data in the vector.
  *
@@ -98,7 +94,7 @@ static Eigen::Vector3f plane_normal(const Eigen::Vector3f& p1,
  *
  * \note Weird things will happen if the vector contains NaNs.
  */
-template <typename T>
+template<typename T>
 static T median(std::vector<T>& data);
 
 /*! \brief Compute the median of the data in the vector.
@@ -115,14 +111,14 @@ static T median(std::vector<T>& data);
  *
  * \note Weird things will happen if the vector contains NaNs.
  */
-template <typename T>
+template<typename T>
 static T almost_median(std::vector<T>& data);
 
 /*! Same as se::math::median() but the order of the original vector is
  * retain. This has a performance impact proportional to the size of the
  * input vector.
  */
-template <typename T>
+template<typename T>
 static T median(const std::vector<T>& data);
 
 /**
@@ -146,8 +142,7 @@ static T median(const std::vector<T>& data);
  */
 static Eigen::Matrix3f hat(const Eigen::Vector3f& omega);
 
-static Eigen::Matrix3f exp_and_theta(const Eigen::Vector3f& omega,
-                                     float&                 theta);
+static Eigen::Matrix3f exp_and_theta(const Eigen::Vector3f& omega, float& theta);
 
 /**
  * \brief Group exponential
@@ -176,4 +171,3 @@ static Eigen::Matrix4f exp(const Eigen::Matrix<float, 6, 1>& a);
 
 
 #endif // SE_MATH_UTIL_HPP
-

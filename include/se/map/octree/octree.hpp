@@ -11,11 +11,11 @@
 
 #include <memory>
 
-#include "se/map/utils/memory pool.hpp"
-#include "se/map/utils/key_util.hpp"
-#include "se/map/utils/setup_util.hpp"
 #include "se/map/octant/octant.hpp"
 #include "se/map/octree/iterator.hpp"
+#include "se/map/utils/key_util.hpp"
+#include "se/map/utils/memory pool.hpp"
+#include "se/map/utils/setup_util.hpp"
 
 
 
@@ -32,85 +32,97 @@ namespace se {
  * \tparam BlockSize    The size in voxels of a block. BlockSize in [1, (octree size) / 2]
  *                      Must be a power of two.
  */
-template <typename DataT,
-          Res      ResT      = Res::Single,
-          int      BlockSize = 8
->
+template<typename DataT, Res ResT = Res::Single, int BlockSize = 8>
 class Octree {
-public:
-  typedef std::shared_ptr<Octree<DataT, ResT, BlockSize> > Ptr;
+    public:
+    typedef std::shared_ptr<Octree<DataT, ResT, BlockSize>> Ptr;
 
-  typedef DataT                         DataType;
-  typedef Node<DataT, ResT>             NodeType;
-  typedef Block<DataT, ResT, BlockSize> BlockType;
+    typedef DataT DataType;
+    typedef Node<DataT, ResT> NodeType;
+    typedef Block<DataT, ResT, BlockSize> BlockType;
 
-  typedef se::BoostMemoryPool<NodeType, BlockType> MemoryPool;
+    typedef se::BoostMemoryPool<NodeType, BlockType> MemoryPool;
 
-  // Compile-time constant expressions
-  // # of voxels per side in a voxel block
-  static constexpr unsigned int block_size = BlockSize;
-  // The maximum scale of a block
-  static constexpr se::scale_t max_block_scale = math::log2_const(BlockSize);
+    // Compile-time constant expressions
+    // # of voxels per side in a voxel block
+    static constexpr unsigned int block_size = BlockSize;
+    // The maximum scale of a block
+    static constexpr se::scale_t max_block_scale = math::log2_const(BlockSize);
 
-  /**
+    /**
    * \brief The octree needs to be initialised during the allocation.
    *
    * \param[in] size    The size in [voxel] of the octree
    */
-  Octree(const int size);
+    Octree(const int size);
 
-  ~Octree() {};                               ///< TODO:
-  Octree(const Octree&) = delete;             ///< Delete copy constructor
-  Octree & operator=(const Octree&) = delete; ///< Delete copy assignment operator
+    ~Octree(){};                               ///< TODO:
+    Octree(const Octree&) = delete;            ///< Delete copy constructor
+    Octree& operator=(const Octree&) = delete; ///< Delete copy assignment operator
 
-  OctreeIterator<Octree<DataT, ResT, BlockSize>> begin();
-  OctreeIterator<Octree<DataT, ResT, BlockSize>> end();
+    OctreeIterator<Octree<DataT, ResT, BlockSize>> begin();
+    OctreeIterator<Octree<DataT, ResT, BlockSize>> end();
 
-  /**
+    /**
    * \brief Verify if the voxel coordinates are contained in the octree.
    *
    * \param[in] voxel_coord The voxel coordinates to be verified
    *
    * \return True if contained in the octree, False otherwise
    */
-  inline bool contains(const Eigen::Vector3i& voxel_coord) const;
+    inline bool contains(const Eigen::Vector3i& voxel_coord) const;
 
-  /**
+    /**
    * \brief Get the node pointer to the root of the octree.
    *
    * \return The pointer to the root of the octree
    */
-  inline se::OctantBase* getRoot() { return root_ptr_; };
+    inline se::OctantBase* getRoot()
+    {
+        return root_ptr_;
+    };
 
-  /**
+    /**
    * \brief Get the node pointer to the root of the octree.
    *
    * \return The pointer to the root of the octree
    */
-  inline se::OctantBase* getRoot() const { return root_ptr_; };
+    inline se::OctantBase* getRoot() const
+    {
+        return root_ptr_;
+    };
 
-  /**
+    /**
    * \brief Get the size of the octree in [voxel] units.
    *
    * \return The size of the octree
    */
-  inline int getSize() const { return size_; }
+    inline int getSize() const
+    {
+        return size_;
+    }
 
-  /**
+    /**
    * \brief Get the maximum scale of the octree. This is equivalent to the scale of the root.
    *
    * \return The max scale of the octree
    */
-  inline int getMaxScale() const { return se::math::log2_const(size_); }
+    inline int getMaxScale() const
+    {
+        return se::math::log2_const(size_);
+    }
 
-  /**
+    /**
    * \brief Get the octree depth the blocks are allocated at.
    *
    * \return The octree depth the blocks are allocated at
    */
-  inline int getBlockDepth() const { return se::math::log2_const(size_) - se::math::log2_const(BlockSize); }
+    inline int getBlockDepth() const
+    {
+        return se::math::log2_const(size_) - se::math::log2_const(BlockSize);
+    }
 
-  /**
+    /**
    * \brief Allocate a node for a given parent node.
    *
    * \warning The returned pointer is of type OctantBase as child might be a node or block.
@@ -124,11 +136,11 @@ public:
    *
    * \return Ture if the node has been newly allocated, False if it has already been allocated
    */
-  inline bool allocate(NodeType*        parent_ptr,
-                       const int        child_idx,
-                       se::OctantBase*& child_ptr);     ///< Allocate child
+    inline bool allocate(NodeType* parent_ptr,
+                         const int child_idx,
+                         se::OctantBase*& child_ptr); ///< Allocate child
 
-  /**
+    /**
    * \brief Allocate a octant for a given parent node.
    *
    * \warning The returned pointer is of type OctantBase as child might be a node or block.
@@ -141,10 +153,9 @@ public:
    *
    * \return The pointer ot the allocated / fetched octant
    */
-  inline se::OctantBase* allocate(NodeType*   parent_ptr,
-                                  const int   child_idx);
+    inline se::OctantBase* allocate(NodeType* parent_ptr, const int child_idx);
 
-  /**
+    /**
    * \brief Allocate all of the parent node's child octants.
    *
    * \warning The returned pointer is of type OctantBase as child might be a node or block.
@@ -155,11 +166,11 @@ public:
    *
    * \return Ture if the node has been newly allocated, False if it has already been allocated
    */
-  inline bool allocateAll(NodeType*        parent_ptr,
-                          const int        child_idx,
-                          se::OctantBase*& child_ptr);     ///< Allocate child
+    inline bool allocateAll(NodeType* parent_ptr,
+                            const int child_idx,
+                            se::OctantBase*& child_ptr); ///< Allocate child
 
-  /**
+    /**
    * \brief Allocate all of the parent node's child octants.
    *
    * \warning The returned pointer is of type OctantBase as child might be a node or block.
@@ -170,37 +181,33 @@ public:
    *
    * \return The pointer ot the allocated / fetched octant of the child_idx
    */
-  inline se::OctantBase* allocateAll(NodeType*   parent_ptr,
-                                     const int   child_idx);
+    inline se::OctantBase* allocateAll(NodeType* parent_ptr, const int child_idx);
 
-  /**
+    /**
    * \brief Recursively delete all children of a given node pointer.
    *
    * \param[in] parent_ptr The node pointer to delete the children of
    */
-  inline void deleteChildren(NodeType* parent_ptr);
+    inline void deleteChildren(NodeType* parent_ptr);
 
-  static constexpr se::Field     fld_ = DataT::fld_;
-  static constexpr se::Colour    col_ = DataT::col_;
-  static constexpr se::Semantics sem_ = DataT::sem_;
+    static constexpr se::Field fld_ = DataT::fld_;
+    static constexpr se::Colour col_ = DataT::col_;
+    static constexpr se::Semantics sem_ = DataT::sem_;
 
-  static constexpr se::Res       res_ = ResT;
+    static constexpr se::Res res_ = ResT;
 
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-private:
-  int size_;                     ///< The size in [voxel] of the octree
-  se::OctantBase* root_ptr_ = nullptr; ///< The pointer to the root node of the octree
+    private:
+    int size_;                           ///< The size in [voxel] of the octree
+    se::OctantBase* root_ptr_ = nullptr; ///< The pointer to the root node of the octree
 
-  MemoryPool memory_pool_;       ///< The memory pool pre-allocating memory for nodes and blocks
+    MemoryPool memory_pool_; ///< The memory pool pre-allocating memory for nodes and blocks
 };
 
 
 
-template <typename DataT,
-          Res      ResT,
-          int      BlockSize
->
+template<typename DataT, Res ResT, int BlockSize>
 constexpr se::scale_t Octree<DataT, ResT, BlockSize>::max_block_scale;
 
 } // namespace se
@@ -208,4 +215,3 @@ constexpr se::scale_t Octree<DataT, ResT, BlockSize>::max_block_scale;
 #include "impl/octree_impl.hpp"
 
 #endif // SE_OCTREE_HPP
-

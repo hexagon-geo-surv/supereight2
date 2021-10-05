@@ -28,9 +28,9 @@ namespace integrator {
  *
  * \return True if the data was set, False otherwise
  */
-template <typename OctreeT>
-inline bool setData(OctreeT&                          octree,
-                    const Eigen::Vector3i&            voxel_coord,
+template<typename OctreeT>
+inline bool setData(OctreeT& octree,
+                    const Eigen::Vector3i& voxel_coord,
                     const typename OctreeT::DataType& data);
 
 } // namespace integrator
@@ -39,4 +39,3 @@ inline bool setData(OctreeT&                          octree,
 #include "impl/integrator_impl.hpp"
 
 #endif // SE_INTEGRATOR_HPP
-

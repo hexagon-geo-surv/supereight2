@@ -16,14 +16,13 @@
 
 namespace se {
 
-  /** Create the appropriate reader instance based on the configuration.
+/** Create the appropriate reader instance based on the configuration.
    *
    * \param[in] config The pipeline configuration.
    * \return A pointer to an instance of a class derived from Reader.
    */
-  Reader* create_reader(const se::ReaderConfig& config);
+Reader* create_reader(const se::ReaderConfig& config);
 
 } // namespace se
 
 #endif
-

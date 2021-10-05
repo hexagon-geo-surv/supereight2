@@ -88,9 +88,8 @@ void remove_suffix(std::string& s, const std::string& suffix);
  *
  * \return The vector containing the substrings.
  */
-std::vector <std::string> split_str(const std::string &s,
-                                    const char delim,
-                                    const bool ignore_consec = false);
+std::vector<std::string>
+split_str(const std::string& s, const char delim, const bool ignore_consec = false);
 
 /**
  * \brief Convert a string to all lower case characters.
@@ -120,8 +119,8 @@ static constexpr int default_width = 33;
  */
 template<typename EigenMatrixT>
 std::string eigen_matrix_to_pretty_str(const EigenMatrixT& M,
-                                       const std::string&  M_name = "",
-                                       const int           width = default_width);
+                                       const std::string& M_name = "",
+                                       const int width = default_width);
 
 /**
  * \brief Convert a matrix name and Eigen::Vector value to a standardised string output.
@@ -135,10 +134,10 @@ std::string eigen_matrix_to_pretty_str(const EigenMatrixT& M,
  * \return The pretty string
  */
 template<typename EigenVectorT>
-std::string eigen_vector_to_pretty_str(const EigenVectorT&             v,
-                                       const std::string&              v_name = "",
+std::string eigen_vector_to_pretty_str(const EigenVectorT& v,
+                                       const std::string& v_name = "",
                                        const std::vector<std::string>& e_names = {},
-                                       const int                       width = default_width);
+                                       const int width = default_width);
 
 /**
  * \brief Convert a matrix name and Eigen::Vector value to a standardised string output.
@@ -152,8 +151,8 @@ std::string eigen_vector_to_pretty_str(const EigenVectorT&             v,
  */
 template<typename T>
 std::string vector_to_pretty_str(const std::vector<T>& v,
-                                 const std::string&    v_name = "",
-                                 const int             width = default_width);
+                                 const std::string& v_name = "",
+                                 const int width = default_width);
 
 /**
  * \brief Convert a volume name and value to a standardised string output (values seperated by 'x').
@@ -167,9 +166,9 @@ std::string vector_to_pretty_str(const std::vector<T>& v,
  * \return The pretty string
  */
 template<typename EigenVector3T>
-std::string volume_to_pretty_str(const EigenVector3T&    vol,
+std::string volume_to_pretty_str(const EigenVector3T& vol,
                                  const std::string& vol_name = "",
-                                 const int          width = default_width);
+                                 const int width = default_width);
 
 /**
  * \brief Convert a bool name and value to a standardised string output.
@@ -180,9 +179,9 @@ std::string volume_to_pretty_str(const EigenVector3T&    vol,
  *
  * \return The pretty string
  */
-std::string bool_to_pretty_str(const bool         state,
+std::string bool_to_pretty_str(const bool state,
                                const std::string& state_name = "",
-                               const int          width = default_width);
+                               const int width = default_width);
 
 /**
  * \brief Convert a string name and value to a standardised string output.
@@ -195,7 +194,7 @@ std::string bool_to_pretty_str(const bool         state,
  */
 std::string str_to_pretty_str(const std::string& string,
                               const std::string& string_name = "",
-                              const int          width = default_width);
+                              const int width = default_width);
 
 /**
  * \brief Convert a matrix name, value and unit to a standardised string output.
@@ -209,10 +208,10 @@ std::string str_to_pretty_str(const std::string& string,
  * \return The pretty string
  */
 template<typename ValueT>
-std::string value_to_pretty_str(const ValueT&      val,
+std::string value_to_pretty_str(const ValueT& val,
                                 const std::string& val_name = "",
                                 const std::string& val_unit = "",
-                                const int          width = default_width);
+                                const int width = default_width);
 
 /**
  * \brief Convert header name to a standardised string output.
@@ -222,8 +221,7 @@ std::string value_to_pretty_str(const ValueT&      val,
  *
  * \return The pretty string
  */
-std::string header_to_pretty_str(const std::string& header_name,
-                                 const int          width = default_width);
+std::string header_to_pretty_str(const std::string& header_name, const int width = default_width);
 
 /** Return the result of expanding a leading ~ in path.
  * \note Also expands environment variables since it uses wordexp(3) internally.
@@ -243,4 +241,3 @@ std::string expand_user(const std::string& path);
 
 
 #endif // SE_STR_UTILS_HPP
-

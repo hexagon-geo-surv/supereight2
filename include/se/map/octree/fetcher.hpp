@@ -29,10 +29,10 @@ namespace fetcher {
  *
  * \return The pointer to the octant if it is allocated, nullptr otherwise
  */
-template <typename OctreeT>
+template<typename OctreeT>
 inline se::OctantBase* octant(const Eigen::Vector3i& octant_coord,
-                              const se::scale_t      scale_desired,
-                              se::OctantBase*        base_parent_ptr);
+                              const se::scale_t scale_desired,
+                              se::OctantBase* base_parent_ptr);
 
 /**
  * \brief Fetch the octant for given coordinates and scale.
@@ -45,10 +45,10 @@ inline se::OctantBase* octant(const Eigen::Vector3i& octant_coord,
  *
  * \return The pointer to the finest allocated octant up to the desired scale
  */
-template <typename OctreeT>
+template<typename OctreeT>
 inline se::OctantBase* finest_octant(const Eigen::Vector3i& octant_coord,
-                                     const se::scale_t      scale_desired,
-                                     se::OctantBase*        base_parent_ptr);
+                                     const se::scale_t scale_desired,
+                                     se::OctantBase* base_parent_ptr);
 
 /**
  * \brief Fetch the block for given block coordinates.
@@ -59,9 +59,8 @@ inline se::OctantBase* finest_octant(const Eigen::Vector3i& octant_coord,
  *
  * \return The pointer to the block if allocated, nullptr otherwise
  */
-template <typename OctreeT>
-inline se::OctantBase* block(const Eigen::Vector3i& block_coord,
-                             se::OctantBase*        base_parent_ptr);
+template<typename OctreeT>
+inline se::OctantBase* block(const Eigen::Vector3i& block_coord, se::OctantBase* base_parent_ptr);
 
 /**
  * \brief Fetch the leaf for given block coordinates.
@@ -72,9 +71,8 @@ inline se::OctantBase* block(const Eigen::Vector3i& block_coord,
  *
  * \return The pointer to the leaf
  */
-template <typename OctreeT>
-inline se::OctantBase* leaf(const Eigen::Vector3i& leaf_coord,
-                            se::OctantBase*        base_parent_ptr);
+template<typename OctreeT>
+inline se::OctantBase* leaf(const Eigen::Vector3i& leaf_coord, se::OctantBase* base_parent_ptr);
 
 
 
@@ -84,4 +82,3 @@ inline se::OctantBase* leaf(const Eigen::Vector3i& leaf_coord,
 #include "impl/fetcher_impl.hpp"
 
 #endif // SE_FETCHER_HPP
-
