@@ -380,7 +380,7 @@ raycast(MapT&                  map,
   // If so, compute the first point of contact with the map.
   // Stop if no intersection will occur (i.e. is_valid = false).
   bool is_valid = true;
-  float t = compute_map_intersection(map, ray_origin_W, ray_dir_W, t_far, is_valid); // TODO: Check which transformation to get.
+  float t = compute_map_intersection(map, ray_origin_W, ray_dir_W, t_far, is_valid);
 
   if (!is_valid)
   {

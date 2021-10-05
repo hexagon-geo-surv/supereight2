@@ -13,7 +13,7 @@ namespace se {
   MapConfig::MapConfig() :
       dim(10, 10, 3),
       res(0.1),
-      T_MW(se::math::to_transformation(dim / 2))
+      T_MW(se::math::to_transformation(Eigen::Vector3f(dim / 2)))
   {
   }
 
@@ -48,7 +48,7 @@ namespace se {
     se::yaml::subnode_as_float(node, "res", res);
 
     // Don't show a warning if origin is not available, set it to dim / 2.
-    T_MW = se::math::to_transformation(dim / 2);
+    T_MW = se::math::to_transformation(Eigen::Vector3f(dim / 2));
 
     if (!node["T_MW"].isNone()) {
       se::yaml::subnode_as_eigen_matrix4f(node, "T_MW", T_MW);

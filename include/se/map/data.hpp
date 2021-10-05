@@ -46,7 +46,7 @@ struct FieldData<se::Field::TSDF>
 {
     FieldData() : tsdf(dflt_tsdf), weight(dflt_weight) {}
     se::field_t  tsdf;
-    se::weight_t weight; // TODO: int or float
+    se::weight_t weight;
     static constexpr bool invert_normals = true;
 };
 
@@ -111,7 +111,7 @@ struct FieldDeltaData<se::Field::TSDF>
 {
     FieldDeltaData() : delta_tsdf(0), delta_weight(0) {}
     se::field_t  delta_tsdf;
-    se::weight_t delta_weight; // TODO: int or float
+    se::weight_t delta_weight;
 };
 
 // Colour data

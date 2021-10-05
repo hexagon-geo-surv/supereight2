@@ -34,7 +34,7 @@ struct IntegrateDepthImplD
                         const SensorT&          sensor,
                         const se::Image<float>& depth_img,
                         const Eigen::Matrix4f&  T_WS,
-                        const unsigned int      frame); // TODO:
+                        const unsigned int      frame);
 };
 
 

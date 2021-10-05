@@ -75,7 +75,7 @@ void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>, 
           se::field_t delta_tsdf = parent_data_union.data.tsdf - parent_data_union.prop_data.delta_tsdf;
 
           if (child_data_union.data.weight != 0) {
-            child_data_union.data.tsdf = std::max(child_data_union.data.tsdf + delta_tsdf, -se::field_t(1));
+            child_data_union.data.tsdf = std::max(child_data_union.data.tsdf + delta_tsdf, se::field_t(-1));
             child_data_union.data.weight = fminf(
                     child_data_union.data.weight + parent_data_union.prop_data.delta_weight,
                     map_.getDataConfig().max_weight);;
@@ -189,7 +189,7 @@ void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>, 
     const se::field_t tsdf_value = std::min(se::field_t(1), sdf_value / config_.truncation_boundary);
     data_union.data.tsdf =
             (data_union.data.tsdf * data_union.data.weight + tsdf_value) / (data_union.data.weight + se::weight_t(1));
-    data_union.data.tsdf = se::math::clamp(data_union.data.tsdf, -se::field_t(1), se::field_t(1));
+    data_union.data.tsdf = se::math::clamp(data_union.data.tsdf, se::field_t(-1), se::field_t(1));
     data_union.data.weight = std::min(data_union.data.weight + se::weight_t(1), map_.getDataConfig().max_weight);
     data_union.prop_data.delta_weight++;
   }

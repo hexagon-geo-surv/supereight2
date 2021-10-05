@@ -113,12 +113,12 @@ static inline Eigen::Matrix4f to_transformation(const Eigen::Vector3f& t)
 
 
 
-//static inline Eigen::Matrix4f to_transformation(const Eigen::Matrix3f& R)
-//{
-//  Eigen::Matrix4f T = Eigen::Matrix4f::Identity();
-//  T.block<3,3>(0,0) = R;
-//  return T;
-//}
+static inline Eigen::Matrix4f to_transformation(const Eigen::Matrix3f& R)
+{
+  Eigen::Matrix4f T = Eigen::Matrix4f::Identity();
+  T.block<3,3>(0,0) = R;
+  return T;
+}
 
 
 

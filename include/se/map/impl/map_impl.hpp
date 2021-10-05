@@ -19,7 +19,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const Eigen::Vector3f& dim,
                                                   const se::DataConfig<FldT, ColB, SemB> data_config) :
     dimension_(dim),
     resolution_(res),
-    T_MW_(se::math::to_transformation(dim / 2)),
+    T_MW_(se::math::to_transformation(Eigen::Vector3f(dim / 2))),
     lb_M_(Eigen::Vector3f::Zero()),
     ub_M_(dimension_),
     data_config_(data_config)
