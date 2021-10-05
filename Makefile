@@ -41,7 +41,7 @@ doc:
 
 .PHONY: format
 format:
-	find include src test -regex '.*\.\(cpp\|hpp\|c\|h\)' -exec clang-format -style=file -i {} \;
+	find app include src test -regex '.*\.\(cpp\|hpp\|c\|h\)' -exec clang-format -style=file -i {} \;
 
 .PHONY: clean
 clean:
