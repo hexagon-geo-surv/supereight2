@@ -45,13 +45,14 @@ inline double PerfStats::Stats::mergeIter(const std::vector<double>& iter_data_v
     case FREQUENCY:
       return meanIter(iter_data_vec);
     case MEMORY:
-      return maxIter(iter_data_vec);;
+      return maxIter(iter_data_vec);
     case POWER:
       return maxIter(iter_data_vec);
     case VOLTAGE:
       return maxIter(iter_data_vec);
     default:
-      return lastIter(iter_data_vec); // { BOOL, DISTANCE, DOUBLE, FRAME, INT, ORIENTATION, POSITION, TIME, UNDEFINED }
+      // { BOOL, DISTANCE, DOUBLE, FRAME, INT, ORIENTATION, POSITION, TIME, UNDEFINED }
+      return lastIter(iter_data_vec);
   }
 }
 
@@ -140,7 +141,8 @@ inline double PerfStats::Stats::merge() const {
     case VOLTAGE:
       return max();
     default:
-      return last(); // { BOOL, DISTANCE, DOUBLE, FRAME, INT, ORIENTATION, POSITION, TIME, UNDEFINED }
+      // { BOOL, DISTANCE, DOUBLE, FRAME, INT, ORIENTATION, POSITION, TIME, UNDEFINED }
+      return last();
   }
 }
 
