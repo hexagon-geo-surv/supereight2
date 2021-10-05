@@ -1,6 +1,9 @@
-// SPDX-FileCopyrightText: 2019-2020 Nils Funk, Imperial College London
-// SPDX-License-Identifier: BSD-3-Clause
-
+/*
+ * SPDX-FileCopyrightText: 2019-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2019-2021 Nils Funk
+ * SPDX-FileCopyrightText: 2021 Sotiris Papatheodorou
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
 
 #ifndef SE_MULTIRES_OFUSION_CORE_HPP
 #define SE_MULTIRES_OFUSION_CORE_HPP

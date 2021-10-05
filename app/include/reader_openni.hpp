@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2014 University of Edinburgh, Imperial College London, University of Manchester.
- * SPDX-FileCopyrightText: 2020 Smart Robotics Lab, Imperial College London
- * SPDX-FileCopyrightText: 2020 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2014 University of Edinburgh, Imperial College London, University of Manchester
+ * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
+ * SPDX-FileCopyrightText: 2020-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2020-2021 Nils Funk
+ * SPDX-FileCopyrightText: 2020-2021 Sotiris Papatheodorou
  * SPDX-License-Identifier: MIT
- * Developed in the PAMELA project, EPSRC Programme Grant EP/K008730/1
  */
 
 #ifndef __READER_OPENNI_HPP

@@ -1,3 +1,11 @@
+/*
+ * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
+ * SPDX-FileCopyrightText: 2020-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2020-2021 Nils Funk
+ * SPDX-FileCopyrightText: 2020-2021 Sotiris Papatheodorou
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 #ifndef SE_MEMORY_POOL_HPP
 #define SE_MEMORY_POOL_HPP
 

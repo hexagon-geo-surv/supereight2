@@ -1,6 +1,8 @@
 /*
- * SPDX-FileCopyrightText: 2020 Masha Popovic, Imperial College London
- * SPDX-FileCopyrightText: 2020 Sotiris Papatheodorou, Imperial College London
+ * SPDX-FileCopyrightText: 2020-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2020 Marija Popovic
+ * SPDX-FileCopyrightText: 2020-2021 Nils Funk
+ * SPDX-FileCopyrightText: 2020-2021 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 

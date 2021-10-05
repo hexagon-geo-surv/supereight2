@@ -1,7 +1,10 @@
-// SPDX-FileCopyrightText: 2018-2020 Smart Robotics Lab, Imperial College London
-// SPDX-FileCopyrightText: 2016 Emanuele Vespa, ETH Zürich
-// SPDX-FileCopyrightText: 2019-2020 Nils Funk, Imperial College London
-// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
+ * SPDX-FileCopyrightText: 2018-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2019-2021 Nils Funk
+ * SPDX-FileCopyrightText: 2020-2021 Sotiris Papatheodorou
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
 
 #ifndef SE_MESHING_IO_HPP
 #define SE_MESHING_IO_HPP

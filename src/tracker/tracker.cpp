@@ -1,6 +1,11 @@
-// SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London
-// SPDX-FileCopyrightText: 2021 Sotiris Papatheodorou, Imperial College London
-// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * SPDX-FileCopyrightText: 2014 University of Edinburgh, Imperial College, University of Manchester
+ * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
+ * SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2021 Nils Funk
+ * SPDX-FileCopyrightText: 2021 Sotiris Papatheodorou
+ * SPDX-License-Identifier: MIT
+ */
 
 #include "se/common/yaml.hpp"
 #include "se/common/str_utils.hpp"
