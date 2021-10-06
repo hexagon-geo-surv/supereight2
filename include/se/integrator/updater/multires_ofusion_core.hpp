@@ -10,8 +10,9 @@
 
 #include <limits>
 
-#include "se/common/math_util.hpp"
 #include "se/common/str_utils.hpp"
+#include "se/map/data.hpp"
+#include "se/map/octant/octant.hpp"
 
 namespace se {
 
