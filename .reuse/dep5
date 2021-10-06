@@ -13,3 +13,13 @@ Files: .gitmodules
 Copyright: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
 License: CC0-1.0
 
+Files: third_party/googletest/*
+Copyright: 2008-2021, Google Inc.
+License: BSD-3-Clause
+
+Files: third_party/srl_projection/*
+Copyright: 2015 Autonomous Systems Lab, ETH Zurich
+Copyright: 2015-2021 Stefan Leutenegger
+Copyright: 2020-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+License: BSD-3-Clause
+
