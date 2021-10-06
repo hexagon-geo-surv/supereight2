@@ -13,6 +13,12 @@ namespace se {
 
 
 
+// Forward declare Node to avoid depending on the order of includes.
+template<typename DataT, se::Res ResT>
+class Node;
+
+
+
 /**
  * \brief The base used for single-resolution blocks
  */
@@ -65,7 +71,6 @@ class BlockSingleRes {
 
 
 
-// Forward Declaration
 template<typename DataT, int BlockSize, typename DerivedT>
 class BlockMultiRes {
 };
