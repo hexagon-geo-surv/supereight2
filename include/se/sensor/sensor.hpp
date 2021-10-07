@@ -117,11 +117,7 @@ class SensorBase {
                                 const float map_res,
                                 const int last_scale,
                                 const int min_scale,
-                                const int max_block_scale) const
-    {
-        return this->underlying().computeIntegrationScaleImpl(
-            block_centre_S, map_res, last_scale, min_scale, max_block_scale);
-    }
+                                const int max_block_scale) const;
 
     /**
      * \brief Return the minimum distance at which measurements are available
@@ -136,10 +132,7 @@ class SensorBase {
      * \return The minimum distance along the ray through the pixel at which
      *         valid measurements may be encountered.
      */
-    float nearDist(const Eigen::Vector3f& ray_S) const
-    {
-        return this->underlying().nearDistImpl(ray_S);
-    }
+    float nearDist(const Eigen::Vector3f& ray_S) const;
 
     /**
      * \brief Return the maximum distance at which measurements are available
@@ -154,10 +147,7 @@ class SensorBase {
      * \return The maximum distance along the ray through the pixel at which
      *         valid measurements may be encountered.
      */
-    float farDist(const Eigen::Vector3f& ray_S) const
-    {
-        return this->underlying().farDistImpl(ray_S);
-    }
+    float farDist(const Eigen::Vector3f& ray_S) const;
 
     /**
      * \brief Convert a point in the sensor frame into a depth measurement.
@@ -168,19 +158,13 @@ class SensorBase {
      *                    sensor frame.
      * \return The depth value that the sensor would get from this point.
      */
-    float measurementFromPoint(const Eigen::Vector3f& point_S) const
-    {
-        return this->underlying().measurementFromPointImpl(point_S);
-    }
+    float measurementFromPoint(const Eigen::Vector3f& point_S) const;
 
     /**
      * \brief Test whether a 3D point in sensor coordinates is inside the
      * sensor frustum.
      */
-    bool pointInFrustum(const Eigen::Vector3f& point_S) const
-    {
-        return this->underlying().pointInFrustumImpl(point_S);
-    }
+    bool pointInFrustum(const Eigen::Vector3f& point_S) const;
 
     /**
      * \brief Test whether a 3D point in sensor coordinates is inside the
@@ -189,10 +173,7 @@ class SensorBase {
      * The difference from PinholeCamera::pointInFrustum is that it is assumed
      * that the far plane is at infinity.
      */
-    bool pointInFrustumInf(const Eigen::Vector3f& point_S) const
-    {
-        return this->underlying().pointInFrustumInfImpl(point_S);
-    }
+    bool pointInFrustumInf(const Eigen::Vector3f& point_S) const;
 
     /**
      * \brief Test whether a sphere in sensor coordinates is inside the sensor
@@ -202,10 +183,7 @@ class SensorBase {
      * offest outwards by the sphere's radius. This is a quick test that in
      * some rare cases may return a sphere as being visible although it isn't.
      */
-    bool sphereInFrustum(const Eigen::Vector3f& centre_S, const float radius) const
-    {
-        return this->underlying().sphereInFrustumImpl(centre_S, radius);
-    }
+    bool sphereInFrustum(const Eigen::Vector3f& centre_S, const float radius) const;
 
     /**
      * \brief Test whether a sphere in sensor coordinates is inside the sensor
@@ -214,10 +192,7 @@ class SensorBase {
      * The difference from PinholeCamera::sphereInFrustum is that it is assumed
      * that the far plane is at infinity.
      */
-    bool sphereInFrustumInf(const Eigen::Vector3f& centre_S, const float radius) const
-    {
-        return this->underlying().sphereInFrustumInfImpl(centre_S, radius);
-    }
+    bool sphereInFrustumInf(const Eigen::Vector3f& centre_S, const float radius) const;
 
     //    static std::string type()
     //    {
@@ -235,14 +210,8 @@ class SensorBase {
     friend DerivedT;
 
     // Simplify access to derived member functions
-    DerivedT& underlying()
-    {
-        return static_cast<DerivedT&>(*this);
-    }
-    const DerivedT& underlying() const
-    {
-        return static_cast<const DerivedT&>(*this);
-    }
+    DerivedT& underlying();
+    const DerivedT& underlying() const;
 };
 
 
