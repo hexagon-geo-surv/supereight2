@@ -24,6 +24,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(
         dimension_(dim),
         resolution_(res),
         T_MW_(se::math::to_transformation(Eigen::Vector3f(dim / 2))),
+        T_WM_(se::math::to_inverse_transformation(T_MW_)),
         lb_M_(Eigen::Vector3f::Zero()),
         ub_M_(dimension_),
         data_config_(data_config)
@@ -41,6 +42,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(
         dimension_(map_config.dim),
         resolution_(map_config.res),
         T_MW_(map_config.T_MW),
+        T_WM_(se::math::to_inverse_transformation(T_MW_)),
         lb_M_(Eigen::Vector3f::Zero()),
         ub_M_(dimension_),
         data_config_(data_config)
@@ -349,9 +351,9 @@ inline void
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::voxelToPoint(const Eigen::Vector3i& voxel_coord,
                                                            Eigen::Vector3f& point_W) const
 {
-    point_W = (se::math::to_inverse_transformation(T_MW_)
-               * ((voxel_coord.cast<float>() + sample_offset_frac) * resolution_).homogeneous())
-                  .template head<3>();
+    point_W =
+        (T_WM_ * ((voxel_coord.cast<float>() + sample_offset_frac) * resolution_).homogeneous())
+            .template head<3>();
 }
 
 
@@ -363,7 +365,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::voxelToPoint(const Eigen::Vector3i
                                                            Eigen::Vector3f& point_W) const
 {
     point_W =
-        (se::math::to_inverse_transformation(T_MW_)
+        (T_WM_
          * ((voxel_coord.cast<float>() + stride * sample_offset_frac) * resolution_).homogeneous())
             .template head<3>();
 }
@@ -377,9 +379,7 @@ inline void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::voxelToCornerPoints(
 {
     Eigen::Matrix<float, 3, 8> corner_points_M =
         (corner_rel_steps_.colwise() + voxel_coord.cast<float>()) * resolution_;
-    corner_points_W =
-        (se::math::to_inverse_transformation(T_MW_) * corner_points_M.colwise().homogeneous())
-            .topRows(3);
+    corner_points_W = (T_WM_ * corner_points_M.colwise().homogeneous()).topRows(3);
 }
 
 
@@ -392,9 +392,7 @@ inline void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::voxelToCornerPoints(
 {
     Eigen::Matrix<float, 3, 8> corner_points_M =
         ((stride * corner_rel_steps_).colwise() + voxel_coord.cast<float>()) * resolution_;
-    corner_points_W =
-        (se::math::to_inverse_transformation(T_MW_) * corner_points_M.colwise().homogeneous())
-            .topRows(3);
+    corner_points_W = (T_WM_ * corner_points_M.colwise().homogeneous()).topRows(3);
 }
 
 

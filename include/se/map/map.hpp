@@ -103,9 +103,9 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      *
      * \return T_WM
      */
-    Eigen::Matrix4f getTWM() const
+    inline Eigen::Matrix4f getTWM() const
     {
-        return se::math::to_inverse_transformation(T_MW_);
+        return T_WM_;
     };
 
     /**
@@ -125,7 +125,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      */
     inline Eigen::Vector3f gettWM() const
     {
-        return se::math::to_translation(se::math::to_inverse_transformation(T_MW_));
+        return se::math::to_translation(T_WM_);
     }
 
     /**
@@ -145,7 +145,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      */
     inline Eigen::Matrix3f getRWM() const
     {
-        return se::math::to_rotation(se::math::to_inverse_transformation(T_MW_));
+        return se::math::to_rotation(T_WM_);
     }
 
     /**
@@ -483,7 +483,8 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
 
     const Eigen::Vector3f dimension_; ///< The dimensions of the map
     const float resolution_;          ///< The resolution of the map
-    const Eigen::Matrix4f T_MW_;      ///< The transformation from world ot world frame
+    const Eigen::Matrix4f T_MW_;      ///< The transformation from world to map frame
+    const Eigen::Matrix4f T_WM_;      ///< The transformation from map to world frame
 
     const Eigen::Vector3f lb_M_; ///< The lower map bound
     const Eigen::Vector3f ub_M_; ///< The upper map bound
