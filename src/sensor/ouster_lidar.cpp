@@ -162,27 +162,6 @@ int se::OusterLidar::computeIntegrationScaleImpl(const Eigen::Vector3f& block_ce
 
 
 
-float se::OusterLidar::nearDistImpl(const Eigen::Vector3f&) const
-{
-    return near_plane;
-}
-
-
-
-float se::OusterLidar::farDistImpl(const Eigen::Vector3f&) const
-{
-    return far_plane;
-}
-
-
-
-float se::OusterLidar::measurementFromPointImpl(const Eigen::Vector3f& point_S) const
-{
-    return point_S.norm();
-}
-
-
-
 bool se::OusterLidar::pointInFrustumImpl(const Eigen::Vector3f& /*point_S*/) const
 {
     // TODO Implement

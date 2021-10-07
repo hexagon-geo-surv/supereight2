@@ -185,27 +185,6 @@ int se::PinholeCamera::computeIntegrationScaleImpl(const Eigen::Vector3f& block_
 
 
 
-float se::PinholeCamera::nearDistImpl(const Eigen::Vector3f& ray_S) const
-{
-    return near_plane / ray_S.normalized().z();
-}
-
-
-
-float se::PinholeCamera::farDistImpl(const Eigen::Vector3f& ray_S) const
-{
-    return far_plane / ray_S.normalized().z();
-}
-
-
-
-float se::PinholeCamera::measurementFromPointImpl(const Eigen::Vector3f& point_S) const
-{
-    return point_S.z();
-}
-
-
-
 bool se::PinholeCamera::pointInFrustumImpl(const Eigen::Vector3f& point_S) const
 {
     for (size_t i = 0; i < num_frustum_normals_; ++i) {
