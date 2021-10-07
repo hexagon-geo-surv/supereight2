@@ -66,8 +66,8 @@ inline DensePoolingImage<PinholeCamera>::DensePoolingImage(const se::Image<float
         pooling_image_.emplace_back(image_width_ * image_height_);
 
     // Initalize image frame at single pixel resolution
-    for (int v = 0; v < image_height_; v++) {
 #pragma omp parallel for
+    for (int v = 0; v < image_height_; v++) {
         for (int u = 0; u < image_width_; u++) {
             Value pixel_depth = (depth_map.data())[u + v * image_width_];
             if (pixel_depth <= 0) {
@@ -90,8 +90,8 @@ inline DensePoolingImage<PinholeCamera>::DensePoolingImage(const se::Image<float
     pooling_image_[1] = default_image;
 
     // Initalize first pixel batch at 3x3 batch resolution
-    for (int y = 0; y < image_height_; y++) {
 #pragma omp parallel for
+    for (int y = 0; y < image_height_; y++) {
         for (int x = 0; x < image_width_; x++) {
             Pixel& pixel = pooling_image_[1][x + image_width_ * y];
 
@@ -145,8 +145,8 @@ inline DensePoolingImage<PinholeCamera>::DensePoolingImage(const se::Image<float
     for (int l = 2, s = 2; l <= image_max_level_; ++l, (s <<= 1U)) {
         pooling_image_[l] = default_image;
         int s_half = s / 2;
-        for (int y = 0; y < image_height_; y++) {
 #pragma omp parallel for
+        for (int y = 0; y < image_height_; y++) {
             for (int x = 0; x < image_width_; x++) {
                 Pixel& pixel = pooling_image_[l][x + y * image_width_];
 
