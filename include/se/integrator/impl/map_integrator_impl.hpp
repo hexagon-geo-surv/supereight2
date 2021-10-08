@@ -163,8 +163,10 @@ void IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
     se::VolumeCarverAllocation allocation_list = volume_carver();
 
     // Update
+    TICK("update")
     se::Updater updater(map, sensor, depth_img, T_WS, frame);
     updater(allocation_list);
+    TOCK("update")
 }
 
 

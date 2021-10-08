@@ -47,6 +47,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
     const int child_size = octree_.getSize() / 2;
     se::OctantBase* root_ptr = octree_.getRoot();
 
+    TICK("allocation")
     octree_.allocateAll(static_cast<NodeType*>(root_ptr), 0); ///< Allocates all 8 children
 #pragma omp parallel for
     for (int child_idx = 0; child_idx < 8; ++child_idx) {
@@ -56,6 +57,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
             child_rel_step * child_size; // Because, + corner is (0, 0, 0) at root depth
         (*this)(child_coord, child_size, 1, static_cast<NodeType*>(root_ptr)->getChild(child_idx));
     }
+    TOCK("allocation")
 
     return allocation_list_;
 }
@@ -153,7 +155,6 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
         || approx_depth_value_max < zero_depth_band_) { // TODO: Alternative sensor_.near_plane.
         return;
     }
-
 
     // Compute the 8 corners of the node to be evaluated
     /// CHANGE: USE voxelToCornerPoints(...)
