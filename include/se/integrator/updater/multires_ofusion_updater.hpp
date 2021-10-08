@@ -57,36 +57,7 @@ class Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockS
             const Eigen::Matrix4f& T_WS,
             const int frame);
 
-    void operator()(se::VolumeCarverAllocation& allocation_list)
-    {
-#pragma omp parallel for
-        for (unsigned int i = 0; i < allocation_list.node_list.size(); ++i) {
-            auto node_ptr = static_cast<NodeType*>(allocation_list.node_list[i]);
-            const int depth =
-                map_.getOctree()->getMaxScale() - se::math::log2_const(node_ptr->getSize());
-            freeNodeRecurse(allocation_list.node_list[i], depth);
-        }
-
-#pragma omp parallel for
-        for (unsigned int i = 0; i < allocation_list.block_list.size(); ++i) {
-            updateBlock(allocation_list.block_list[i],
-                        allocation_list.variance_state_list[i] == se::VarianceState::Constant,
-                        allocation_list.projects_inside_list[i]);
-        }
-
-        /// Propagation
-#pragma omp parallel for
-        for (unsigned int i = 0; i < allocation_list.block_list.size(); ++i) {
-            updater::propagateBlockToCoarsestScale<BlockType>(allocation_list.block_list[i]);
-        }
-#pragma omp parallel for
-        for (unsigned int i = 0; i < freed_block_list_.size(); ++i) {
-            updater::propagateBlockToCoarsestScale<BlockType>(freed_block_list_[i]);
-        }
-
-        propagateToRoot(allocation_list.block_list);
-    }
-
+    void operator()(se::VolumeCarverAllocation& allocation_list);
 
     private:
     /**
