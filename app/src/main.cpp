@@ -136,8 +136,10 @@ int main(int argc, char** argv)
 
         // Raycast from T_MS
         TICK("raycast")
-        se::raycaster::raycastVolume(
-            map, surface_point_cloud_W, surface_normals_W, surface_scale, T_WS, sensor);
+        if (config.app.enable_rendering || !config.app.enable_ground_truth) {
+          se::raycaster::raycastVolume(
+              map, surface_point_cloud_W, surface_normals_W, surface_scale, T_WS, sensor);
+        }
         TOCK("raycast")
 
         // Convert rgba, depth and render the volume (if enabled)
