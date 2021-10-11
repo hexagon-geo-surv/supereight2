@@ -40,6 +40,7 @@ template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
 void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
              SensorT>::operator()(se::VolumeCarverAllocation& allocation_list)
 {
+    TICK("node-update")
 #pragma omp parallel for
     for (unsigned int i = 0; i < allocation_list.node_list.size(); ++i) {
         auto node_ptr = static_cast<NodeType*>(allocation_list.node_list[i]);
@@ -47,25 +48,33 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
             map_.getOctree()->getMaxScale() - se::math::log2_const(node_ptr->getSize());
         freeNodeRecurse(allocation_list.node_list[i], depth);
     }
+    TOCK("node-update")
 
+    TICK("block-update")
 #pragma omp parallel for
     for (unsigned int i = 0; i < allocation_list.block_list.size(); ++i) {
         updateBlock(allocation_list.block_list[i],
                     allocation_list.variance_state_list[i] == se::VarianceState::Constant,
                     allocation_list.projects_inside_list[i]);
     }
+    TOCK("block-update")
 
     /// Propagation
+    TICK("block-propagation")
 #pragma omp parallel for
     for (unsigned int i = 0; i < allocation_list.block_list.size(); ++i) {
         updater::propagateBlockToCoarsestScale<BlockType>(allocation_list.block_list[i]);
     }
+    TOCK("block-propagation")
+    TICK("free-block-propagation")
 #pragma omp parallel for
     for (unsigned int i = 0; i < freed_block_list_.size(); ++i) {
         updater::propagateBlockToCoarsestScale<BlockType>(freed_block_list_[i]);
     }
-
+    TOCK("free-block-propagation")
+    TICK("root-propagation")
     propagateToRoot(allocation_list.block_list);
+    TOCK("root-propagation")
 }
 
 
