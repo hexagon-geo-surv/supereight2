@@ -41,11 +41,11 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
              SensorT>::operator()(se::VolumeCarverAllocation& allocation_list)
 {
     TICK("node-update")
+    auto& octree = *map_.getOctree();
 #pragma omp parallel for
     for (unsigned int i = 0; i < allocation_list.node_list.size(); ++i) {
         auto node_ptr = static_cast<NodeType*>(allocation_list.node_list[i]);
-        const int depth =
-            map_.getOctree()->getMaxScale() - se::math::log2_const(node_ptr->getSize());
+        const int depth = octree.getMaxScale() - std::log2(node_ptr->getSize());
         freeNodeRecurse(allocation_list.node_list[i], depth);
     }
     TOCK("node-update")
@@ -83,14 +83,15 @@ template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
 void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
              SensorT>::propagateToRoot(std::vector<se::OctantBase*>& block_list)
 {
+    auto& octree = *map_.getOctree();
     for (const auto& octant_ptr : block_list) {
         BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
         if (block_ptr->getParent()) {
-            node_set_[map_.getOctree()->getBlockDepth() - 1].insert(block_ptr->getParent());
+            node_set_[octree.getBlockDepth() - 1].insert(block_ptr->getParent());
         }
     }
 
-    for (int d = map_.getOctree()->getBlockDepth() - 1; d > 0; d--) // TODO: block depth - 1?
+    for (int d = octree.getBlockDepth() - 1; d > 0; d--) // TODO: block depth - 1?
     {
         std::set<se::OctantBase*>::iterator it;
         for (it = node_set_[d].begin(); it != node_set_[d].end(); ++it) {
@@ -100,13 +101,13 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
             }
             if (octant_ptr->getParent()) {
                 auto node_data = updater::propagateToNoteAtCoarserScale<NodeType, BlockType>(
-                    octant_ptr, map_.getOctree()->getMaxScale(), frame_);
+                    octant_ptr, octree.getMaxScale(), frame_);
                 node_set_[d - 1].insert(octant_ptr->getParent());
 
                 if (node_data.observed
                     && node_data.occupancy * node_data.weight
                         <= 0.95 * map_.getDataConfig().min_occupancy) {
-                    map_.getOctree()->deleteChildren(static_cast<NodeType*>(octant_ptr));
+                    octree.deleteChildren(static_cast<NodeType*>(octant_ptr));
                 }
 
                 // TODO: ^SWITCH 1 - Alternative approach (conservative)
@@ -116,7 +117,7 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
                 //              && node_data.x <= 0.95 * map_.getDataConfig().log_odd_min
                 //              && node_data.y > map_.getDataConfig().max_weight / 2)
                 //          {
-                //            map_.getOctree()->deleteChildren(octant_ptr);
+                //            octree.deleteChildren(octant_ptr);
                 //          }
 
             } // if parent
@@ -124,7 +125,7 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
     }         // depth d
 
     updater::propagateToNoteAtCoarserScale<NodeType, BlockType>(
-        map_.getOctree()->getRoot(), map_.getOctree()->getMaxScale(), frame_);
+        octree.getRoot(), octree.getMaxScale(), frame_);
 }
 
 
