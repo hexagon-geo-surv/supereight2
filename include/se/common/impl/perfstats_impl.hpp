@@ -343,6 +343,7 @@ inline std::string PerfStats::createDataIterString()
 inline std::string PerfStats::createDataIterString(const size_t iter)
 {
     std::stringstream data_ss;
+    data_ss << std::fixed << std::setprecision(6);
 
     for (const auto& type : header_order_) {
         for (const auto& o : order_) {

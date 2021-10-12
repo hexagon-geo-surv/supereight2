@@ -26,6 +26,7 @@
 #include <Eigen/Dense>
 #include <algorithm>
 #include <fstream>
+#include <iomanip>
 #include <map>
 #include <mutex>
 #include <numeric>
