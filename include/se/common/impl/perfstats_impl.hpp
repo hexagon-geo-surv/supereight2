@@ -325,7 +325,9 @@ inline std::string PerfStats::createHeaderString()
         }
     }
 
-    std::string header_string = header_ss.str().c_str();
+    std::string header_string = header_ss.str();
+    // Erase the trailing TAB.
+    header_string.pop_back();
     return header_string;
 }
 
@@ -362,7 +364,9 @@ inline std::string PerfStats::createDataIterString(const size_t iter)
         }
     }
 
-    std::string data_string = data_ss.str().c_str();
+    std::string data_string = data_ss.str();
+    // Erase the trailing TAB.
+    data_string.pop_back();
     return data_string;
 }
 
