@@ -10,7 +10,7 @@
 #define SE_MEMORY_POOL_HPP
 
 #include <Eigen/Dense>
-#include <boost/pool/object_pool.hpp>
+#include <boost/pool/pool.hpp>
 
 namespace se {
 
@@ -21,6 +21,10 @@ class BoostMemoryPool {
     public:
     typedef typename NodeT::DataType DataType;
 
+    BoostMemoryPool() : node_buffer_(sizeof(NodeT)), block_buffer_(sizeof(BlockT))
+    {
+    }
+
     /**
      * \brief Allocate a node using its coordinates and size.
      *
@@ -28,7 +32,7 @@ class BoostMemoryPool {
      */
     inline NodeT* allocateNode(const Eigen::Vector3i& node_coord, const unsigned int node_size)
     {
-        return node_buffer_.construct(node_coord, node_size, DataType());
+        return new (node_buffer_.malloc()) NodeT(node_coord, node_size, DataType());
     }
 
     /**
@@ -42,7 +46,7 @@ class BoostMemoryPool {
      */
     inline NodeT* allocateNode(NodeT* parent_ptr, const int child_idx, const DataType init_data)
     {
-        return node_buffer_.construct(parent_ptr, child_idx, init_data);
+        return new (node_buffer_.malloc()) NodeT(parent_ptr, child_idx, init_data);
     }
 
     /**
@@ -56,7 +60,7 @@ class BoostMemoryPool {
      */
     inline BlockT* allocateBlock(NodeT* parent_ptr, const int child_idx, const DataType init_data)
     {
-        return block_buffer_.construct(parent_ptr, child_idx, init_data);
+        return new (block_buffer_.malloc()) BlockT(parent_ptr, child_idx, init_data);
     }
 
     /**
@@ -64,7 +68,8 @@ class BoostMemoryPool {
      */
     inline void deleteNode(NodeT* node_ptr)
     {
-        node_buffer_.destroy(node_ptr);
+        node_ptr->~NodeT();
+        node_buffer_.free(node_ptr);
     }
 
     /**
@@ -72,11 +77,12 @@ class BoostMemoryPool {
      */
     inline void deleteBlock(BlockT* block_ptr)
     {
-        block_buffer_.destroy(block_ptr);
+        block_ptr->~BlockT();
+        block_buffer_.free(block_ptr);
     }
 
-    boost::object_pool<NodeT> node_buffer_;   ///< The node buffer
-    boost::object_pool<BlockT> block_buffer_; ///< The block buffer
+    boost::pool<> node_buffer_;  ///< The node buffer
+    boost::pool<> block_buffer_; ///< The block buffer
 };
 
 } // namespace se
