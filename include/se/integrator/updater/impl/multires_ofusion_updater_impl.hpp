@@ -40,7 +40,9 @@ template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
 void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
              SensorT>::operator()(se::VolumeCarverAllocation& allocation_list)
 {
-    TICK("node-update")
+    TICK("fusion-total")
+
+    TICK("fusion-nodes")
     auto& octree = *map_.getOctree();
 #pragma omp parallel for
     for (unsigned int i = 0; i < allocation_list.node_list.size(); ++i) {
@@ -48,33 +50,38 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
         const int depth = octree.getMaxScale() - std::log2(node_ptr->getSize());
         freeNodeRecurse(allocation_list.node_list[i], depth);
     }
-    TOCK("node-update")
+    TOCK("fusion-nodes")
 
-    TICK("block-update")
+    TICK("fusion-blocks")
 #pragma omp parallel for
     for (unsigned int i = 0; i < allocation_list.block_list.size(); ++i) {
         updateBlock(allocation_list.block_list[i],
                     allocation_list.variance_state_list[i] == se::VarianceState::Constant,
                     allocation_list.projects_inside_list[i]);
     }
-    TOCK("block-update")
+    TOCK("fusion-blocks")
+
+    TOCK("fusion-total")
 
     /// Propagation
-    TICK("block-propagation")
+    TICK("propagation-total")
+
+    TICK("propagation-blocks")
 #pragma omp parallel for
     for (unsigned int i = 0; i < allocation_list.block_list.size(); ++i) {
         updater::propagateBlockToCoarsestScale<BlockType>(allocation_list.block_list[i]);
     }
-    TOCK("block-propagation")
-    TICK("free-block-propagation")
 #pragma omp parallel for
     for (unsigned int i = 0; i < freed_block_list_.size(); ++i) {
         updater::propagateBlockToCoarsestScale<BlockType>(freed_block_list_[i]);
     }
-    TOCK("free-block-propagation")
-    TICK("root-propagation")
+    TOCK("propagation-blocks")
+
+    TICK("propagation-to-root")
     propagateToRoot(allocation_list.block_list);
-    TOCK("root-propagation")
+    TOCK("propagation-to-root")
+
+    TOCK("propagation-total")
 }
 
 

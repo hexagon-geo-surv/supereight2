@@ -158,9 +158,11 @@ void IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
     const unsigned int frame)
 {
     // Allocation
+    TICK("allocation")
     VolumeCarver<MapT, SensorT> volume_carver(
         map, sensor, depth_img, T_WS, frame); //< process based on variance state and project inside
     se::VolumeCarverAllocation allocation_list = volume_carver();
+    TOCK("allocation")
 
     // Update
     TICK("update")
