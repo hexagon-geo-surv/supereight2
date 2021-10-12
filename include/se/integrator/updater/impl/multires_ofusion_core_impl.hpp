@@ -155,9 +155,6 @@ propagateToNoteAtCoarserScale(se::OctantBase* octant_ptr,
         }
     }
 
-    /// CHANGED
-    //  const unsigned int child_idx = se::child_idx(node_ptr->code(), se::keyops::depth(node_ptr->code()), voxel_depth);
-    //  auto& node_data = node_ptr->getParent()->childData(child_idx);
     typename NodeT::DataType node_data = node_ptr->getData();
 
     if (data_count > 0) {
@@ -325,42 +322,12 @@ inline void propagateBlockToCoarsestScale(se::OctantBase* octant_ptr)
                         target_data.weight = ceil((float) mean_weight) / data_count;
                         target_data.observed = false;
 
-                        //              target_data.occupancy = mean_occupancy / data_count;
-                        //              target_data.weight = max_weight;
-                        //              if (observed_count == 8) {
-                        //                target_data.observed = true; // TODO: We don't set the observed count to true for mean values
-                        //              }
-
-                        //              target_data.occupancy = max_mean_occupancy;
-                        //              target_data.weight = max_weight;
-                        //              if (observed_count == 8) {
-                        //                target_data.observed = true; // TODO: We don't set the observed count to true for mean values
-                        //              }
-
                         target_max_data.occupancy = max_mean_occupancy;
                         target_max_data.weight = max_weight;
                         if (observed_count == 8) {
                             target_max_data.observed =
                                 true; // TODO: We don't set the observed count to true for mean values
                         }
-
-                        //              if (abs(target_data.occupancy - target_max_data.occupancy) > 1) {
-                        //                std::cout << "-----" << std::endl;
-                        //                std::cout << target_data.occupancy << "/" << target_max_data.occupancy << "/" << data_count << std::endl;
-                        //                for (int k = 0; k < 2; k++) {
-                        //                  for (int j = 0; j < 2; j++) {
-                        //                    for (int i = 0; i < 2; i++) {
-                        //
-                        //                      const int child_data_idx = (2 * x + i) + (2 * y + j) * size_at_child_scale_li + (2 * z + k) * size_at_child_scale_sq;
-                        //                      const auto child_data = data_at_child_scale[child_data_idx];
-                        //
-                        //                      std::cout << se::str_utils::value_to_pretty_str(child_data.occupancy, "child.x") << std::endl;
-                        //                      std::cout << se::str_utils::value_to_pretty_str(child_data.weight, "child.y") << std::endl;
-                        //
-                        //                    } // i
-                        //                  } // j
-                        //                } // k
-                        //              }
                     }
 
                 } // x
@@ -437,18 +404,6 @@ inline void propagateBlockToCoarsestScale(se::OctantBase* octant_ptr)
                         target_data.occupancy = mean_occupancy / data_count;
                         target_data.weight = ceil((float) mean_weight) / data_count;
                         target_data.observed = false;
-
-                        //              target_data.occupancy = mean_occupancy / data_count;
-                        //              target_data.weight = ceil((float) mean_weight) / data_count;
-                        //              if (observed_count == 8) {
-                        //                target_data.observed = true; // TODO: We don't set the observed count to true for mean values
-                        //              }
-
-                        //              target_data.occupancy = max_mean_occupancy;
-                        //              target_data.weight = max_weight;
-                        //              if (observed_count == 8) {
-                        //                target_data.observed = true; // TODO: We don't set the observed count to true for mean values
-                        //              }
 
                         target_max_data.occupancy = max_mean_occupancy;
                         target_max_data.weight = max_weight;
@@ -559,11 +514,6 @@ inline void meanCoarsePropagation(const se::OctantBase* octant_ptr,
         target_data.occupancy = mean_occupancy / data_count;
         target_data.weight = ((float) mean_weight) / data_count;
         target_data.observed = true;
-
-        //      // TODO: ^SWITCH 2 - Set observed if all children are known.
-        //      if (observed_count == 8) {
-        //        target_data.observed = true;
-        //      }
     }
 }
 

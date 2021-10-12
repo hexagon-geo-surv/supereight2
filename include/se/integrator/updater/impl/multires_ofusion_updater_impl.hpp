@@ -117,16 +117,6 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
                     octree.deleteChildren(static_cast<NodeType*>(octant_ptr));
                 }
 
-                // TODO: ^SWITCH 1 - Alternative approach (conservative)
-                // Delete node if it's in free space and it's max value already surpassed a lower threshold.
-                // Approach only saves time.
-                //          if (   node_data.observed
-                //              && node_data.x <= 0.95 * map_.getDataConfig().log_odd_min
-                //              && node_data.y > map_.getDataConfig().max_weight / 2)
-                //          {
-                //            octree.deleteChildren(octant_ptr);
-                //          }
-
             } // if parent
         }     // nodes at depth d
     }         // depth d
