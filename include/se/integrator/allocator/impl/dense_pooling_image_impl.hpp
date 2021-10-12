@@ -65,7 +65,7 @@ inline DensePoolingImage<PinholeCamera>::DensePoolingImage(const se::Image<float
     for (int l = 0; l <= image_max_level_; l++)
         pooling_image_.emplace_back(image_width_ * image_height_);
 
-    // Initalize image frame at single pixel resolution
+        // Initalize image frame at single pixel resolution
 #pragma omp parallel for
     for (int v = 0; v < image_height_; v++) {
         for (int u = 0; u < image_width_; u++) {
