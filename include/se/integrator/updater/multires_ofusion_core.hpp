@@ -41,7 +41,7 @@ inline float compute_three_sigma(const se::field_t depth_value,
  * \return The estimated wall thickness.
  */
 template<typename ConfigT>
-inline float compute_tau(const field_t depth_value,
+inline float compute_tau(const se::field_t depth_value,
                          const float tau_min,
                          const float tau_max,
                          const ConfigT config);
@@ -54,14 +54,14 @@ namespace updater {
 /**
  * \brief Update the weighted mean log-odd octant occupancy and set the octant to observed.
  *
- * \param[in,out] data         The data in the octant.
+ * \param[in,out] data     The data in the octant.
  * \param[in] sample_value The sample occupancy to be integrated.
  *
  * \return True/false if the voxel has been observed the first time
  */
 template<typename DataT>
 inline bool
-weightedMeanUpdate(DataT& data, const float sample_value, const se::weight_t max_weight);
+weighted_mean_update(DataT& data, const se::field_t sample_value, const se::weight_t max_weight);
 
 
 
@@ -76,11 +76,11 @@ weightedMeanUpdate(DataT& data, const float sample_value, const se::weight_t max
  * \return True/false if the node has been observed the first time
  */
 template<typename DataT, typename ConfigT>
-inline bool updateVoxel(DataT& data,
-                        const float range_diff,
-                        const float tau,
-                        const float three_sigma,
-                        const ConfigT config);
+inline bool update_voxel(DataT& data,
+                         const float range_diff,
+                         const float tau,
+                         const float three_sigma,
+                         const ConfigT config);
 
 
 
@@ -92,7 +92,7 @@ inline bool updateVoxel(DataT& data,
  * \param[in,out] node_data The reference to the node data.
  */
 template<typename DataT, typename ConfigT>
-inline void freeNode(DataT& node_data, const ConfigT config);
+inline void free_node(DataT& node_data, const ConfigT config);
 
 
 /**
@@ -103,7 +103,7 @@ inline void freeNode(DataT& node_data, const ConfigT config);
  * \param[in,out] node_data The reference to the node data.
  */
 template<typename DataT, typename ConfigT>
-inline bool freeVoxel(DataT& voxel_data, const ConfigT config);
+inline bool free_voxel(DataT& voxel_data, const ConfigT config);
 
 
 /**
@@ -116,10 +116,8 @@ inline bool freeVoxel(DataT& voxel_data, const ConfigT config);
  * \return data Summary of the node
  */
 template<typename NodeT, typename BlockT>
-inline typename NodeT::DataType
-propagateToNoteAtCoarserScale(se::OctantBase* octant_ptr,
-                              const unsigned int /* voxel_depth */, // TODO:
-                              const unsigned int frame);
+inline typename NodeT::DataType propagate_to_parent_node(se::OctantBase* octant_ptr,
+                                                         const unsigned int frame);
 
 
 
@@ -131,52 +129,7 @@ propagateToNoteAtCoarserScale(se::OctantBase* octant_ptr,
  * \param[in] initial_scale Scale from which propagate up voxel values
 */
 template<typename BlockT>
-inline void propagateBlockToCoarsestScale(se::OctantBase* octant_ptr);
-
-
-
-/**
- * \brief Propagate the maximum log-odd occupancy of the eight children up to the next scale.
- *
- * \note UNUSED FUNCTION
- *
- * \note The maximum log-odd occupancy is the maximum partly observed log-odd occupancy.
- *       To check if the node is safe for planning, verify if the log-odd occupancy is below a chosen threshold
- *       and that the node is observed (data.observed == true -> node or all children have been seen).
- *
- * \note The maximum log-odd occupancy is the maximum product of data.occupancy * data.weight and
- *       not the maximum mean log-odd Occupancy data.occupancy.
- *
- * \param[in,out] block           The block in which the target voxel is included.
- * \param[in]     voxel_coord     The coordinates of the target voxel (corner).
- * \param[in]     target_scale    The scale to which to propage the data to.
- * \param[in]     target_stride   The stride in voxel units of the target scale.
- * \param[in,out] target_data     The data reference to the target voxel.
- */
-template<typename BlockT>
-inline void maxCoarsePropagation(const se::OctantBase* octant_ptr,
-                                 const Eigen::Vector3i target_coord,
-                                 const int target_scale,
-                                 const unsigned int target_stride,
-                                 typename BlockT::DataType& target_data);
-
-
-
-template<typename BlockT>
-inline void meanCoarsePropagation(const se::OctantBase* octant_ptr,
-                                  const Eigen::Vector3i target_coord,
-                                  const int target_scale,
-                                  const unsigned int target_stride,
-                                  typename BlockT::DataType& target_data);
-
-
-
-template<typename BlockT>
-inline void propagateToVoxelAtCoarserScale(const se::OctantBase* octant_ptr,
-                                           const Eigen::Vector3i voxel_coord,
-                                           const int target_scale,
-                                           const unsigned int target_stride,
-                                           typename BlockT::DataType& voxel_data);
+inline void propagate_block_to_coarsest_scale(se::OctantBase* octant_ptr);
 
 
 

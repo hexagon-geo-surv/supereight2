@@ -69,11 +69,11 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
     TICK("propagation-blocks")
 #pragma omp parallel for
     for (unsigned int i = 0; i < allocation_list.block_list.size(); ++i) {
-        updater::propagateBlockToCoarsestScale<BlockType>(allocation_list.block_list[i]);
+        updater::propagate_block_to_coarsest_scale<BlockType>(allocation_list.block_list[i]);
     }
 #pragma omp parallel for
     for (unsigned int i = 0; i < freed_block_list_.size(); ++i) {
-        updater::propagateBlockToCoarsestScale<BlockType>(freed_block_list_[i]);
+        updater::propagate_block_to_coarsest_scale<BlockType>(freed_block_list_[i]);
     }
     TOCK("propagation-blocks")
 
@@ -107,8 +107,8 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
                 continue;
             }
             if (octant_ptr->getParent()) {
-                auto node_data = updater::propagateToNoteAtCoarserScale<NodeType, BlockType>(
-                    octant_ptr, octree.getMaxScale(), frame_);
+                auto node_data =
+                    updater::propagate_to_parent_node<NodeType, BlockType>(octant_ptr, frame_);
                 node_set_[d - 1].insert(octant_ptr->getParent());
 
                 if (node_data.observed
@@ -121,8 +121,7 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
         }     // nodes at depth d
     }         // depth d
 
-    updater::propagateToNoteAtCoarserScale<NodeType, BlockType>(
-        octree.getRoot(), octree.getMaxScale(), frame_);
+    updater::propagate_to_parent_node<NodeType, BlockType>(octree.getRoot(), frame_);
 }
 
 
@@ -137,7 +136,7 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
     const unsigned int block_size = BlockType::size;
     const Eigen::Vector3i block_coord = block_ptr->getCoord();
     Eigen::Vector3f block_centre_point_W;
-    /// CHANGED
+
     map_.voxelToPoint(block_coord, block_size, block_centre_point_W);
     const Eigen::Vector3f block_centre_point_C =
         (T_SW_ * (block_centre_point_W).homogeneous()).head(3);
@@ -242,7 +241,7 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
                     auto& buffer_data =
                         block_ptr->bufferData(buffer_idx); /// \note pass by reference now.
                     block_ptr->incrBufferObservedCount(
-                        updater::freeVoxel(buffer_data, map_.getDataConfig()));
+                        updater::free_voxel(buffer_data, map_.getDataConfig()));
                 } // x
             }     // y
         }         // z
@@ -269,7 +268,7 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
                     x + y * size_at_integration_scale_li + z * size_at_integration_scale_sq;
                 auto& voxel_data = block_ptr->currData(voxel_idx); /// \note pass by reference now.
                 block_ptr->incrCurrObservedCount(
-                    updater::freeVoxel(voxel_data, map_.getDataConfig()));
+                    updater::free_voxel(voxel_data, map_.getDataConfig()));
             } // x
         }     // y
     }         // z
@@ -440,14 +439,14 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
 
                     if (low_variance) {
                         block_ptr->incrBufferObservedCount(
-                            updater::freeVoxel(buffer_data, map_.getDataConfig()));
+                            updater::free_voxel(buffer_data, map_.getDataConfig()));
                     }
                     else {
                         const float sample_point_C_m = sensor_.measurementFromPoint(sample_point_C);
                         const float range = sample_point_C.norm();
                         const float range_diff =
                             (sample_point_C_m - depth_value) * (range / sample_point_C_m);
-                        block_ptr->incrBufferObservedCount(updater::updateVoxel(
+                        block_ptr->incrBufferObservedCount(updater::update_voxel(
                             buffer_data, range_diff, tau, three_sigma, map_.getDataConfig()));
                     }
                 } // x
@@ -510,14 +509,14 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
                 auto& voxel_data = block_ptr->currData(voxel_idx); /// \note pass by reference now.
                 if (low_variance) {
                     block_ptr->incrCurrObservedCount(
-                        updater::freeVoxel(voxel_data, map_.getDataConfig()));
+                        updater::free_voxel(voxel_data, map_.getDataConfig()));
                 }
                 else {
                     const float sample_point_C_m = sensor_.measurementFromPoint(sample_point_C);
                     const float range = sample_point_C.norm();
                     const float range_diff =
                         (sample_point_C_m - depth_value) * (range / sample_point_C_m);
-                    block_ptr->incrCurrObservedCount(updater::updateVoxel(
+                    block_ptr->incrCurrObservedCount(updater::update_voxel(
                         voxel_data, range_diff, tau, three_sigma, map_.getDataConfig()));
                 }
             } // x
@@ -536,9 +535,8 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
     NodeType* node_ptr = static_cast<NodeType*>(octant_ptr);
 
     if (node_ptr->getChildrenMask() == 0) {
-        /// CHANGED
         typename NodeType::DataType node_data = node_ptr->getData();
-        updater::freeNode(node_data, map_.getDataConfig());
+        updater::free_node(node_data, map_.getDataConfig());
         node_ptr->setData(node_data);
 #pragma omp critical(node_lock)
         { // Add node to node list for later up-propagation (finest node for this tree-branch)

@@ -56,7 +56,8 @@ namespace updater {
 
 
 template<typename DataT>
-inline bool weightedMeanUpdate(DataT& data, const float sample_value, const se::weight_t max_weight)
+inline bool
+weighted_mean_update(DataT& data, const se::field_t sample_value, const se::weight_t max_weight)
 {
     data.occupancy = (data.occupancy * data.weight + sample_value) / (data.weight + 1);
     data.weight = std::min((data.weight + 1), max_weight);
@@ -72,11 +73,11 @@ inline bool weightedMeanUpdate(DataT& data, const float sample_value, const se::
 
 
 template<typename DataT, typename ConfigT>
-inline bool updateVoxel(DataT& data,
-                        const float range_diff,
-                        const float tau,
-                        const float three_sigma,
-                        const ConfigT config)
+inline bool update_voxel(DataT& data,
+                         const float range_diff,
+                         const float tau,
+                         const float three_sigma,
+                         const ConfigT config)
 {
     float sample_value;
 
@@ -95,44 +96,42 @@ inline bool updateVoxel(DataT& data,
         return false;
     }
 
-    return weightedMeanUpdate(data, sample_value, config.max_weight);
+    return weighted_mean_update(data, sample_value, config.max_weight);
 }
 
 
 
 template<typename DataT, typename ConfigT>
-inline void freeNode(DataT& node_data, const ConfigT config)
+inline void free_node(DataT& node_data, const ConfigT config)
 {
-    weightedMeanUpdate(node_data, config.log_odd_min, config.max_weight);
+    weighted_mean_update(node_data, config.log_odd_min, config.max_weight);
 }
 
 
 
 template<typename DataT, typename ConfigT>
-inline bool freeVoxel(DataT& voxel_data, const ConfigT config)
+inline bool free_voxel(DataT& voxel_data, const ConfigT config)
 {
-    return weightedMeanUpdate(voxel_data, config.log_odd_min, config.max_weight);
+    return weighted_mean_update(voxel_data, config.log_odd_min, config.max_weight);
 }
 
 
 
 template<typename NodeT, typename BlockT>
-inline typename NodeT::DataType
-propagateToNoteAtCoarserScale(se::OctantBase* octant_ptr,
-                              const unsigned int /* voxel_depth */, // TODO:
-                              const unsigned int frame)
+inline typename NodeT::DataType propagate_to_parent_node(se::OctantBase* octant_ptr,
+                                                         const int frame)
 {
     NodeT* node_ptr = static_cast<NodeT*>(octant_ptr);
 
     node_ptr->setTimeStamp(frame);
 
-    float max_mean_occupancy = 0;
+    se::field_t max_mean_occupancy = 0;
     se::weight_t max_weight = 0;
-    float max_occupancy = -std::numeric_limits<float>::max();
-    unsigned int observed_count = 0;
-    unsigned int data_count = 0;
+    se::field_t max_occupancy = -std::numeric_limits<se::field_t>::max();
+    size_t observed_count = 0;
+    size_t data_count = 0;
 
-    for (unsigned int child_idx = 0; child_idx < 8; ++child_idx) {
+    for (int child_idx = 0; child_idx < 8; ++child_idx) {
         se::OctantBase* child_ptr = node_ptr->getChild(child_idx);
 
         if (!child_ptr) {
@@ -171,65 +170,66 @@ propagateToNoteAtCoarserScale(se::OctantBase* octant_ptr,
 
 
 template<typename BlockT>
-inline void propagateBlockToCoarsestScale(se::OctantBase* octant_ptr)
+inline void propagate_block_to_coarsest_scale(se::OctantBase* octant_ptr)
 {
     typedef typename BlockT::DataType DataType;
 
     BlockT* block_ptr = static_cast<BlockT*>(octant_ptr);
-    int target_scale = block_ptr->getCurrentScale() + 1;
-    unsigned int size_at_target_scale_li = BlockT::size >> target_scale;
-    unsigned int size_at_target_scale_sq = se::math::sq(size_at_target_scale_li);
 
-    int child_scale = target_scale - 1;
-    unsigned int size_at_child_scale_li = BlockT::size >> child_scale;
-    unsigned int size_at_child_scale_sq = se::math::sq(size_at_child_scale_li);
+    int child_scale = block_ptr->getCurrentScale();
+    int size_at_child_scale_li = BlockT::size >> child_scale;
+    int size_at_child_scale_sq = se::math::sq(size_at_child_scale_li);
+
+    int parent_scale = child_scale + 1;
+    int size_at_parent_scale_li = BlockT::size >> parent_scale;
+    int size_at_parent_scale_sq = se::math::sq(size_at_parent_scale_li);
 
     DataType min_data;
-    se::field_t o_min;
+    se::field_t min_occupancy;
 
     if (block_ptr->buffer_scale() > block_ptr->getCurrentScale()) {
-        DataType* max_data_at_target_scale = block_ptr->blockMaxDataAtScale(target_scale);
+        DataType* max_data_at_parent_scale = block_ptr->blockMaxDataAtScale(parent_scale);
         DataType* max_data_at_child_scale = block_ptr->blockDataAtScale(child_scale);
 
         min_data = max_data_at_child_scale[0];
-        o_min = min_data.occupancy * min_data.weight;
+        min_occupancy = min_data.occupancy * min_data.weight;
 
-        for (unsigned int z = 0; z < size_at_target_scale_li; z++) {
-            for (unsigned int y = 0; y < size_at_target_scale_li; y++) {
-                for (unsigned int x = 0; x < size_at_target_scale_li; x++) {
-                    const int target_max_data_idx =
-                        x + y * size_at_target_scale_li + z * size_at_target_scale_sq;
-                    auto& target_max_data = max_data_at_target_scale[target_max_data_idx];
+        for (int z = 0; z < size_at_parent_scale_li; z++) {
+            for (int y = 0; y < size_at_parent_scale_li; y++) {
+                for (int x = 0; x < size_at_parent_scale_li; x++) {
+                    const int parent_max_data_idx =
+                        x + y * size_at_parent_scale_li + z * size_at_parent_scale_sq;
+                    auto& parent_max_data = max_data_at_parent_scale[parent_max_data_idx];
 
-                    float max_mean_occupancy = 0;
+                    se::field_t max_mean_occupancy = 0;
                     se::weight_t max_weight = 0;
-                    float max_occupancy = -std::numeric_limits<float>::max();
+                    se::field_t max_occupancy = -std::numeric_limits<float>::max();
 
-                    int observed_count = 0;
-                    int data_count = 0;
+                    size_t observed_count = 0;
+                    size_t data_count = 0;
 
-                    for (unsigned int k = 0; k < 2; k++) {
-                        for (unsigned int j = 0; j < 2; j++) {
-                            for (unsigned int i = 0; i < 2; i++) {
+                    for (int k = 0; k < 2; k++) {
+                        for (int j = 0; j < 2; j++) {
+                            for (int i = 0; i < 2; i++) {
                                 const int child_max_data_idx = (2 * x + i)
                                     + (2 * y + j) * size_at_child_scale_li
                                     + (2 * z + k) * size_at_child_scale_sq;
                                 const auto child_data = max_data_at_child_scale[child_max_data_idx];
 
-                                float o = (child_data.occupancy * child_data.weight);
+                                se::field_t occupancy = (child_data.occupancy * child_data.weight);
 
                                 if (child_data.weight > 0) {
-                                    if (o > max_occupancy) {
+                                    if (occupancy > max_occupancy) {
                                         data_count++;
                                         // Update max
                                         max_mean_occupancy = child_data.occupancy;
                                         max_weight = child_data.weight;
                                         max_occupancy = max_mean_occupancy * max_weight;
                                     }
-                                    else if (o < o_min) {
+                                    else if (occupancy < min_occupancy) {
                                         min_data.occupancy = child_data.occupancy;
                                         min_data.weight = child_data.weight;
-                                        o_min = o;
+                                        min_occupancy = occupancy;
                                     }
                                 }
 
@@ -242,10 +242,10 @@ inline void propagateBlockToCoarsestScale(se::OctantBase* octant_ptr)
                     }         // k
 
                     if (data_count > 0) {
-                        target_max_data.occupancy = max_mean_occupancy;
-                        target_max_data.weight = max_weight;
+                        parent_max_data.occupancy = max_mean_occupancy;
+                        parent_max_data.weight = max_weight;
                         if (observed_count == 8) {
-                            target_max_data.observed =
+                            parent_max_data.observed =
                                 true; // TODO: We don't set the observed count to true for mean values
                         }
                     }
@@ -255,20 +255,20 @@ inline void propagateBlockToCoarsestScale(se::OctantBase* octant_ptr)
         }         // z
     }
     else {
-        DataType* max_data_at_target_scale = block_ptr->blockMaxDataAtScale(target_scale);
-        DataType* data_at_target_scale = block_ptr->blockDataAtScale(target_scale);
+        DataType* max_data_at_parent_scale = block_ptr->blockMaxDataAtScale(parent_scale);
+        DataType* data_at_parent_scale = block_ptr->blockDataAtScale(parent_scale);
         DataType* data_at_child_scale = block_ptr->blockDataAtScale(child_scale);
 
         min_data = data_at_child_scale[0];
-        o_min = min_data.occupancy * min_data.weight;
+        min_occupancy = min_data.occupancy * min_data.weight;
 
-        for (unsigned int z = 0; z < size_at_target_scale_li; z++) {
-            for (unsigned int y = 0; y < size_at_target_scale_li; y++) {
-                for (unsigned int x = 0; x < size_at_target_scale_li; x++) {
-                    const int target_data_idx =
-                        x + y * size_at_target_scale_li + z * size_at_target_scale_sq;
-                    auto& target_data = data_at_target_scale[target_data_idx];
-                    auto& target_max_data = max_data_at_target_scale[target_data_idx];
+        for (int z = 0; z < size_at_parent_scale_li; z++) {
+            for (int y = 0; y < size_at_parent_scale_li; y++) {
+                for (int x = 0; x < size_at_parent_scale_li; x++) {
+                    const int parent_data_idx =
+                        x + y * size_at_parent_scale_li + z * size_at_parent_scale_sq;
+                    auto& parent_data = data_at_parent_scale[parent_data_idx];
+                    auto& parent_max_data = max_data_at_parent_scale[parent_data_idx];
 
                     se::field_t mean_occupancy = 0;
                     se::weight_t mean_weight = 0;
@@ -277,12 +277,12 @@ inline void propagateBlockToCoarsestScale(se::OctantBase* octant_ptr)
                     se::weight_t max_weight = 0;
                     se::field_t max_occupancy = -std::numeric_limits<se::field_t>::max();
 
-                    int observed_count = 0;
-                    int data_count = 0;
+                    size_t observed_count = 0;
+                    size_t data_count = 0;
 
-                    for (unsigned int k = 0; k < 2; k++) {
-                        for (unsigned int j = 0; j < 2; j++) {
-                            for (unsigned int i = 0; i < 2; i++) {
+                    for (int k = 0; k < 2; k++) {
+                        for (int j = 0; j < 2; j++) {
+                            for (int i = 0; i < 2; i++) {
                                 const int child_data_idx = (2 * x + i)
                                     + (2 * y + j) * size_at_child_scale_li
                                     + (2 * z + k) * size_at_child_scale_sq;
@@ -294,18 +294,19 @@ inline void propagateBlockToCoarsestScale(se::OctantBase* octant_ptr)
                                     mean_occupancy += child_data.occupancy;
                                     mean_weight += child_data.weight;
 
-                                    float o = (child_data.occupancy * child_data.weight);
+                                    se::field_t occupancy =
+                                        (child_data.occupancy * child_data.weight);
 
-                                    if (o > max_occupancy) {
+                                    if (occupancy > max_occupancy) {
                                         // Update max
                                         max_mean_occupancy = child_data.occupancy;
                                         max_weight = child_data.weight;
                                         max_occupancy = max_mean_occupancy * max_weight;
                                     }
-                                    else if (o > o_min) {
+                                    else if (occupancy > min_occupancy) {
                                         min_data.occupancy = child_data.occupancy;
                                         min_data.weight = child_data.weight;
-                                        o_min = o;
+                                        min_occupancy = occupancy;
                                     }
                                 }
 
@@ -318,14 +319,14 @@ inline void propagateBlockToCoarsestScale(se::OctantBase* octant_ptr)
                     }         // k
 
                     if (data_count > 0) {
-                        target_data.occupancy = mean_occupancy / data_count;
-                        target_data.weight = ceil((float) mean_weight) / data_count;
-                        target_data.observed = false;
+                        parent_data.occupancy = mean_occupancy / data_count;
+                        parent_data.weight = ceil((float) mean_weight) / data_count;
+                        parent_data.observed = false;
 
-                        target_max_data.occupancy = max_mean_occupancy;
-                        target_max_data.weight = max_weight;
+                        parent_max_data.occupancy = max_mean_occupancy;
+                        parent_max_data.weight = max_weight;
                         if (observed_count == 8) {
-                            target_max_data.observed =
+                            parent_max_data.observed =
                                 true; // TODO: We don't set the observed count to true for mean values
                         }
                     }
@@ -337,26 +338,26 @@ inline void propagateBlockToCoarsestScale(se::OctantBase* octant_ptr)
 
 
 
-    for (target_scale += 1; target_scale <= BlockT::getMaxScale(); ++target_scale) {
-        unsigned int size_at_target_scale_li = BlockT::size >> target_scale;
-        unsigned int size_at_target_scale_sq = se::math::sq(size_at_target_scale_li);
+    for (parent_scale += 1; parent_scale <= BlockT::getMaxScale(); ++parent_scale) {
+        size_at_parent_scale_li = BlockT::size >> parent_scale;
+        size_at_parent_scale_sq = se::math::sq(size_at_parent_scale_li);
 
-        int child_scale = target_scale - 1;
-        unsigned int size_at_child_scale_li = BlockT::size >> child_scale;
-        unsigned int size_at_child_scale_sq = se::math::sq(size_at_child_scale_li);
+        child_scale = parent_scale - 1;
+        size_at_child_scale_li = BlockT::size >> child_scale;
+        size_at_child_scale_sq = se::math::sq(size_at_child_scale_li);
 
-        DataType* max_data_at_target_scale = block_ptr->blockMaxDataAtScale(target_scale);
-        DataType* data_at_target_scale = block_ptr->blockDataAtScale(target_scale);
+        DataType* max_data_at_parent_scale = block_ptr->blockMaxDataAtScale(parent_scale);
+        DataType* data_at_parent_scale = block_ptr->blockDataAtScale(parent_scale);
         DataType* max_data_at_child_scale = block_ptr->blockMaxDataAtScale(child_scale);
         DataType* data_at_child_scale = block_ptr->blockDataAtScale(child_scale);
 
-        for (unsigned int z = 0; z < size_at_target_scale_li; z++) {
-            for (unsigned int y = 0; y < size_at_target_scale_li; y++) {
-                for (unsigned int x = 0; x < size_at_target_scale_li; x++) {
-                    const int target_data_idx =
-                        x + y * size_at_target_scale_li + z * size_at_target_scale_sq;
-                    auto& target_data = data_at_target_scale[target_data_idx];
-                    auto& target_max_data = max_data_at_target_scale[target_data_idx];
+        for (int z = 0; z < size_at_parent_scale_li; z++) {
+            for (int y = 0; y < size_at_parent_scale_li; y++) {
+                for (int x = 0; x < size_at_parent_scale_li; x++) {
+                    const int parent_data_idx =
+                        x + y * size_at_parent_scale_li + z * size_at_parent_scale_sq;
+                    auto& parent_data = data_at_parent_scale[parent_data_idx];
+                    auto& parent_max_data = max_data_at_parent_scale[parent_data_idx];
 
                     se::field_t mean_occupancy = 0;
                     se::weight_t mean_weight = 0;
@@ -365,12 +366,12 @@ inline void propagateBlockToCoarsestScale(se::OctantBase* octant_ptr)
                     se::weight_t max_weight = 0;
                     se::field_t max_occupancy = -std::numeric_limits<float>::max();
 
-                    int observed_count = 0;
-                    int data_count = 0;
+                    size_t observed_count = 0;
+                    size_t data_count = 0;
 
-                    for (unsigned int k = 0; k < 2; k++) {
-                        for (unsigned int j = 0; j < 2; j++) {
-                            for (unsigned int i = 0; i < 2; i++) {
+                    for (int k = 0; k < 2; k++) {
+                        for (int j = 0; j < 2; j++) {
+                            for (int i = 0; i < 2; i++) {
                                 const int child_data_idx = (2 * x + i)
                                     + (2 * y + j) * size_at_child_scale_li
                                     + (2 * z + k) * size_at_child_scale_sq;
@@ -401,14 +402,14 @@ inline void propagateBlockToCoarsestScale(se::OctantBase* octant_ptr)
                     }         // k
 
                     if (data_count > 0) {
-                        target_data.occupancy = mean_occupancy / data_count;
-                        target_data.weight = ceil((float) mean_weight) / data_count;
-                        target_data.observed = false;
+                        parent_data.occupancy = mean_occupancy / data_count;
+                        parent_data.weight = ceil((float) mean_weight) / data_count;
+                        parent_data.observed = false;
 
-                        target_max_data.occupancy = max_mean_occupancy;
-                        target_max_data.weight = max_weight;
+                        parent_max_data.occupancy = max_mean_occupancy;
+                        parent_max_data.weight = max_weight;
                         if (observed_count == 8) {
-                            target_max_data.observed =
+                            parent_max_data.observed =
                                 true; // TODO: We don't set the observed count to true for mean values
                         }
                     }
@@ -419,115 +420,6 @@ inline void propagateBlockToCoarsestScale(se::OctantBase* octant_ptr)
     }
 
     block_ptr->setMinData(min_data);
-}
-
-
-
-template<typename BlockT>
-inline void maxCoarsePropagation(const se::OctantBase* octant_ptr,
-                                 const Eigen::Vector3i target_coord,
-                                 const int target_scale,
-                                 const unsigned int target_stride,
-                                 typename BlockT::DataType& target_data)
-{
-    BlockT* block_ptr = static_cast<BlockT*>(octant_ptr);
-
-    se::field_t max_mean_occupancy = -std::numeric_limits<se::field_t>::max();
-    se::weight_t max_weight = 0;
-    se::field_t max_occupancy = -std::numeric_limits<se::field_t>::max();
-    unsigned int observed_count = 0;
-    unsigned int data_count = 0;
-
-    int child_scale = target_scale - 1;
-    unsigned int child_stride = target_stride >> 1; ///<< Halfen target stride
-
-    for (unsigned int k = 0; k < target_stride; k += child_stride) {
-        for (unsigned int j = 0; j < target_stride; j += child_stride) {
-            for (unsigned int i = 0; i < target_stride; i += child_stride) {
-                const auto child_data =
-                    block_ptr->data(target_coord + Eigen::Vector3i(i, j, k), child_scale);
-                /// Only compare partly observed children (child_data.weight > 0)
-                /// max_mean_occupancy is the product of data.occupancy * data.weight (i.e. not the mean log-odd occupancy)
-                if (child_data.weight > 0
-                    && ((child_data.occupancy * child_data.weight) > max_occupancy)) {
-                    data_count++;
-                    max_mean_occupancy = child_data.occupancy;
-                    max_weight = child_data.weight;
-                    max_occupancy = max_mean_occupancy * max_weight;
-                }
-
-                if (child_data.observed) {
-                    observed_count++;
-                }
-
-            } // i
-        }     // j
-    }         // k
-
-    if (data_count > 0) {
-        target_data.occupancy = max_mean_occupancy;
-        target_data.weight = max_weight;
-        if (observed_count
-            == 8) { ///<< If all children have been observed, set parent/target to observed.
-            target_data.observed = true;
-        }
-    }
-}
-
-
-
-template<typename BlockT>
-inline void meanCoarsePropagation(const se::OctantBase* octant_ptr,
-                                  const Eigen::Vector3i target_coord,
-                                  const int target_scale,
-                                  const unsigned int target_stride,
-                                  typename BlockT::DataType& target_data)
-{
-    BlockT* block_ptr = static_cast<BlockT*>(octant_ptr);
-
-    se::field_t mean_occupancy = 0;
-    se::weight_t mean_weight = 0;
-    unsigned int observed_count = 0;
-    unsigned int data_count = 0;
-
-    int child_scale = target_scale - 1;
-    unsigned int child_stride = target_stride >> 1;
-
-    for (unsigned int k = 0; k < target_stride; k += child_stride) {
-        for (unsigned int j = 0; j < target_stride; j += child_stride) {
-            for (unsigned int i = 0; i < target_stride; i += child_stride) {
-                auto child_data =
-                    block_ptr->data(target_coord + Eigen::Vector3i(i, j, k), child_scale);
-                if (child_data.weight > 0) {
-                    data_count++;
-                    mean_occupancy += child_data.occupancy;
-                    mean_weight += child_data.weight;
-                }
-                if (child_data.observed) {
-                    observed_count++;
-                }
-            }
-        }
-    }
-
-    if (data_count == 8) {
-        target_data.occupancy = mean_occupancy / data_count;
-        target_data.weight = ((float) mean_weight) / data_count;
-        target_data.observed = true;
-    }
-}
-
-
-
-template<typename BlockT>
-inline void propagateToVoxelAtCoarserScale(const se::OctantBase* octant_ptr,
-                                           const Eigen::Vector3i voxel_coord,
-                                           const int target_scale,
-                                           const unsigned int target_stride,
-                                           typename BlockT::DataType& voxel_data)
-{
-    BlockT* block_ptr = static_cast<BlockT*>(octant_ptr);
-    maxCoarsePropagation(block_ptr, voxel_coord, target_scale, target_stride, voxel_data);
 }
 
 
