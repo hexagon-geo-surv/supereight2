@@ -74,7 +74,7 @@ make download-icl-nuim
 Copy the configuration file into the dataset folder and run supereight:
 
 ``` sh
-./build/release/se_app/main_tsdf_multi PATH/TO/dataset/living_room_traj0_frei_png/config.yaml
+./build/release/app/supereight_tsdf_single_pinholecamera PATH/TO/dataset/living_room_traj0_frei_png/config.yaml
 ```
 
 ### 1. Setting up a map
