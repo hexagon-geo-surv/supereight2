@@ -1,5 +1,7 @@
 # Supereight 2.0
 
+Welcome to supereight 2.0: a high performance template octree library and a dense volumetric SLAM pipeline implementation.
+
 Supereight 2.0 is a complete rewrite of the
 [original supereight](https://github.com/emanuelev/supereight). It adds
 [state-of-the-art mapping features](https://arxiv.org/abs/2010.07929) while also
