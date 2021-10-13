@@ -298,6 +298,45 @@ Internally the integrator is split in an allocator and an updater.
 | TSDF       | Multi      | Ray-casting    | Custom       |
 | Occupancy  | Multi      | Volume-carving | Custom       |
 
+### 5. Outputs
+
+#### Mesh
+The mesh can be extracted from the map using its `se::Map::saveMesh()` function. Internally the function runs a marching cube algorithm on the 
+primal grid (single-res implementation) or dual grid (multi-res implementation). The mesh can be saved
+as a `.ply`, `.obj` or `.vtk` file. Based on the provided filename the according type will be saved.
+
+```cpp
+// Example
+map.saveMesh("./out/mesh.ply");
+```
+
+#### Structure
+The map's underlying octree structure up to block level can saved using `se::Map::saveStructure()` function. 
+The structure can be saved as a `.ply`, `.obj` or `.vtk` file. Based on the provided filename the according type will be saved.
+
+```cpp
+map.saveStructure("./out/struct.ply");
+```
+
+#### Slice
+Slices through the TSDF/occupancy field of the map can be saved using the `se::Map::saveFieldSlice()` function. The field can only be saved as a `.vtk` file.
+Given a position `t_WS` three axis aligned slices located at the `t_WS.x()` (y-z plane), `t_WS.y()` (x-z plane) and `t_WS.z()` (x-y plane)
+will be saved.
+
+```cpp
+// Example
+map.saveFieldSlice("./out/slice", t_WS);
+```
+
+#### Visualisation
+The file formats can be visualised with the following software (non-exhaustive):
+
+| File type | Solution                                                                                                                 |
+|-----------|--------------------------------------------------------------------------------------------------------------------------|
+| `.ply`    | [CloudCompare](https://www.danielgm.net/cc/), [MeshLab](https://www.meshlab.net/), [ParaView](https://www.paraview.org/) |
+| `.obj`    | [MeshLab](https://www.meshlab.net/), [ParaView](https://www.paraview.org/)                                               |
+| `.vtk`    | [ParaView](https://www.paraview.org/)                                                                                    |
+
 ## License
 
 Copyright 2018-2019 Emanuele Vespa</br>
