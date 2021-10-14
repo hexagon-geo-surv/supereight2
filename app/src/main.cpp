@@ -9,6 +9,7 @@
 
 #include "config.hpp"
 #include "draw.hpp"
+#include "montage.hpp"
 #include "reader.hpp"
 #include "se/common/filesystem.hpp"
 
@@ -166,14 +167,22 @@ int main(int argc, char** argv)
         // Visualise rgba, depth, tracking data and the volume render (if enabled)
         TICK("draw")
         if (config.app.enable_gui) {
-            drawthem(output_rgba_img_data,
-                     processed_img_res,
-                     output_depth_img_data,
-                     processed_img_res,
-                     output_tracking_img_data,
-                     processed_img_res,
-                     output_volume_img_data,
-                     processed_img_res);
+            // Create vectors of images and labels.
+            cv::Size res(processed_img_res.x(), processed_img_res.y());
+            std::vector<cv::Mat> images;
+            std::vector<std::string> labels;
+            labels.emplace_back("Input RGB");
+            images.emplace_back(res, CV_8UC4, output_rgba_img_data);
+            labels.emplace_back("Input depth");
+            images.emplace_back(res, CV_8UC4, output_depth_img_data);
+            labels.emplace_back(config.app.enable_ground_truth ? "Tracking disabled" : "Tracking");
+            images.emplace_back(res, CV_8UC4, output_tracking_img_data);
+            labels.emplace_back("3D render");
+            images.emplace_back(res, CV_8UC4, output_volume_img_data);
+            // Combine all the images into one, overlay the labels and show it.
+            cv::Mat render = se::montage(2, 2, images, labels);
+            drawit(reinterpret_cast<uint32_t*>(render.data),
+                   Eigen::Vector2i(render.cols, render.rows));
         }
         TOCK("draw")
 

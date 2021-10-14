@@ -54,7 +54,7 @@ foreach(APP_CONFIG ${SE_APP_CONFIG})
 
   # Compile the app using the generated file.
   set(EXE_NAME "supereight_${FIELD_LC}_${RES_LC}_${SENSOR_LC}")
-  add_executable(${EXE_NAME} ${GENERATED_MAIN})
+  add_executable(${EXE_NAME} ${GENERATED_MAIN} "src/montage.cpp")
   target_include_directories(${EXE_NAME} BEFORE PRIVATE include)
   target_link_libraries(${EXE_NAME} PRIVATE SE::Supereight ${LIB_NAME})
   # Allow handling large files in 32-bit systems
