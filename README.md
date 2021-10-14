@@ -7,22 +7,6 @@ Supereight 2.0 is a complete rewrite of the
 [state-of-the-art mapping features](https://arxiv.org/abs/2010.07929) while also
 making the library more flexible and easier to use.
 
-If you use supereight 2.0 in your work, please cite
-
-``` bibtex
-@Article{Funk_RAL2021,
-  author  = {Nils Funk and Juan Tarrio and Sotiris Papatheodorou and Marija Popovi\'{c} and Pablo F. Alcantarilla and Stefan Leutenegger},
-  title   = {Multi-Resolution {3D} Mapping with Explicit Free Space Representation for Fast and Accurate Mobile Robot Motion Planning},
-  journal = {IEEE Robotics and Automation Letters},
-  year    = {2021},
-  volume  = {6},
-  number  = {2},
-  pages   = {3553--3560},
-  month   = apr,
-  issn    = {2377-3766},
-}
-```
-
 Supereight 2.0 follows [semantic versioning](https://semver.org/).
 
 ## Build
@@ -336,6 +320,53 @@ The file formats can be visualised with the following software (non-exhaustive):
 | `.ply`    | [CloudCompare](https://www.danielgm.net/cc/), [MeshLab](https://www.meshlab.net/), [ParaView](https://www.paraview.org/) |
 | `.obj`    | [MeshLab](https://www.meshlab.net/), [ParaView](https://www.paraview.org/)                                               |
 | `.vtk`    | [ParaView](https://www.paraview.org/)                                                                                    |
+
+## References
+
+If you use supereight 2.0 in your work, please cite
+
+``` bibtex
+@ARTICLE{Vespa_RAL2018,
+  author={Vespa, Emanuele and Nikolov, Nikolay and Grimm, Marius and Nardi, Luigi and Kelly, Paul H. J. and Leutenegger, Stefan},
+  journal={IEEE Robotics and Automation Letters}, 
+  title={Efficient Octree-Based Volumetric {SLAM} Supporting Signed-Distance and Occupancy Mapping}, 
+  year={2018},
+  volume={3},
+  number={2},
+  pages={1144-1151},
+  doi={10.1109/LRA.2018.2792537}}
+}
+```
+
+Additionally, if you are using MultiresOFusion or MultiresTSDF, please cite
+
+``` bibtex
+@ARTICLE{Funk_RAL2021,
+  author  = {Nils Funk and Juan Tarrio and Sotiris Papatheodorou and Marija Popovi\'{c} and Pablo F. Alcantarilla and Stefan Leutenegger},
+  title   = {Multi-Resolution {3D} Mapping with Explicit Free Space Representation for Fast and Accurate Mobile Robot Motion Planning},
+  journal = {IEEE Robotics and Automation Letters},
+  year    = {2021},
+  volume  = {6},
+  number  = {2},
+  pages   = {3553--3560},
+  month   = apr,
+  issn    = {2377-3766},
+}
+```
+or
+``` bibtex
+@INPROCEEDINGS{Vespa_3DV2019,
+  author={Vespa, Emanuele and Funk, Nils and Kelly, Paul H. J. and Leutenegger, Stefan},
+  booktitle={2019 International Conference on 3D Vision (3DV)}, 
+  title={Adaptive-Resolution Octree-Based Volumetric {SLAM}}, 
+  year={2019},
+  volume={},
+  number={},
+  pages={654-662},
+  doi={10.1109/3DV.2019.00077}}
+}
+```
+respectively.
 
 ## License
 
