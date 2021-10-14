@@ -284,8 +284,14 @@ Internally the integrator is split in an allocator and an updater.
 
 ### 5. Outputs
 
+#### GUI
+
+If GLUT is available and `enable_gui` is `true` in the config file then the
+input RGB and depth images, the tracking result and a 3D render from the current
+camera pose will be shown.
+
 #### Mesh
-The mesh can be extracted from the map using its `se::Map::saveMesh()` function. Internally the function runs a marching cube algorithm on the 
+The mesh can be extracted from the map using its `se::Map::saveMesh()` function. Internally the function runs a marching cube algorithm on the
 primal grid (single-res implementation) or dual grid (multi-res implementation). The mesh can be saved
 as a `.ply`, `.obj` or `.vtk` file. Based on the provided filename the according type will be saved.
 
@@ -295,7 +301,7 @@ map.saveMesh("./out/mesh.ply");
 ```
 
 #### Structure
-The map's underlying octree structure up to block level can saved using `se::Map::saveStructure()` function. 
+The map's underlying octree structure up to block level can saved using `se::Map::saveStructure()` function.
 The structure can be saved as a `.ply`, `.obj` or `.vtk` file. Based on the provided filename the according type will be saved.
 
 ```cpp
