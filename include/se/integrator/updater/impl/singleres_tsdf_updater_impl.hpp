@@ -72,7 +72,7 @@ void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Single, BlockSize>,
 
                     // Update the TSDF
                     const float m = sensor_.measurementFromPoint(point_S);
-                    const float sdf_value = (depth_value - m) / m * point_S.norm();
+                    const se::field_t sdf_value = (depth_value - m) / m * point_S.norm();
 
                     DataType& data = block_ptr->getData(voxel_coord);
                     updateVoxel(data, sdf_value);
