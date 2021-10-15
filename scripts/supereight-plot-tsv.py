@@ -81,7 +81,7 @@ class Stats:
         columns = header.strip().split("\t")
         for i, c in enumerate(columns):
             # Extract the name and its unit.
-            unit_idx = c.rfind(" [")
+            unit_idx = c.rfind(" (")
             if unit_idx >= 0:
                 name = c[0:unit_idx].strip()
                 unit = c[unit_idx+2:-1].strip()
@@ -89,7 +89,7 @@ class Stats:
                 name = c.strip()
                 unit = ""
             # Set the unit to empty if it's not a unit.
-            if unit in ["#", "-"]:
+            if unit in ["#", "-", "?"]:
                 unit = ""
             stats_by_name[name] = QuantityValues(name, unit)
             # The following will create a reference, not a copy.

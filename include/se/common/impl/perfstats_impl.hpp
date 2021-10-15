@@ -170,43 +170,43 @@ inline std::string PerfStats::Stats::unitString()
 {
     switch (type_) {
     case BOOL:
-        return "[bool]";
+        return "(bool)";
     case DOUBLE:
-        return "[double]";
+        return "(double)";
     case COORDINATES:
-        return "[voxel]";
+        return "(voxel)";
     case COUNT:
-        return "[count]";
+        return "(count)";
     case CURRENT:
-        return "[I]";
+        return "(I)";
     case DISTANCE:
-        return "[dm]";
+        return "(m)";
     case DURATION:
-        return "[ds]";
+        return "(s)";
     case ENERGY:
-        return "[J]";
+        return "(J)";
     case FRAME:
-        return "[#]";
+        return "(#)";
     case FREQUENCY:
-        return "[1/s]";
+        return "(Hz)";
     case INT:
-        return "[int]";
+        return "(int)";
     case ITERATION:
-        return "[#]";
+        return "(#)";
     case MEMORY:
-        return "[MB]";
+        return "(MB)";
     case ORIENTATION:
-        return "[-]";
+        return "(-)";
     case POSITION:
-        return "[m]";
+        return "(m)";
     case POWER:
-        return "[W]";
+        return "(W)";
     case TIME:
-        return "[s]";
+        return "(s)";
     case VOLTAGE:
-        return "[V]";
+        return "(V)";
     default: // { UNDEFINED }
-        return "[und.]";
+        return "(?)";
     }
 }
 
