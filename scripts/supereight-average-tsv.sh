@@ -13,8 +13,9 @@ fi
 awk_program='
 # This is the awk way of testing whether something is a number.
 function is_num(x) { return x + 0 == x }
-# Set the input and output column (field) separator to tab.
-BEGIN { FS = "\t"; OFS = "\t" }
+# Set the input and output column (field) separator to tab. Use 6 decimal digits
+# for printing numbers.
+BEGIN { FS = "\t"; OFS = "\t"; CONVFMT = "%.6f" }
 # Print the header (first) line.
 NR == 1
 # Accumulate the numerical values of each column for all other lines.
