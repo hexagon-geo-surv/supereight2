@@ -28,6 +28,7 @@ void point_cloud_to_normal(se::Image<Eigen::Vector3f>& normals,
 template<typename MapT>
 inline typename std::enable_if_t<MapT::fld_ == se::Field::Occupancy, std::optional<Eigen::Vector4f>>
 raycast(MapT& map,
+        const typename MapT::OctreeType& octree,
         const Eigen::Vector3f& ray_origin_W,
         const Eigen::Vector3f& ray_dir_W,
         const float t_near,
@@ -39,6 +40,7 @@ raycast(MapT& map,
 template<typename MapT>
 inline typename std::enable_if_t<MapT::fld_ == se::Field::TSDF, std::optional<Eigen::Vector4f>>
 raycast(MapT& map,
+        const typename MapT::OctreeType& octree,
         const Eigen::Vector3f& ray_origin_W,
         const Eigen::Vector3f& ray_dir_W,
         const float t_near,

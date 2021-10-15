@@ -197,6 +197,7 @@ inline float compute_map_intersection(const MapT& map,
  */
 template<typename MapT>
 inline void advance_ray(const MapT& map,
+                        const typename MapT::OctreeType& octree,
                         const Eigen::Vector3f& ray_origin_W,
                         const Eigen::Vector3f& ray_dir_W,
                         float& t,
@@ -218,10 +219,10 @@ inline void advance_ray(const MapT& map,
     Eigen::Vector3f V_max = Eigen::Vector3f::Ones();
 
 
-    Eigen::Vector3f delta_V_map = map.getOctree()->getSize()
+    Eigen::Vector3f delta_V_map = octree.getSize()
         / ray_dir_W.array().abs(); // [voxel]/[-], potentionally dividing by 0
 
-    Eigen::Vector3f map_frac = ray_origin_coord_f / map.getOctree()->getSize();
+    Eigen::Vector3f map_frac = ray_origin_coord_f / octree.getSize();
     // V at which the map boundary gets crossed (separate V for each dimension x-y-z)
     Eigen::Vector3f v_map;
     if (ray_dir_W.x() < 0) {
@@ -251,12 +252,12 @@ inline void advance_ray(const MapT& map,
     t_far = voxel_dim * v_far;                                                        // [m]
 
     typename MapT::OctreeType::DataType data =
-        se::visitor::getMaxData(*(map.getOctree()), ray_origin_coord_f.cast<int>(), max_scale);
+        se::visitor::getMaxData(octree, ray_origin_coord_f.cast<int>(), scale);
 
     while (data.occupancy * data.weight > -0.2f && scale > 2) { // TODO Verify
         scale -= 1;
         data =
-            se::visitor::getMaxData(*(map.getOctree()), ray_origin_coord_f.cast<int>(), max_scale);
+            se::visitor::getMaxData(octree, ray_origin_coord_f.cast<int>(), scale);
     }
 
     Eigen::Vector3f ray_coord_f = ray_origin_coord_f;
@@ -311,17 +312,17 @@ inline void advance_ray(const MapT& map,
         v_add += V_min + 0.01;
         ray_coord_f = (v + v_add) * ray_dir_W + ray_origin_coord_f;
 
-        data = se::visitor::getMaxData(*(map.getOctree()), ray_coord_f.cast<int>(), scale);
+        data = se::visitor::getMaxData(octree, ray_coord_f.cast<int>(), scale);
 
         if (data.occupancy * data.weight > -0.2f) {
             while (data.occupancy * data.weight > -0.2f && scale > 2) {
                 scale -= 1;
-                data = se::visitor::getMaxData(*(map.getOctree()), ray_coord_f.cast<int>(), scale);
+                data = se::visitor::getMaxData(octree, ray_coord_f.cast<int>(), scale);
             }
         }
         else {
             for (int s = scale + 1; s <= max_scale; s++) {
-                data = se::visitor::getMaxData(*(map.getOctree()), ray_coord_f.cast<int>(), s);
+                data = se::visitor::getMaxData(octree, ray_coord_f.cast<int>(), s);
 
                 if (data.occupancy * data.weight > -0.2f) {
                     break;
@@ -351,6 +352,7 @@ inline void advance_ray(const MapT& map,
 template<typename MapT>
 inline typename std::enable_if_t<MapT::fld_ == se::Field::Occupancy, std::optional<Eigen::Vector4f>>
 raycast(MapT& map,
+        const typename MapT::OctreeType& octree,
         const Eigen::Vector3f& ray_origin_W,
         const Eigen::Vector3f& ray_dir_W,
         float /* t_near */,
@@ -371,10 +373,10 @@ raycast(MapT& map,
 
     const int max_scale = std::min(
         7,
-        map.getOctree()->getMaxScale()
+        octree.getMaxScale()
             - 1); // Max possible free space skipped per iteration (node size = 2^max_scale)
 
-    advance_ray(map, ray_origin_W, ray_dir_W, t, t_far, max_scale, is_valid);
+    advance_ray(map, octree, ray_origin_W, ray_dir_W, t, t_far, max_scale, is_valid);
 
     if (!is_valid) {
         // Ray passes only through free space or intersects with the map before t_near or after t_far.
@@ -461,6 +463,7 @@ raycast(MapT& map,
 template<typename MapT>
 inline typename std::enable_if_t<MapT::fld_ == se::Field::TSDF, std::optional<Eigen::Vector4f>>
 raycast(MapT& map,
+        const typename MapT::OctreeType& /* octree */,
         const Eigen::Vector3f& ray_origin_W,
         const Eigen::Vector3f& ray_dir_W,
         const float t_near,
@@ -543,6 +546,7 @@ void raycast_volume(const MapT& map,
                     const Eigen::Matrix4f& T_WS,
                     const SensorT& sensor)
 {
+    const typename MapT::OctreeType& octree = *(map.getOctree());
 #pragma omp parallel for
     for (int y = 0; y < surface_point_cloud_W.height(); y++) {
 #pragma omp simd
@@ -555,7 +559,7 @@ void raycast_volume(const MapT& map,
                 (se::math::to_rotation(T_WS) * ray_dir_S.normalized()).head(3);
             const Eigen::Vector3f t_WS = se::math::to_translation(T_WS);
             std::optional<Eigen::Vector4f> surface_intersection_W = raycast(
-                map, t_WS, ray_dir_W, sensor.nearDist(ray_dir_S), sensor.farDist(ray_dir_S));
+                map, octree, t_WS, ray_dir_W, sensor.nearDist(ray_dir_S), sensor.farDist(ray_dir_S));
 
             if (surface_intersection_W) {
                 // Set surface scale
