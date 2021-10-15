@@ -138,7 +138,7 @@ int main(int argc, char** argv)
         // Raycast from T_MS
         TICK("raycast")
         if (config.app.enable_rendering || !config.app.enable_ground_truth) {
-            se::raycaster::raycastVolume(
+            se::raycaster::raycast_volume(
                 map, surface_point_cloud_W, surface_normals_W, surface_scale, T_WS, sensor);
         }
         TOCK("raycast")
@@ -153,7 +153,7 @@ int main(int argc, char** argv)
                 processed_depth_img, sensor.near_plane, sensor.far_plane, output_depth_img_data);
             tracker.renderTrackingResult(output_tracking_img_data);
             if (frame % config.app.rendering_rate == 0) {
-                se::raycaster::renderVolumeKernel(output_volume_img_data,
+                se::raycaster::render_volume_kernel(output_volume_img_data,
                                                   processed_img_res,
                                                   se::math::to_translation(T_WS),
                                                   ambient,

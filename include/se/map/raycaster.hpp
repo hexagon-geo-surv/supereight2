@@ -48,20 +48,20 @@ raycast(MapT& map,
         const float largestep);
 
 template<typename MapT, typename SensorT>
-void raycastVolume(const MapT& map,
-                   se::Image<Eigen::Vector3f>& surface_point_cloud_W,
-                   se::Image<Eigen::Vector3f>& surface_normals_W,
-                   se::Image<int8_t>& surface_scale,
-                   const Eigen::Matrix4f& T_WS,
-                   const SensorT& sensor);
+void raycast_volume(const MapT& map,
+                    se::Image<Eigen::Vector3f>& surface_point_cloud_W,
+                    se::Image<Eigen::Vector3f>& surface_normals_W,
+                    se::Image<int8_t>& surface_scale,
+                    const Eigen::Matrix4f& T_WS,
+                    const SensorT& sensor);
 
-void renderVolumeKernel(uint32_t* volume_RGBA_image_data,
-                        const Eigen::Vector2i& volume_RGBA_image_res,
-                        const Eigen::Vector3f& light_W,
-                        const Eigen::Vector3f& ambient_W,
-                        const se::Image<Eigen::Vector3f>& surface_point_cloud_W,
-                        const se::Image<Eigen::Vector3f>& surface_normals_W,
-                        const se::Image<int8_t>& surface_scale);
+void render_volume_kernel(uint32_t* volume_RGBA_image_data,
+                          const Eigen::Vector2i& volume_RGBA_image_res,
+                          const Eigen::Vector3f& light_W,
+                          const Eigen::Vector3f& ambient_W,
+                          const se::Image<Eigen::Vector3f>& surface_point_cloud_W,
+                          const se::Image<Eigen::Vector3f>& surface_normals_W,
+                          const se::Image<int8_t>& surface_scale);
 
 
 
