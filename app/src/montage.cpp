@@ -95,4 +95,3 @@ cv::Mat montage(int montage_width,
 }
 
 } // namespace se
-

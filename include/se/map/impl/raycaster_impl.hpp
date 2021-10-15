@@ -219,8 +219,8 @@ inline void advance_ray(const MapT& map,
     Eigen::Vector3f V_max = Eigen::Vector3f::Ones();
 
 
-    Eigen::Vector3f delta_V_map = octree.getSize()
-        / ray_dir_W.array().abs(); // [voxel]/[-], potentionally dividing by 0
+    Eigen::Vector3f delta_V_map =
+        octree.getSize() / ray_dir_W.array().abs(); // [voxel]/[-], potentionally dividing by 0
 
     Eigen::Vector3f map_frac = ray_origin_coord_f / octree.getSize();
     // V at which the map boundary gets crossed (separate V for each dimension x-y-z)
@@ -256,8 +256,7 @@ inline void advance_ray(const MapT& map,
 
     while (data.occupancy * data.weight > -0.2f && scale > 2) { // TODO Verify
         scale -= 1;
-        data =
-            se::visitor::getMaxData(octree, ray_origin_coord_f.cast<int>(), scale);
+        data = se::visitor::getMaxData(octree, ray_origin_coord_f.cast<int>(), scale);
     }
 
     Eigen::Vector3f ray_coord_f = ray_origin_coord_f;
@@ -558,8 +557,13 @@ void raycast_volume(const MapT& map,
             const Eigen::Vector3f ray_dir_W =
                 (se::math::to_rotation(T_WS) * ray_dir_S.normalized()).head(3);
             const Eigen::Vector3f t_WS = se::math::to_translation(T_WS);
-            std::optional<Eigen::Vector4f> surface_intersection_W = raycast(
-                map, octree, t_WS, ray_dir_W, sensor.nearDist(ray_dir_S), sensor.farDist(ray_dir_S));
+            std::optional<Eigen::Vector4f> surface_intersection_W =
+                raycast(map,
+                        octree,
+                        t_WS,
+                        ray_dir_W,
+                        sensor.nearDist(ray_dir_S),
+                        sensor.farDist(ray_dir_S));
 
             if (surface_intersection_W) {
                 // Set surface scale

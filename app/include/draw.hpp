@@ -99,7 +99,7 @@ void drawit(const T* scene, const Eigen::Vector2i& res)
     glutSwapBuffers();
 }
 
-#else  // SE_GLUT
+#else // SE_GLUT
 
 template<typename T>
 void drawit(const T*, const Eigen::Vector2i&)

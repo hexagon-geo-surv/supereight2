@@ -154,12 +154,12 @@ int main(int argc, char** argv)
             tracker.renderTrackingResult(output_tracking_img_data);
             if (frame % config.app.rendering_rate == 0) {
                 se::raycaster::render_volume_kernel(output_volume_img_data,
-                                                  processed_img_res,
-                                                  se::math::to_translation(T_WS),
-                                                  ambient,
-                                                  surface_point_cloud_W,
-                                                  surface_normals_W,
-                                                  surface_scale);
+                                                    processed_img_res,
+                                                    se::math::to_translation(T_WS),
+                                                    ambient,
+                                                    surface_point_cloud_W,
+                                                    surface_normals_W,
+                                                    surface_scale);
             }
         }
         TOCK("render")
