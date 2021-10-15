@@ -21,7 +21,7 @@ NR == 1
 # Accumulate the numerical values of each column for all other lines.
 NR > 1 { for (i = 1; i <= NF; i++) { if (is_num($i)) { s[i] += $i; n[i]++ } } }
 # Create a record with the means of each column and print it.
-END { for (i = 1; i <= NF; i++) $i = s[i]/n[i]; print }'
+END { for (i = 1; i <= NF; i++) { if (n[i]) $i = s[i]/n[i]; else $i = "*" }; print }'
 
 # Process all input files and align their columns at the end.
 while [ "$#" -gt 0 ]; do
