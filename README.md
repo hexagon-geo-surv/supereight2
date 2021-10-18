@@ -327,6 +327,43 @@ The file formats can be visualised with the following software (non-exhaustive):
 | `.obj`    | [MeshLab](https://www.meshlab.net/), [ParaView](https://www.paraview.org/)                                               |
 | `.vtk`    | [ParaView](https://www.paraview.org/)                                                                                    |
 
+## Performance
+The following shows performance of the different pipelines (TSDF, MultiresTSDF and MultiresOFuison) for numerous datasets.
+All pipelines are run at 1cm resolution with a down-sampling factor of x0.5.
+
+### TSDF
+| dataset                     | total (s) | read (s) | integration (s) | raycast (s) |
+| --------------------------- | --------- | -------- | --------------- | ----------- |
+| living_room_traj0_frei_png  | 0.0169    | 0.0078   | 0.0038          | 0.0043      |
+| cow_and_lady                | 0.0253    | 0.0003   | 0.0158          | 0.0082      |
+| rgbd_dataset_freiburg2_desk | 0.0250    | 0.0032   | 0.0105          | 0.0073      |
+| living_room_traj1_frei_png  | 0.0157    | 0.0077   | 0.0032          | 0.0038      |
+| living_room_traj3_frei_png  | 0.0165    | 0.0076   | 0.0035          | 0.0042      |
+| living_room_traj2_frei_png  | 0.0189    | 0.0079   | 0.0053          | 0.0046      |
+| rgbd_dataset_freiburg1_desk | 0.0164    | 0.0040   | 0.0036          | 0.0047      |
+
+### MultiresTSDF
+| dataset                     | total (s) | read (s) | integration (s) | raycast (s) |
+| --------------------------- | --------- | -------- | --------------- | ----------- |
+| living_room_traj0_frei_png  | 0.0211    | 0.0079   | 0.0061          | 0.0062      |
+| cow_and_lady                | 0.0367    | 0.0003   | 0.0247          | 0.0107      |
+| rgbd_dataset_freiburg2_desk | 0.0308    | 0.0003   | 0.0173          | 0.0093      |
+| living_room_traj1_frei_png  | 0.0196    | 0.0078   | 0.0051          | 0.0055      |
+| living_room_traj3_frei_png  | 0.0203    | 0.0076   | 0.0055          | 0.0060      |
+| living_room_traj2_frei_png  | 0.0239    | 0.0079   | 0.0084          | 0.0065      |
+| rgbd_dataset_freiburg1_desk | 0.0170    | 0.0003   | 0.0059          | 0.0068      |
+
+### MultiresOFusion
+| dataset                     | total (s) | read (s) | integration (s) | raycast (s) |
+| --------------------------- | --------- | -------- | --------------- | ----------- |
+| living_room_traj0_frei_png  | 0.0403    | 0.0079   | 0.01442         | 0.0170      |
+| living_room_traj1_frei_png  | 0.0414    | 0.0079   | 0.0161          | 0.0164      |
+| living_room_traj3_frei_png  | 0.0457    | 0.0077   | 0.0145          | 0.0225      |
+| living_room_traj2_frei_png  | 0.0505    | 0.0079   | 0.0204          | 0.0212      |
+| cow_and_lady                | 0.0576    | 0.0003   | 0.0243          | 0.0321      |
+| rgbd_dataset_freiburg2_desk | 0.0578    | 0.0003   | 0.0180          | 0.0364      |
+| rgbd_dataset_freiburg1_desk | 0.0404    | 0.0003   | 0.0069          | 0.0298      |
+
 ## References
 
 If you use supereight 2.0 in your work, please cite
