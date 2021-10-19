@@ -341,22 +341,22 @@ All pipelines are run at 1cm resolution with a down-sampling factor of x0.5.
 | dataset                     | total (s) | read (s) | integration (s) | raycast (s) |
 | --------------------------- | --------- | -------- | --------------- | ----------- |
 | living_room_traj0_frei_png  | 0.0169    | 0.0078   | 0.0038          | 0.0043      |
-| cow_and_lady                | 0.0253    | 0.0003   | 0.0158          | 0.0082      |
-| rgbd_dataset_freiburg2_desk | 0.0250    | 0.0032   | 0.0105          | 0.0073      |
 | living_room_traj1_frei_png  | 0.0157    | 0.0077   | 0.0032          | 0.0038      |
 | living_room_traj3_frei_png  | 0.0165    | 0.0076   | 0.0035          | 0.0042      |
 | living_room_traj2_frei_png  | 0.0189    | 0.0079   | 0.0053          | 0.0046      |
+| cow_and_lady                | 0.0253    | 0.0003   | 0.0158          | 0.0082      |
+| rgbd_dataset_freiburg2_desk | 0.0250    | 0.0032   | 0.0105          | 0.0073      |
 | rgbd_dataset_freiburg1_desk | 0.0164    | 0.0040   | 0.0036          | 0.0047      |
 
 ### MultiresTSDF
 | dataset                     | total (s) | read (s) | integration (s) | raycast (s) |
 | --------------------------- | --------- | -------- | --------------- | ----------- |
 | living_room_traj0_frei_png  | 0.0211    | 0.0079   | 0.0061          | 0.0062      |
-| cow_and_lady                | 0.0367    | 0.0003   | 0.0247          | 0.0107      |
-| rgbd_dataset_freiburg2_desk | 0.0308    | 0.0003   | 0.0173          | 0.0093      |
 | living_room_traj1_frei_png  | 0.0196    | 0.0078   | 0.0051          | 0.0055      |
 | living_room_traj3_frei_png  | 0.0203    | 0.0076   | 0.0055          | 0.0060      |
 | living_room_traj2_frei_png  | 0.0239    | 0.0079   | 0.0084          | 0.0065      |
+| cow_and_lady                | 0.0367    | 0.0003   | 0.0247          | 0.0107      |
+| rgbd_dataset_freiburg2_desk | 0.0308    | 0.0003   | 0.0173          | 0.0093      |
 | rgbd_dataset_freiburg1_desk | 0.0170    | 0.0003   | 0.0059          | 0.0068      |
 
 ### MultiresOFusion
