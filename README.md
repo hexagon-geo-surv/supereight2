@@ -136,7 +136,7 @@ variable (the path to the current user's home directory).
 
 #### ICL NUIM
 
-Use the `./dataset-tools/ICL/icl-nuim-download.sh` script to download the ICL-NUIM datasets in `TUM` format. It will
+Use the `./scripts/icl-nuim-download.sh` script to download the ICL-NUIM datasets in `TUM` format. It will
 download the datasets and handle all the post-processing.
 When downloading the dataset manually the user has to
 
@@ -257,7 +257,7 @@ To convert TUM datasets run
 ./dataset-tools/ICL-NUIM/tum2raw /path/to/dataset /path/to/dataset/scene.raw
 ```
 
-Use the `./dataset-tools/ICL/icl-nuim-download.sh` script to download the ICL NUIM datasets in `TUM` format.
+Use the `./scripts/icl-nuim-download.sh` script to download the ICL NUIM datasets in `TUM` format.
 Read (Section TUM, Subsection ICL NUIM dataset) when downloading the dataset manually.
 
 ##### From Newer College
