@@ -9,7 +9,7 @@ making the library more flexible and easier to use.
 
 Supereight 2 follows [semantic versioning](https://semver.org/).
 
-![MultiresTSDF - ICL NUIM Traj 2 - mesh](./doc/images/tsdf-multi-icl-nuim-traj-2-mesh.png)
+![MultiresTSDF - ICL NUIM Traj 2 - mesh](./doc/images/tsdf-multi-icl-nuim-traj-2-mesh.jpeg)
 
 ## Build
 
@@ -297,7 +297,7 @@ The mesh can be extracted from the map using its `se::Map::saveMesh()` function.
 primal grid (single-res implementation) or dual grid (multi-res implementation). The mesh can be saved
 as a `.ply`, `.obj` or `.vtk` file. Based on the provided filename the according type will be saved.
 
-![MultiresOFusion - Cow and Lady - mesh](./doc/images/occupancy-multi-cow-and-lady-mesh.png)
+![MultiresOFusion - Cow and Lady - mesh](./doc/images/occupancy-multi-cow-and-lady-mesh.jpeg)
 
 ```cpp
 // Example
@@ -322,7 +322,7 @@ will be saved.
 map.saveFieldSlice("./out/slice", t_WS);
 ```
 
-![MultiresOFusion - Cow and Lady - slice](./doc/images/occupancy-multi-cow-and-lady-slice.png)
+![MultiresOFusion - Cow and Lady - slice](./doc/images/occupancy-multi-cow-and-lady-slice.jpeg)
 
 #### Visualisation
 The file formats can be visualised with the following software (non-exhaustive):
