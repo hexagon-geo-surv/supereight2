@@ -251,10 +251,12 @@ dataset/
 
 ##### From TUM
 
-To convert TUM datasets run
+To convert TUM datasets clone [dataset-tools](https://bitbucket.org/smartroboticslab/dataset-tools.git) and run
 
 ``` sh
-./dataset-tools/ICL-NUIM/tum2raw /path/to/dataset /path/to/dataset/scene.raw
+cd dataset-tools/TUM/tum2raw
+make
+./bin/tum2raw /path/to/dataset
 ```
 
 Use the `./scripts/icl-nuim-download.sh` script to download the ICL NUIM datasets in `TUM` format.
@@ -262,10 +264,11 @@ Read (Section TUM, Subsection ICL NUIM dataset) when downloading the dataset man
 
 ##### From Newer College
 
-To convert Newer College datasets run
+To convert Newer College datasets clone [dataset-tools](https://bitbucket.org/smartroboticslab/dataset-tools.git) and run
 
 ``` sh
-./dataset-tools/NewerCollege/newercollege2raw /path/to/dataset /path/to/dataset/scene.raw
+cd dataset-tools/NewerCollege
+./newercollege2raw.py /path/to/dataset
 ```
 
 ### 4. Setting up an integrator and integrate a depth frame
