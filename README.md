@@ -51,6 +51,15 @@ cmake --build .
 
 
 
+## Documentation
+
+Online documentation can be found [here](https://supereight.readthedocs.io).
+
+If you have Doxygen installed you can build a local copy of the documentation in
+`doc/html` by running `make doc`.
+
+
+
 ## Usage example
 
 Download the ICL-NUIM datasets:
