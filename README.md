@@ -309,7 +309,7 @@ The mesh can be extracted from the map using its `se::Map::saveMesh()` function.
 primal grid (single-res implementation) or dual grid (multi-res implementation). The mesh can be saved
 as a `.ply`, `.obj` or `.vtk` file. Based on the provided filename the according type will be saved.
 
-![MultiresOFusion - Cow and Lady - mesh](./doc/images/occupancy-multi-cow-and-lady-mesh.jpeg)
+![MultiresOccupancy - Cow and Lady - mesh](./doc/images/occupancy-multi-cow-and-lady-mesh.jpeg)
 
 ```cpp
 // Example
@@ -334,7 +334,7 @@ will be saved.
 map.saveFieldSlice("./out/slice", t_WS);
 ```
 
-![MultiresOFusion - Cow and Lady - slice](./doc/images/occupancy-multi-cow-and-lady-slice.jpeg)
+![MultiresOccupancy - Cow and Lady - slice](./doc/images/occupancy-multi-cow-and-lady-slice.jpeg)
 
 #### Visualisation
 The file formats can be visualised with the following software (non-exhaustive):
@@ -371,7 +371,7 @@ All pipelines are run at 1cm resolution with a down-sampling factor of x0.5.
 | rgbd_dataset_freiburg2_desk | 0.0308    | 0.0003   | 0.0173          | 0.0093      |
 | rgbd_dataset_freiburg1_desk | 0.0170    | 0.0003   | 0.0059          | 0.0068      |
 
-### MultiresOFusion
+### MultiresOccupancy
 | dataset                     | total (s) | read (s) | integration (s) | raycast (s) |
 | --------------------------- | --------- | -------- | --------------- | ----------- |
 | living_room_traj0_frei_png  | 0.0403    | 0.0079   | 0.01442         | 0.0170      |
@@ -399,7 +399,7 @@ If you use supereight 2 in your work, please cite
 }
 ```
 
-Additionally, if you are using MultiresOFusion or MultiresTSDF, please cite
+Additionally, if you are using MultiresOccupancy or MultiresTSDF, please cite
 
 ``` bibtex
 @ARTICLE{Funk_RAL2021,
