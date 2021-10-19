@@ -32,8 +32,8 @@ sudo apt --yes install git g++ cmake libeigen3-dev libopencv-dev freeglut3-dev l
 Clone the repository and its submodules:
 
 ``` sh
-git clone --recurse-submodules git@bitbucket.org:smartroboticslab/supereight-2-srl.git
-cd supereight-2-srl
+git clone --recurse-submodules https://bitbucket.org/smartroboticslab/supereight2.git
+cd supereight2
 # If you cloned without the --recurse-submodules run the following command:
 git submodule update --init --recursive
 ```
@@ -53,7 +53,7 @@ cmake --build .
 
 ## Documentation
 
-Online documentation can be found [here](https://supereight.readthedocs.io).
+Online documentation can be found [here](https://supereight2.readthedocs.io).
 
 If you have Doxygen installed you can build a local copy of the documentation in
 `doc/html` by running `make doc`.
