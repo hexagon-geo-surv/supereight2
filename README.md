@@ -1,13 +1,13 @@
-# Supereight 2
+# supereight 2
 
 Welcome to supereight 2: a high performance template octree library and a dense volumetric SLAM pipeline implementation.
 
-Supereight 2 is a complete rewrite of the
+supereight 2 is a complete rewrite of the
 [original supereight](https://github.com/emanuelev/supereight). It adds
 [state-of-the-art mapping features](https://arxiv.org/abs/2010.07929) while also
 making the library more flexible and easier to use.
 
-Supereight 2 follows [semantic versioning](https://semver.org/).
+supereight 2 follows [semantic versioning](https://semver.org/).
 
 ![MultiresTSDF - ICL NUIM Traj 2 - mesh](./doc/images/tsdf-multi-icl-nuim-traj-2-mesh.jpeg)
 
@@ -434,6 +434,6 @@ Copyright 2019-2021 Nils Funk</br>
 Copyright 2019-2021 Sotiris Papatheodorou</br>
 All rights reserved.
 
-Supereight 2 is distributed under the
+supereight 2 is distributed under the
 [BSD 3-clause license](LICENSES/BSD-3-Clause.txt).
 
