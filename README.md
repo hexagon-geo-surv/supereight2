@@ -9,7 +9,7 @@ making the library more flexible and easier to use.
 
 Supereight 2 follows [semantic versioning](https://semver.org/).
 
-![MultiresTSDF - ICL NUIM Traj 2 - mesh](./doc/tsdf-multi-icl-nuim-traj-2-mesh.png)
+![MultiresTSDF - ICL NUIM Traj 2 - mesh](./doc/images/tsdf-multi-icl-nuim-traj-2-mesh.png)
 
 ## Build
 
@@ -297,7 +297,7 @@ The mesh can be extracted from the map using its `se::Map::saveMesh()` function.
 primal grid (single-res implementation) or dual grid (multi-res implementation). The mesh can be saved
 as a `.ply`, `.obj` or `.vtk` file. Based on the provided filename the according type will be saved.
 
-![MultiresOFusion - Cow and Lady - mesh](./doc/occupancy-multi-cow-and-lady-mesh.png)
+![MultiresOFusion - Cow and Lady - mesh](./doc/images/occupancy-multi-cow-and-lady-mesh.png)
 
 ```cpp
 // Example
@@ -322,7 +322,7 @@ will be saved.
 map.saveFieldSlice("./out/slice", t_WS);
 ```
 
-![MultiresOFusion - Cow and Lady - slice](./doc/occupancy-multi-cow-and-lady-slice.png)
+![MultiresOFusion - Cow and Lady - slice](./doc/images/occupancy-multi-cow-and-lady-slice.png)
 
 #### Visualisation
 The file formats can be visualised with the following software (non-exhaustive):
@@ -377,8 +377,8 @@ If you use supereight 2 in your work, please cite
 ``` bibtex
 @ARTICLE{Vespa_RAL2018,
   author={Vespa, Emanuele and Nikolov, Nikolay and Grimm, Marius and Nardi, Luigi and Kelly, Paul H. J. and Leutenegger, Stefan},
-  journal={IEEE Robotics and Automation Letters}, 
-  title={Efficient Octree-Based Volumetric {SLAM} Supporting Signed-Distance and Occupancy Mapping}, 
+  journal={IEEE Robotics and Automation Letters},
+  title={Efficient Octree-Based Volumetric {SLAM} Supporting Signed-Distance and Occupancy Mapping},
   year={2018},
   volume={3},
   number={2},
@@ -406,8 +406,8 @@ or
 ``` bibtex
 @INPROCEEDINGS{Vespa_3DV2019,
   author={Vespa, Emanuele and Funk, Nils and Kelly, Paul H. J. and Leutenegger, Stefan},
-  booktitle={2019 International Conference on 3D Vision (3DV)}, 
-  title={Adaptive-Resolution Octree-Based Volumetric {SLAM}}, 
+  booktitle={2019 International Conference on 3D Vision (3DV)},
+  title={Adaptive-Resolution Octree-Based Volumetric {SLAM}},
   year={2019},
   volume={},
   number={},
