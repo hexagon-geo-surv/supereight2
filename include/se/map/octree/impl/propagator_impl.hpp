@@ -194,7 +194,7 @@ void propagateToRoot(std::vector<se::OctantBase*>& octant_ptrs, PropagateF& prop
 
 
 
-void propagateTimeStampToRoot(std::vector<se::OctantBase*>& octant_ptrs)
+static void propagateTimeStampToRoot(std::vector<se::OctantBase*>& octant_ptrs)
 {
     auto time_step_prop = [](se::OctantBase* child_ptr, se::OctantBase* parent_ptr) {
         if (child_ptr->getTimeStamp() > parent_ptr->getTimeStamp()) {
