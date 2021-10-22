@@ -8,13 +8,13 @@ IFS="$(printf '%b_' '\t\n')"; IFS="${IFS%_}"
 
 # Show the program usage on standard output.
 usage() {
-	printf "Usage: %s [OPTION]... [DIRECTORY]\n" "$(basename "$0")"
-	printf "Download the ICL-NUIM dataset in the TUM format in DIRECTORY.\n"
-	printf "If DIRECTORY is not provided the current directory wil be used.\n"
-	# 1. Search the current file for case labels with comments.
-	# 2. Remove case syntax.
-	# 3. Add leading dash.
-	grep -E '[[:space:]].) #' "$0" | sed -e 's/) #/ /g' -e 's/^[ \t]*/    -/g'
+	printf 'Usage: %s [OPTION]... DIRECTORY\n' "$(basename "$0")"
+	printf 'Download the ICL-NUIM dataset living room sequences in the TUM\n'
+	printf 'format inside DIRECTORY.\n'
+	printf '  -o Optimize the downloaded PNG images using optipng to reduce\n'
+	printf '     their size. This will take some time but it will speed up\n'
+	printf '     reading the images when the dataset is run.\n'
+	printf '  -h Show this help message\n'
 }
 
 generate_filename_list() {
@@ -22,14 +22,14 @@ generate_filename_list() {
 	output_file="$2"
 	input_dir_name=$(basename "$input_dir")
 	# Write the file header in the output file.
-	printf "# timestamp filename\n" > "$output_file"
+	printf '# timestamp filename\n' > "$output_file"
 	# Loop over all PNG images in the input directory.
 	for file in "$input_dir"/*.png ; do
 		[ -f "$file" ] || continue
 		file=$(basename "$file")
 		filename_no_ext=$(basename "$file" .png)
 		# Print the entry for this file.
-		printf "%s %s/%s\n" "$filename_no_ext" "$input_dir_name" "$file"
+		printf '%s %s/%s\n' "$filename_no_ext" "$input_dir_name" "$file"
 	# Sort the entries and append to the output file.
 	done | sort -n >> "$output_file"
 }
@@ -60,6 +60,13 @@ post_process_tum() {
 
 
 
+optimize_pngs() {
+	# Find all PNG files and run optipng on them in parallel.
+	find "$1" -type f -name '*.png' | parallel optipng > /dev/null 2>&1
+}
+
+
+
 sequence_urls_tum='https://www.doc.ic.ac.uk/~ahanda/living_room_traj0_frei_png.tar.gz
 https://www.doc.ic.ac.uk/~ahanda/living_room_traj1_frei_png.tar.gz
 https://www.doc.ic.ac.uk/~ahanda/living_room_traj2_frei_png.tar.gz
@@ -68,9 +75,13 @@ https://www.doc.ic.ac.uk/~ahanda/living_room_traj3_frei_png.tar.gz'
 
 
 # Parse the options.
-while getopts 'ih' opt_name ; do
+optimize=0
+while getopts 'oh' opt_name; do
 	case "$opt_name" in
-		h) # Display this help message and exit.
+		o)
+			optimize=1
+			;;
+		h)
 			usage
 			exit 0
 			;;
@@ -113,24 +124,28 @@ for url in $sequence_urls_tum; do
 
 	# Skip the sequence if its directory already exists.
 	if [ -d "$sequence_dir" ] ; then
-		printf "Skipping sequence %s, directory %s already exists\n" \
+		printf 'Skipping sequence %s, directory %s already exists\n' \
 			"$sequence_name" "$sequence_dir"
 		continue
 	fi
 
 	# Download the sequence.
-	printf "Downloading %s to %s\n" "$url" "$filename"
+	printf 'Downloading %s to %s\n' "$url" "$filename"
 	wget --no-verbose --append-output "$log_file" --continue \
 		--output-document "$filename" "$url"
 
 	# Extract the sequence into its own directory.
-	printf "Extracting %s into %s\n" "$filename" "$sequence_dir"
+	printf 'Extracting %s into %s\n' "$filename" "$sequence_dir"
 	mkdir -p "$sequence_dir"
 	tar -xzf "$filename" -C "$sequence_dir"
 
 	# Post-process the sequence.
-	printf "Post-processing %s\n" "$sequence_dir"
+	printf 'Post-processing %s\n' "$sequence_dir"
 	post_process_tum "$sequence_dir"
+	if [ "$optimize" -eq 1 ]; then
+		printf 'Optimizing %s\n' "$sequence_dir"
+		optimize_pngs "$sequence_dir"
+	fi
 
 	# Remove the downloaded file.
 	rm "$filename"
