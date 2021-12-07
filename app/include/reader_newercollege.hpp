@@ -45,8 +45,6 @@ class NewerCollegeReader : public Reader {
     private:
     static const int8_t pixel_offset[64];
 
-    size_t ouster_pcd_idx_to_image_idx(size_t ouster_idx);
-
     ReaderStatus nextDepth(Image<float>& depth_image);
 
     ReaderStatus nextRGBA(Image<uint32_t>& rgba_image);
