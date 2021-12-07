@@ -54,13 +54,6 @@ Eigen::Vector3f atof3(const std::string& line)
 
 
 
-const int8_t se::NewerCollegeReader::pixel_offset[64] = {
-    0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,
-    12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18,
-    0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18};
-
-
-
 se::NewerCollegeReader::NewerCollegeReader(const se::ReaderConfig& c) : se::Reader(c)
 {
     // Ensure a valid directory was provided

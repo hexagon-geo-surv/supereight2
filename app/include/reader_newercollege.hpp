@@ -43,11 +43,15 @@ class NewerCollegeReader : public Reader {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     private:
-    static const int8_t pixel_offset[64];
 
     ReaderStatus nextDepth(Image<float>& depth_image);
 
     ReaderStatus nextRGBA(Image<uint32_t>& rgba_image);
+
+    static constexpr int8_t pixel_offset[64] = {
+        0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,
+        12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18,
+        0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18};
 
     /** Return the number of LIDAR scans in the supplied directory.
      * LIDAR scans are considered those whose name conforms to the pattern
