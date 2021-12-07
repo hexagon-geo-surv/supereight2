@@ -223,6 +223,9 @@ se::Reader::Reader(const se::ReaderConfig& c) :
 se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image)
 {
     if (!good()) {
+        if (verbose_ >= 1) {
+            std::clog << "Stopping reading due to reader status: " << status_ << "\n";
+        }
         return status_;
     }
     nextFrame();
@@ -230,6 +233,9 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image)
     if (!good()) {
         camera_active_ = false;
         camera_open_ = false;
+        if (verbose_ >= 1) {
+            std::clog << "Stopping reading due to nextDepth() status: " << status_ << "\n";
+        }
     }
     return status_;
 }
@@ -240,6 +246,9 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
                                       se::Image<uint32_t>& rgba_image)
 {
     if (!good()) {
+        if (verbose_ >= 1) {
+            std::clog << "Stopping reading due to reader status: " << status_ << "\n";
+        }
         return status_;
     }
     nextFrame();
@@ -247,12 +256,18 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
     if (!good()) {
         camera_active_ = false;
         camera_open_ = false;
+        if (verbose_ >= 1) {
+            std::clog << "Stopping reading due to nextDepth() status: " << status_ << "\n";
+        }
         return status_;
     }
     status_ = mergeStatus(nextRGBA(rgba_image), status_);
     if (!good()) {
         camera_active_ = false;
         camera_open_ = false;
+        if (verbose_ >= 1) {
+            std::clog << "Stopping reading due to nextRGBA() status: " << status_ << "\n";
+        }
     }
     return status_;
 }
@@ -264,6 +279,9 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
                                       Eigen::Matrix4f& T_WB)
 {
     if (!good()) {
+        if (verbose_ >= 1) {
+            std::clog << "Stopping reading due to reader status: " << status_ << "\n";
+        }
         return status_;
     }
     nextFrame();
@@ -271,18 +289,27 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
     if (!good()) {
         camera_active_ = false;
         camera_open_ = false;
+        if (verbose_ >= 1) {
+            std::clog << "Stopping reading due to nextDepth() status: " << status_ << "\n";
+        }
         return status_;
     }
     status_ = mergeStatus(nextRGBA(rgba_image), status_);
     if (!good()) {
         camera_active_ = false;
         camera_open_ = false;
+        if (verbose_ >= 1) {
+            std::clog << "Stopping reading due to nextRGBA() status: " << status_ << "\n";
+        }
         return status_;
     }
     status_ = mergeStatus(nextPose(T_WB), status_);
     if (!good()) {
         camera_active_ = false;
         camera_open_ = false;
+        if (verbose_ >= 1) {
+            std::clog << "Stopping reading due to nextPose() status: " << status_ << "\n";
+        }
     }
     return status_;
 }
@@ -420,7 +447,7 @@ se::ReaderStatus se::Reader::readPose(Eigen::Matrix4f& T_WB, const size_t frame)
         }
         // Ensure all the pose elements are finite
         if (!pose_data_valid) {
-            if (verbose_ == 1) {
+            if (verbose_ >= 1) {
                 std::cerr << "Warning: Expected finite ground truth pose but got";
                 for (uint8_t i = 0; i < 7; ++i) {
                     std::cerr << " " << pose_data[i];
@@ -435,7 +462,7 @@ se::ReaderStatus se::Reader::readPose(Eigen::Matrix4f& T_WB, const size_t frame)
             pose_data[6], pose_data[3], pose_data[4], pose_data[5]);
         // Ensure the quaternion represents a valid orientation
         if (std::abs(orientation.norm() - 1.0f) > 1e-3) {
-            if (verbose_ == 1) {
+            if (verbose_ >= 1) {
                 std::cerr << "Warning: Expected unit quaternion but got " << orientation.x() << " "
                           << orientation.y() << " " << orientation.z() << " " << orientation.w()
                           << " (x,y,z,w) with norm " << orientation.norm() << "\n";
