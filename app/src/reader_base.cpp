@@ -132,7 +132,7 @@ se::ReaderConfig::ReaderConfig(const std::string& yaml_file) : se::ReaderConfig:
         sequence_path = dataset_dir / sequence_path_p;
     }
     const stdfs::path ground_truth_file_p(ground_truth_file);
-    if (ground_truth_file_p.is_relative()) {
+    if (!ground_truth_file_p.empty() && ground_truth_file_p.is_relative()) {
         ground_truth_file = dataset_dir / ground_truth_file_p;
     }
 }
