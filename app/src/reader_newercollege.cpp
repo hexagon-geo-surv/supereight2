@@ -21,6 +21,7 @@
 
 
 
+#ifdef SE_PCL
 Eigen::Vector3f atof3(const std::string& line)
 {
     Eigen::Vector3f res = Eigen::Vector3f::Zero();
@@ -193,3 +194,49 @@ std::vector<std::string> se::NewerCollegeReader::getScanFilenames(const std::str
     }
     return filenames;
 }
+
+
+
+#else
+se::NewerCollegeReader::NewerCollegeReader(const se::ReaderConfig& c) : se::Reader(c)
+{
+    status_ = se::ReaderStatus::error;
+    std::cerr << "Error: not compiled with PCL, no Newer College support\n";
+}
+
+
+
+void se::NewerCollegeReader::restart()
+{
+    se::Reader::restart();
+}
+
+
+
+std::string se::NewerCollegeReader::name() const
+{
+    return std::string("NewerCollegeReader");
+}
+
+
+
+se::ReaderStatus se::NewerCollegeReader::nextDepth(se::Image<float>&)
+{
+    return se::ReaderStatus::error;
+}
+
+
+
+se::ReaderStatus se::NewerCollegeReader::nextRGBA(se::Image<uint32_t>&)
+{
+    return se::ReaderStatus::error;
+}
+
+
+
+std::vector<std::string> se::NewerCollegeReader::getScanFilenames(const std::string&)
+{
+    return std::vector<std::string>();
+}
+
+#endif

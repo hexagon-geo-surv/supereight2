@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 3.5...3.16)
 
 find_package(GLUT)
 find_package(OpenGL)
+find_package(PCL COMPONENTS io)
 
 # Compile the reader as a library so that it isn't recompiled for each app.
 set(LIB_NAME reader)
@@ -20,6 +21,12 @@ add_library(${LIB_NAME} STATIC
 )
 target_include_directories(${LIB_NAME} PRIVATE include)
 target_link_libraries(${LIB_NAME} PRIVATE SE::Supereight)
+if(PCL_FOUND)
+  target_include_directories(${LIB_NAME} PRIVATE ${PCL_INCLUDE_DIRS})
+  target_link_directories(${LIB_NAME} PRIVATE ${PCL_LIBRARY_DIRS})
+  target_link_libraries(${LIB_NAME} PRIVATE ${PCL_LIBRARIES})
+  target_compile_definitions(${LIB_NAME} PRIVATE ${PCL_DEFINITIONS} "-DSE_PCL")
+endif()
 
 
 
