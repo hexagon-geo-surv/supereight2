@@ -191,7 +191,8 @@ se::Reader::Reader(const se::ReaderConfig& c) :
         status_(se::ReaderStatus::ok),
         frame_(SIZE_MAX),
         num_frames_(0),
-        ground_truth_frame_(SIZE_MAX)
+        ground_truth_frame_(SIZE_MAX),
+        ground_truth_delimiter_(' ')
 {
     // Trim trailing slashes from sequence_path_
     sequence_path_.erase(sequence_path_.find_last_not_of("/") + 1);
@@ -203,6 +204,9 @@ se::Reader::Reader(const se::ReaderConfig& c) :
             status_ = se::ReaderStatus::error;
             camera_active_ = false;
             camera_open_ = false;
+        }
+        if (se::str_utils::ends_with(ground_truth_file_, ".csv")) {
+            ground_truth_delimiter_ = ',';
         }
     }
     // Ensure the available clock has enough accuracy to measure the requested
@@ -382,7 +386,7 @@ se::ReaderStatus se::Reader::mergeStatus(se::ReaderStatus status_1, se::ReaderSt
 
 se::ReaderStatus se::Reader::nextPose(Eigen::Matrix4f& T_WB)
 {
-    return readPose(T_WB, frame_);
+    return readPose(T_WB, frame_, ground_truth_delimiter_);
 }
 
 se::ReaderStatus se::Reader::getPose(Eigen::Matrix4f& T_WB, const size_t frame)
@@ -397,7 +401,7 @@ se::ReaderStatus se::Reader::getPose(Eigen::Matrix4f& T_WB, const size_t frame)
     ground_truth_fs_.clear();
     ground_truth_fs_.seekg(0);
 
-    auto status = readPose(T_WB, frame);
+    auto status = readPose(T_WB, frame, ground_truth_delimiter_);
 
     // Restore current state of ground truth variables
     ground_truth_frame_ = ground_truth_frame_curr;
@@ -407,7 +411,8 @@ se::ReaderStatus se::Reader::getPose(Eigen::Matrix4f& T_WB, const size_t frame)
 }
 
 
-se::ReaderStatus se::Reader::readPose(Eigen::Matrix4f& T_WB, const size_t frame)
+se::ReaderStatus
+se::Reader::readPose(Eigen::Matrix4f& T_WB, const size_t frame, const char delimiter)
 {
     std::string line;
     while (true) {
@@ -427,7 +432,7 @@ se::ReaderStatus se::Reader::readPose(Eigen::Matrix4f& T_WB, const size_t frame)
             continue;
         }
         // Data line read, split on spaces
-        const std::vector<std::string> line_data = se::str_utils::split_str(line, ' ');
+        const std::vector<std::string> line_data = se::str_utils::split_str(line, delimiter);
         const size_t num_cols = line_data.size();
         if (num_cols < 7) {
             std::cerr << "Error: Invalid ground truth file format. "

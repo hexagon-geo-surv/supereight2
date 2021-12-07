@@ -248,11 +248,12 @@ class Reader {
      * \note Use getPose(...) to request a pose. It keeps track of the ground_truth_frame_
      *       and ifstream state.
      *
-     * \param[in]  frame The frame number of the requested ground truth pose.
-     * \param[out] T_WB  The ground truth pose.
+     * \param[out] T_WB      The ground truth pose.
+     * \param[in]  frame     The frame number of the requested ground truth pose.
+     * \param[in]  delimiter The character delimiting columns in the file. Defaults to space.
      * \return An appropriate status code.
      */
-    ReaderStatus readPose(Eigen::Matrix4f& T_WB, const size_t frame);
+    ReaderStatus readPose(Eigen::Matrix4f& T_WB, const size_t frame, const char delimiter = ' ');
 
 
     /** Read the next ground truth pose.
@@ -270,6 +271,7 @@ class Reader {
 
     private:
     size_t ground_truth_frame_;
+    char ground_truth_delimiter_;
     std::chrono::steady_clock::time_point prev_frame_timestamp_;
 
     /** Prepare for reading the next frame.
