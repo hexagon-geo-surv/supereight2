@@ -153,6 +153,29 @@ std::ostream& se::operator<<(std::ostream& os, const se::ReaderConfig& c)
 
 
 
+std::ostream& se::operator<<(std::ostream& os, const ReaderStatus& s)
+{
+    switch (s) {
+    case ReaderStatus::ok:
+        os << "OK";
+        break;
+    case ReaderStatus::skip:
+        os << "skip";
+        break;
+    case ReaderStatus::eof:
+        os << "EOF";
+        break;
+    case ReaderStatus::error:
+        os << "error";
+        break;
+    default:
+        os << "unknown status";
+    }
+    return os;
+}
+
+
+
 se::Reader::Reader(const se::ReaderConfig& c) :
         camera_active_(true),
         camera_open_(true),

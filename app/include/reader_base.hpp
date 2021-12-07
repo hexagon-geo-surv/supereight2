@@ -67,6 +67,8 @@ enum class ReaderStatus : int {
     error,
 };
 
+std::ostream& operator<<(std::ostream& os, const ReaderStatus& s);
+
 
 
 /** Base abstract class for dataset readers.
