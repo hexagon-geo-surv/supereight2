@@ -67,8 +67,12 @@ se::NewerCollegeReader::NewerCollegeReader(const se::ReaderConfig& c) : se::Read
     // Set the depth and RGBA image resolutions.
     depth_image_res_ = Eigen::Vector2i(1024, 64);
     rgba_image_res_ = Eigen::Vector2i(1024, 64);
-    // Get the total number of frames.
-    num_frames_ = numScans(sequence_path_);
+    // Get the scan filenames and total number of frames.
+    scan_filenames_ = getScanFilenames(sequence_path_);
+    num_frames_ = scan_filenames_.size();
+    if (verbose_ >= 1) {
+        std::clog << "Found " << num_frames_ << " PCD files\n";
+    }
 }
 
 
@@ -107,10 +111,8 @@ se::ReaderStatus se::NewerCollegeReader::nextDepth(se::Image<float>& depth_image
     }
     // Initialize the image to zeros.
     std::memset(depth_image.data(), 0, depth_image_res_.prod() * sizeof(float));
-    // Generate the filename and open the file for reading.
-    std::ostringstream basename;
-    basename << "cloud_" << std::setfill('0') << std::setw(5) << frame_ << ".pcd";
-    const std::string filename(sequence_path_ + "/" + basename.str());
+    // Open the file for reading.
+    const std::string filename = scan_filenames_[frame_];
     std::ifstream fs(filename, std::ios::in);
     if (!fs.good()) {
         std::cerr << "Error: can't read " << filename << "\n";
@@ -126,6 +128,12 @@ se::ReaderStatus se::NewerCollegeReader::nextDepth(se::Image<float>& depth_image
         // Ignore comment lines
         if (line[0] == '#') {
             continue;
+        }
+        if (line[0] == 'D') {
+            if (line == "DATA binary" || line == "DATA binary_compressed") {
+                std::cerr << "Error: can't read non-ASCII PCD file " << filename << "\n";
+                return se::ReaderStatus::error;
+            }
         }
         // Ignore PCL lines
         if (std::isalpha(line[0])) {
@@ -164,21 +172,24 @@ se::ReaderStatus se::NewerCollegeReader::nextRGBA(se::Image<uint32_t>& rgba_imag
 
 
 
-size_t se::NewerCollegeReader::numScans(const std::string& dir) const
+std::vector<std::string> se::NewerCollegeReader::getScanFilenames(const std::string& dir)
 {
-    const std::regex cloud_image_regex(".*cloud_[[:digit:]]{5}.pcd");
-    size_t cloud_count = 0;
+    static const std::string regex_pattern = ".*cloud_[[:digit:]]{10}_[[:digit:]]{9}.pcd";
+    static const std::regex cloud_image_regex(regex_pattern);
+    std::vector<std::string> filenames;
     for (const auto& p : stdfs::directory_iterator(dir)) {
         if (!stdfs::is_directory(p.path())) {
             const std::string filename = p.path().string();
             if (std::regex_match(filename, cloud_image_regex)) {
-                cloud_count++;
+                filenames.push_back(filename);
             }
         }
     }
-    if (cloud_count == 0) {
-        std::cerr << "Warning: found no files matching the regular expression "
-                  << "'cloud_[[:digit:]]{5}.pcd'\n";
+    // Sort the filenames to make they are opened in the correct order. This assumes that any
+    // numbers are zero-padded, which is true in the NewerCollege dataset.
+    std::sort(filenames.begin(), filenames.end());
+    if (filenames.empty()) {
+        std::cerr << "Warning: no files matching the regular expression " << regex_pattern << "\n";
     }
-    return cloud_count;
+    return filenames;
 }

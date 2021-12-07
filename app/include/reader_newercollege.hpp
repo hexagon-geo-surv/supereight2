@@ -43,6 +43,7 @@ class NewerCollegeReader : public Reader {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     private:
+    std::vector<std::string> scan_filenames_;
 
     ReaderStatus nextDepth(Image<float>& depth_image);
 
@@ -53,14 +54,14 @@ class NewerCollegeReader : public Reader {
         12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18,
         0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18};
 
-    /** Return the number of LIDAR scans in the supplied directory.
+    /** Return the filenames of LIDAR scans in PCD formatin the supplied directory.
      * LIDAR scans are considered those whose name conforms to the pattern
-     * cloud_XXXX.pcd where X is a digit 0-9.
+     * cloud_XXXXXXXXXX_XXXXXXXXX.pcd where X is a digit 0-9.
      *
-     * \param[in] dir The directory inside which to look for depth images.
-     * \return The number of LIDAR scans found.
+     * \param[in] dir The directory inside which to look for PCD files.
+     * \return The filenames of the PCD files found in lexicographical order.
      */
-    size_t numScans(const std::string& dir) const;
+    static std::vector<std::string> getScanFilenames(const std::string& dir);
 };
 
 } // namespace se
