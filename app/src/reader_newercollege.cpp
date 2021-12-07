@@ -61,6 +61,7 @@ se::NewerCollegeReader::NewerCollegeReader(const se::ReaderConfig& c) : se::Read
         status_ = se::ReaderStatus::error;
         camera_active_ = false;
         camera_open_ = false;
+        std::cerr << "Error: " << sequence_path_ << " is not a directory\n";
         return;
     }
     // Set the depth and RGBA image resolutions.
@@ -84,6 +85,7 @@ void se::NewerCollegeReader::restart()
         status_ = se::ReaderStatus::error;
         camera_active_ = false;
         camera_open_ = false;
+        std::cerr << "Error: " << sequence_path_ << " is not a directory\n";
     }
 }
 
@@ -111,7 +113,11 @@ se::ReaderStatus se::NewerCollegeReader::nextDepth(se::Image<float>& depth_image
     const std::string filename(sequence_path_ + "/" + basename.str());
     std::ifstream fs(filename, std::ios::in);
     if (!fs.good()) {
+        std::cerr << "Error: can't read " << filename << "\n";
         return se::ReaderStatus::error;
+    }
+    else if (verbose_ >= 1) {
+        std::clog << "Reading " << filename << "\n";
     }
     size_t pixel_idx = SIZE_MAX;
     std::vector<float> data(depth_image_res_.prod(), 0);
