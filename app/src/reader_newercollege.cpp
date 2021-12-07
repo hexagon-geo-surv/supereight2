@@ -19,6 +19,10 @@
 #include "se/common/filesystem.hpp"
 #include "se/common/image_utils.hpp"
 
+#ifdef SE_PCL
+#    include <pcl/io/pcd_io.h>
+#    include <pcl/point_types.h>
+#endif
 
 
 #ifdef SE_PCL
@@ -112,37 +116,21 @@ se::ReaderStatus se::NewerCollegeReader::nextDepth(se::Image<float>& depth_image
     }
     // Initialize the image to zeros.
     std::memset(depth_image.data(), 0, depth_image_res_.prod() * sizeof(float));
-    // Open the file for reading.
+    // Read the point cloud.
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
     const std::string filename = scan_filenames_[frame_];
-    std::ifstream fs(filename, std::ios::in);
-    if (!fs.good()) {
-        std::cerr << "Error: can't read " << filename << "\n";
+    if (pcl::io::loadPCDFile<pcl::PointXYZ>(filename, *cloud) == -1) {
+        std::cerr << "Error: can't read point cloud from " << filename << "\n";
         return se::ReaderStatus::error;
     }
     else if (verbose_ >= 1) {
-        std::clog << "Reading " << filename << "\n";
+        std::clog << "Read point cloud from " << filename << "\n";
     }
+    // Read the point cloud and convert each point to a distance.
     size_t pixel_idx = SIZE_MAX;
     std::vector<float> data(depth_image_res_.prod(), 0);
-    // Read the point cloud and convert each point to a distance.
-    for (std::string line; std::getline(fs, line);) {
-        // Ignore comment lines
-        if (line[0] == '#') {
-            continue;
-        }
-        if (line[0] == 'D') {
-            if (line == "DATA binary" || line == "DATA binary_compressed") {
-                std::cerr << "Error: can't read non-ASCII PCD file " << filename << "\n";
-                return se::ReaderStatus::error;
-            }
-        }
-        // Ignore PCL lines
-        if (std::isalpha(line[0])) {
-            continue;
-        }
-        // Read the point
-        const Eigen::Vector3f point = atof3(line);
-        data[++pixel_idx] = point.norm();
+    for (const auto& point : *cloud) {
+        data[++pixel_idx] = Eigen::Vector3f(point.x, point.y, point.z).norm();
     }
 
     // Reorganize the distances into a depth image.
