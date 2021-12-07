@@ -1,0 +1,69 @@
+%YAML:1.2
+# SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+# SPDX-License-Identifier: CC0-1.0
+
+map:
+  dim:                        [102.4, 102.4, 102.4]
+  res:                        0.1
+
+data:
+  # tsdf
+  truncation_boundary_factor: 8
+  max_weight:                 100
+
+  # occupancy
+  surface_boundary:           0
+  min_occupancy:              -100
+  max_occupancy:               100
+  log_odd_min:                -5.015
+  log_odd_max:                 5.015
+  fs_integr_scale:            1
+  const_surface_thickness:    false
+  uncertainty_model:          linear
+  tau_min_factor:             3
+  tau_max_factor:             12
+  k_tau:                      0.05
+  sigma_min_factor:           1         # minimum/maximum uncertainty := 3 x sigma_min_factor/sigma_max_factor * voxel_dim
+  sigma_max_factor:           3         # minimum/maximum uncertainty := 3 x sigma_min_factor/sigma_max_factor * voxel_dim
+  k_sigma:                    0.05
+
+sensor:
+  width:                      1024
+  height:                     64
+  elevation_angles:           [17.744, 17.12, 16.536, 15.982, 15.53, 14.936, 14.373, 13.823, 13.373, 12.786, 12.23, 11.687, 11.241, 10.67, 10.132, 9.574, 9.138, 8.577, 8.023, 7.479, 7.046, 6.481, 5.944, 5.395, 4.963, 4.401, 3.859, 3.319, 2.871, 2.324, 1.783, 1.238, 0.786, 0.245, -0.299, -0.849, -1.288, -1.841, -2.275, -2.926, -3.378, -3.91, -4.457, -5.004, -5.46, -6.002, -6.537, -7.096, -7.552, -8.09, -8.629, -9.196, -9.657, -10.183, -10.732, -11.289, -11.77, -12.297, -12.854, -13.415, -13.916, -14.442, -14.997, -15.595]
+  azimuth_angles:             [3.102, 3.0383750000000003, 2.98175, 2.950125, 3.063, 3.021375, 3.00175, 2.996125, 3.045, 3.031375, 3.03375, 3.043125, 3.042, 3.043375, 3.05175, 3.074125, 3.03, 3.051375, 3.0797499999999998, 3.101125, 3.034, 3.067375, 3.09775, 3.142125, 3.048, 3.093375, 3.13475, 3.170125, 3.059, 3.107375, 3.15275, 3.194125, 3.085, 3.136375, 3.17675, 3.217125, 3.117, 3.159375, 3.15275, 3.257125, 3.149, 3.189375, 3.22975, 3.270125, 3.19, 3.222375, 3.26075, 3.291125, 3.23, 3.253375, 3.28775, 3.301125, 3.274, 3.299375, 3.31975, 3.306125, 3.327, 3.3453749999999998, 3.3377499999999998, 3.322125, 3.393, 3.384375, 3.35875, 3.324125]
+  near_plane:                 0.8
+  far_plane:                  60.0
+  T_BS:                       [-0.70676,  -0.70745,   0.00000,   0.29300, 0.70745,  -0.70676,   0.00000,   0.00000, 0.00000,   0.00000,   1.00000,   0.14718, 0.00000,   0.00000,   0.00000,   1.00000]
+
+tracker:
+  iterations:                 [10, 5, 4]
+  dist_threshold:             0.1
+  normal_threshold:           0.8
+  track_threshold:            0.15
+  icp_threshold:              0.00001
+
+reader:
+  reader_type:                "newercollege"
+  sequence_path:              ""
+  ground_truth_file:          "registered_poses.csv"
+  fps:                        0.0
+  drop_frames:                false
+  verbose:                    0
+
+app:
+  enable_ground_truth:        true
+  enable_rendering:           true
+  enable_gui:                 true
+  enable_meshing:             true
+  enable_slice_meshing:       true
+  enable_structure_meshing:   true
+  mesh_output_dir:            "meshes"
+  sensor_downsampling_factor: 1
+  tracking_rate:              1
+  integration_rate:           1
+  rendering_rate:             1
+  meshing_rate:               0
+  max_frames:                 -1
+  log_file:                   "log.tsv"
+
