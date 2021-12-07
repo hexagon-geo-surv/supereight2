@@ -26,8 +26,11 @@ target_link_libraries(${LIB_NAME} PRIVATE SE::Supereight)
 # Compile the apps for each configuration in SE_APP_CONFIG.
 set(SE_APP_CONFIG
   "TSDF Single PinholeCamera"
+  "TSDF Single OusterLidar"
   "TSDF Multi PinholeCamera"
+  "TSDF Multi OusterLidar"
   "Occupancy Multi PinholeCamera"
+  "Occupancy Multi OusterLidar"
 )
 foreach(APP_CONFIG ${SE_APP_CONFIG})
   # Replace spaces with semicolons to convert the string to a CMake list.
