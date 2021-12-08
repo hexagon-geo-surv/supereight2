@@ -12,7 +12,7 @@
 namespace se {
 namespace visitor {
 
-namespace {
+namespace detail {
 
 /*
 * Interpolation's value gather offsets
@@ -678,7 +678,7 @@ inline bool get_neighbours(const OctreeT& octree,
     }
     return true;
 }
-} // namespace
+} // namespace detail
 
 
 
@@ -901,7 +901,7 @@ getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
         return {};
     }
 
-    get_neighbours(octree, base_coord, neighbour_data);
+    detail::get_neighbours(octree, base_coord, neighbour_data);
 
     for (int n = 0; n < 8; n++) //< 8 neighbours
     {
@@ -972,7 +972,7 @@ inline
             return {};
         }
 
-        if (!get_neighbours(octree, base_coord, scale, neighbour_data)) {
+        if (!detail::get_neighbours(octree, base_coord, scale, neighbour_data)) {
             continue;
         }
 
@@ -1046,7 +1046,7 @@ getFieldInterp(const OctreeT& octree,
             return {};
         }
 
-        if (!get_neighbours(octree, base_coord, scale, neighbour_data)) {
+        if (!detail::get_neighbours(octree, base_coord, scale, neighbour_data)) {
             continue;
         }
 
