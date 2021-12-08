@@ -238,7 +238,8 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
 
 
 
-    for (int scale = 0; scale < map.getOctree()->getMaxScale(); scale++) {
+    const int max_scale = map.getOctree()->getMaxScale();
+    for (int scale = 0; scale < max_scale; scale++) {
         map.saveMaxFieldSlice(config.app.mesh_output_dir + "/test-max-field-slice-max-field-scale-"
                                   + std::to_string(scale),
                               se::math::to_translation(T_WS),

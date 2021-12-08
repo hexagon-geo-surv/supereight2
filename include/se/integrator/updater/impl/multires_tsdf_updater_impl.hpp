@@ -34,6 +34,8 @@ void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>,
 {
     unsigned int block_size = BlockType::getSize();
     const Eigen::Matrix4f T_SW = se::math::to_inverse_transformation(T_WS_);
+    const Octree<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>& octree =
+        *map_.getOctree();
 
     auto valid_predicate = [&](float depth_value) { return depth_value >= sensor_.near_plane; };
 
@@ -102,7 +104,7 @@ void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>,
                 }
             };
 
-            se::propagator::propagateBlockDown(*map_.getOctree(),
+            se::propagator::propagateBlockDown(octree,
                                                static_cast<se::OctantBase*>(block_ptr),
                                                curr_scale,
                                                child_down_funct,
@@ -179,7 +181,7 @@ void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>,
             return 0;
         };
 
-        se::propagator::propagateBlockUp(*map_.getOctree(),
+        se::propagator::propagateBlockUp(octree,
                                          static_cast<se::OctantBase*>(block_ptr),
                                          curr_scale,
                                          child_up_funct,

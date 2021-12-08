@@ -30,7 +30,7 @@ Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>, 
         frame_(frame),
         map_res_(map.getRes()),
         config_(map),
-        node_set_(map.getOctree()->getBlockDepth())
+        node_set_(octree_.getBlockDepth())
 {
 }
 
@@ -43,11 +43,10 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
     TICK("fusion-total")
 
     TICK("fusion-nodes")
-    auto& octree = *map_.getOctree();
 #pragma omp parallel for
     for (unsigned int i = 0; i < allocation_list.node_list.size(); ++i) {
         auto node_ptr = static_cast<NodeType*>(allocation_list.node_list[i]);
-        const int depth = octree.getMaxScale() - std::log2(node_ptr->getSize());
+        const int depth = octree_.getMaxScale() - std::log2(node_ptr->getSize());
         freeNodeRecurse(allocation_list.node_list[i], depth);
     }
     TOCK("fusion-nodes")
@@ -90,15 +89,14 @@ template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
 void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
              SensorT>::propagateToRoot(std::vector<se::OctantBase*>& block_list)
 {
-    auto& octree = *map_.getOctree();
     for (const auto& octant_ptr : block_list) {
         BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
         if (block_ptr->getParent()) {
-            node_set_[octree.getBlockDepth() - 1].insert(block_ptr->getParent());
+            node_set_[octree_.getBlockDepth() - 1].insert(block_ptr->getParent());
         }
     }
 
-    for (int d = octree.getBlockDepth() - 1; d > 0; d--) // TODO: block depth - 1?
+    for (int d = octree_.getBlockDepth() - 1; d > 0; d--) // TODO: block depth - 1?
     {
         std::set<se::OctantBase*>::iterator it;
         for (it = node_set_[d].begin(); it != node_set_[d].end(); ++it) {
@@ -114,14 +112,14 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
                 if (node_data.observed
                     && node_data.occupancy * node_data.weight
                         <= 0.95 * map_.getDataConfig().min_occupancy) {
-                    octree.deleteChildren(static_cast<NodeType*>(octant_ptr));
+                    octree_.deleteChildren(static_cast<NodeType*>(octant_ptr));
                 }
 
             } // if parent
         }     // nodes at depth d
     }         // depth d
 
-    updater::propagate_to_parent_node<NodeType, BlockType>(octree.getRoot(), frame_);
+    updater::propagate_to_parent_node<NodeType, BlockType>(octree_.getRoot(), frame_);
 }
 
 
