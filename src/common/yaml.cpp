@@ -30,11 +30,11 @@ void subnode_as_bool(const cv::FileNode& base_node, const std::string& subnode_n
             b = false;
         }
         else {
-            std::cerr << "Warning: ignoring non-bool data in " << subnode_name
+            std::cerr << "Warning: ignoring non-bool string \"" << s << "\" in " << subnode_name
                       << ", using default value \"" << b << "\"\n";
         }
     }
-    else {
+    else if (!subnode.empty()) {
         std::cerr << "Warning: ignoring non-bool data in " << subnode_name
                   << ", using default value \"" << b << "\"\n";
     }
@@ -48,7 +48,7 @@ void subnode_as_int(const cv::FileNode& base_node, const std::string& subnode_na
     if (subnode.isInt()) {
         i = static_cast<int>(subnode);
     }
-    else {
+    else if (!subnode.empty()) {
         std::cerr << "Warning: ignoring non-int data in " << subnode_name
                   << ", using default value \"" << i << "\"\n";
     }
@@ -62,7 +62,7 @@ void subnode_as_float(const cv::FileNode& base_node, const std::string& subnode_
     if (subnode.isReal() || subnode.isInt()) {
         f = static_cast<float>(subnode);
     }
-    else {
+    else if (!subnode.empty()) {
         std::cerr << "Warning: ignoring non-float data in " << subnode_name
                   << ", using default value \"" << f << "\"\n";
     }
@@ -78,7 +78,7 @@ void subnode_as_string(const cv::FileNode& base_node,
     if (subnode.isString()) {
         s = static_cast<std::string>(subnode);
     }
-    else {
+    else if (!subnode.empty()) {
         std::cerr << "Warning: ignoring non-string data in " << subnode_name
                   << ", using default value \"" << s << "\"\n";
     }
@@ -94,15 +94,12 @@ void subnode_as_eigen_vector3f(const cv::FileNode& base_node,
     if (subnode.isSeq() && subnode.size() == 3) {
         eigen_v3f = Eigen::Vector3f(subnode[0], subnode[1], subnode[2]);
     }
-    else {
+    else if (!subnode.empty()) {
         // Show warnings on invalid data
         std::cerr << "Warning: ";
         if (subnode.isSeq() && subnode.size() != 3) {
             std::cerr << "expected list of length 3 for " << subnode_name << " but got length "
                       << subnode.size();
-        }
-        else if (subnode.isNone()) {
-            std::cerr << "no data for " << subnode_name;
         }
         else {
             std::cerr << "ignoring non-list data in " << subnode_name;
@@ -123,15 +120,12 @@ void subnode_as_eigen_matrix3f(const cv::FileNode& base_node,
         eigen_m3f << subnode[0], subnode[1], subnode[2], subnode[3], subnode[4], subnode[5],
             subnode[6], subnode[7], subnode[8];
     }
-    else {
+    else if (!subnode.empty()) {
         // Show warnings on invalid data
         std::cerr << "Warning: ";
         if (subnode.isSeq() && subnode.size() != 3) {
             std::cerr << "expected list of length 3 for " << subnode_name << " but got length "
                       << subnode.size();
-        }
-        else if (subnode.isNone()) {
-            std::cerr << "no data for " << subnode_name;
         }
         else {
             std::cerr << "ignoring non-list data in " << subnode_name;
@@ -151,15 +145,12 @@ void subnode_as_eigen_matrix4f(const cv::FileNode& base_node,
             subnode[6], subnode[7], subnode[8], subnode[9], subnode[10], subnode[11], subnode[12],
             subnode[13], subnode[14], subnode[15];
     }
-    else {
+    else if (!subnode.empty()) {
         // Show warnings on invalid data
         std::cerr << "Warning: ";
         if (subnode.isSeq() && subnode.size() != 3) {
             std::cerr << "expected list of length 3 for " << subnode_name << " but got length "
                       << subnode.size();
-        }
-        else if (subnode.isNone()) {
-            std::cerr << "no data for " << subnode_name;
         }
         else {
             std::cerr << "ignoring non-list data in " << subnode_name;

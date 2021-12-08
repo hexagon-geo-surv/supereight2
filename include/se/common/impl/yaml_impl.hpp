@@ -27,14 +27,11 @@ void subnode_as_vector(const cv::FileNode& base_node,
             v.push_back(static_cast<T>(e));
         }
     }
-    else {
+    else if (!subnode.empty()) {
         // Show warnings on invalid data
         std::cerr << "Warning: ";
         if (subnode.isSeq() && subnode.size() == 0) {
             std::cerr << "ignoring empty list in " << subnode_name;
-        }
-        else if (subnode.isNone()) {
-            std::cerr << "no data for " << subnode_name;
         }
         else {
             std::cerr << "ignoring non-list data in " << subnode_name;
