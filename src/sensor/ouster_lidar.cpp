@@ -26,7 +26,17 @@ se::OusterLidarConfig::OusterLidarConfig(const std::string& yaml_file) : SensorC
     const cv::FileNode node = fs["sensor"];
 
     se::yaml::subnode_as_eigen_vector_x(node, "elevation_angles", beam_elevation_angles);
+    if (beam_elevation_angles.size() != height) {
+        throw std::invalid_argument("expected " + std::to_string(height)
+                                    + " beam elevation angles but got "
+                                    + std::to_string(beam_elevation_angles.size()));
+    }
     se::yaml::subnode_as_eigen_vector_x(node, "azimuth_angles", beam_azimuth_angles);
+    if (beam_azimuth_angles.size() != height) {
+        throw std::invalid_argument("expected " + std::to_string(height)
+                                    + " beam azimuth angles but got "
+                                    + std::to_string(beam_azimuth_angles.size()));
+    }
 }
 
 
@@ -53,8 +63,8 @@ se::OusterLidar::OusterLidar(const OusterLidarConfig& c) :
     assert(c.height > 0);
     assert(c.near_plane >= 0.f);
     assert(c.far_plane > c.near_plane);
-    assert(c.beam_azimuth_angles.size() > 0);
-    assert(c.beam_elevation_angles.size() > 0);
+    assert(c.beam_azimuth_angles.size() == c.height);
+    assert(c.beam_elevation_angles.size() == c.height);
     float min_elevation_angle = fabsf(c.beam_elevation_angles[1] - c.beam_elevation_angles[0]);
     for (int i = 2; i < c.beam_elevation_angles.size(); i++) {
         const float diff = fabsf(c.beam_elevation_angles[i - 1] - c.beam_elevation_angles[i]);

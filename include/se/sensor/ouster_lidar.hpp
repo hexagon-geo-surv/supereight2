@@ -22,8 +22,11 @@ struct OusterLidarConfig : public SensorConfigBase {
      */
     OusterLidarConfig();
 
-    /** Initializes the config from a YAML file. Data not present in the YAML file will be initialized
-     * as in SensorConfig::SensorConfig().
+    /** Initializes the config from a YAML file. Data not present in the YAML file will be
+     * initialized as in SensorConfig::SensorConfig().
+     *
+     * \throws std::invalid_argument Throws std::invalid_argument if the number of beam elevation or
+     * azimuth angles is different than the sensor height.
      */
     OusterLidarConfig(const std::string& yaml_file);
 
