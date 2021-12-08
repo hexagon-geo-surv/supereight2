@@ -75,7 +75,6 @@ int main(int argc, char** argv)
     }
 
     // Setup input, processed and output imgs
-    se::ReaderStatus read_ok = se::ReaderStatus::ok;
     Eigen::Matrix4f T_WB = Eigen::Matrix4f::Identity(); //< Body to world transformation
     Eigen::Matrix4f T_BS = sensor.T_BS;                 //< Sensor to body transformation
     Eigen::Matrix4f T_WS = T_WB * T_BS;                 //< Sensor to world transformation
@@ -88,25 +87,28 @@ int main(int argc, char** argv)
     // and updating method
     se::MapIntegrator integrator(map);
 
-    int frame = 0;
-
     // Setup surface pointcloud, normals and scale
     se::Image<Eigen::Vector3f> surface_point_cloud_W(processed_img_res.x(), processed_img_res.y());
     se::Image<Eigen::Vector3f> surface_normals_W(processed_img_res.x(), processed_img_res.y());
     se::Image<int8_t> surface_scale(processed_img_res.x(), processed_img_res.y());
 
-    while (read_ok == se::ReaderStatus::ok) {
+    int frame = 0;
+    while (frame != config.app.max_frames) {
         se::perfstats.setIter(frame++);
 
         TICK("total")
 
         TICK("read")
+        se::ReaderStatus read_ok = se::ReaderStatus::ok;
         if (config.app.enable_ground_truth || frame == 1) {
             read_ok = reader->nextData(input_depth_img, input_rgba_img, T_WB);
             T_WS = T_WB * T_BS;
         }
         else {
             read_ok = reader->nextData(input_depth_img, input_rgba_img);
+        }
+        if (read_ok != se::ReaderStatus::ok) {
+            break;
         }
         TOCK("read")
 
@@ -206,10 +208,6 @@ int main(int argc, char** argv)
         }
 
         se::perfstats.writeToFilestream();
-
-        if (frame == config.app.max_frames) {
-            break;
-        }
     }
 
     // Free memory
