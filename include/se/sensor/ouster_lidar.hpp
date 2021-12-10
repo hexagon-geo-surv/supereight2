@@ -77,6 +77,9 @@ class OusterLidar : public SensorBase<OusterLidar> {
     srl::projection::OusterLidar model;
     float min_ray_angle;
 
+    float min_elevation_rad;
+    float max_elevation_rad;
+
     /** \brief The horizontal field of view in radians. */
     float horizontal_fov;
     /** \brief The vertical field of view in radians. */

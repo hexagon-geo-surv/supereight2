@@ -76,8 +76,10 @@ se::OusterLidar::OusterLidar(const OusterLidarConfig& c) :
     min_ray_angle = std::min(min_elevation_angle, azimuth_angle);
     horizontal_fov = 2.0f * M_PI;
     constexpr float deg_to_rad = M_PI / 180.0f;
-    const float max_elevation = c.beam_elevation_angles.maxCoeff();
     const float min_elevation = c.beam_elevation_angles.minCoeff();
+    min_elevation_rad = min_elevation * deg_to_rad;
+    const float max_elevation = c.beam_elevation_angles.maxCoeff();
+    max_elevation_rad = max_elevation * deg_to_rad;
     vertical_fov = deg_to_rad * (max_elevation - min_elevation);
 }
 
@@ -104,8 +106,10 @@ se::OusterLidar::OusterLidar(const OusterLidarConfig& c, const float dsf) :
     min_ray_angle = std::min(min_elevation_angle, azimuth_angle);
     horizontal_fov = 2.0f * M_PI;
     constexpr float deg_to_rad = M_PI / 180.0f;
-    const float max_elevation = c.beam_elevation_angles.maxCoeff();
     const float min_elevation = c.beam_elevation_angles.minCoeff();
+    min_elevation_rad = min_elevation * deg_to_rad;
+    const float max_elevation = c.beam_elevation_angles.maxCoeff();
+    max_elevation_rad = max_elevation * deg_to_rad;
     vertical_fov = deg_to_rad * (max_elevation - min_elevation);
 }
 
@@ -113,6 +117,11 @@ se::OusterLidar::OusterLidar(const OusterLidarConfig& c, const float dsf) :
 
 se::OusterLidar::OusterLidar(const OusterLidar& ol, const float dsf) :
         se::SensorBase<se::OusterLidar>(ol),
+        min_ray_angle(ol.min_ray_angle),
+        min_elevation_rad(ol.min_elevation_rad),
+        max_elevation_rad(ol.max_elevation_rad),
+        horizontal_fov(ol.horizontal_fov),
+        vertical_fov(ol.vertical_fov),
         model(ol.model.imageWidth() / dsf,
               ol.model.imageHeight() / dsf,
               ol.model.beamAzimuthAngles(),
@@ -172,34 +181,101 @@ int se::OusterLidar::computeIntegrationScaleImpl(const Eigen::Vector3f& block_ce
 
 
 
-bool se::OusterLidar::pointInFrustumImpl(const Eigen::Vector3f& /*point_S*/) const
+bool se::OusterLidar::pointInFrustumImpl(const Eigen::Vector3f& point_S) const
 {
-    // TODO Implement
-    return false;
+    if (point_S.norm() > far_plane) {
+        return false;
+    }
+
+    if (point_S.norm() < near_plane) {
+        return false;
+    }
+
+    const float point_elevation = std::asin(point_S.z() / point_S.norm());
+
+    if (point_elevation < min_elevation_rad || point_elevation > max_elevation_rad) {
+        return false;
+    }
+
+    return true;
 }
 
 
 
-bool se::OusterLidar::pointInFrustumInfImpl(const Eigen::Vector3f& /*point_S*/) const
+bool se::OusterLidar::pointInFrustumInfImpl(const Eigen::Vector3f& point_S) const
 {
-    // TODO Implement
-    return false;
+    if (point_S.norm() < near_plane) {
+        return false;
+    }
+
+    const float point_elevation = std::asin(point_S.z() / point_S.norm());
+
+    if (point_elevation < min_elevation_rad || point_elevation > max_elevation_rad) {
+        return false;
+    }
+
+    return true;
 }
 
 
 
-bool se::OusterLidar::sphereInFrustumImpl(const Eigen::Vector3f& /*centre_S*/,
-                                          const float /*radius*/) const
+bool se::OusterLidar::sphereInFrustumImpl(const Eigen::Vector3f& centre_S,
+                                          const float radius) const
 {
-    // TODO Implement
-    return false;
+    if (centre_S.norm() - radius > far_plane) {
+        return false;
+    }
+
+    if (centre_S.norm() + radius < near_plane) {
+        return false;
+    }
+
+    const float centre_elevation_rad = std::asin(centre_S.z() / centre_S.norm());
+
+    if (centre_elevation_rad < min_elevation_rad) {
+        const float delta_elevation = std::abs(centre_elevation_rad - min_elevation_rad);
+        const float cone_dist = std::sin(delta_elevation) * centre_S.norm();
+        if (cone_dist > radius) {
+            return false;
+        }
+    }
+
+    if (centre_elevation_rad > max_elevation_rad) {
+        const float delta_elevation = std::abs(centre_elevation_rad - max_elevation_rad);
+        const float cone_dist = std::sin(delta_elevation) * centre_S.norm();
+        if (cone_dist > radius) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 
 
-bool se::OusterLidar::sphereInFrustumInfImpl(const Eigen::Vector3f& /*centre_S*/,
-                                             const float /*radius*/) const
+bool se::OusterLidar::sphereInFrustumInfImpl(const Eigen::Vector3f& centre_S,
+                                             const float radius) const
 {
-    // TODO Implement
-    return false;
+    if (centre_S.norm() + radius < near_plane) {
+        return false;
+    }
+
+    const float centre_elevation_rad = std::asin(centre_S.z() / centre_S.norm());
+
+    if (centre_elevation_rad < min_elevation_rad) {
+        const float delta_elevation = std::abs(centre_elevation_rad - min_elevation_rad);
+        const float cone_dist = std::sin(delta_elevation) * centre_S.norm();
+        if (cone_dist > radius) {
+            return false;
+        }
+    }
+
+    if (centre_elevation_rad > max_elevation_rad) {
+        const float delta_elevation = std::abs(centre_elevation_rad - max_elevation_rad);
+        const float cone_dist = std::sin(delta_elevation) * centre_S.norm();
+        if (cone_dist > radius) {
+            return false;
+        }
+    }
+    return true;
 }
