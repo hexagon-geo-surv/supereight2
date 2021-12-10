@@ -22,10 +22,12 @@ add_library(${LIB_NAME} STATIC
 target_include_directories(${LIB_NAME} PRIVATE include)
 target_link_libraries(${LIB_NAME} PRIVATE SE::Supereight)
 if(PCL_FOUND)
-  target_include_directories(${LIB_NAME} PRIVATE ${PCL_INCLUDE_DIRS})
-  target_link_directories(${LIB_NAME} PRIVATE ${PCL_LIBRARY_DIRS})
+  # These have to be added globaly for compatibility with PCL 1.8.1 on Ubuntu 18.04.
+  include_directories(${PCL_INCLUDE_DIRS})
+  link_directories(${PCL_LIBRARY_DIRS})
+  add_definitions(${PCL_DEFINITIONS})
   target_link_libraries(${LIB_NAME} PRIVATE ${PCL_LIBRARIES})
-  target_compile_definitions(${LIB_NAME} PRIVATE ${PCL_DEFINITIONS} "-DSE_PCL")
+  target_compile_definitions(${LIB_NAME} PRIVATE "-DSE_PCL")
 endif()
 
 
