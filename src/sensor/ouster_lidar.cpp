@@ -219,8 +219,7 @@ bool se::OusterLidar::pointInFrustumInfImpl(const Eigen::Vector3f& point_S) cons
 
 
 
-bool se::OusterLidar::sphereInFrustumImpl(const Eigen::Vector3f& centre_S,
-                                          const float radius) const
+bool se::OusterLidar::sphereInFrustumImpl(const Eigen::Vector3f& centre_S, const float radius) const
 {
     if (centre_S.norm() - radius > far_plane) {
         return false;
