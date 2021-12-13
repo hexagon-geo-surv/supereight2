@@ -176,7 +176,7 @@ class SensorBase {
     bool pointInFrustumInf(const Eigen::Vector3f& point_S) const;
 
     /**
-     * \brief Test whether a sphere in sensor coordinates is inside the sensor
+     * \brief Test whether a sphere in sensor coordinates is at least partially inside the sensor
      * frustum.
      *
      * It is tested whether the sphere's centre is inside the sensor frustum
@@ -186,7 +186,7 @@ class SensorBase {
     bool sphereInFrustum(const Eigen::Vector3f& centre_S, const float radius) const;
 
     /**
-     * \brief Test whether a sphere in sensor coordinates is inside the sensor
+     * \brief Test whether a sphere in sensor coordinates is at least partially inside the sensor
      * frustum.
      *
      * The difference from PinholeCamera::sphereInFrustum is that it is assumed
