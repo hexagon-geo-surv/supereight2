@@ -24,7 +24,7 @@ git remote add public git@bitbucket.org:smartroboticslab/supereight2.git
    running
 
    ``` sh
-   ./run_tests.sh -d /path/to/datasets/`
+   ./run_tests.sh -u 18.04 devel; ./run_tests.sh -d ~/Documents/Datasets/ -u 20.04 devel
    ```
 
 1. Pull the latest commits in the `devel` and `master` branches from the private
@@ -39,6 +39,15 @@ git remote add public git@bitbucket.org:smartroboticslab/supereight2.git
 
 1. Increase the version number in `CMakeLists.txt` in a separate commit. Keep
    [semantic versioning](https://semver.org/) in mind when doing this.
+
+    ``` sh
+    # Set the project version in CMakeLists.txt to X.Y.Z and then:
+    se2_version='vX.Y.Z'
+    git add CMakeLists.txt
+    git commit -m "Bump version to $se2_version"
+    git push origin devel
+    ```
+
 1. Fast-forward merge the `devel` branch into the `master` branch.
 
     ``` sh
@@ -46,10 +55,12 @@ git remote add public git@bitbucket.org:smartroboticslab/supereight2.git
     git merge --ff devel
     ```
 
-1. Create a git tag with the version number.
+1. Create a git tag with the version number with name `supereight2 vX.Y.Z` and
+   the output of `git shortlog` as the extended description.
 
     ``` sh
-    git tag vX.Y.Z master
+    tag_msg=$(printf 'supereight2 %s\n\n%s\n' "$se2_version" "$(git shortlog origin/master..master)")
+    git tag --no-sign -a -m "$tag_msg" "$se2_version" master
     ```
 
 1. Push the master branch to both the private and public repositories.
@@ -62,7 +73,7 @@ git remote add public git@bitbucket.org:smartroboticslab/supereight2.git
 1. Push the tag to both the private and public repositories.
 
     ``` sh
-    git push origin vX.Y.Z
-    git push public vX.Y.Z
+    git push origin "$se2_version"
+    git push public "$se2_version"
     ```
 
