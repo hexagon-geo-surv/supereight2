@@ -47,7 +47,7 @@ tracker:
 reader:
   reader_type:                "raw"
   sequence_path:              "scene.raw"
-  ground_truth_file:          "groundtruth.txt"
+  ground_truth_file:          "association.txt"
   fps:                        0.0
   drop_frames:                false
   verbose:                    0
