@@ -236,56 +236,6 @@ void point_cloud_to_normal(se::Image<Eigen::Vector3f>& normals,
 
 
 
-void downsample_depth(const float* input_depth_data,
-                      const Eigen::Vector2i& input_depth_res,
-                      se::Image<float>& output_depth)
-{
-    // Check for unsupported conditions
-    if ((input_depth_res.x() < output_depth.width())
-        || input_depth_res.y() < output_depth.height()) {
-        std::cerr << "Invalid ratio." << std::endl;
-        exit(1);
-    }
-    if ((input_depth_res.x() % output_depth.width() != 0)
-        || (input_depth_res.y() % output_depth.height() != 0)) {
-        std::cerr << "Invalid ratio." << std::endl;
-        exit(1);
-    }
-    if ((input_depth_res.x() / output_depth.width()
-         != input_depth_res.y() / output_depth.height())) {
-        std::cerr << "Invalid ratio." << std::endl;
-        exit(1);
-    }
-
-    const int ratio = input_depth_res.x() / output_depth.width();
-#pragma omp parallel for
-    for (int y_out = 0; y_out < output_depth.height(); y_out++) {
-        for (int x_out = 0; x_out < output_depth.width(); x_out++) {
-            std::vector<float> box_values;
-            box_values.reserve(ratio * ratio);
-            for (int b = 0; b < ratio; b++) {
-                for (int a = 0; a < ratio; a++) {
-                    const int y_in = y_out * ratio + b;
-                    const int x_in = x_out * ratio + a;
-                    const float depth_value = input_depth_data[x_in + input_depth_res.x() * y_in];
-                    // Only consider positive, non-NaN values for the median
-                    if ((depth_value < 1e-5) || std::isnan(depth_value)) {
-                        continue;
-                    }
-                    else {
-                        box_values.push_back(depth_value);
-                    }
-                }
-            }
-            output_depth(x_out, y_out) =
-                box_values.empty() ? 0.0f : se::math::almost_median(box_values);
-            box_values.clear();
-        }
-    }
-}
-
-
-
 void half_sample_robust_image(se::Image<float>& output_image,
                               const se::Image<float>& input_image,
                               const float e_d,
@@ -324,55 +274,6 @@ void half_sample_robust_image(se::Image<float>& output_image,
             }
             output_image[out_pixel.x() + out_pixel.y() * output_image.width()] =
                 pixel_value_sum / pixel_count;
-        }
-    }
-}
-
-
-
-void downsample_image(const uint32_t* input_RGBA_image_data,
-                      const Eigen::Vector2i& input_RGBA_image_res,
-                      se::Image<uint32_t>& output_RGBA_image)
-{
-    // Check for correct image sizes.
-    assert((input_RGBA_image_res.x() >= output_RGBA_image.width())
-           && "Error: input width must be greater than output width");
-    assert((input_RGBA_image_res.y() >= output_RGBA_image.height())
-           && "Error: input height must be greater than output height");
-    assert((input_RGBA_image_res.x() % output_RGBA_image.width() == 0)
-           && "Error: input width must be an integer multiple of output width");
-    assert((input_RGBA_image_res.y() % output_RGBA_image.height() == 0)
-           && "Error: input height must be an integer multiple of output height");
-    assert((input_RGBA_image_res.x() / output_RGBA_image.width()
-            == input_RGBA_image_res.y() / output_RGBA_image.height())
-           && "Error: input and output width and height ratios must be the same");
-
-    const int ratio = input_RGBA_image_res.x() / output_RGBA_image.width();
-    // Iterate over each output pixel.
-#pragma omp parallel for
-    for (int y_out = 0; y_out < output_RGBA_image.height(); ++y_out) {
-        for (int x_out = 0; x_out < output_RGBA_image.width(); ++x_out) {
-            // Average the neighboring pixels by iterating over the nearby input
-            // pixels.
-            uint16_t r = 0, g = 0, b = 0;
-            for (int yy = 0; yy < ratio; ++yy) {
-                for (int xx = 0; xx < ratio; ++xx) {
-                    const int x_in = x_out * ratio + xx;
-                    const int y_in = y_out * ratio + yy;
-                    const uint32_t pixel_value =
-                        input_RGBA_image_data[x_in + input_RGBA_image_res.x() * y_in];
-                    r += se::r_from_rgba(pixel_value);
-                    g += se::g_from_rgba(pixel_value);
-                    b += se::b_from_rgba(pixel_value);
-                }
-            }
-            r /= ratio * ratio;
-            g /= ratio * ratio;
-            b /= ratio * ratio;
-
-            // Combine into a uint32_t by adding an alpha channel with 100% opacity.
-            const uint32_t rgba = se::pack_rgba(r, g, b, 255);
-            output_RGBA_image(x_out, y_out) = rgba;
         }
     }
 }

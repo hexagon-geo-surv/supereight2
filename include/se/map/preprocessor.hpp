@@ -15,8 +15,25 @@
 namespace se {
 namespace preprocessor {
 
+/**
+ * Downsample the input depth to match the resolution of the output depth. The ration between the
+ * resolutions must be a power of 2. Median downsampling is used to prevent creating new depth
+ * values which create artifacts behind object edges. Depth values of 0 are considered invalid and
+ * are ignored when computing the median.
+ */
 void downsample_depth(se::Image<float>& input_depth_img, se::Image<float>& output_depth_img);
 
+/**
+ * Downsample an RGBA image and copy into an se::Image class.
+ *
+ * \param[in] input_RGBA Pointer to the RGBA image data, 4 channels, 8 bits
+ * per channel.
+ * \param[in] input_res Size of the RGBA image in pixels (width and height).
+ * \param[out] output_RGB Object to store the output image to. The output image
+ * dimensions must be an integer multiple of the input image dimensions. The
+ * data for each pixel is stored in ARGB order, with the alpha channel in the
+ * MSB of the uint32_t and the red channel in the LSB of the uint32_t.
+ */
 void downsample_rgba(se::Image<uint32_t>& input_RGBA_img, se::Image<uint32_t>& output_RGBA_img);
 
 void bilateral_filter(se::Image<float>& out,
@@ -42,36 +59,10 @@ void point_cloud_to_depth(se::Image<float>& depth_image,
 template<bool NegY>
 void point_cloud_to_normal(se::Image<Eigen::Vector3f>& out, const se::Image<Eigen::Vector3f>& in);
 
-/**
- * Downsample the input depth to match the resolution of the output depth.
- * The ration between the resolutions must be a power of 2. Median downsampling
- * is used to prevent creating new depth which create artifacts behind object
- * edges. Depth values of 0 are considered invalid and are ignored when
- * computing the median.
- */
-void downsample_depth(const float* input_depth,
-                      const Eigen::Vector2i& input_res,
-                      se::Image<float>& output_depth);
-
 void half_sample_robust_image(se::Image<float>& out,
                               const se::Image<float>& in,
                               const float e_d,
                               const int r);
-
-/**
- * Downsample an RGBA image and copy into an se::Image class.
- *
- * \param[in] input_RGBA Pointer to the RGBA image data, 4 channels, 8 bits
- * per channel.
- * \param[in] input_res Size of the RGBA image in pixels (width and height).
- * \param[out] output_RGB Object to store the output image to. The output image
- * dimensions must be an integer multiple of the input image dimensions. The
- * data for each pixel is stored in ARGB order, with the alpha channel in the
- * MSB of the uint32_t and the red channel in the LSB of the uint32_t.
- */
-void downsample_image(const uint32_t* input_RGBA,
-                      const Eigen::Vector2i& input_res,
-                      se::Image<uint32_t>& output_RGBA);
 
 } // namespace preprocessor
 } // namespace se
