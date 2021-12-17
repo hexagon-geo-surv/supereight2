@@ -27,8 +27,6 @@ se::OpenNIReader::OpenNIReader(const se::ReaderConfig& c) :
     if (rc_ != openni::STATUS_OK) {
         std::cerr << "Error: Could not initialize OpenNI\n";
         status_ = se::ReaderStatus::error;
-        camera_active_ = false;
-        camera_open_ = false;
         return;
     }
     // Open a camera
@@ -41,8 +39,6 @@ se::OpenNIReader::OpenNIReader(const se::ReaderConfig& c) :
     if (rc_ != openni::STATUS_OK) {
         std::cerr << "Error: No Kinect device found\n";
         status_ = se::ReaderStatus::error;
-        camera_active_ = false;
-        camera_open_ = false;
         return;
     }
 
@@ -53,8 +49,6 @@ se::OpenNIReader::OpenNIReader(const se::ReaderConfig& c) :
             std::cerr << "Error: Could not create depth stream\n"
                       << openni::OpenNI::getExtendedError() << "\n";
             status_ = se::ReaderStatus::error;
-            camera_active_ = false;
-            camera_open_ = false;
             return;
         }
         // Start and stop the depth stream (to allow getting device info?)
@@ -64,8 +58,6 @@ se::OpenNIReader::OpenNIReader(const se::ReaderConfig& c) :
                       << openni::OpenNI::getExtendedError() << "\n";
             depth_stream_.destroy();
             status_ = se::ReaderStatus::error;
-            camera_active_ = false;
-            camera_open_ = false;
             return;
         }
         depth_stream_.stop();
@@ -75,8 +67,6 @@ se::OpenNIReader::OpenNIReader(const se::ReaderConfig& c) :
             std::cerr << "Error: Could not create RGB stream\n"
                       << openni::OpenNI::getExtendedError() << "\n";
             status_ = se::ReaderStatus::error;
-            camera_active_ = false;
-            camera_open_ = false;
             return;
         }
     }
@@ -93,8 +83,6 @@ se::OpenNIReader::OpenNIReader(const se::ReaderConfig& c) :
         if (rc_ != openni::STATUS_OK) {
             std::cout << "Error: Could not set depth video mode\n";
             status_ = se::ReaderStatus::error;
-            camera_active_ = false;
-            camera_open_ = false;
             return;
         }
         // Set the RGB camera video mode
@@ -106,8 +94,6 @@ se::OpenNIReader::OpenNIReader(const se::ReaderConfig& c) :
         if (rc_ != openni::STATUS_OK) {
             std::cout << "Error: Could not set RGB video mode\n";
             status_ = se::ReaderStatus::error;
-            camera_active_ = false;
-            camera_open_ = false;
             return;
         }
     }
@@ -122,8 +108,6 @@ se::OpenNIReader::OpenNIReader(const se::ReaderConfig& c) :
     if (depth_image_res_ != rgba_image_res_) {
         std::cout << "Error: Depth and RGB resolution mismatch\n";
         status_ = se::ReaderStatus::error;
-        camera_active_ = false;
-        camera_open_ = false;
         return;
     }
 
@@ -156,8 +140,6 @@ se::OpenNIReader::OpenNIReader(const se::ReaderConfig& c) :
     // Start the streams
     depth_stream_.start();
     rgb_stream_.start();
-    camera_open_ = true;
-    camera_active_ = true;
 }
 
 

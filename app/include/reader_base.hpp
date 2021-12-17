@@ -199,16 +199,6 @@ class Reader {
      */
     bool isLiveReader() const;
 
-    /** Don't use this.
-     * \deprecated Ugly hack only for use with the Qt GUI until we fix it.
-     */
-    bool camera_active_;
-
-    /** Don't use this.
-     * \deprecated Ugly hack only for use with the Qt GUI until we fix it.
-     */
-    bool camera_open_;
-
     /** Merge se::ReaderStatus values keeping the worst one.
      *
      * \param[in] status_1 The first se::ReaderStatus to merge.

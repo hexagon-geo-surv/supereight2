@@ -403,8 +403,6 @@ se::TUMReader::TUMReader(const se::ReaderConfig& c) : se::Reader(c)
         || !stdfs::is_regular_file(sequence_path_ + "/depth.txt")
         || !stdfs::is_regular_file(sequence_path_ + "/rgb.txt")) {
         status_ = se::ReaderStatus::error;
-        camera_active_ = false;
-        camera_open_ = false;
         std::cerr << "Error: The TUM sequence path must be a directory that contains"
                   << " depth and rgb subdirectories and depth.txt and rgb.txt files\n";
         return;
@@ -420,8 +418,6 @@ se::TUMReader::TUMReader(const se::ReaderConfig& c) : se::Reader(c)
         const std::vector<TUMPoseEntry> gt_poses = read_tum_ground_truth(ground_truth_file_);
         if (gt_poses.empty()) {
             status_ = se::ReaderStatus::error;
-            camera_active_ = false;
-            camera_open_ = false;
             return;
         }
         // Interpolate the ground truth poses at the depth image timestamps
@@ -430,8 +426,6 @@ se::TUMReader::TUMReader(const se::ReaderConfig& c) : se::Reader(c)
         if (associated_gt_poses.empty()) {
             std::cerr << "Error: Could not associate any ground truth poses to depth images\n";
             status_ = se::ReaderStatus::error;
-            camera_active_ = false;
-            camera_open_ = false;
             return;
         }
         // Generate the associated ground truth file
@@ -443,8 +437,6 @@ se::TUMReader::TUMReader(const se::ReaderConfig& c) : se::Reader(c)
             std::cerr << "Error: Could not read generated ground truth file " << generated_filename
                       << "\n";
             status_ = se::ReaderStatus::error;
-            camera_active_ = false;
-            camera_open_ = false;
             return;
         }
     }
@@ -471,8 +463,6 @@ se::TUMReader::TUMReader(const se::ReaderConfig& c) : se::Reader(c)
         if (image_data.empty()) {
             std::cerr << "Error: Could not read depth image " << first_depth_filename << "\n";
             status_ = se::ReaderStatus::error;
-            camera_active_ = false;
-            camera_open_ = false;
             return;
         }
 
@@ -487,8 +477,6 @@ se::TUMReader::TUMReader(const se::ReaderConfig& c) : se::Reader(c)
         if (image_data.empty()) {
             std::cerr << "Error: Could not read RGB image " << first_rgb_filename << "\n";
             status_ = se::ReaderStatus::error;
-            camera_active_ = false;
-            camera_open_ = false;
             return;
         }
         rgba_image_res_ = Eigen::Vector2i(image_data.cols, image_data.rows);
@@ -502,13 +490,9 @@ void se::TUMReader::restart()
     se::Reader::restart();
     if (stdfs::is_directory(sequence_path_)) {
         status_ = se::ReaderStatus::ok;
-        camera_active_ = true;
-        camera_open_ = true;
     }
     else {
         status_ = se::ReaderStatus::error;
-        camera_active_ = false;
-        camera_open_ = false;
     }
 }
 

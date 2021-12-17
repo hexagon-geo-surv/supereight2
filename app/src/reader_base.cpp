@@ -177,8 +177,6 @@ std::ostream& se::operator<<(std::ostream& os, const ReaderStatus& s)
 
 
 se::Reader::Reader(const se::ReaderConfig& c) :
-        camera_active_(true),
-        camera_open_(true),
         sequence_path_(c.sequence_path),
         ground_truth_file_(c.ground_truth_file),
         depth_image_res_(1, 1),
@@ -202,8 +200,6 @@ se::Reader::Reader(const se::ReaderConfig& c) :
         if (!ground_truth_fs_.good()) {
             std::cerr << "Error: Could not read ground truth file " << ground_truth_file_ << "\n";
             status_ = se::ReaderStatus::error;
-            camera_active_ = false;
-            camera_open_ = false;
         }
         if (se::str_utils::ends_with(ground_truth_file_, ".csv")) {
             ground_truth_delimiter_ = ',';
@@ -235,8 +231,6 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image)
     nextFrame();
     status_ = nextDepth(depth_image);
     if (!good()) {
-        camera_active_ = false;
-        camera_open_ = false;
         if (verbose_ >= 1) {
             std::clog << "Stopping reading due to nextDepth() status: " << status_ << "\n";
         }
@@ -258,8 +252,6 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
     nextFrame();
     status_ = nextDepth(depth_image);
     if (!good()) {
-        camera_active_ = false;
-        camera_open_ = false;
         if (verbose_ >= 1) {
             std::clog << "Stopping reading due to nextDepth() status: " << status_ << "\n";
         }
@@ -267,8 +259,6 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
     }
     status_ = mergeStatus(nextRGBA(rgba_image), status_);
     if (!good()) {
-        camera_active_ = false;
-        camera_open_ = false;
         if (verbose_ >= 1) {
             std::clog << "Stopping reading due to nextRGBA() status: " << status_ << "\n";
         }
@@ -291,8 +281,6 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
     nextFrame();
     status_ = nextDepth(depth_image);
     if (!good()) {
-        camera_active_ = false;
-        camera_open_ = false;
         if (verbose_ >= 1) {
             std::clog << "Stopping reading due to nextDepth() status: " << status_ << "\n";
         }
@@ -300,8 +288,6 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
     }
     status_ = mergeStatus(nextRGBA(rgba_image), status_);
     if (!good()) {
-        camera_active_ = false;
-        camera_open_ = false;
         if (verbose_ >= 1) {
             std::clog << "Stopping reading due to nextRGBA() status: " << status_ << "\n";
         }
@@ -309,8 +295,6 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
     }
     status_ = mergeStatus(nextPose(T_WB), status_);
     if (!good()) {
-        camera_active_ = false;
-        camera_open_ = false;
         if (verbose_ >= 1) {
             std::clog << "Stopping reading due to nextPose() status: " << status_ << "\n";
         }
@@ -437,8 +421,6 @@ se::Reader::readPose(Eigen::Matrix4f& T_WB, const size_t frame, const char delim
         if (num_cols < 7) {
             std::cerr << "Error: Invalid ground truth file format. "
                       << "Expected line format: ... tx ty tz qx qy qz qw\n";
-            camera_active_ = false;
-            camera_open_ = false;
             return se::ReaderStatus::error;
         }
         // Convert the last 7 columns to float

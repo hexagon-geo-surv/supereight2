@@ -272,8 +272,6 @@ se::InteriorNetReader::InteriorNetReader(const se::ReaderConfig& c) : se::Reader
         || !stdfs::is_regular_file(sequence_path_ + "/depth0/data.csv")
         || !stdfs::is_regular_file(sequence_path_ + "/cam0/data.csv")) {
         status_ = se::ReaderStatus::error;
-        camera_active_ = false;
-        camera_open_ = false;
         std::cerr
             << "Error: The InteriorNet sequence path must be a directory that contains"
             << " depth0/data and cam0/data subdirectories and depth0/data.csv and cam0/data.csv files\n";
@@ -291,8 +289,6 @@ se::InteriorNetReader::InteriorNetReader(const se::ReaderConfig& c) : se::Reader
             read_interiornet_ground_truth(ground_truth_file_);
         if (gt_poses.empty()) {
             status_ = se::ReaderStatus::error;
-            camera_active_ = false;
-            camera_open_ = false;
             return;
         }
         association(gt_poses, depth_images, rgb_images);
@@ -306,8 +302,6 @@ se::InteriorNetReader::InteriorNetReader(const se::ReaderConfig& c) : se::Reader
             std::cerr << "Error: Could not read generated ground truth file " << generated_filename
                       << "\n";
             status_ = se::ReaderStatus::error;
-            camera_active_ = false;
-            camera_open_ = false;
             return;
         }
     }
@@ -333,8 +327,6 @@ se::InteriorNetReader::InteriorNetReader(const se::ReaderConfig& c) : se::Reader
         if (image_data.data == NULL) {
             std::cerr << "Error: Could not read depth image " << first_depth_filename << "\n";
             status_ = se::ReaderStatus::error;
-            camera_active_ = false;
-            camera_open_ = false;
             return;
         }
 
@@ -362,8 +354,6 @@ se::InteriorNetReader::InteriorNetReader(const se::ReaderConfig& c) : se::Reader
         if (image_data.data == NULL) {
             std::cerr << "Error: Could not read RGB image " << first_rgb_filename << "\n";
             status_ = se::ReaderStatus::error;
-            camera_active_ = false;
-            camera_open_ = false;
             return;
         }
         rgba_image_res_ = Eigen::Vector2i(image_data.cols, image_data.rows);
@@ -377,13 +367,9 @@ void se::InteriorNetReader::restart()
     se::Reader::restart();
     if (stdfs::is_directory(sequence_path_)) {
         status_ = se::ReaderStatus::ok;
-        camera_active_ = true;
-        camera_open_ = true;
     }
     else {
         status_ = se::ReaderStatus::error;
-        camera_active_ = false;
-        camera_open_ = false;
     }
 }
 
