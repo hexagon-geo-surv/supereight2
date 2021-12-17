@@ -124,8 +124,7 @@ void bilateral_filter(se::Image<float>& output_image,
 {
     if ((input_image.width() != output_image.width())
         || input_image.height() != output_image.height()) {
-        std::cerr << "input/output image sizes differ." << std::endl;
-        exit(1);
+        output_image = se::Image<float>(input_image.width(), input_image.height());
     }
 
     const int width = input_image.width();
@@ -241,10 +240,9 @@ void half_sample_robust_image(se::Image<float>& output_image,
                               const float e_d,
                               const int radius)
 {
-    if ((input_image.width() / output_image.width() != 2)
-        || (input_image.height() / output_image.height() != 2)) {
-        std::cerr << "Invalid ratio." << std::endl;
-        exit(1);
+    if ((input_image.width() / 2 != output_image.width())
+        || (input_image.height() / 2 != output_image.height())) {
+        output_image = se::Image<float>(input_image.width() / 2, input_image.height() / 2);
     }
 
 #pragma omp parallel for
