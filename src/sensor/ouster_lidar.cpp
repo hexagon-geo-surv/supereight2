@@ -117,15 +117,15 @@ se::OusterLidar::OusterLidar(const OusterLidarConfig& c, const float dsf) :
 
 se::OusterLidar::OusterLidar(const OusterLidar& ol, const float dsf) :
         se::SensorBase<se::OusterLidar>(ol),
+        model(ol.model.imageWidth() / dsf,
+              ol.model.imageHeight() / dsf,
+              ol.model.beamAzimuthAngles(),
+              ol.model.beamElevationAngles()), // TODO: Does the beam need to be scaled too?
         min_ray_angle(ol.min_ray_angle),
         min_elevation_rad(ol.min_elevation_rad),
         max_elevation_rad(ol.max_elevation_rad),
         horizontal_fov(ol.horizontal_fov),
-        vertical_fov(ol.vertical_fov),
-        model(ol.model.imageWidth() / dsf,
-              ol.model.imageHeight() / dsf,
-              ol.model.beamAzimuthAngles(),
-              ol.model.beamElevationAngles()) // TODO: Does the beam need to be scaled too?
+        vertical_fov(ol.vertical_fov)
 {
 }
 
