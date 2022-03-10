@@ -74,6 +74,11 @@ class Image {
     int width_;
     int height_;
     std::vector<T, Eigen::aligned_allocator<T>> data_;
+
+    // std::vector<bool> is specialized for space efficiency which means that element access doesn't
+    // return references to the data as expected, causing compilation issues.
+    static_assert(!std::is_same<T, bool>::value,
+                  "Use char/uint8_t instead of bool to avoid the std::vector<bool> specialization");
 };
 
 
