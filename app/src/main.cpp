@@ -181,14 +181,13 @@ int main(int argc, char** argv)
                 cv::Size res(processed_img_res.x(), processed_img_res.y());
                 std::vector<cv::Mat> images;
                 std::vector<std::string> labels;
-                labels.emplace_back("Input RGB");
+                labels.emplace_back("INPUT RGB");
                 images.emplace_back(res, CV_8UC4, output_rgba_img_data.get());
-                labels.emplace_back("Input depth");
+                labels.emplace_back("INPUT DEPTH");
                 images.emplace_back(res, CV_8UC4, output_depth_img_data.get());
-                labels.emplace_back(config.app.enable_ground_truth ? "Tracking disabled"
-                                                                   : "Tracking");
+                labels.emplace_back(config.app.enable_ground_truth ? "TRACKING OFF" : "TRACKING");
                 images.emplace_back(res, CV_8UC4, output_tracking_img_data.get());
-                labels.emplace_back("3D render");
+                labels.emplace_back("RENDER");
                 images.emplace_back(res, CV_8UC4, output_volume_img_data.get());
                 // Combine all the images into one, overlay the labels and show it.
                 cv::Mat render = se::montage(2, 2, images, labels);
