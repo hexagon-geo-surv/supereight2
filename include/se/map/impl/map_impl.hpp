@@ -319,7 +319,7 @@ int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveStructure(const std::strin
 
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMesh(const std::string& filename,
-                                                           const Eigen::Matrix4f& T_WM) const
+                                                           const Eigen::Matrix4f& T_OW) const
 {
     se::TriangleMesh mesh;
     if constexpr (ResT == se::Res::Single) {
@@ -329,14 +329,46 @@ int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMesh(const std::string& fi
         se::algorithms::dual_marching_cube(*octree_ptr_, mesh);
     }
 
+    Eigen::Matrix4f T_OM = resolution_ * T_OW * T_WM_;
+
     if (str_utils::ends_with(filename, ".ply")) {
-        return io::save_mesh_ply(mesh, filename, T_WM);
+        return io::save_mesh_ply(mesh, filename, T_OM);
     }
     else if (str_utils::ends_with(filename, ".vtk")) {
-        return io::save_mesh_vtk(mesh, filename, T_WM);
+        return io::save_mesh_vtk(mesh, filename, T_OM);
     }
     else if (str_utils::ends_with(filename, ".obj")) {
-        return io::save_mesh_obj(mesh, filename, T_WM);
+        return io::save_mesh_obj(mesh, filename, T_OM);
+    }
+    else {
+        std::cerr << "Error saving mesh: unknown file extension in " << filename << "\n";
+        return 2;
+    }
+}
+
+
+
+template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
+int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMeshVoxel(const std::string& filename) const
+{
+    se::TriangleMesh mesh;
+    if constexpr (ResT == se::Res::Single) {
+        se::algorithms::marching_cube(*octree_ptr_, mesh);
+    }
+    else {
+        se::algorithms::dual_marching_cube(*octree_ptr_, mesh);
+    }
+
+    Eigen::Matrix4f T = Eigen::Matrix4f::Identity();
+
+    if (str_utils::ends_with(filename, ".ply")) {
+        return io::save_mesh_ply(mesh, filename, T);
+    }
+    else if (str_utils::ends_with(filename, ".vtk")) {
+        return io::save_mesh_vtk(mesh, filename, T);
+    }
+    else if (str_utils::ends_with(filename, ".obj")) {
+        return io::save_mesh_obj(mesh, filename, T);
     }
     else {
         std::cerr << "Error saving mesh: unknown file extension in " << filename << "\n";

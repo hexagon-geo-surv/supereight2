@@ -303,17 +303,26 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
                       const Eigen::Matrix4f& T_WM = Eigen::Matrix4f::Identity()) const;
 
     /**
-     * \brief Extract the mesh from the map using a marching cube algorithm and save it to a file.
+     * \brief Create a mesh in the world frame in units of metres and save it to a file.
      *
      * \param[in] filename The file where the mesh will be saved. The file format will be selected
      *                     based on the file extension. Allowed file extensions are `.ply`, `.vtk` and
      *                     `.obj`.
-     * \param[in] T_WM     Transformation from the world frame where the mesh is generated to the world
-     *                     frame. Defaults to identity.
+     * \param[in] T_OW     Transformation from the world frame in units of metres to the output frame. Defaults to identity.
      * \return Zero on success and non-zero on error.
      */
     int saveMesh(const std::string& filename,
-                 const Eigen::Matrix4f& T_WM = Eigen::Matrix4f::Identity()) const;
+                 const Eigen::Matrix4f& T_OW = Eigen::Matrix4f::Identity()) const;
+
+    /**
+     * \brief Create a mesh in the map frame in units of voxel and save it to a file.
+     *
+     * \param[in] filename The file where the mesh will be saved. The file format will be selected
+     *                     based on the file extension. Allowed file extensions are `.ply`, `.vtk` and
+     *                     `.obj`.
+     * \return Zero on success and non-zero on error.
+     */
+    int saveMeshVoxel(const std::string& filename) const;
 
     /**
      * \brief Convert voxel coordinates in [voxel] to its centre point coordinates in [meter].

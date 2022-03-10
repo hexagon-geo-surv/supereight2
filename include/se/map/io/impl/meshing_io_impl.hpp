@@ -15,7 +15,7 @@ namespace io {
 template<typename FaceT>
 int save_mesh_vtk(const Mesh<FaceT>& mesh,
                   const std::string& filename,
-                  const Eigen::Matrix4f& T_WM,
+                  const Eigen::Matrix4f& T_OM,
                   const float* point_data,
                   const float* cell_data)
 {
@@ -42,7 +42,7 @@ int save_mesh_vtk(const Mesh<FaceT>& mesh,
     for (size_t f = 0; f < num_faces; ++f) {
         for (size_t v = 0; v < FaceT::num_vertexes; ++v) {
             const Eigen::Vector3f vertex_W =
-                (T_WM * mesh[f].vertexes[v].homogeneous()).template head<3>();
+                (T_OM * mesh[f].vertexes[v].homogeneous()).template head<3>();
             file << vertex_W.x() << " " << vertex_W.y() << " " << vertex_W.z() << "\n";
         }
     }
@@ -96,7 +96,7 @@ int save_mesh_vtk(const Mesh<FaceT>& mesh,
 template<typename FaceT>
 int save_mesh_ply(const Mesh<FaceT>& mesh,
                   const std::string& filename,
-                  const Eigen::Matrix4f& T_WM,
+                  const Eigen::Matrix4f& T_OM,
                   const float* point_data,
                   const float* cell_data)
 {
@@ -137,7 +137,7 @@ int save_mesh_ply(const Mesh<FaceT>& mesh,
     for (size_t f = 0; f < num_faces; ++f) {
         for (size_t v = 0; v < FaceT::num_vertexes; ++v) {
             const Eigen::Vector3f vertex_W =
-                (T_WM * mesh[f].vertexes[v].homogeneous()).template head<3>();
+                (T_OM * mesh[f].vertexes[v].homogeneous()).template head<3>();
             file << vertex_W.x() << " " << vertex_W.y() << " " << vertex_W.z();
             if (has_point_data) {
                 file << " " << point_data[f * FaceT::num_vertexes + v] << "\n";
@@ -173,7 +173,7 @@ int save_mesh_ply(const Mesh<FaceT>& mesh,
 
 
 template<typename FaceT>
-int save_mesh_obj(const Mesh<FaceT>& mesh, const std::string& filename, const Eigen::Matrix4f& T_WM)
+int save_mesh_obj(const Mesh<FaceT>& mesh, const std::string& filename, const Eigen::Matrix4f& T_OM)
 {
     // Open the file for writing.
     std::ofstream file(filename.c_str());
@@ -194,7 +194,7 @@ int save_mesh_obj(const Mesh<FaceT>& mesh, const std::string& filename, const Ei
     for (size_t f = 0; f < num_faces; ++f) {
         for (size_t v = 0; v < FaceT::num_vertexes; ++v) {
             const Eigen::Vector3f vertex_W =
-                (T_WM * mesh[f].vertexes[v].homogeneous()).template head<3>();
+                (T_OM * mesh[f].vertexes[v].homogeneous()).template head<3>();
             file << "v " << vertex_W.x() << " " << vertex_W.y() << " " << vertex_W.z() << "\n";
         }
     }
