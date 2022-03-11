@@ -16,7 +16,7 @@ supereight 2 follows [semantic versioning](https://semver.org/).
 Install the dependencies
 
 * GCC 7+ or clang 6+
-* CMake 3.10+
+* CMake 3.8+
 * Eigen 3
 * OpenCV 3+
 * GLut (optional, for the GUI)
@@ -48,6 +48,18 @@ cd build/release
 cmake -DCMAKE_BUILD_TYPE=Release ../..
 cmake --build .
 ```
+
+You can install the library after building:
+
+``` sh
+# You might need to run the following commands as root/using sudo
+make install
+# Or if you don't have/like Make do a standard CMake install
+cmake --install build/release
+```
+
+You can then use supereight 2 in your CMake project by adding
+`find_package(Supereight2 REQUIRED)` and linking against `SRL::Supereight2`.
 
 
 

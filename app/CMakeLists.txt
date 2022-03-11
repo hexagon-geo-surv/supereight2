@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
 # SPDX-License-Identifier: CC0-1.0
 
-cmake_minimum_required(VERSION 3.5...3.16)
+cmake_minimum_required(VERSION 3.8...3.16)
 
 find_package(GLUT)
 find_package(OpenGL)
@@ -20,7 +20,7 @@ add_library(${LIB_NAME} STATIC
   "src/reader_tum.cpp"
 )
 target_include_directories(${LIB_NAME} PRIVATE include)
-target_link_libraries(${LIB_NAME} PRIVATE SE::Supereight)
+target_link_libraries(${LIB_NAME} PRIVATE SRL::Supereight2)
 if(PCL_FOUND)
   # These have to be added globaly for compatibility with PCL 1.8.1 on Ubuntu 18.04.
   include_directories(${PCL_INCLUDE_DIRS})
@@ -68,7 +68,7 @@ foreach(APP_CONFIG ${SE_APP_CONFIG})
   set(EXE_NAME "supereight_${FIELD_LC}_${RES_LC}_${SENSOR_LC}")
   add_executable(${EXE_NAME} ${GENERATED_MAIN} "src/montage.cpp")
   target_include_directories(${EXE_NAME} BEFORE PRIVATE include)
-  target_link_libraries(${EXE_NAME} PRIVATE SE::Supereight ${LIB_NAME})
+  target_link_libraries(${EXE_NAME} PRIVATE SRL::Supereight2 ${LIB_NAME})
   # Allow handling large files in 32-bit systems
   target_compile_definitions(${EXE_NAME} PRIVATE _FILE_OFFSET_BITS=64)
 

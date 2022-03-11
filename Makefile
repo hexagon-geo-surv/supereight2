@@ -35,6 +35,12 @@ test-debug: debug
 
 
 
+.PHONY: install
+install: release
+	cmake --install build/release
+
+
+
 .PHONY: doc
 doc:
 	doxygen
