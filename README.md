@@ -51,9 +51,10 @@ cmake --build .
 
 
 
-## Documentation
+## API documentation
 
-Online documentation can be found [here](https://supereight2.readthedocs.io).
+Online API documentation can be found
+[here](https://supereight2.readthedocs.io).
 
 If you have Doxygen installed you can build a local copy of the documentation in
 `doc/html` by running `make doc`.
@@ -114,13 +115,16 @@ const se::OusterLidar   ouster_lidar(config.sensor, config.app.sensor_downsampli
 
 ### 3. Setting up a reader
 
+Supereight accepts float depth images with units of metres. A number of readers
+for common datasets are available.
+
 | Reader Type   | Scene Format                  | `sequence_path`        | GT Format                | `ground_truth_file`                    |
 |---------------|-------------------------------|------------------------|--------------------------|----------------------------------------|
-| TUM           | TUM rgb/depth                 | `path/to/dataset/`     | TUM ground truth         | `path/to/tum_groundtruth.txt`          |
-| InteriorNet   | InteriorNet rgb/depth         | `path/to/dataset/`     | InteriorNet ground truth | `path/to/cam0.ccam`                    |
+| TUM           | TUM RGB/depth                 | `path/to/dataset/`     | TUM ground truth         | `path/to/tum_groundtruth.txt`          |
+| InteriorNet   | InteriorNet RGB/depth         | `path/to/dataset/`     | InteriorNet ground truth | `path/to/cam0.ccam`                    |
 | Newer College | Newer College point cloud     | `path/to/pointclouds/` | TUM ground truth         | `path/to/tum_groundtruth.txt`          |
-| RAW           | RAW file                      | `path/to/scene.raw`    | Association format       | `path/to/association.txt`              |
-| OpenNI        | -                             | -                      | -                        | -                                      |
+| RAW           | SLAMBench RAW file            | `path/to/scene.raw`    | Association format       | `path/to/association.txt`              |
+| OpenNI        | Microsoft Kinect/Asus Xtion   | -                      | -                        | -                                      |
 
 Relative paths are relative to the YAML configuration file. A `~` in the
 beginning of a path is expanded to the contents of the `HOME` environment
@@ -130,23 +134,25 @@ variable (the path to the current user's home directory).
 
 [File Format](https://vision.in.tum.de/data/datasets/rgbd-dataset/file_formats)
 
-> The depth images are scaled by a factor of 5000,
-> i.e., a pixel value of 5000 in the depth image corresponds to a distance of 1 meter from the camera,
-> 10000 to 2 meter distance, etc. A pixel value of 0 means missing value/no data.
+> The depth images are scaled by a factor of 5000, i.e. a pixel value of 5000 in
+> the depth image corresponds to a distance of 1 metre from the camera, 10000 to
+> a distance of 2 metres, etc. A pixel value of 0 corresponds to invalid data.
 
 #### ICL NUIM
 
-Use the `./scripts/icl-nuim-download.sh` script to download the ICL-NUIM datasets in `TUM` format. It will
-download the datasets and handle all the post-processing.
-When downloading the dataset manually the user has to
+Use the `./scripts/icl-nuim-download.sh` script to download the ICL-NUIM
+datasets in the `TUM` format described previously. It will download the datasets
+and handle all the post-processing. When downloading the datasets manually the
+user has to
 
-- create the `rgb.txt` and `depth.txt` and
-- rename the `livingRoomX.gt.freiburg` to `groundtruth.txt`
+* create the `rgb.txt` and `depth.txt` files
+* rename `livingRoomX.gt.freiburg` to `groundtruth.txt`
 
 to match the `TUM` format.
 
-We recommend to delete `depth/0.png` and `rgb/0.png` from the dataset and remove them from the `rgb.txt`, `depth.txt` and
-`association.txt` files, as no matching ground truth is available (additionally delete frame 1 for the `of kt0` dataset).
+We recommend to delete `depth/0.png` and `rgb/0.png` from the dataset and remove
+them from the `rgb.txt`, `depth.txt` and `association.txt` files, as no matching
+ground truth is available (additionally delete frame 1 for the `kt0` dataset).
 
 ```text
 dataset/
@@ -300,11 +306,12 @@ Internally the integrator is split in an allocator and an updater.
 
 #### GUI
 
-If GLUT is available and `enable_gui` is `true` in the config file then the
-input RGB and depth images, the tracking result and a 3D render from the current
-camera pose will be shown.
+If GLUT is available and `enable_gui` is `true` in the configuration file then
+the input RGB and depth images, the tracking result and a 3D render from the
+current camera pose will be shown.
 
 #### Mesh
+
 The mesh can be extracted from the map using its `se::Map::saveMesh()` function. Internally the function runs a marching cube algorithm on the
 primal grid (single-res implementation) or dual grid (multi-res implementation). The mesh can be saved
 as a `.ply`, `.obj` or `.vtk` file. Based on the provided filename the according type will be saved.
@@ -312,99 +319,106 @@ as a `.ply`, `.obj` or `.vtk` file. Based on the provided filename the according
 ![MultiresOccupancy - Cow and Lady - mesh](./doc/images/occupancy-multi-cow-and-lady-mesh.jpeg)
 
 ```cpp
-// Example
-map.saveMesh("./out/mesh.ply");
+map.saveMesh("./mesh.ply");
 ```
 
 #### Structure
+
 The map's underlying octree structure up to block level can saved using `se::Map::saveStructure()` function.
 The structure can be saved as a `.ply`, `.obj` or `.vtk` file. Based on the provided filename the according type will be saved.
 
 ```cpp
-map.saveStructure("./out/struct.ply");
+map.saveStructure("./octree_structure.ply");
 ```
 
 #### Slice
+
 Slices through the TSDF/occupancy field of the map can be saved using the `se::Map::saveFieldSlice()` function. The field can only be saved as a `.vtk` file.
 Given a position `t_WS` three axis aligned slices located at the `t_WS.x()` (y-z plane), `t_WS.y()` (x-z plane) and `t_WS.z()` (x-y plane)
 will be saved.
 
 ```cpp
-// Example
-map.saveFieldSlice("./out/slice", t_WS);
+map.saveFieldSlice("./octree_slice", t_WS);
 ```
 
 ![MultiresOccupancy - Cow and Lady - slice](./doc/images/occupancy-multi-cow-and-lady-slice.jpeg)
 
 #### Visualisation
+
 The file formats can be visualised with the following software (non-exhaustive):
 
-| File type | Solution                                                                                                                 |
+| File type | Software                                                                                                                 |
 |-----------|--------------------------------------------------------------------------------------------------------------------------|
-| `.ply`    | [CloudCompare](https://www.danielgm.net/cc/), [MeshLab](https://www.meshlab.net/), [ParaView](https://www.paraview.org/) |
-| `.obj`    | [MeshLab](https://www.meshlab.net/), [ParaView](https://www.paraview.org/)                                               |
+| `.ply`    | [ParaView](https://www.paraview.org/), [MeshLab](https://www.meshlab.net/), [CloudCompare](https://www.danielgm.net/cc/) |
+| `.obj`    | [ParaView](https://www.paraview.org/), [MeshLab](https://www.meshlab.net/)                                               |
 | `.vtk`    | [ParaView](https://www.paraview.org/)                                                                                    |
 
 ## Performance
-The following shows performance of the different pipelines (TSDF, MultiresTSDF and MultiresOFuison) for numerous datasets.
-All pipelines are run at 1cm resolution with a down-sampling factor of x0.5.
+
+The following shows performance of the different pipelines (TSDF, MultiresTSDF
+and MultiresOccupancy) for numerous datasets. All pipelines are run at 1cm voxel
+resolution with a 320x240 input image resolution.
 
 ### TSDF
-| dataset                     | total (s) | read (s) | integration (s) | raycast (s) |
-| --------------------------- | --------- | -------- | --------------- | ----------- |
-| living_room_traj0_frei_png  | 0.0169    | 0.0078   | 0.0038          | 0.0043      |
-| living_room_traj1_frei_png  | 0.0157    | 0.0077   | 0.0032          | 0.0038      |
-| living_room_traj2_frei_png  | 0.0189    | 0.0079   | 0.0053          | 0.0046      |
-| living_room_traj3_frei_png  | 0.0165    | 0.0076   | 0.0035          | 0.0042      |
-| cow_and_lady                | 0.0253    | 0.0003   | 0.0158          | 0.0082      |
-| rgbd_dataset_freiburg1_desk | 0.0164    | 0.0040   | 0.0036          | 0.0047      |
-| rgbd_dataset_freiburg2_desk | 0.0250    | 0.0032   | 0.0105          | 0.0073      |
+
+| Dataset                     | Frame total (s) | Data read (s) | Integration (s) | Raycasting (s) |
+| :-------------------------- | --------------- | ------------- | --------------- | -------------- |
+| living_room_traj0_frei_png  | 0.0169          | 0.0078        | 0.0038          | 0.0043         |
+| living_room_traj1_frei_png  | 0.0157          | 0.0077        | 0.0032          | 0.0038         |
+| living_room_traj2_frei_png  | 0.0189          | 0.0079        | 0.0053          | 0.0046         |
+| living_room_traj3_frei_png  | 0.0165          | 0.0076        | 0.0035          | 0.0042         |
+| cow_and_lady                | 0.0253          | 0.0003        | 0.0158          | 0.0082         |
+| rgbd_dataset_freiburg1_desk | 0.0164          | 0.0040        | 0.0036          | 0.0047         |
+| rgbd_dataset_freiburg2_desk | 0.0250          | 0.0032        | 0.0105          | 0.0073         |
 
 ### MultiresTSDF
-| dataset                     | total (s) | read (s) | integration (s) | raycast (s) |
-| --------------------------- | --------- | -------- | --------------- | ----------- |
-| living_room_traj0_frei_png  | 0.0211    | 0.0079   | 0.0061          | 0.0062      |
-| living_room_traj1_frei_png  | 0.0196    | 0.0078   | 0.0051          | 0.0055      |
-| living_room_traj2_frei_png  | 0.0239    | 0.0079   | 0.0084          | 0.0065      |
-| living_room_traj3_frei_png  | 0.0203    | 0.0076   | 0.0055          | 0.0060      |
-| cow_and_lady                | 0.0367    | 0.0003   | 0.0247          | 0.0107      |
-| rgbd_dataset_freiburg1_desk | 0.0170    | 0.0003   | 0.0059          | 0.0068      |
-| rgbd_dataset_freiburg2_desk | 0.0308    | 0.0003   | 0.0173          | 0.0093      |
+
+| Dataset                     | Frame total (s) | Data read (s) | Integration (s) | Raycasting (s) |
+| :-------------------------- | --------------- | ------------- | --------------- | -------------- |
+| living_room_traj0_frei_png  | 0.0211          | 0.0079        | 0.0061          | 0.0062         |
+| living_room_traj1_frei_png  | 0.0196          | 0.0078        | 0.0051          | 0.0055         |
+| living_room_traj2_frei_png  | 0.0239          | 0.0079        | 0.0084          | 0.0065         |
+| living_room_traj3_frei_png  | 0.0203          | 0.0076        | 0.0055          | 0.0060         |
+| cow_and_lady                | 0.0367          | 0.0003        | 0.0247          | 0.0107         |
+| rgbd_dataset_freiburg1_desk | 0.0170          | 0.0003        | 0.0059          | 0.0068         |
+| rgbd_dataset_freiburg2_desk | 0.0308          | 0.0003        | 0.0173          | 0.0093         |
 
 ### MultiresOccupancy
-| dataset                     | total (s) | read (s) | integration (s) | raycast (s) |
-| --------------------------- | --------- | -------- | --------------- | ----------- |
-| living_room_traj0_frei_png  | 0.0403    | 0.0079   | 0.01442         | 0.0170      |
-| living_room_traj1_frei_png  | 0.0414    | 0.0079   | 0.0161          | 0.0164      |
-| living_room_traj2_frei_png  | 0.0505    | 0.0079   | 0.0204          | 0.0212      |
-| living_room_traj3_frei_png  | 0.0457    | 0.0077   | 0.0145          | 0.0225      |
-| cow_and_lady                | 0.0576    | 0.0003   | 0.0243          | 0.0321      |
-| rgbd_dataset_freiburg1_desk | 0.0404    | 0.0003   | 0.0069          | 0.0298      |
-| rgbd_dataset_freiburg2_desk | 0.0578    | 0.0003   | 0.0180          | 0.0364      |
+
+| Dataset                     | Frame total (s) | Data read (s) | Integration (s) | Raycasting (s) |
+| :-------------------------- | --------------- | ------------- | --------------- | -------------- |
+| living_room_traj0_frei_png  | 0.0403          | 0.0079        | 0.01442         | 0.0170         |
+| living_room_traj1_frei_png  | 0.0414          | 0.0079        | 0.0161          | 0.0164         |
+| living_room_traj2_frei_png  | 0.0505          | 0.0079        | 0.0204          | 0.0212         |
+| living_room_traj3_frei_png  | 0.0457          | 0.0077        | 0.0145          | 0.0225         |
+| cow_and_lady                | 0.0576          | 0.0003        | 0.0243          | 0.0321         |
+| rgbd_dataset_freiburg1_desk | 0.0404          | 0.0003        | 0.0069          | 0.0298         |
+| rgbd_dataset_freiburg2_desk | 0.0578          | 0.0003        | 0.0180          | 0.0364         |
 
 ## References
 
 If you use supereight 2 in your work, please cite
 
 ``` bibtex
-@ARTICLE{Vespa_RAL2018,
-  author={Vespa, Emanuele and Nikolov, Nikolay and Grimm, Marius and Nardi, Luigi and Kelly, Paul H. J. and Leutenegger, Stefan},
-  journal={IEEE Robotics and Automation Letters},
-  title={Efficient Octree-Based Volumetric {SLAM} Supporting Signed-Distance and Occupancy Mapping},
-  year={2018},
-  volume={3},
-  number={2},
-  pages={1144-1151},
-  doi={10.1109/LRA.2018.2792537}}
+@Article{Vespa_RAL2018,
+  author  = {Vespa, Emanuele and Nikolov, Nikolay and Grimm, Marius and Nardi, Luigi and Kelly, Paul H. J. and Leutenegger, Stefan},
+  title   = {Efficient Octree-Based Volumetric {SLAM} Supporting Signed-Distance and Occupancy Mapping},
+  journal = {IEEE Robotics and Automation Letters},
+  year    = {2018},
+  volume  = {3},
+  number  = {2},
+  pages   = {1144--1151},
+  month   = apr,
+  issn    = {2377-3766},
 }
 ```
 
 Additionally, if you are using MultiresOccupancy or MultiresTSDF, please cite
 
 ``` bibtex
-@ARTICLE{Funk_RAL2021,
+@Article{Funk_RAL2021,
   author  = {Nils Funk and Juan Tarrio and Sotiris Papatheodorou and Marija Popovi\'{c} and Pablo F. Alcantarilla and Stefan Leutenegger},
-  title   = {Multi-Resolution {3D} Mapping with Explicit Free Space Representation for Fast and Accurate Mobile Robot Motion Planning},
+  title   = {Multi-Resolution {3D} Mapping With Explicit Free Space Representation for Fast and Accurate Mobile Robot Motion Planning},
   journal = {IEEE Robotics and Automation Letters},
   year    = {2021},
   volume  = {6},
@@ -416,15 +430,12 @@ Additionally, if you are using MultiresOccupancy or MultiresTSDF, please cite
 ```
 or
 ``` bibtex
-@INPROCEEDINGS{Vespa_3DV2019,
-  author={Vespa, Emanuele and Funk, Nils and Kelly, Paul H. J. and Leutenegger, Stefan},
-  booktitle={2019 International Conference on 3D Vision (3DV)},
-  title={Adaptive-Resolution Octree-Based Volumetric {SLAM}},
-  year={2019},
-  volume={},
-  number={},
-  pages={654-662},
-  doi={10.1109/3DV.2019.00077}}
+@InProceedings{Vespa_3DV2019,
+  author    = {Vespa, Emanuele and Funk, Nils and Kelly, Paul H. J. and Leutenegger, Stefan},
+  title     = {Adaptive-Resolution Octree-Based Volumetric {SLAM}},
+  booktitle = {International Conference on 3D Vision (3DV)},
+  year      = {2019},
+  pages     = {654--662},
 }
 ```
 respectively.
@@ -432,10 +443,9 @@ respectively.
 ## License
 
 Copyright 2018-2019 Emanuele Vespa</br>
-Copyright 2019-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich</br>
-Copyright 2019-2021 Nils Funk</br>
-Copyright 2019-2021 Sotiris Papatheodorou</br>
-All rights reserved.
+Copyright 2019-2022 Smart Robotics Lab, Imperial College London, Technical University of Munich</br>
+Copyright 2019-2022 Nils Funk</br>
+Copyright 2019-2022 Sotiris Papatheodorou</br>
 
 supereight 2 is distributed under the
 [BSD 3-clause license](LICENSES/BSD-3-Clause.txt).
