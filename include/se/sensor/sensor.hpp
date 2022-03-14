@@ -190,6 +190,8 @@ class SensorBase {
     float far_plane;
     Eigen::Matrix4f T_BS;
 
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     private:
     // Make sure the derived class and the template parameter are the same (i.e. prevent class D1 : Base<D2>)
     SensorBase(){};
