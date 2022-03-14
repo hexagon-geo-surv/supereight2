@@ -14,7 +14,6 @@ se::SensorConfigBase::SensorConfigBase() :
         height(0),
         near_plane(0.0f),
         far_plane(INFINITY),
-        left_hand_frame(false),
         T_BS(Eigen::Matrix4f::Identity())
 {
 }
@@ -51,7 +50,6 @@ se::SensorConfigBase::SensorConfigBase(const std::string& yaml_file) :
     se::yaml::subnode_as_int(node, "height", height);
     se::yaml::subnode_as_float(node, "near_plane", near_plane);
     se::yaml::subnode_as_float(node, "far_plane", far_plane);
-    se::yaml::subnode_as_bool(node, "left_hand_frame", left_hand_frame);
 
     T_BS = Eigen::Matrix4f::Identity();
 

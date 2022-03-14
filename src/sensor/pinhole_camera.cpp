@@ -31,7 +31,6 @@ se::PinholeCameraConfig::PinholeCameraConfig(const std::string& yaml_file) :
     se::yaml::subnode_as_float(node, "fy", fy);
     se::yaml::subnode_as_float(node, "cx", cx);
     se::yaml::subnode_as_float(node, "cy", cy);
-    left_hand_frame = fy < 0;
 }
 
 
@@ -42,8 +41,6 @@ std::ostream& se::operator<<(std::ostream& os, const se::PinholeCameraConfig& c)
     os << str_utils::value_to_pretty_str(c.height, "height") << " px\n";
     os << str_utils::value_to_pretty_str(c.near_plane, "near_plane") << " m\n";
     os << str_utils::value_to_pretty_str(c.far_plane, "far_plane") << " m\n";
-    os << str_utils::str_to_pretty_str((c.left_hand_frame ? "yes" : "no"), "left_hand_frame")
-       << "\n";
     os << str_utils::value_to_pretty_str(c.fx, "fx") << "\n";
     os << str_utils::value_to_pretty_str(c.fy, "fy") << "\n";
     os << str_utils::value_to_pretty_str(c.cx, "cx") << "\n";
@@ -71,6 +68,8 @@ se::PinholeCamera::PinholeCamera(const PinholeCameraConfig& c) :
         model(c.width, c.height, c.fx, c.fy, c.cx, c.cy, _distortion),
         scaled_pixel(1 / c.fx)
 {
+    left_hand_frame = (c.fx < 0.0f) ^ (c.fy < 0.0f);
+
     computeFrustumVertices();
     computeFrustumNormals();
 

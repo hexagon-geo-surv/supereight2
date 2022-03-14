@@ -15,10 +15,7 @@ namespace se {
 template<typename DerivedT>
 template<typename ConfigT>
 SensorBase<DerivedT>::SensorBase(const ConfigT& c) :
-        left_hand_frame(c.left_hand_frame),
-        near_plane(c.near_plane),
-        far_plane(c.far_plane),
-        T_BS(c.T_BS)
+        left_hand_frame(false), near_plane(c.near_plane), far_plane(c.far_plane), T_BS(c.T_BS)
 {
 }
 

@@ -47,8 +47,6 @@ std::ostream& se::operator<<(std::ostream& os, const se::OusterLidarConfig& c)
     os << str_utils::value_to_pretty_str(c.height, "height") << " px\n";
     os << str_utils::value_to_pretty_str(c.near_plane, "near_plane") << " m\n";
     os << str_utils::value_to_pretty_str(c.far_plane, "far_plane") << " m\n";
-    os << str_utils::str_to_pretty_str((c.left_hand_frame ? "yes" : "no"), "left_hand_frame")
-       << "\n";
     os << str_utils::eigen_matrix_to_pretty_str(c.T_BS, "T_BS") << "\n";
     return os;
 }
