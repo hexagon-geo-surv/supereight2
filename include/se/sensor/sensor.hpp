@@ -47,22 +47,9 @@ template<typename DerivedT>
 class SensorBase {
     public:
     template<typename ConfigT>
-    SensorBase(const ConfigT& c) :
-            left_hand_frame(c.left_hand_frame),
-            near_plane(c.near_plane),
-            far_plane(c.far_plane),
-            T_BS(c.T_BS)
-    {
-    }
+    SensorBase(const ConfigT& c);
 
-    SensorBase(const DerivedT& d) :
-            left_hand_frame(d.left_hand_frame),
-            near_plane(d.near_plane),
-            far_plane(d.far_plane),
-            T_BS(d.T_BS)
-    {
-    }
-
+    SensorBase(const DerivedT& d);
 
     /**
      * \brief Project a point in sensor frame to its image value.

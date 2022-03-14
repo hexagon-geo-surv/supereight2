@@ -13,6 +13,29 @@ namespace se {
 
 
 template<typename DerivedT>
+template<typename ConfigT>
+SensorBase<DerivedT>::SensorBase(const ConfigT& c) :
+        left_hand_frame(c.left_hand_frame),
+        near_plane(c.near_plane),
+        far_plane(c.far_plane),
+        T_BS(c.T_BS)
+{
+}
+
+
+
+template<typename DerivedT>
+SensorBase<DerivedT>::SensorBase(const DerivedT& d) :
+        left_hand_frame(d.left_hand_frame),
+        near_plane(d.near_plane),
+        far_plane(d.far_plane),
+        T_BS(d.T_BS)
+{
+}
+
+
+
+template<typename DerivedT>
 template<typename ValidPredicate>
 bool SensorBase<DerivedT>::projectToPixelValue(const Eigen::Vector3f& point_S,
                                                const se::Image<float>& img,
