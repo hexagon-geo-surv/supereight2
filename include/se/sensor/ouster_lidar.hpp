@@ -72,7 +72,7 @@ class OusterLidar : public SensorBase<OusterLidar> {
 
     bool sphereInFrustumInfImpl(const Eigen::Vector3f& centre_S, const float radius) const;
 
-    static std::string type();
+    static std::string typeImpl();
 
     srl::projection::OusterLidar model;
     float min_ray_angle;

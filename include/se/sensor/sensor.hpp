@@ -194,10 +194,10 @@ class SensorBase {
      */
     bool sphereInFrustumInf(const Eigen::Vector3f& centre_S, const float radius) const;
 
-    //    static std::string type()
-    //    {
-    //      return this->underlying().typeImpl(); // TODO:
-    //    }
+    /**
+     * \brief Return the sensor type as a string.
+     */
+    static std::string type();
 
     bool left_hand_frame;
     float near_plane;

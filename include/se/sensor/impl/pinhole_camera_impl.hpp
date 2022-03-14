@@ -33,9 +33,9 @@ inline float se::PinholeCamera::measurementFromPointImpl(const Eigen::Vector3f& 
 
 
 
-inline std::string se::PinholeCamera::type()
+inline std::string se::PinholeCamera::typeImpl()
 {
-    return "pinholecamera";
+    return "PinholeCamera";
 }
 
 

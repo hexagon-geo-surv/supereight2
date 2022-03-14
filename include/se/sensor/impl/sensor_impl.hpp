@@ -128,6 +128,14 @@ bool SensorBase<DerivedT>::sphereInFrustumInf(const Eigen::Vector3f& centre_S,
 
 
 template<typename DerivedT>
+std::string SensorBase<DerivedT>::type()
+{
+    return DerivedT::typeImpl();
+}
+
+
+
+template<typename DerivedT>
 DerivedT& SensorBase<DerivedT>::underlying()
 {
     return static_cast<DerivedT&>(*this);

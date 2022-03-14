@@ -67,7 +67,7 @@ class PinholeCamera : public SensorBase<PinholeCamera> {
 
     bool sphereInFrustumInfImpl(const Eigen::Vector3f& centre_S, const float radius) const;
 
-    static std::string type();
+    static std::string typeImpl();
 
     srl::projection::PinholeCamera<srl::projection::NoDistortion> model;
     float scaled_pixel;

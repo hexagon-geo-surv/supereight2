@@ -33,9 +33,9 @@ inline float se::OusterLidar::measurementFromPointImpl(const Eigen::Vector3f& po
 
 
 
-inline std::string se::OusterLidar::type()
+inline std::string se::OusterLidar::typeImpl()
 {
-    return "ousterlidar";
+    return "OusterLidar";
 }
 
 
