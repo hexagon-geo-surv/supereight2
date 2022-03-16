@@ -329,7 +329,9 @@ int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMesh(const std::string& fi
         se::algorithms::dual_marching_cube(*octree_ptr_, mesh);
     }
 
-    Eigen::Matrix4f T_OM = resolution_ * T_OW * T_WM_;
+    Eigen::Matrix4f T_WM_scale = T_WM_;
+    T_WM_scale.topLeftCorner<3, 3>() *= resolution_;
+    const Eigen::Matrix4f T_OM = T_OW * T_WM_scale;
 
     if (str_utils::ends_with(filename, ".ply")) {
         return io::save_mesh_ply(mesh, filename, T_OM);
