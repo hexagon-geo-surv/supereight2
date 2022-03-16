@@ -19,10 +19,9 @@
 
 
 
-se::Reader* reader = nullptr;
-
 se::Reader* se::create_reader(const se::ReaderConfig& config)
 {
+    se::Reader* reader = nullptr;
     // OpenNI from a camera or a file
     if (config.reader_type == se::ReaderType::OPENNI
         && (config.sequence_path.empty()
