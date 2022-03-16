@@ -22,24 +22,23 @@
 se::Reader* se::create_reader(const se::ReaderConfig& config)
 {
     se::Reader* reader = nullptr;
-    // OpenNI from a camera or a file
     if (config.reader_type == se::ReaderType::OPENNI
         && (config.sequence_path.empty()
             || (stdfs::path(config.sequence_path).extension() == ".oni"))) {
         reader = new se::OpenNIReader(config);
-    } // Slambench 1.0 .raw reader
+    }
     else if (config.reader_type == se::ReaderType::RAW
              && stdfs::path(config.sequence_path).extension() == ".raw") {
         reader = new se::RAWReader(config);
-    } // NewerCollege reader
+    }
     else if (config.reader_type == se::ReaderType::NEWERCOLLEGE
              && stdfs::is_directory(config.sequence_path)) {
         reader = new se::NewerCollegeReader(config);
-    } // TUM reader
+    }
     else if (config.reader_type == se::ReaderType::TUM
              && stdfs::is_directory(config.sequence_path)) {
         reader = new se::TUMReader(config);
-    } // InteriorNet reader
+    }
     else if (config.reader_type == se::ReaderType::INTERIORNET
              && stdfs::is_directory(config.sequence_path)) {
         reader = new se::InteriorNetReader(config);
