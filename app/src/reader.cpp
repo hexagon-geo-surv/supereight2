@@ -22,25 +22,19 @@
 se::Reader* se::create_reader(const se::ReaderConfig& config)
 {
     se::Reader* reader = nullptr;
-    if (config.reader_type == se::ReaderType::OPENNI
-        && (config.sequence_path.empty()
-            || (stdfs::path(config.sequence_path).extension() == ".oni"))) {
+    if (config.reader_type == se::ReaderType::OPENNI) {
         reader = new se::OpenNIReader(config);
     }
-    else if (config.reader_type == se::ReaderType::RAW
-             && stdfs::path(config.sequence_path).extension() == ".raw") {
+    else if (config.reader_type == se::ReaderType::RAW) {
         reader = new se::RAWReader(config);
     }
-    else if (config.reader_type == se::ReaderType::NEWERCOLLEGE
-             && stdfs::is_directory(config.sequence_path)) {
+    else if (config.reader_type == se::ReaderType::NEWERCOLLEGE) {
         reader = new se::NewerCollegeReader(config);
     }
-    else if (config.reader_type == se::ReaderType::TUM
-             && stdfs::is_directory(config.sequence_path)) {
+    else if (config.reader_type == se::ReaderType::TUM) {
         reader = new se::TUMReader(config);
     }
-    else if (config.reader_type == se::ReaderType::INTERIORNET
-             && stdfs::is_directory(config.sequence_path)) {
+    else if (config.reader_type == se::ReaderType::INTERIORNET) {
         reader = new se::InteriorNetReader(config);
     }
     else {
