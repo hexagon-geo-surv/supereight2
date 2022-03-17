@@ -22,9 +22,17 @@
 namespace se {
 
 struct MapConfig {
+    /** The dimensions of the map in metres.
+     */
     Eigen::Vector3f dim;
+
+    /** The resolution of map voxels in metres.
+     */
     float res;
-    Eigen::Matrix4f T_MW; //< World to map transformation
+
+    /** The transformation from the world frame W to the map frame M.
+     */
+    Eigen::Matrix4f T_MW;
 
     /** Initializes the config to a 10m x 10m x 3m map with a 10cm resolution and the origin at the
      * centre of the volume.
