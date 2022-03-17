@@ -1,8 +1,8 @@
 /*
  * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
- * SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
- * SPDX-FileCopyrightText: 2021 Nils Funk
- * SPDX-FileCopyrightText: 2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2022 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2022 Nils Funk
+ * SPDX-FileCopyrightText: 2022 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -15,39 +15,20 @@
 
 
 namespace se {
-AppConfig::AppConfig() :
-        enable_ground_truth(false),
-        enable_rendering(true),
-        enable_gui(true),
-        enable_meshing(false),
-        enable_slice_meshing(false),
-        enable_structure_meshing(),
-        mesh_output_dir(""),
-        sensor_downsampling_factor(1),
-        tracking_rate(1),
-        integration_rate(1),
-        rendering_rate(4),
-        meshing_rate(100),
-        max_frames(-1),
-        log_file("")
-{
-}
 
-
-
-AppConfig::AppConfig(const std::string& yaml_file) : AppConfig::AppConfig()
+void AppConfig::readYaml(const std::string& filename)
 {
     // Open the file for reading.
     cv::FileStorage fs;
     try {
-        if (!fs.open(yaml_file, cv::FileStorage::READ | cv::FileStorage::FORMAT_YAML)) {
-            std::cerr << "Error: couldn't read configuration file " << yaml_file << "\n";
+        if (!fs.open(filename, cv::FileStorage::READ | cv::FileStorage::FORMAT_YAML)) {
+            std::cerr << "Error: couldn't read configuration file " << filename << "\n";
             return;
         }
     }
     catch (const cv::Exception& e) {
         // OpenCV throws if the file contains non-YAML data.
-        std::cerr << "Error: invalid YAML in configuration file " << yaml_file << "\n";
+        std::cerr << "Error: invalid YAML in configuration file " << filename << "\n";
         return;
     }
 
@@ -55,7 +36,7 @@ AppConfig::AppConfig(const std::string& yaml_file) : AppConfig::AppConfig()
     const cv::FileNode node = fs["app"];
     if (node.type() != cv::FileNode::MAP) {
         std::cerr << "Warning: using default app configuration, no \"app\" section found in "
-                  << yaml_file << "\n";
+                  << filename << "\n";
         return;
     }
 
@@ -81,7 +62,7 @@ AppConfig::AppConfig(const std::string& yaml_file) : AppConfig::AppConfig()
 
     // If the mesh_output_dir or log_file contain relative paths, interpret them as relative to the
     // directory where filename is located.
-    const stdfs::path dataset_dir = stdfs::path(yaml_file).parent_path();
+    const stdfs::path dataset_dir = stdfs::path(filename).parent_path();
     const stdfs::path mesh_output_dir_p(mesh_output_dir);
     if (mesh_output_dir_p.is_relative()) {
         mesh_output_dir = dataset_dir / mesh_output_dir_p;

@@ -1,8 +1,8 @@
 /*
  * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
- * SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
- * SPDX-FileCopyrightText: 2021 Nils Funk
- * SPDX-FileCopyrightText: 2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2022 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2022 Nils Funk
+ * SPDX-FileCopyrightText: 2022 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -24,67 +24,47 @@ namespace se {
 
 struct AppConfig {
     /** Whether to use the available ground truth camera pose.
-     *
-     * <br>\em Default: false
      */
-    bool enable_ground_truth;
+    bool enable_ground_truth = false;
 
     /** Whether to show the supereight renders. Hiding them results in faster operation.
-     *
-     * <br>\em Default: true
      */
-    bool enable_rendering;
+    bool enable_rendering = true;
 
     /** Whether to show the GUI. Hiding the GUI results in faster operation.
-     *
-     * <br>\em Default: true
      */
-    bool enable_gui;
+    bool enable_gui = true;
 
     /** Whether to mesh the octree.
-     *
-     * <br>\em Default: false
      */
-    bool enable_meshing;
+    bool enable_meshing = false;
 
     /** Whether to create meshes of a slice from the octree.
-     *
-     * <br>\em Default: false
      */
-    bool enable_slice_meshing;
+    bool enable_slice_meshing = false;
 
     /** Whether to created meshes of the octree's structure.
-     *
-     * <br>\em Default: false
      */
-    bool enable_structure_meshing;
+    bool enable_structure_meshing = false;
 
     /** The directory where meshes are saved.
-     *
-     * <br>\em Default: ""
      */
     std::string mesh_output_dir;
 
     /** The ratio of the input frame size over the frame size used internally.
      * Values greater than 1 result in the input frames being downsampled
      * before processing. Valid values are 1, 2, 4 and 8.
-     *
-     * <br>\em Default: 1
      */
-    int sensor_downsampling_factor;
+    int sensor_downsampling_factor = 1;
 
     /** Perform tracking on a frame every tracking_rate frames.
-     *
-     * <br>\em Default: 1
      */
-    int tracking_rate;
+    int tracking_rate = 1;
 
     /** Integrate a 3D reconstruction every integration_rate frames. Should not
      * be less than tracking_rate.
-     *
-     * <br>\em Default: 1
      */
-    int integration_rate;
+    int integration_rate = 1;
 
     /** Render the 3D reconstruction every rendering_rate frames.
      *
@@ -93,51 +73,35 @@ struct AppConfig {
      * Special cases:
      * If rendering_rate == 0 the volume is only rendered for configuration::max_frame.
      * If rendering_rate < 0  the volume is only rendered for frame abs(rendering_rate).
-     *
-     * <br>\em Default: 4
      */
-    int rendering_rate;
+    int rendering_rate = 4;
 
     /** Mesh the 3D reconstruction every meshing_rate frames.
      *
      * Special cases:
      * If meshing_rate == 0 the volume is only meshed for configuration::max_frame.
      * If meshing_rate < 0  the volume is only meshed for frame abs(meshing_rate).
-     *
-     * <br>\em Default: 100
      */
-    int meshing_rate;
+    int meshing_rate = 100;
 
     /** The maximum number of frames to read. Set to -1 to read the whole dataset.
-     *
-     * <br>\em Default: -1 (full dataset)
      */
-    int max_frames;
+    int max_frames = -1;
 
     /** The file where the timing results will be written to. The timing results will be written to
      * standard output if log_file is empty.
      *
      * \todo Show on stdout on empty string. Will have to update the perfstats.
-     *
-     * <br>\em Default: ""
      */
     std::string log_file;
 
-
-
-    /** Initializes the app config to some sensible defaults.
+    /** Reads the struct members from the "app" node of a YAML file. Members not present in the
+     * YAML file aren't modified.
      */
-    AppConfig();
-
-    /** Initializes the config from a YAML file. Data not present in the YAML file will be
-     * initialized as in AppConfig::AppConfig().
-     */
-    AppConfig(const std::string& yaml_file);
+    void readYaml(const std::string& filename);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
-
-
 
 std::ostream& operator<<(std::ostream& os, const AppConfig& c);
 
