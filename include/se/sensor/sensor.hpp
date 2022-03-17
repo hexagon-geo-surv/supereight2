@@ -1,7 +1,7 @@
 /*
- * SPDX-FileCopyrightText: 2020-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
- * SPDX-FileCopyrightText: 2020-2021 Nils Funk
- * SPDX-FileCopyrightText: 2020-2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2020-2022 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2020-2022 Nils Funk
+ * SPDX-FileCopyrightText: 2020-2022 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -20,7 +20,7 @@ namespace se {
 
 
 
-struct SensorConfigBase {
+struct SensorBaseConfig {
     // General
     int width;
     int height;
@@ -30,12 +30,12 @@ struct SensorConfigBase {
 
     /** Initializes the config to an invalid sensor model with 0 and NaN parameters.
      */
-    SensorConfigBase();
+    SensorBaseConfig();
 
     /** Initializes the config from a YAML file. Data not present in the YAML file will be initialized
      * as in SensorConfig::SensorConfig().
      */
-    SensorConfigBase(const std::string& yaml_file);
+    SensorBaseConfig(const std::string& yaml_file);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };

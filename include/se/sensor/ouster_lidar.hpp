@@ -1,7 +1,7 @@
 /*
- * SPDX-FileCopyrightText: 2020-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
- * SPDX-FileCopyrightText: 2020-2021 Nils Funk
- * SPDX-FileCopyrightText: 2020-2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2020-2022 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2020-2022 Nils Funk
+ * SPDX-FileCopyrightText: 2020-2022 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -14,7 +14,7 @@ namespace se {
 
 
 
-struct OusterLidarConfig : public SensorConfigBase {
+struct OusterLidarConfig : public SensorBaseConfig {
     Eigen::VectorXf beam_elevation_angles = Eigen::VectorXf(1);
     Eigen::VectorXf beam_azimuth_angles = Eigen::VectorXf(1);
 

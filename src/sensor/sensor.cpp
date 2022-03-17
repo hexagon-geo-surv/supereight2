@@ -1,7 +1,7 @@
 /*
- * SPDX-FileCopyrightText: 2020-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
- * SPDX-FileCopyrightText: 2020-2021 Nils Funk
- * SPDX-FileCopyrightText: 2020-2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2020-2022 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2020-2022 Nils Funk
+ * SPDX-FileCopyrightText: 2020-2022 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -9,7 +9,7 @@
 
 
 
-se::SensorConfigBase::SensorConfigBase() :
+se::SensorBaseConfig::SensorBaseConfig() :
         width(0),
         height(0),
         near_plane(0.0f),
@@ -20,8 +20,8 @@ se::SensorConfigBase::SensorConfigBase() :
 
 
 
-se::SensorConfigBase::SensorConfigBase(const std::string& yaml_file) :
-        se::SensorConfigBase::SensorConfigBase()
+se::SensorBaseConfig::SensorBaseConfig(const std::string& yaml_file) :
+        se::SensorBaseConfig::SensorBaseConfig()
 {
     // Open the file for reading.
     cv::FileStorage fs;

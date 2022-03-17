@@ -1,7 +1,7 @@
 /*
- * SPDX-FileCopyrightText: 2020-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
- * SPDX-FileCopyrightText: 2020-2021 Nils Funk
- * SPDX-FileCopyrightText: 2020-2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2020-2022 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2020-2022 Nils Funk
+ * SPDX-FileCopyrightText: 2020-2022 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -10,13 +10,13 @@
 
 
 
-se::OusterLidarConfig::OusterLidarConfig() : SensorConfigBase()
+se::OusterLidarConfig::OusterLidarConfig() : SensorBaseConfig()
 {
 }
 
 
 
-se::OusterLidarConfig::OusterLidarConfig(const std::string& yaml_file) : SensorConfigBase(yaml_file)
+se::OusterLidarConfig::OusterLidarConfig(const std::string& yaml_file) : SensorBaseConfig(yaml_file)
 {
     // Open the file for reading.
     cv::FileStorage fs;
