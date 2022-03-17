@@ -1,9 +1,9 @@
 /*
  * SPDX-FileCopyrightText: 2014 University of Edinburgh, Imperial College, University of Manchester
  * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
- * SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
- * SPDX-FileCopyrightText: 2021 Nils Funk
- * SPDX-FileCopyrightText: 2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2022 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2022 Nils Funk
+ * SPDX-FileCopyrightText: 2022 Sotiris Papatheodorou
  * SPDX-License-Identifier: MIT
  */
 
@@ -19,20 +19,16 @@ namespace se {
 constexpr float e_delta = 0.1f;
 
 struct TrackerConfig {
-    std::vector<int> iterations;
-    float dist_threshold;
-    float normal_threshold;
-    float track_threshold;
-    float icp_threshold;
+    std::vector<int> iterations{10, 5, 4};
+    float dist_threshold = 0.1f;
+    float normal_threshold = 0.8f;
+    float track_threshold = 0.15f;
+    float icp_threshold = 0.00001f;
 
-    /** Initializes the config to some valid values.
+    /** Reads the struct members from the "tracker" node of a YAML file. Members not present in the
+     * YAML file aren't modified.
      */
-    TrackerConfig();
-
-    /** Initializes the config from a YAML file. Data not present in the YAML file will be initialized
-     * as in TrackerConfig::TrackerConfig().
-     */
-    TrackerConfig(const std::string& yaml_file);
+    void readYaml(const std::string& filename);
 };
 
 std::ostream& operator<<(std::ostream& os, const TrackerConfig& c);

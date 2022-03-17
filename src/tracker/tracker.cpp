@@ -1,9 +1,9 @@
 /*
  * SPDX-FileCopyrightText: 2014 University of Edinburgh, Imperial College, University of Manchester
  * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
- * SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
- * SPDX-FileCopyrightText: 2021 Nils Funk
- * SPDX-FileCopyrightText: 2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2022 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2022 Nils Funk
+ * SPDX-FileCopyrightText: 2022 Sotiris Papatheodorou
  * SPDX-License-Identifier: MIT
  */
 
@@ -16,32 +16,19 @@
 
 namespace se {
 
-
-
-TrackerConfig::TrackerConfig() :
-        iterations({10, 5, 4}),
-        dist_threshold(0.1f),
-        normal_threshold(0.8f),
-        track_threshold(0.15f),
-        icp_threshold(0.00001f)
-{
-}
-
-
-
-TrackerConfig::TrackerConfig(const std::string& yaml_file) : TrackerConfig::TrackerConfig()
+void TrackerConfig::readYaml(const std::string& filename)
 {
     // Open the file for reading.
     cv::FileStorage fs;
     try {
-        if (!fs.open(yaml_file, cv::FileStorage::READ | cv::FileStorage::FORMAT_YAML)) {
-            std::cerr << "Error: couldn't read configuration file " << yaml_file << "\n";
+        if (!fs.open(filename, cv::FileStorage::READ | cv::FileStorage::FORMAT_YAML)) {
+            std::cerr << "Error: couldn't read configuration file " << filename << "\n";
             return;
         }
     }
     catch (const cv::Exception& e) {
         // OpenCV throws if the file contains non-YAML data.
-        std::cerr << "Error: invalid YAML in configuration file " << yaml_file << "\n";
+        std::cerr << "Error: invalid YAML in configuration file " << filename << "\n";
         return;
     }
 
@@ -50,7 +37,7 @@ TrackerConfig::TrackerConfig(const std::string& yaml_file) : TrackerConfig::Trac
     if (node.type() != cv::FileNode::MAP) {
         std::cerr
             << "Warning: using default tracker configuration, no \"tracker\" section found in "
-            << yaml_file << "\n";
+            << filename << "\n";
         return;
     }
 
@@ -66,7 +53,7 @@ TrackerConfig::TrackerConfig(const std::string& yaml_file) : TrackerConfig::Trac
 
 std::ostream& operator<<(std::ostream& os, const TrackerConfig& c)
 {
-    os << str_utils::vector_to_pretty_str(c.iterations, "iterations") << "\n";
+    os << str_utils::vector_to_pretty_str(c.iterations, "iterations");
     os << str_utils::value_to_pretty_str(c.dist_threshold, "dist_threshold") << "\n";
     os << str_utils::value_to_pretty_str(c.normal_threshold, "normal_threshold") << "\n";
     os << str_utils::value_to_pretty_str(c.track_threshold, "track_threshold") << "\n";
