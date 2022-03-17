@@ -13,7 +13,14 @@
 namespace se {
 
 struct OusterLidarConfig : public SensorBaseConfig {
+    /** The elevation offset for each Lidar beam in degrees. The number of offsets should be the
+     * same as se::SensorBaseConfig::height.
+     */
     Eigen::VectorXf beam_elevation_angles = Eigen::VectorXf(1);
+
+    /** The azimuth offset for each Lidar beam in degrees. The number of offsets should be the same
+     * as se::SensorBaseConfig::height.
+     */
     Eigen::VectorXf beam_azimuth_angles = Eigen::VectorXf(1);
 
     /** Reads the struct members from the "sensor" node of a YAML file. Members not present in the

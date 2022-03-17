@@ -13,9 +13,20 @@
 namespace se {
 
 struct PinholeCameraConfig : public SensorBaseConfig {
+    /** The sensor's horizontal focal length in pixels.
+     */
     float fx = std::numeric_limits<float>::quiet_NaN();
+
+    /** The sensor's vertical focal length in pixels.
+     */
     float fy = std::numeric_limits<float>::quiet_NaN();
+
+    /** The sensor's optical centre horizontal coordinate in pixels.
+     */
     float cx = std::numeric_limits<float>::quiet_NaN();
+
+    /** The sensor's optical centre vertical coordinate in pixels.
+     */
     float cy = std::numeric_limits<float>::quiet_NaN();
 
     /** Reads the struct members from the "sensor" node of a YAML file. Members not present in the

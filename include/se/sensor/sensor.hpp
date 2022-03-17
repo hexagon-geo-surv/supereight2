@@ -21,10 +21,24 @@
 namespace se {
 
 struct SensorBaseConfig {
+    /** The width of images produced by the sensor in pixels.
+     */
     int width = 0;
+
+    /** The height of images produced by the sensor in pixels.
+     */
     int height = 0;
+
+    /** The sensor's near plane in metres.
+     */
     float near_plane = 0.0f;
+
+    /** The sensor's far plane in metres.
+     */
     float far_plane = std::numeric_limits<float>::infinity();
+
+    /** The transformation from the sensor frame S to the body frame B.
+     */
     Eigen::Matrix4f T_BS = Eigen::Matrix4f::Identity();
 
     /** Reads the struct members from the "sensor" node of a YAML file. Members not present in the
