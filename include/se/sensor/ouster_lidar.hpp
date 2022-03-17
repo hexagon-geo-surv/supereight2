@@ -12,23 +12,17 @@
 
 namespace se {
 
-
-
 struct OusterLidarConfig : public SensorBaseConfig {
     Eigen::VectorXf beam_elevation_angles = Eigen::VectorXf(1);
     Eigen::VectorXf beam_azimuth_angles = Eigen::VectorXf(1);
 
-    /** Initializes the config to an invalid sensor model with 0 and NaN parameters.
-     */
-    OusterLidarConfig();
-
-    /** Initializes the config from a YAML file. Data not present in the YAML file will be
-     * initialized as in SensorConfig::SensorConfig().
+    /** Reads the struct members from the "sensor" node of a YAML file. Members not present in the
+     * YAML file aren't modified.
      *
      * \throws std::invalid_argument Throws std::invalid_argument if the number of beam elevation or
      * azimuth angles is different than the sensor height.
      */
-    OusterLidarConfig(const std::string& yaml_file);
+    void readYaml(const std::string& filename);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };

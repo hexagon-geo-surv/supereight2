@@ -9,31 +9,19 @@
 
 
 
-se::SensorBaseConfig::SensorBaseConfig() :
-        width(0),
-        height(0),
-        near_plane(0.0f),
-        far_plane(INFINITY),
-        T_BS(Eigen::Matrix4f::Identity())
-{
-}
-
-
-
-se::SensorBaseConfig::SensorBaseConfig(const std::string& yaml_file) :
-        se::SensorBaseConfig::SensorBaseConfig()
+void se::SensorBaseConfig::readYaml(const std::string& filename)
 {
     // Open the file for reading.
     cv::FileStorage fs;
     try {
-        if (!fs.open(yaml_file, cv::FileStorage::READ | cv::FileStorage::FORMAT_YAML)) {
-            std::cerr << "Error: couldn't read configuration file " << yaml_file << "\n";
+        if (!fs.open(filename, cv::FileStorage::READ | cv::FileStorage::FORMAT_YAML)) {
+            std::cerr << "Error: couldn't read configuration file " << filename << "\n";
             return;
         }
     }
     catch (const cv::Exception& e) {
         // OpenCV throws if the file contains non-YAML data.
-        std::cerr << "Error: invalid YAML in configuration file " << yaml_file << "\n";
+        std::cerr << "Error: invalid YAML in configuration file " << filename << "\n";
         return;
     }
 
@@ -41,7 +29,7 @@ se::SensorBaseConfig::SensorBaseConfig(const std::string& yaml_file) :
     const cv::FileNode node = fs["sensor"];
     if (node.type() != cv::FileNode::MAP) {
         std::cerr << "Warning: using default sensor configuration, no \"sensor\" section found in "
-                  << yaml_file << "\n";
+                  << filename << "\n";
         return;
     }
 

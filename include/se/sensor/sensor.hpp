@@ -8,6 +8,8 @@
 #ifndef SE_SENSOR_HPP
 #define SE_SENSOR_HPP
 
+#include <limits>
+
 #include "se/common/image_utils.hpp"
 #include "se/common/math_util.hpp"
 #include "se/common/projection.hpp"
@@ -18,24 +20,17 @@
 
 namespace se {
 
-
-
 struct SensorBaseConfig {
-    // General
-    int width;
-    int height;
-    float near_plane;
-    float far_plane;
-    Eigen::Matrix4f T_BS;
+    int width = 0;
+    int height = 0;
+    float near_plane = 0.0f;
+    float far_plane = std::numeric_limits<float>::infinity();
+    Eigen::Matrix4f T_BS = Eigen::Matrix4f::Identity();
 
-    /** Initializes the config to an invalid sensor model with 0 and NaN parameters.
+    /** Reads the struct members from the "sensor" node of a YAML file. Members not present in the
+     * YAML file aren't modified.
      */
-    SensorBaseConfig();
-
-    /** Initializes the config from a YAML file. Data not present in the YAML file will be initialized
-     * as in SensorConfig::SensorConfig().
-     */
-    SensorBaseConfig(const std::string& yaml_file);
+    void readYaml(const std::string& filename);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };

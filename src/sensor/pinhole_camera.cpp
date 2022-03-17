@@ -10,18 +10,14 @@
 
 
 
-se::PinholeCameraConfig::PinholeCameraConfig() : SensorBaseConfig()
+void se::PinholeCameraConfig::readYaml(const std::string& filename)
 {
-}
+    // Read the base class members.
+    SensorBaseConfig::readYaml(filename);
 
-
-
-se::PinholeCameraConfig::PinholeCameraConfig(const std::string& yaml_file) :
-        SensorBaseConfig(yaml_file)
-{
     // Open the file for reading.
     cv::FileStorage fs;
-    fs.open(yaml_file, cv::FileStorage::READ | cv::FileStorage::FORMAT_YAML);
+    fs.open(filename, cv::FileStorage::READ | cv::FileStorage::FORMAT_YAML);
 
     // Get the node containing the sensor configuration.
     const cv::FileNode node = fs["sensor"];

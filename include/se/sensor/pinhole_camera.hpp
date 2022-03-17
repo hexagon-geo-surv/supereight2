@@ -12,23 +12,16 @@
 
 namespace se {
 
-
-
 struct PinholeCameraConfig : public SensorBaseConfig {
-    // PinholeCamera
-    float fx = nan("");
-    float fy = nan("");
-    float cx = nan("");
-    float cy = nan("");
+    float fx = std::numeric_limits<float>::quiet_NaN();
+    float fy = std::numeric_limits<float>::quiet_NaN();
+    float cx = std::numeric_limits<float>::quiet_NaN();
+    float cy = std::numeric_limits<float>::quiet_NaN();
 
-    /** Initializes the config to an invalid sensor model with 0 and NaN parameters.
+    /** Reads the struct members from the "sensor" node of a YAML file. Members not present in the
+     * YAML file aren't modified.
      */
-    PinholeCameraConfig();
-
-    /** Initializes the config from a YAML file. Data not present in the YAML file will be initialized
-     * as in SensorConfig::SensorConfig().
-     */
-    PinholeCameraConfig(const std::string& yaml_file);
+    void readYaml(const std::string& filename);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
