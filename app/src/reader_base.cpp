@@ -1,9 +1,9 @@
 /*
  * SPDX-FileCopyrightText: 2014 University of Edinburgh, Imperial College London, University of Manchester
  * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
- * SPDX-FileCopyrightText: 2020-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
- * SPDX-FileCopyrightText: 2020-2021 Nils Funk
- * SPDX-FileCopyrightText: 2020-2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2020-2022 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2020-2022 Nils Funk
+ * SPDX-FileCopyrightText: 2020-2022 Sotiris Papatheodorou
  * SPDX-License-Identifier: MIT
  */
 
@@ -72,32 +72,19 @@ std::string se::reader_type_to_string(se::ReaderType t)
 
 
 
-se::ReaderConfig::ReaderConfig() :
-        reader_type(se::ReaderType::RAW),
-        sequence_path(""),
-        ground_truth_file(""),
-        inverse_scale(0),
-        fps(30),
-        drop_frames(false),
-        verbose(0)
-{
-}
-
-
-
-se::ReaderConfig::ReaderConfig(const std::string& yaml_file) : se::ReaderConfig::ReaderConfig()
+void se::ReaderConfig::readYaml(const std::string& filename)
 {
     // Open the file for reading.
     cv::FileStorage fs;
     try {
-        if (!fs.open(yaml_file, cv::FileStorage::READ | cv::FileStorage::FORMAT_YAML)) {
-            std::cerr << "Error: couldn't read configuration file " << yaml_file << "\n";
+        if (!fs.open(filename, cv::FileStorage::READ | cv::FileStorage::FORMAT_YAML)) {
+            std::cerr << "Error: couldn't read configuration file " << filename << "\n";
             return;
         }
     }
     catch (const cv::Exception& e) {
         // OpenCV throws if the file contains non-YAML data.
-        std::cerr << "Error: invalid YAML in configuration file " << yaml_file << "\n";
+        std::cerr << "Error: invalid YAML in configuration file " << filename << "\n";
         return;
     }
 
@@ -105,7 +92,7 @@ se::ReaderConfig::ReaderConfig(const std::string& yaml_file) : se::ReaderConfig:
     const cv::FileNode node = fs["reader"];
     if (node.type() != cv::FileNode::MAP) {
         std::cerr << "Warning: using default reader configuration, no \"reader\" section found in "
-                  << yaml_file << "\n";
+                  << filename << "\n";
         return;
     }
 
@@ -126,7 +113,7 @@ se::ReaderConfig::ReaderConfig(const std::string& yaml_file) : se::ReaderConfig:
 
     // If the sequence_path or ground_truth_file contain relative paths, interpret them as relative
     // to the directory where filename is located.
-    const stdfs::path dataset_dir = stdfs::path(yaml_file).parent_path();
+    const stdfs::path dataset_dir = stdfs::path(filename).parent_path();
     const stdfs::path sequence_path_p(sequence_path);
     if (sequence_path_p.is_relative()) {
         sequence_path = dataset_dir / sequence_path_p;

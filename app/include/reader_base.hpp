@@ -1,9 +1,9 @@
 /*
  * SPDX-FileCopyrightText: 2014 University of Edinburgh, Imperial College London, University of Manchester
  * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
- * SPDX-FileCopyrightText: 2020-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
- * SPDX-FileCopyrightText: 2020-2021 Nils Funk
- * SPDX-FileCopyrightText: 2020-2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2020-2022 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2020-2022 Nils Funk
+ * SPDX-FileCopyrightText: 2020-2022 Sotiris Papatheodorou
  * SPDX-License-Identifier: MIT
  */
 
@@ -29,21 +29,21 @@ ReaderType string_to_reader_type(const std::string& s);
 
 std::string reader_type_to_string(ReaderType t);
 
+
+
 struct ReaderConfig {
-    ReaderType reader_type;
+    ReaderType reader_type = se::ReaderType::RAW;
     std::string sequence_path;
     std::string ground_truth_file;
-    float inverse_scale; ///< depth to meter scaling
-    float fps;
-    bool drop_frames;
-    int verbose;
+    float inverse_scale = 0.0f;
+    float fps = 30.0f;
+    bool drop_frames = false;
+    int verbose = 0;
 
-    ReaderConfig();
-
-    /** Initializes the config from a YAML file. Data not present in the YAML file will be initialized
-     * as in ReaderConfig::ReaderConfig().
+    /** Reads the struct members from the "reader" node of a YAML file. Members not present in the
+     * YAML file aren't modified.
      */
-    ReaderConfig(const std::string& yaml_file);
+    void readYaml(const std::string& filename);
 };
 
 std::ostream& operator<<(std::ostream& os, const ReaderConfig& c);
