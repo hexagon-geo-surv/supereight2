@@ -1,8 +1,8 @@
 /*
- * SPDX-FileCopyrightText: 2020-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2020-2022 Smart Robotics Lab, Imperial College London, Technical University of Munich
  * SPDX-FileCopyrightText: 2020 Marija Popovic
- * SPDX-FileCopyrightText: 2020-2021 Nils Funk
- * SPDX-FileCopyrightText: 2020-2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2020-2022 Nils Funk
+ * SPDX-FileCopyrightText: 2020-2022 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -22,7 +22,9 @@
 
 namespace se {
 
-/** Reader for Newer College datasets. */
+/** Reader for the Newer College dataset.
+ * https://ori-drs.github.io/newer-college-dataset/
+ */
 class NewerCollegeReader : public Reader {
     public:
     /** Construct an NewerCollegeReader from a ReaderConfig.

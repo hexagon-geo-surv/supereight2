@@ -1,7 +1,7 @@
 /*
- * SPDX-FileCopyrightText: 2020-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
- * SPDX-FileCopyrightText: 2020-2021 Nils Funk
- * SPDX-FileCopyrightText: 2020-2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2020-2022 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2020-2022 Nils Funk
+ * SPDX-FileCopyrightText: 2020-2022 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -23,8 +23,9 @@ namespace se {
 
 
 
-/** Reader for TUM RGBD datasets. */
-
+/** Reader for the TUM RGBD dataset.
+ * https://vision.in.tum.de/data/datasets/rgbd-dataset
+ */
 class TUMReader : public Reader {
     public:
     /** Construct a TUMReader from a ReaderConfig.

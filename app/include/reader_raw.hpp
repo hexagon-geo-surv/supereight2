@@ -1,9 +1,9 @@
 /*
  * SPDX-FileCopyrightText: 2014 University of Edinburgh, Imperial College London, University of Manchester
  * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
- * SPDX-FileCopyrightText: 2020-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
- * SPDX-FileCopyrightText: 2020-2021 Nils Funk
- * SPDX-FileCopyrightText: 2020-2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2020-2022 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2020-2022 Nils Funk
+ * SPDX-FileCopyrightText: 2020-2022 Sotiris Papatheodorou
  * SPDX-License-Identifier: MIT
  */
 
@@ -22,7 +22,9 @@
 
 namespace se {
 
-/** Reader for Slambench 1.0 .raw files. */
+/** Reader for SLAMBench 1.0 .raw files.
+ * http://apt.cs.manchester.ac.uk/projects/PAMELA/tools/SLAMBench/
+ */
 class RAWReader : public Reader {
     public:
     /** Construct a RAWReader from a ReaderConfig.

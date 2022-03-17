@@ -23,7 +23,19 @@
 
 namespace se {
 
-enum class ReaderType { OPENNI, RAW, TUM, INTERIORNET, NEWERCOLLEGE, UNKNOWN };
+enum class ReaderType {
+    /** Use the se::OpenNIReader. */
+    OPENNI,
+    /** Use the se::RAWReader. */
+    RAW,
+    /** Use the se::TUMReader. */
+    TUM,
+    /** Use the se::InteriorNetReader. */
+    INTERIORNET,
+    /** Use the se::NewerCollegeReader. */
+    NEWERCOLLEGE,
+    UNKNOWN
+};
 
 ReaderType string_to_reader_type(const std::string& s);
 

@@ -1,9 +1,9 @@
 /*
  * SPDX-FileCopyrightText: 2014 University of Edinburgh, Imperial College London, University of Manchester
  * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
- * SPDX-FileCopyrightText: 2020-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
- * SPDX-FileCopyrightText: 2020-2021 Nils Funk
- * SPDX-FileCopyrightText: 2020-2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2020-2022 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2020-2022 Nils Funk
+ * SPDX-FileCopyrightText: 2020-2022 Sotiris Papatheodorou
  * SPDX-License-Identifier: MIT
  */
 
@@ -27,7 +27,9 @@
 
 namespace se {
 
-/** Reader for ICL-NUIM datasets. */
+/** Reader for the Microsoft Kinect and Asus Xtion using the OpenNI2 driver.
+ * https://structure.io/openni
+ */
 class OpenNIReader : public Reader {
     public:
     /** Construct an OpenNIReader from a ReaderConfig.
