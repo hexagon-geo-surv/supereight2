@@ -26,8 +26,6 @@ struct PinholeCameraConfig : public SensorBaseConfig {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
-
-
 std::ostream& operator<<(std::ostream& os, const PinholeCameraConfig& c);
 
 
