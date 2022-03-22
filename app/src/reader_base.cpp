@@ -199,9 +199,11 @@ se::Reader::Reader(const se::ReaderConfig& c) :
     constexpr double clock_tick_period =
         se_clock::period::num / static_cast<double>(se_clock::period::den);
     if (clock_tick_period > spf_) {
-        std::cerr
-            << "Error: The inter-frame time interval must be larger than the clock tick period. Use a lower FPS value\n";
-        exit(EXIT_FAILURE);
+        std::stringstream s;
+        s << "The inter-frame time interval (" << std::fixed << std::setprecision(15) << spf_
+          << " s) must be greater than the clock tick period (" << clock_tick_period
+          << " s). Use a lower FPS value.";
+        throw std::invalid_argument(s.str());
     }
 }
 

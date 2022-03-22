@@ -18,7 +18,7 @@ int main(int argc, char** argv)
     try {
         if (argc != 2) {
             std::cerr << "Usage: " << argv[0] << " YAML_FILE\n";
-            exit(2);
+            return 2;
         }
 
         // ========= Config & I/O INITIALIZATION  =========
@@ -76,7 +76,7 @@ int main(int argc, char** argv)
         reader = se::create_reader(config.reader);
 
         if (reader == nullptr) {
-            exit(EXIT_FAILURE);
+            return EXIT_FAILURE;
         }
 
         // Setup input, processed and output imgs
