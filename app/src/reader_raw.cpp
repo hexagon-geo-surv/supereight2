@@ -115,14 +115,14 @@ se::ReaderStatus se::RAWReader::nextDepth(se::Image<float>& depth_image)
     }
     // Read the whole image into a buffer.
     const size_t image_size = depth_image.size();
-    std::unique_ptr<uint16_t> buffer(new uint16_t[image_size]);
-    if (!raw_fs_.read(reinterpret_cast<char*>(buffer.get()), image_size * sizeof(uint16_t))) {
+    std::vector<uint16_t> buffer(image_size);
+    if (!raw_fs_.read(reinterpret_cast<char*>(buffer.data()), image_size * sizeof(uint16_t))) {
         return se::ReaderStatus::error;
     }
     // Scale the data from millimetres to metres.
 #pragma omp parallel for
     for (size_t p = 0; p < image_size; ++p) {
-        depth_image[p] = buffer.get()[p] / 1000.0f;
+        depth_image[p] = buffer.data()[p] / 1000.0f;
     }
     return se::ReaderStatus::ok;
 }
@@ -144,11 +144,11 @@ se::ReaderStatus se::RAWReader::nextRGBA(se::Image<uint32_t>& rgba_image)
     }
     // Read the whole image into a buffer.
     const size_t image_size = rgba_image.size();
-    std::unique_ptr<uint8_t> buffer(new uint8_t[3 * image_size]);
-    if (!raw_fs_.read(reinterpret_cast<char*>(buffer.get()), image_size * 3 * sizeof(uint8_t))) {
+    std::vector<uint8_t> buffer(3 * image_size);
+    if (!raw_fs_.read(reinterpret_cast<char*>(buffer.data()), image_size * 3 * sizeof(uint8_t))) {
         return se::ReaderStatus::error;
     }
     // Convert the RGB image in the buffer to RGBA.
-    rgb_to_rgba(buffer.get(), rgba_image.data(), image_size);
+    rgb_to_rgba(buffer.data(), rgba_image.data(), image_size);
     return se::ReaderStatus::ok;
 }
