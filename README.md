@@ -15,7 +15,7 @@ supereight 2 follows [semantic versioning](https://semver.org/).
 
 Install the dependencies
 
-* GCC 7+ or clang 6+
+* GCC 7+ or clang 6+ (for C++ 17 features)
 * CMake 3.8+
 * Eigen 3
 * OpenCV 3+
