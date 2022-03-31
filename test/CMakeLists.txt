@@ -20,4 +20,5 @@ add_subdirectory(map/meshing)
 add_subdirectory(map/octree_allocator)
 add_subdirectory(map/octree_visitor)
 add_subdirectory(system/multires_ofusion)
+# Don't add installcheck to the subdirectories, it should be built independently of the library.
 

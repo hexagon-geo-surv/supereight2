@@ -43,6 +43,13 @@ install: release
 uninstall:
 	cmake --build build/release --target uninstall
 
+.PHONY: installcheck
+installcheck:
+	mkdir -p test/installcheck/build
+	cd test/installcheck/build && cmake -DCMAKE_BUILD_TYPE=Release ..
+	cmake --build test/installcheck/build
+	./test/installcheck/build/installcheck
+
 
 
 .PHONY: doc
@@ -56,6 +63,7 @@ format:
 .PHONY: clean
 clean:
 	rm -rf build
+	rm -rf test/installcheck/build
 
 .PHONY: clean-cmake-cache
 clean-cmake-cache:
