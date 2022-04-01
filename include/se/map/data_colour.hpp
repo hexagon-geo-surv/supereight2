@@ -15,6 +15,7 @@ namespace se {
 
 // Defaults
 static constexpr se::rgba_t dflt_rgba = 0xFFFFFFFF; // White
+static constexpr se::rgba_t dflt_delta_rgba = 0;
 
 // Colour data
 template<se::Colour ColB>
@@ -40,7 +41,7 @@ struct ColourDeltaData {
 
 template<>
 struct ColourDeltaData<se::Colour::On> {
-    ColourDeltaData() : delta_rgba(0)
+    ColourDeltaData() : delta_rgba(dflt_delta_rgba)
     {
     }
     se::rgba_t delta_rgba;

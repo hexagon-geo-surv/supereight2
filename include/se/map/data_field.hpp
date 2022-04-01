@@ -15,8 +15,11 @@ namespace se {
 
 // Defaults
 static constexpr se::field_t dflt_tsdf = 1.0f;
+static constexpr se::field_t dflt_delta_tsdf = 0.0f;
 static constexpr se::field_t dflt_occupancy = 0.0f;
-static constexpr se::weight_t dflt_weight = 0.0;
+static constexpr se::field_t dflt_delta_occupancy = 0.0f;
+static constexpr se::weight_t dflt_weight = 0.0f;
+static constexpr se::weight_t dflt_delta_weight = 0.0f;
 static constexpr se::time_stamp_t dflt_time_stamp = -1.0f;
 
 template<se::Field FieldT>
@@ -59,7 +62,7 @@ struct FieldDeltaData {
 
 template<>
 struct FieldDeltaData<se::Field::Occupancy> {
-    FieldDeltaData() : delta_occupancy(0)
+    FieldDeltaData() : delta_occupancy(dflt_delta_occupancy)
     {
     }
     se::field_t delta_occupancy;
@@ -67,7 +70,7 @@ struct FieldDeltaData<se::Field::Occupancy> {
 
 template<>
 struct FieldDeltaData<se::Field::TSDF> {
-    FieldDeltaData() : delta_tsdf(0), delta_weight(0)
+    FieldDeltaData() : delta_tsdf(dflt_delta_tsdf), delta_weight(dflt_delta_weight)
     {
     }
     se::field_t delta_tsdf;
