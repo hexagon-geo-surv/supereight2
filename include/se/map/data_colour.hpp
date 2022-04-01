@@ -14,7 +14,7 @@
 namespace se {
 
 // Defaults
-static const se::rgba_t dflt_rgba = 0xFFFFFFFF; // White
+static constexpr se::rgba_t dflt_rgba = 0xFFFFFFFF; // White
 
 // Colour data
 template<se::Colour ColB>

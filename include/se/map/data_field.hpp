@@ -14,10 +14,10 @@
 namespace se {
 
 // Defaults
-static const se::field_t dflt_tsdf = 1.0f;
-static const se::field_t dflt_occupancy = 0.0f;
-static const se::weight_t dflt_weight = 0.0;
-static const se::time_stamp_t dflt_time_stamp = -1.0f;
+static constexpr se::field_t dflt_tsdf = 1.0f;
+static constexpr se::field_t dflt_occupancy = 0.0f;
+static constexpr se::weight_t dflt_weight = 0.0;
+static constexpr se::time_stamp_t dflt_time_stamp = -1.0f;
 
 template<se::Field FieldT>
 struct FieldData {

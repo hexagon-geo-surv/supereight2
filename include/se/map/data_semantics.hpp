@@ -14,7 +14,7 @@
 namespace se {
 
 // Defaults
-static const se::semantics_t dflt_semantics = 0;
+static constexpr se::semantics_t dflt_semantics = 0;
 
 // Semantic data
 template<se::Semantics SemB>
