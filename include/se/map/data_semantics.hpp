@@ -24,10 +24,7 @@ struct SemanticData {
 // Semantic data
 template<>
 struct SemanticData<se::Semantics::On> {
-    SemanticData() : sem(dflt_semantics)
-    {
-    }
-    se::semantics_t sem;
+    se::semantics_t sem = dflt_semantics;
 };
 
 

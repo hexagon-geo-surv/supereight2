@@ -24,10 +24,7 @@ struct ColourData {
 
 template<>
 struct ColourData<se::Colour::On> {
-    ColourData() : rgba(dflt_rgba)
-    {
-    }
-    se::rgba_t rgba;
+    se::rgba_t rgba = dflt_rgba;
 };
 
 ///////////////////
@@ -41,10 +38,7 @@ struct ColourDeltaData {
 
 template<>
 struct ColourDeltaData<se::Colour::On> {
-    ColourDeltaData() : delta_rgba(dflt_delta_rgba)
-    {
-    }
-    se::rgba_t delta_rgba;
+    se::rgba_t delta_rgba = dflt_delta_rgba;
 };
 
 

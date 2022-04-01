@@ -28,27 +28,17 @@ struct FieldData {
 
 template<>
 struct FieldData<se::Field::Occupancy> {
-    FieldData() :
-            occupancy(dflt_occupancy),
-            weight(dflt_weight),
-            observed(false),
-            time_stamp(dflt_time_stamp)
-    {
-    }
-    se::field_t occupancy;
-    se::weight_t weight;
-    bool observed;
-    se::time_stamp_t time_stamp;
+    se::field_t occupancy = dflt_occupancy;
+    se::weight_t weight = dflt_weight;
+    bool observed = false;
+    se::time_stamp_t time_stamp = dflt_time_stamp;
     static constexpr bool invert_normals = false;
 };
 
 template<>
 struct FieldData<se::Field::TSDF> {
-    FieldData() : tsdf(dflt_tsdf), weight(dflt_weight)
-    {
-    }
-    se::field_t tsdf;
-    se::weight_t weight;
+    se::field_t tsdf = dflt_tsdf;
+    se::weight_t weight = dflt_weight;
     static constexpr bool invert_normals = true;
 };
 
@@ -62,19 +52,13 @@ struct FieldDeltaData {
 
 template<>
 struct FieldDeltaData<se::Field::Occupancy> {
-    FieldDeltaData() : delta_occupancy(dflt_delta_occupancy)
-    {
-    }
-    se::field_t delta_occupancy;
+    se::field_t delta_occupancy = dflt_delta_occupancy;
 };
 
 template<>
 struct FieldDeltaData<se::Field::TSDF> {
-    FieldDeltaData() : delta_tsdf(dflt_delta_tsdf), delta_weight(dflt_delta_weight)
-    {
-    }
-    se::field_t delta_tsdf;
-    se::weight_t delta_weight;
+    se::field_t delta_tsdf = dflt_delta_tsdf;
+    se::weight_t delta_weight = dflt_delta_weight;
 };
 
 ///////////////////
