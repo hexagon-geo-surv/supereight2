@@ -54,6 +54,8 @@ void AppConfig::readYaml(const std::string& filename)
     se::yaml::subnode_as_bool(node, "enable_slice_meshing", enable_slice_meshing);
     se::yaml::subnode_as_bool(node, "enable_structure_meshing", enable_structure_meshing);
     se::yaml::subnode_as_string(node, "mesh_path", mesh_path);
+    se::yaml::subnode_as_string(node, "slice_path", slice_path);
+    se::yaml::subnode_as_string(node, "structure_path", structure_path);
     se::yaml::subnode_as_int(node, "sensor_downsampling_factor", sensor_downsampling_factor);
     se::yaml::subnode_as_int(node, "tracking_rate", tracking_rate);
     se::yaml::subnode_as_int(node, "integration_rate", integration_rate);
@@ -64,6 +66,8 @@ void AppConfig::readYaml(const std::string& filename)
 
     const stdfs::path dataset_dir = stdfs::path(filename).parent_path();
     mesh_path = process_path(mesh_path, dataset_dir);
+    slice_path = process_path(slice_path, dataset_dir);
+    structure_path = process_path(structure_path, dataset_dir);
     log_file = process_path(log_file, dataset_dir);
 }
 
@@ -77,6 +81,8 @@ std::ostream& operator<<(std::ostream& os, const AppConfig& c)
     os << str_utils::bool_to_pretty_str(c.enable_meshing, "enable_meshing") << "\n";
     os << str_utils::bool_to_pretty_str(c.enable_slice_meshing, "enable_slice_meshing") << "\n";
     os << str_utils::str_to_pretty_str(c.mesh_path, "mesh_path") << "\n";
+    os << str_utils::str_to_pretty_str(c.slice_path, "slice_path") << "\n";
+    os << str_utils::str_to_pretty_str(c.structure_path, "structure_path") << "\n";
     os << str_utils::value_to_pretty_str(c.sensor_downsampling_factor, "sensor_downsampling_factor")
        << "\n";
     os << str_utils::value_to_pretty_str(c.tracking_rate, "tracking_rate") << "\n";

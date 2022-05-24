@@ -51,6 +51,14 @@ struct AppConfig {
      */
     std::string mesh_path;
 
+    /** The path where slice meshes are saved.
+     */
+    std::string slice_path;
+
+    /** The path where structure meshes are saved.
+     */
+    std::string structure_path;
+
     /** The ratio of the input frame size over the frame size used internally.
      * Values greater than 1 result in the input frames being downsampled
      * before processing. Valid values are 1, 2, 4 and 8.

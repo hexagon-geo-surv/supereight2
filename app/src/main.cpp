@@ -32,6 +32,16 @@ int main(int argc, char** argv)
                 stdfs::create_directories(config.app.mesh_path);
             }
         }
+        if (config.app.enable_slice_meshing) {
+            if (!config.app.slice_path.empty()) {
+                stdfs::create_directories(config.app.slice_path);
+            }
+        }
+        if (config.app.enable_structure_meshing) {
+            if (!config.app.structure_path.empty()) {
+                stdfs::create_directories(config.app.structure_path);
+            }
+        }
 
         // Setup log stream
         std::ofstream log_file_stream;
@@ -200,17 +210,18 @@ int main(int argc, char** argv)
             TOCK("total")
             const bool last_frame =
                 frame == config.app.max_frames || static_cast<size_t>(frame) == reader->numFrames();
-            if (config.app.enable_meshing
-                && ((config.app.meshing_rate > 0 && frame % config.app.meshing_rate == 0)
-                    || last_frame)) {
-                map.saveMesh(config.app.mesh_path + "/mesh_" + std::to_string(frame) + ".ply");
+            if ((config.app.meshing_rate > 0 && frame % config.app.meshing_rate == 0)
+                || last_frame) {
+                if (config.app.enable_meshing) {
+                    map.saveMesh(config.app.mesh_path + "/mesh_" + std::to_string(frame) + ".ply");
+                }
                 if (config.app.enable_slice_meshing) {
-                    map.saveFieldSlice(config.app.mesh_path + "/slice",
+                    map.saveFieldSlice(config.app.slice_path + "/slice",
                                        se::math::to_translation(T_WS),
                                        std::to_string(frame));
                 }
                 if (config.app.enable_structure_meshing) {
-                    map.saveStructure(config.app.mesh_path + "/struct_" + std::to_string(frame)
+                    map.saveStructure(config.app.structure_path + "/struct_" + std::to_string(frame)
                                       + ".ply");
                 }
             }
