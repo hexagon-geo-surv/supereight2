@@ -35,27 +35,18 @@ struct AppConfig {
      */
     bool enable_gui = true;
 
-    /** Whether to mesh the octree.
-     */
-    bool enable_meshing = false;
-
-    /** Whether to create meshes of a slice from the octree.
-     */
-    bool enable_slice_meshing = false;
-
-    /** Whether to created meshes of the octree's structure.
-     */
-    bool enable_structure_meshing = false;
-
-    /** The path where meshes are saved.
+    /** The path where meshes are saved. Set to the empty string to disable meshing. Set to `"."`
+     * for the current directory.
      */
     std::string mesh_path;
 
-    /** The path where slice meshes are saved.
+    /** The path where slice meshes are saved. Set to the empty string to disable slice meshing. Set
+     * to `"."` for the current directory.
      */
     std::string slice_path;
 
-    /** The path where structure meshes are saved.
+    /** The path where structure meshes are saved. Set to the empty string to disable structure
+     * meshing. Set to `"."` for the current directory.
      */
     std::string structure_path;
 

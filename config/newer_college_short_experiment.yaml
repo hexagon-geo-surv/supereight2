@@ -55,9 +55,6 @@ app:
   enable_ground_truth:        true
   enable_rendering:           true
   enable_gui:                 true
-  enable_meshing:             true
-  enable_slice_meshing:       true
-  enable_structure_meshing:   true
   mesh_path:                  "meshes"
   slice_path:                 "meshes"
   structure_path:             "meshes"

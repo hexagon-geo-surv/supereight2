@@ -17,7 +17,10 @@ std::string process_path(const std::string& path, const std::string& dataset_dir
 {
     // Expand leading ~ in the path if possible and interpret it as relative to dataset_dir if it's
     // a relative path.
-    return se::str_utils::resolve_relative_path(se::str_utils::expand_user(path), dataset_dir);
+    if (!path.empty()) {
+        return se::str_utils::resolve_relative_path(se::str_utils::expand_user(path), dataset_dir);
+    }
+    return path;
 }
 
 namespace se {
@@ -50,9 +53,6 @@ void AppConfig::readYaml(const std::string& filename)
     se::yaml::subnode_as_bool(node, "enable_ground_truth", enable_ground_truth);
     se::yaml::subnode_as_bool(node, "enable_rendering", enable_rendering);
     se::yaml::subnode_as_bool(node, "enable_gui", enable_gui);
-    se::yaml::subnode_as_bool(node, "enable_meshing", enable_meshing);
-    se::yaml::subnode_as_bool(node, "enable_slice_meshing", enable_slice_meshing);
-    se::yaml::subnode_as_bool(node, "enable_structure_meshing", enable_structure_meshing);
     se::yaml::subnode_as_string(node, "mesh_path", mesh_path);
     se::yaml::subnode_as_string(node, "slice_path", slice_path);
     se::yaml::subnode_as_string(node, "structure_path", structure_path);
@@ -78,8 +78,6 @@ std::ostream& operator<<(std::ostream& os, const AppConfig& c)
     os << str_utils::bool_to_pretty_str(c.enable_ground_truth, "enable_ground_truth") << "\n";
     os << str_utils::bool_to_pretty_str(c.enable_rendering, "enable_rendering") << "\n";
     os << str_utils::bool_to_pretty_str(c.enable_gui, "enable_gui") << "\n";
-    os << str_utils::bool_to_pretty_str(c.enable_meshing, "enable_meshing") << "\n";
-    os << str_utils::bool_to_pretty_str(c.enable_slice_meshing, "enable_slice_meshing") << "\n";
     os << str_utils::str_to_pretty_str(c.mesh_path, "mesh_path") << "\n";
     os << str_utils::str_to_pretty_str(c.slice_path, "slice_path") << "\n";
     os << str_utils::str_to_pretty_str(c.structure_path, "structure_path") << "\n";

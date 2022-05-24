@@ -27,20 +27,14 @@ int main(int argc, char** argv)
         std::cout << config;
 
         // Create the mesh output directory
-        if (config.app.enable_meshing) {
-            if (!config.app.mesh_path.empty()) {
-                stdfs::create_directories(config.app.mesh_path);
-            }
+        if (!config.app.mesh_path.empty()) {
+            stdfs::create_directories(config.app.mesh_path);
         }
-        if (config.app.enable_slice_meshing) {
-            if (!config.app.slice_path.empty()) {
-                stdfs::create_directories(config.app.slice_path);
-            }
+        if (!config.app.slice_path.empty()) {
+            stdfs::create_directories(config.app.slice_path);
         }
-        if (config.app.enable_structure_meshing) {
-            if (!config.app.structure_path.empty()) {
-                stdfs::create_directories(config.app.structure_path);
-            }
+        if (!config.app.structure_path.empty()) {
+            stdfs::create_directories(config.app.structure_path);
         }
 
         // Setup log stream
@@ -212,15 +206,15 @@ int main(int argc, char** argv)
                 frame == config.app.max_frames || static_cast<size_t>(frame) == reader->numFrames();
             if ((config.app.meshing_rate > 0 && frame % config.app.meshing_rate == 0)
                 || last_frame) {
-                if (config.app.enable_meshing) {
+                if (!config.app.mesh_path.empty()) {
                     map.saveMesh(config.app.mesh_path + "/mesh_" + std::to_string(frame) + ".ply");
                 }
-                if (config.app.enable_slice_meshing) {
+                if (!config.app.slice_path.empty()) {
                     map.saveFieldSlice(config.app.slice_path + "/slice",
                                        se::math::to_translation(T_WS),
                                        std::to_string(frame));
                 }
-                if (config.app.enable_structure_meshing) {
+                if (!config.app.structure_path.empty()) {
                     map.saveStructure(config.app.structure_path + "/struct_" + std::to_string(frame)
                                       + ".ply");
                 }
