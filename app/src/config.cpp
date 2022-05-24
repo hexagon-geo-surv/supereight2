@@ -13,6 +13,12 @@
 #include "se/common/yaml.hpp"
 
 
+std::string process_path(const std::string& path, const std::string& dataset_dir)
+{
+    // Expand leading ~ in the path if possible and interpret it as relative to dataset_dir if it's
+    // a relative path.
+    return se::str_utils::resolve_relative_path(se::str_utils::expand_user(path), dataset_dir);
+}
 
 namespace se {
 
@@ -56,21 +62,9 @@ void AppConfig::readYaml(const std::string& filename)
     se::yaml::subnode_as_int(node, "max_frames", max_frames);
     se::yaml::subnode_as_string(node, "log_file", log_file);
 
-    // Expand ~ in the paths.
-    mesh_path = se::str_utils::expand_user(mesh_path);
-    log_file = se::str_utils::expand_user(log_file);
-
-    // If the mesh_path or log_file contain relative paths, interpret them as relative to the
-    // directory where filename is located.
     const stdfs::path dataset_dir = stdfs::path(filename).parent_path();
-    const stdfs::path mesh_path_p(mesh_path);
-    if (mesh_path_p.is_relative()) {
-        mesh_path = dataset_dir / mesh_path_p;
-    }
-    const stdfs::path log_file_p(log_file);
-    if (log_file_p.is_relative()) {
-        log_file = dataset_dir / log_file_p;
-    }
+    mesh_path = process_path(mesh_path, dataset_dir);
+    log_file = process_path(log_file, dataset_dir);
 }
 
 
