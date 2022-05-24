@@ -9,6 +9,8 @@
 
 #include <algorithm>
 
+#include "se/common/filesystem.hpp"
+
 // POSIX systems must have the unistd.h header.
 #if __has_include(<unistd.h>)
 #    include <wordexp.h>
@@ -198,7 +200,14 @@ std::string expand_user(const std::string& path)
     return expanded_path;
 }
 
-
+std::string resolve_relative_path(const std::string& relative_path, const std::string& base_dir)
+{
+    const stdfs::path relative_path_p(relative_path);
+    if (relative_path_p.is_relative()) {
+        return base_dir / relative_path_p;
+    }
+    return relative_path;
+}
 
 } // namespace str_utils
 } // namespace se

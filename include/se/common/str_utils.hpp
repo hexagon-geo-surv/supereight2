@@ -229,7 +229,10 @@ std::string header_to_pretty_str(const std::string& header_name, const int width
  */
 std::string expand_user(const std::string& path);
 
-
+/** Return the path resulting by resolving relative_path relative to the directory base_dir. If
+ * relative_path is an absolute path it is returned as-is.
+ */
+std::string resolve_relative_path(const std::string& relative_path, const std::string& base_dir);
 
 } // namespace str_utils
 } // namespace se
