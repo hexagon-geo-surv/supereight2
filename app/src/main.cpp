@@ -28,8 +28,8 @@ int main(int argc, char** argv)
 
         // Create the mesh output directory
         if (config.app.enable_meshing) {
-            if (!config.app.mesh_output_dir.empty()) {
-                stdfs::create_directories(config.app.mesh_output_dir);
+            if (!config.app.mesh_path.empty()) {
+                stdfs::create_directories(config.app.mesh_path);
             }
         }
 
@@ -203,16 +203,15 @@ int main(int argc, char** argv)
             if (config.app.enable_meshing
                 && ((config.app.meshing_rate > 0 && frame % config.app.meshing_rate == 0)
                     || last_frame)) {
-                map.saveMesh(config.app.mesh_output_dir + "/mesh_" + std::to_string(frame)
-                             + ".ply");
+                map.saveMesh(config.app.mesh_path + "/mesh_" + std::to_string(frame) + ".ply");
                 if (config.app.enable_slice_meshing) {
-                    map.saveFieldSlice(config.app.mesh_output_dir + "/slice",
+                    map.saveFieldSlice(config.app.mesh_path + "/slice",
                                        se::math::to_translation(T_WS),
                                        std::to_string(frame));
                 }
                 if (config.app.enable_structure_meshing) {
-                    map.saveStructure(config.app.mesh_output_dir + "/struct_"
-                                      + std::to_string(frame) + ".ply");
+                    map.saveStructure(config.app.mesh_path + "/struct_" + std::to_string(frame)
+                                      + ".ply");
                 }
             }
 

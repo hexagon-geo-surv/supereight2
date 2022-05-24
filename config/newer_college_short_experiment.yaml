@@ -58,7 +58,7 @@ app:
   enable_meshing:             true
   enable_slice_meshing:       true
   enable_structure_meshing:   true
-  mesh_output_dir:            "meshes"
+  mesh_path:                  "meshes"
   sensor_downsampling_factor: 1
   tracking_rate:              1
   integration_rate:           1

@@ -47,9 +47,9 @@ struct AppConfig {
      */
     bool enable_structure_meshing = false;
 
-    /** The directory where meshes are saved.
+    /** The path where meshes are saved.
      */
-    std::string mesh_output_dir;
+    std::string mesh_path;
 
     /** The ratio of the input frame size over the frame size used internally.
      * Values greater than 1 result in the input frames being downsampled

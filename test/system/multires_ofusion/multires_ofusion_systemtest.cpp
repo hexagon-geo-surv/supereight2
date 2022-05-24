@@ -48,9 +48,9 @@ TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
     se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
 
     // Output files in a temporary directory.
-    config.app.mesh_output_dir = std::string(tmp + "/meshes");
+    config.app.mesh_path = std::string(tmp + "/meshes");
     config.app.log_file = std::string(tmp + "/log.tsv");
-    stdfs::create_directories(config.app.mesh_output_dir);
+    stdfs::create_directories(config.app.mesh_path);
 
     // Create a pinhole camera and downsample the intrinsics
     const se::PinholeCamera sensor(config.sensor, config.app.sensor_downsampling_factor);
@@ -79,10 +79,10 @@ TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
         integrator.integrateDepth(sensor, processed_depth_img, T_WS, frame);
     }
 
-    map.saveFieldSlice(config.app.mesh_output_dir + "/test-field-interp-slice",
+    map.saveFieldSlice(config.app.mesh_path + "/test-field-interp-slice",
                        se::math::to_translation(T_WS),
                        std::to_string(max_frame));
-    map.saveStructure(config.app.mesh_output_dir + "/test-field-interp-structure_"
+    map.saveStructure(config.app.mesh_path + "/test-field-interp-structure_"
                       + std::to_string(max_frame) + ".ply");
 
     Eigen::Vector3f point_W;
@@ -116,9 +116,9 @@ TEST(MultiResOFusionSystemTest, GetField)
     se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
 
     // Output files in a temporary directory.
-    config.app.mesh_output_dir = std::string(tmp + "/meshes");
+    config.app.mesh_path = std::string(tmp + "/meshes");
     config.app.log_file = std::string(tmp + "/log.tsv");
-    stdfs::create_directories(config.app.mesh_output_dir);
+    stdfs::create_directories(config.app.mesh_path);
 
     // Create a pinhole camera and downsample the intrinsics
     const se::PinholeCamera sensor(config.sensor, config.app.sensor_downsampling_factor);
@@ -155,12 +155,12 @@ TEST(MultiResOFusionSystemTest, GetField)
 
     se::OccupancyData data;
 
-    map.saveFieldSlice(config.app.mesh_output_dir + "/test-field-slice",
+    map.saveFieldSlice(config.app.mesh_path + "/test-field-slice",
                        se::math::to_translation(T_WS),
                        std::to_string(max_frame));
 
-    map.saveStructure(config.app.mesh_output_dir + "/test-field-structure_"
-                      + std::to_string(max_frame) + ".ply");
+    map.saveStructure(config.app.mesh_path + "/test-field-structure_" + std::to_string(max_frame)
+                      + ".ply");
 
     map.voxelToPoint(voxel_coord_unknown_1, point_W);
     data = map.getData(point_W);
@@ -188,9 +188,9 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
     se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
 
     // Output files in a temporary directory.
-    config.app.mesh_output_dir = std::string(tmp + "/meshes");
+    config.app.mesh_path = std::string(tmp + "/meshes");
     config.app.log_file = std::string(tmp + "/log.tsv");
-    stdfs::create_directories(config.app.mesh_output_dir);
+    stdfs::create_directories(config.app.mesh_path);
 
     // Create a pinhole camera and downsample the intrinsics
     const se::PinholeCamera sensor(config.sensor, config.app.sensor_downsampling_factor);
@@ -228,11 +228,11 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
     map.voxelToPoint(voxel_coord, point_W);
     data = map.getMaxData(point_W, scale_5);
 
-    map.saveFieldSlice(config.app.mesh_output_dir + "/test-max-field-slice-field",
+    map.saveFieldSlice(config.app.mesh_path + "/test-max-field-slice-field",
                        se::math::to_translation(T_WS),
                        std::to_string(max_frame));
 
-    map.saveScaleSlice(config.app.mesh_output_dir + "/test-max-field-slice-scale",
+    map.saveScaleSlice(config.app.mesh_path + "/test-max-field-slice-scale",
                        se::math::to_translation(T_WS),
                        std::to_string(max_frame));
 
@@ -240,14 +240,14 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
 
     const int max_scale = map.getOctree()->getMaxScale();
     for (int scale = 0; scale < max_scale; scale++) {
-        map.saveMaxFieldSlice(config.app.mesh_output_dir + "/test-max-field-slice-max-field-scale-"
+        map.saveMaxFieldSlice(config.app.mesh_path + "/test-max-field-slice-max-field-scale-"
                                   + std::to_string(scale),
                               se::math::to_translation(T_WS),
                               scale,
                               std::to_string(max_frame));
     }
 
-    map.saveStructure(config.app.mesh_output_dir + "/test-max-field-structure_"
+    map.saveStructure(config.app.mesh_path + "/test-max-field-structure_"
                       + std::to_string(max_frame));
 }
 
@@ -260,9 +260,9 @@ TEST(MultiResOFusionSystemTest, DeleteChildren)
     se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
 
     // Output files in a temporary directory.
-    config.app.mesh_output_dir = std::string(tmp + "/meshes");
+    config.app.mesh_path = std::string(tmp + "/meshes");
     config.app.log_file = std::string(tmp + "/log.tsv");
-    stdfs::create_directories(config.app.mesh_output_dir);
+    stdfs::create_directories(config.app.mesh_path);
 
     // Create a pinhole camera and downsample the intrinsics
     const se::PinholeCamera sensor(config.sensor, config.app.sensor_downsampling_factor);
@@ -307,11 +307,11 @@ TEST(MultiResOFusionSystemTest, DeleteChildren)
         map.voxelToPoint(voxel_coord, point_W);
         data = map.getData(point_W);
 
-        map.saveFieldSlice(config.app.mesh_output_dir + "/test-delete-child-slice",
+        map.saveFieldSlice(config.app.mesh_path + "/test-delete-child-slice",
                            se::math::to_translation(T_WS),
                            std::to_string(frame));
 
-        map.saveStructure(config.app.mesh_output_dir + "/test-delete-child-structure_"
+        map.saveStructure(config.app.mesh_path + "/test-delete-child-structure_"
                           + std::to_string(frame) + ".ply");
     }
 }
@@ -326,9 +326,9 @@ TEST(MultiResOFusionSystemTest, Raycasting)
     std::cout << config;
 
     // Output files in a temporary directory.
-    config.app.mesh_output_dir = std::string(tmp + "/meshes");
+    config.app.mesh_path = std::string(tmp + "/meshes");
     config.app.log_file = std::string(tmp + "/log.tsv");
-    stdfs::create_directories(config.app.mesh_output_dir);
+    stdfs::create_directories(config.app.mesh_path);
 
     // Setup log stream
     std::ofstream log_file_stream;
@@ -398,26 +398,23 @@ TEST(MultiResOFusionSystemTest, Raycasting)
                                         surface_normals_W,
                                         surface_scale);
 
-    map.saveStructure(config.app.mesh_output_dir + "/test-raycasting-structure_"
-                      + std::to_string(frame) + ".ply");
-    map.saveStructure(config.app.mesh_output_dir + "/test-raycasting-structure_"
-                      + std::to_string(frame) + ".vtk");
-    map.saveStructure(config.app.mesh_output_dir + "/test-raycasting-structure_"
-                      + std::to_string(frame) + ".obj");
-    map.saveFieldSlice(config.app.mesh_output_dir + "/test-raycasting-slice-field",
+    map.saveStructure(config.app.mesh_path + "/test-raycasting-structure_" + std::to_string(frame)
+                      + ".ply");
+    map.saveStructure(config.app.mesh_path + "/test-raycasting-structure_" + std::to_string(frame)
+                      + ".vtk");
+    map.saveStructure(config.app.mesh_path + "/test-raycasting-structure_" + std::to_string(frame)
+                      + ".obj");
+    map.saveFieldSlice(config.app.mesh_path + "/test-raycasting-slice-field",
                        se::math::to_translation(T_WS),
                        std::to_string(frame));
-    map.saveMesh(config.app.mesh_output_dir + "/test-raycasting-mesh_" + std::to_string(frame)
-                 + ".ply");
-    map.saveMesh(config.app.mesh_output_dir + "/test-raycasting-mesh_" + std::to_string(frame)
-                 + ".vtk");
-    map.saveMesh(config.app.mesh_output_dir + "/test-raycasting-mesh_" + std::to_string(frame)
-                 + ".obj");
+    map.saveMesh(config.app.mesh_path + "/test-raycasting-mesh_" + std::to_string(frame) + ".ply");
+    map.saveMesh(config.app.mesh_path + "/test-raycasting-mesh_" + std::to_string(frame) + ".vtk");
+    map.saveMesh(config.app.mesh_path + "/test-raycasting-mesh_" + std::to_string(frame) + ".obj");
 
     cv::Mat depth_cv_image(
         processed_img_res.y(), processed_img_res.x(), CV_8UC4, output_volume_img_data);
     cv::cvtColor(depth_cv_image, depth_cv_image, cv::COLOR_RGBA2BGRA);
-    cv::imwrite((config.app.mesh_output_dir + "/test-raycasting-img.png").c_str(), depth_cv_image);
+    cv::imwrite((config.app.mesh_path + "/test-raycasting-img.png").c_str(), depth_cv_image);
 
     delete[] output_rgba_img_data;
     delete[] output_depth_img_data;

@@ -47,7 +47,7 @@ void AppConfig::readYaml(const std::string& filename)
     se::yaml::subnode_as_bool(node, "enable_meshing", enable_meshing);
     se::yaml::subnode_as_bool(node, "enable_slice_meshing", enable_slice_meshing);
     se::yaml::subnode_as_bool(node, "enable_structure_meshing", enable_structure_meshing);
-    se::yaml::subnode_as_string(node, "mesh_output_dir", mesh_output_dir);
+    se::yaml::subnode_as_string(node, "mesh_path", mesh_path);
     se::yaml::subnode_as_int(node, "sensor_downsampling_factor", sensor_downsampling_factor);
     se::yaml::subnode_as_int(node, "tracking_rate", tracking_rate);
     se::yaml::subnode_as_int(node, "integration_rate", integration_rate);
@@ -57,15 +57,15 @@ void AppConfig::readYaml(const std::string& filename)
     se::yaml::subnode_as_string(node, "log_file", log_file);
 
     // Expand ~ in the paths.
-    mesh_output_dir = se::str_utils::expand_user(mesh_output_dir);
+    mesh_path = se::str_utils::expand_user(mesh_path);
     log_file = se::str_utils::expand_user(log_file);
 
-    // If the mesh_output_dir or log_file contain relative paths, interpret them as relative to the
+    // If the mesh_path or log_file contain relative paths, interpret them as relative to the
     // directory where filename is located.
     const stdfs::path dataset_dir = stdfs::path(filename).parent_path();
-    const stdfs::path mesh_output_dir_p(mesh_output_dir);
-    if (mesh_output_dir_p.is_relative()) {
-        mesh_output_dir = dataset_dir / mesh_output_dir_p;
+    const stdfs::path mesh_path_p(mesh_path);
+    if (mesh_path_p.is_relative()) {
+        mesh_path = dataset_dir / mesh_path_p;
     }
     const stdfs::path log_file_p(log_file);
     if (log_file_p.is_relative()) {
@@ -82,7 +82,7 @@ std::ostream& operator<<(std::ostream& os, const AppConfig& c)
     os << str_utils::bool_to_pretty_str(c.enable_gui, "enable_gui") << "\n";
     os << str_utils::bool_to_pretty_str(c.enable_meshing, "enable_meshing") << "\n";
     os << str_utils::bool_to_pretty_str(c.enable_slice_meshing, "enable_slice_meshing") << "\n";
-    os << str_utils::str_to_pretty_str(c.mesh_output_dir, "mesh_output_dir") << "\n";
+    os << str_utils::str_to_pretty_str(c.mesh_path, "mesh_path") << "\n";
     os << str_utils::value_to_pretty_str(c.sensor_downsampling_factor, "sensor_downsampling_factor")
        << "\n";
     os << str_utils::value_to_pretty_str(c.tracking_rate, "tracking_rate") << "\n";
