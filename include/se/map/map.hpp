@@ -259,43 +259,70 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
     inline std::optional<se::field_vec_t> getFieldGrad(const Eigen::Vector3f& point_W) const;
 
     /**
-     * \brief Save three axis aligned slices field value (x, y and z) at the provided coordinates to a file.
+     * \brief Save three slices of the field value, each perpendicular to one of the axes (x, y and
+     * z) at the provided coordinates. Setting any of the filenames to the empty string will skip
+     * saving the respective slice.
      *
-     * \param[in] file_path   The path to store the slices at (without .vtk file ending)
-     * \param[in] point_W     The coordinates of the point in world frame [meter] to extract the slices from
-     * \param[in] num         The slice number, e.g. frame number (OPTIONAL)
+     * \note Only VTK (`.vtk`) files are currently supported.
+     *
+     * \param[in] filename_x The file where the slice perpendicular to the x axis will be written.
+     * \param[in] filename_y The file where the slice perpendicular to the y axis will be written.
+     * \param[in] filename_z The file where the slice perpendicular to the z axis will be written.
+     * \param[in] point_W    The point in the world frame in units of meters where the slices
+     *                       intersect. The x coordinate denotes the position along the x axis that
+     *                       the slice perpendicular to the x axis will be computed etc.
+     * \return Zero on success and non-zero on error.
      */
-    void saveFieldSlice(const std::string& file_path,
-                        const Eigen::Vector3f& point_W,
-                        const std::string& num = "") const;
+    int saveFieldSlices(const std::string& filename_x,
+                        const std::string& filename_y,
+                        const std::string& filename_z,
+                        const Eigen::Vector3f& point_W) const;
 
     /**
-     * \brief Save three axis aligned max field value slices (x, y and z) at the provided coordinates to a file.
+     * \brief Save three slices of the maximum field value, each perpendicular to one of the axes
+     * (x, y and z) at the provided coordinates. Setting any of the filenames to the empty string
+     * will skip saving the respective slice.
      *
-     * \param[in] file_path   The path to store the slices at (without .vtk file ending)
-     * \param[in] point_W     The coordinates of the point in world frame [meter] to extract the slices from
-     * \param[in] scale       The min scale at which to extract the max field data from
-     * \param[in] num         The slice number, e.g. frame number (OPTIONAL)
+     * \note Only VTK (`.vtk`) files are currently supported.
+     *
+     * \param[in] filename_x The file where the slice perpendicular to the x axis will be written.
+     * \param[in] filename_y The file where the slice perpendicular to the y axis will be written.
+     * \param[in] filename_z The file where the slice perpendicular to the z axis will be written.
+     * \param[in] point_W    The point in the world frame in units of meters where the slices
+     *                       intersect. The x coordinate denotes the position along the x axis that
+     *                       the slice perpendicular to the x axis will be computed etc.
+     * \param[in] scale      The minimum scale the maximum field values will be extracted from.
+     * \return Zero on success and non-zero on error.
      */
     template<se::Field FldTDummy = FldT>
-    typename std::enable_if_t<FldTDummy == se::Field::Occupancy, void>
-    saveMaxFieldSlice(const std::string& file_path,
-                      const Eigen::Vector3f& point_W,
-                      const int scale,
-                      const std::string& num = "") const;
+    typename std::enable_if_t<FldTDummy == se::Field::Occupancy, int>
+    saveMaxFieldSlices(const std::string& filename_x,
+                       const std::string& filename_y,
+                       const std::string& filename_z,
+                       const Eigen::Vector3f& point_W,
+                       const int scale) const;
 
     /**
-     * \brief Save three axis aligned integration scale slices (x, y and z) at the provided coordinates to a file.
+     * \brief Save three slices of the integration scale, each perpendicular to one of the axes (x,
+     * y and z) at the provided coordinates. Setting any of the filenames to the empty string will
+     * skip saving the respective slice.
      *
-     * \param[in] file_path   The path to store the slices at (without .vtk file ending)
-     * \param[in] point_W     The coordinates of the point in world frame [meter] to extract the slices from
-     * \param[in] num         The slice number, e.g. frame number (OPTIONAL)
+     * \note Only VTK (`.vtk`) files are currently supported.
+     *
+     * \param[in] filename_x The file where the slice perpendicular to the x axis will be written.
+     * \param[in] filename_y The file where the slice perpendicular to the y axis will be written.
+     * \param[in] filename_z The file where the slice perpendicular to the z axis will be written.
+     * \param[in] point_W    The point in the world frame in units of meters where the slices
+     *                       intersect. The x coordinate denotes the position along the x axis that
+     *                       the slice perpendicular to the x axis will be computed etc.
+     * \return Zero on success and non-zero on error.
      */
     template<Res ResTDummy = ResT>
-    typename std::enable_if_t<ResTDummy == Res::Multi, void>
-    saveScaleSlice(const std::string& file_path,
-                   const Eigen::Vector3f& point_W,
-                   const std::string& num = "") const;
+    typename std::enable_if_t<ResTDummy == Res::Multi, int>
+    saveScaleSlices(const std::string& filename_x,
+                    const std::string& filename_y,
+                    const std::string& filename_z,
+                    const Eigen::Vector3f& point_W) const;
 
     /**
      * \brief Save the octree structure to a file.

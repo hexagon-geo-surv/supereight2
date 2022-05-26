@@ -83,9 +83,10 @@ TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
         integrator.integrateDepth(sensor, processed_depth_img, T_WS, frame);
     }
 
-    map.saveFieldSlice(config.app.slice_path + "/test-field-interp-slice",
-                       se::math::to_translation(T_WS),
-                       std::to_string(max_frame));
+    map.saveFieldSlices(config.app.slice_path + "/test-field-interp-slice-x.vtk",
+                        config.app.slice_path + "/test-field-interp-slice-y.vtk",
+                        config.app.slice_path + "/test-field-interp-slice-z.vtk",
+                        se::math::to_translation(T_WS));
     map.saveStructure(config.app.structure_path + "/test-field-interp-structure_"
                       + std::to_string(max_frame) + ".ply");
 
@@ -163,9 +164,10 @@ TEST(MultiResOFusionSystemTest, GetField)
 
     se::OccupancyData data;
 
-    map.saveFieldSlice(config.app.slice_path + "/test-field-slice",
-                       se::math::to_translation(T_WS),
-                       std::to_string(max_frame));
+    map.saveFieldSlices(config.app.slice_path + "/test-field-slice-x.vtk",
+                        config.app.slice_path + "/test-field-slice-y.vtk",
+                        config.app.slice_path + "/test-field-slice-z.vtk",
+                        se::math::to_translation(T_WS));
 
     map.saveStructure(config.app.structure_path + "/test-field-structure_"
                       + std::to_string(max_frame) + ".ply");
@@ -240,23 +242,28 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
     map.voxelToPoint(voxel_coord, point_W);
     data = map.getMaxData(point_W, scale_5);
 
-    map.saveFieldSlice(config.app.slice_path + "/test-max-field-slice-field",
-                       se::math::to_translation(T_WS),
-                       std::to_string(max_frame));
+    map.saveFieldSlices(config.app.slice_path + "/test-max-field-slice-field-x.vtk",
+                        config.app.slice_path + "/test-max-field-slice-field-y.vtk",
+                        config.app.slice_path + "/test-max-field-slice-field-z.vtk",
+                        se::math::to_translation(T_WS));
 
-    map.saveScaleSlice(config.app.slice_path + "/test-max-field-slice-scale",
-                       se::math::to_translation(T_WS),
-                       std::to_string(max_frame));
+    map.saveScaleSlices(config.app.slice_path + "/test-max-field-slice-scale-x.vtk",
+                        config.app.slice_path + "/test-max-field-slice-scale-y.vtk",
+                        config.app.slice_path + "/test-max-field-slice-scale-z.vtk",
+                        se::math::to_translation(T_WS));
 
 
 
     const int max_scale = map.getOctree()->getMaxScale();
     for (int scale = 0; scale < max_scale; scale++) {
-        map.saveMaxFieldSlice(config.app.slice_path + "/test-max-field-slice-max-field-scale-"
-                                  + std::to_string(scale),
-                              se::math::to_translation(T_WS),
-                              scale,
-                              std::to_string(max_frame));
+        map.saveMaxFieldSlices(config.app.slice_path + "/test-max-field-slice-max-field-scale-"
+                                   + std::to_string(scale) + "-x.vtk",
+                               config.app.slice_path + "/test-max-field-slice-max-field-scale-"
+                                   + std::to_string(scale) + "-y.vtk",
+                               config.app.slice_path + "/test-max-field-slice-max-field-scale-"
+                                   + std::to_string(scale) + "-z.vtk",
+                               se::math::to_translation(T_WS),
+                               scale);
     }
 
     map.saveStructure(config.app.structure_path + "/test-max-field-structure_"
@@ -323,9 +330,11 @@ TEST(MultiResOFusionSystemTest, DeleteChildren)
         map.voxelToPoint(voxel_coord, point_W);
         data = map.getData(point_W);
 
-        map.saveFieldSlice(config.app.slice_path + "/test-delete-child-slice",
-                           se::math::to_translation(T_WS),
-                           std::to_string(frame));
+        map.saveFieldSlices(
+            config.app.slice_path + "/test-delete-child-slice-" + std::to_string(frame) + "-x.vtk",
+            config.app.slice_path + "/test-delete-child-slice-" + std::to_string(frame) + "-y.vtk",
+            config.app.slice_path + "/test-delete-child-slice-" + std::to_string(frame) + "-z.vtk",
+            se::math::to_translation(T_WS));
 
         map.saveStructure(config.app.structure_path + "/test-delete-child-structure_"
                           + std::to_string(frame) + ".ply");
@@ -424,9 +433,11 @@ TEST(MultiResOFusionSystemTest, Raycasting)
                       + std::to_string(frame) + ".vtk");
     map.saveStructure(config.app.structure_path + "/test-raycasting-structure_"
                       + std::to_string(frame) + ".obj");
-    map.saveFieldSlice(config.app.slice_path + "/test-raycasting-slice-field",
-                       se::math::to_translation(T_WS),
-                       std::to_string(frame));
+    map.saveFieldSlices(
+        config.app.slice_path + "/test-raycasting-slice-field-" + std::to_string(frame) + "-x.vtk",
+        config.app.slice_path + "/test-raycasting-slice-field-" + std::to_string(frame) + "-y.vtk",
+        config.app.slice_path + "/test-raycasting-slice-field-" + std::to_string(frame) + "-z.vtk",
+        se::math::to_translation(T_WS));
     map.saveMesh(config.app.mesh_path + "/test-raycasting-mesh_" + std::to_string(frame) + ".ply");
     map.saveMesh(config.app.mesh_path + "/test-raycasting-mesh_" + std::to_string(frame) + ".vtk");
     map.saveMesh(config.app.mesh_path + "/test-raycasting-mesh_" + std::to_string(frame) + ".obj");

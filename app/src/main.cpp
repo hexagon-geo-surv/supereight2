@@ -210,9 +210,11 @@ int main(int argc, char** argv)
                     map.saveMesh(config.app.mesh_path + "/mesh_" + std::to_string(frame) + ".ply");
                 }
                 if (!config.app.slice_path.empty()) {
-                    map.saveFieldSlice(config.app.slice_path + "/slice",
-                                       se::math::to_translation(T_WS),
-                                       std::to_string(frame));
+                    map.saveFieldSlices(
+                        config.app.slice_path + "/slice_x_" + std::to_string(frame) + ".vtk",
+                        config.app.slice_path + "/slice_y_" + std::to_string(frame) + ".vtk",
+                        config.app.slice_path + "/slice_z_" + std::to_string(frame) + ".vtk",
+                        se::math::to_translation(T_WS));
                 }
                 if (!config.app.structure_path.empty()) {
                     map.saveStructure(config.app.structure_path + "/struct_" + std::to_string(frame)
