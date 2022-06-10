@@ -105,16 +105,14 @@ static inline bool in(const Scalar v, const Scalar a, const Scalar b)
 
 static inline Eigen::Vector3f to_translation(const Eigen::Matrix4f& T)
 {
-    Eigen::Vector3f t = T.block<3, 1>(0, 3);
-    return t;
+    return T.block<3, 1>(0, 3);
 }
 
 
 
 static inline Eigen::Matrix3f to_rotation(const Eigen::Matrix4f& T)
 {
-    Eigen::Matrix3f R = T.block<3, 3>(0, 0);
-    return R;
+    return T.block<3, 3>(0, 0);
 }
 
 
@@ -149,16 +147,14 @@ static inline Eigen::Matrix4f to_transformation(const Eigen::Matrix3f& R, const 
 
 static inline Eigen::Vector3f to_inverse_translation(const Eigen::Matrix4f& T)
 {
-    Eigen::Vector3f t_inv = -T.block<3, 3>(0, 0).inverse() * T.block<3, 1>(0, 3);
-    return t_inv;
+    return -T.block<3, 3>(0, 0).inverse() * T.block<3, 1>(0, 3);
 }
 
 
 
 static inline Eigen::Matrix3f to_inverse_rotation(const Eigen::Matrix4f& T)
 {
-    Eigen::Matrix3f R_inv = (T.block<3, 3>(0, 0)).inverse();
-    return R_inv;
+    return (T.block<3, 3>(0, 0)).inverse();
 }
 
 
