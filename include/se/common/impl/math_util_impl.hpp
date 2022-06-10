@@ -147,14 +147,14 @@ static inline Eigen::Matrix4f to_transformation(const Eigen::Matrix3f& R, const 
 
 static inline Eigen::Vector3f to_inverse_translation(const Eigen::Matrix4f& T)
 {
-    return -T.topLeftCorner<3, 3>().inverse() * T.topRightCorner<3, 1>();
+    return -T.topLeftCorner<3, 3>().transpose() * T.topRightCorner<3, 1>();
 }
 
 
 
 static inline Eigen::Matrix3f to_inverse_rotation(const Eigen::Matrix4f& T)
 {
-    return (T.topLeftCorner<3, 3>()).inverse();
+    return T.topLeftCorner<3, 3>().transpose();
 }
 
 
@@ -162,8 +162,8 @@ static inline Eigen::Matrix3f to_inverse_rotation(const Eigen::Matrix4f& T)
 static inline Eigen::Matrix4f to_inverse_transformation(const Eigen::Matrix4f& T)
 {
     Eigen::Matrix4f T_inv = Eigen::Matrix4f::Identity();
-    T_inv.topLeftCorner<3, 3>() = T.topLeftCorner<3, 3>().inverse();
-    T_inv.topRightCorner<3, 1>() = -T.topLeftCorner<3, 3>().inverse() * T.topRightCorner<3, 1>();
+    T_inv.topLeftCorner<3, 3>() = T.topLeftCorner<3, 3>().transpose();
+    T_inv.topRightCorner<3, 1>() = -T.topLeftCorner<3, 3>().transpose() * T.topRightCorner<3, 1>();
     return T_inv;
 }
 
