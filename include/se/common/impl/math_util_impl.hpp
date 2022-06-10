@@ -105,14 +105,14 @@ static inline bool in(const Scalar v, const Scalar a, const Scalar b)
 
 static inline Eigen::Vector3f to_translation(const Eigen::Matrix4f& T)
 {
-    return T.block<3, 1>(0, 3);
+    return T.topRightCorner<3, 1>();
 }
 
 
 
 static inline Eigen::Matrix3f to_rotation(const Eigen::Matrix4f& T)
 {
-    return T.block<3, 3>(0, 0);
+    return T.topLeftCorner<3, 3>();
 }
 
 
@@ -120,7 +120,7 @@ static inline Eigen::Matrix3f to_rotation(const Eigen::Matrix4f& T)
 static inline Eigen::Matrix4f to_transformation(const Eigen::Vector3f& t)
 {
     Eigen::Matrix4f T = Eigen::Matrix4f::Identity();
-    T.block<3, 1>(0, 3) = t;
+    T.topRightCorner<3, 1>() = t;
     return T;
 }
 
@@ -129,7 +129,7 @@ static inline Eigen::Matrix4f to_transformation(const Eigen::Vector3f& t)
 static inline Eigen::Matrix4f to_transformation(const Eigen::Matrix3f& R)
 {
     Eigen::Matrix4f T = Eigen::Matrix4f::Identity();
-    T.block<3, 3>(0, 0) = R;
+    T.topLeftCorner<3, 3>() = R;
     return T;
 }
 
@@ -138,8 +138,8 @@ static inline Eigen::Matrix4f to_transformation(const Eigen::Matrix3f& R)
 static inline Eigen::Matrix4f to_transformation(const Eigen::Matrix3f& R, const Eigen::Vector3f& t)
 {
     Eigen::Matrix4f T = Eigen::Matrix4f::Identity();
-    T.block<3, 3>(0, 0) = R;
-    T.block<3, 1>(0, 3) = t;
+    T.topLeftCorner<3, 3>() = R;
+    T.topRightCorner<3, 1>() = t;
     return T;
 }
 
@@ -147,14 +147,14 @@ static inline Eigen::Matrix4f to_transformation(const Eigen::Matrix3f& R, const 
 
 static inline Eigen::Vector3f to_inverse_translation(const Eigen::Matrix4f& T)
 {
-    return -T.block<3, 3>(0, 0).inverse() * T.block<3, 1>(0, 3);
+    return -T.topLeftCorner<3, 3>().inverse() * T.topRightCorner<3, 1>();
 }
 
 
 
 static inline Eigen::Matrix3f to_inverse_rotation(const Eigen::Matrix4f& T)
 {
-    return (T.block<3, 3>(0, 0)).inverse();
+    return (T.topLeftCorner<3, 3>()).inverse();
 }
 
 
@@ -162,8 +162,8 @@ static inline Eigen::Matrix3f to_inverse_rotation(const Eigen::Matrix4f& T)
 static inline Eigen::Matrix4f to_inverse_transformation(const Eigen::Matrix4f& T)
 {
     Eigen::Matrix4f T_inv = Eigen::Matrix4f::Identity();
-    T_inv.block<3, 3>(0, 0) = T.block<3, 3>(0, 0).inverse();
-    T_inv.block<3, 1>(0, 3) = -T.block<3, 3>(0, 0).inverse() * T.block<3, 1>(0, 3);
+    T_inv.topLeftCorner<3, 3>() = T.topLeftCorner<3, 3>().inverse();
+    T_inv.topRightCorner<3, 1>() = -T.topLeftCorner<3, 3>().inverse() * T.topRightCorner<3, 1>();
     return T_inv;
 }
 
@@ -323,8 +323,8 @@ static Eigen::Matrix4f exp(const Eigen::Matrix<float, 6, 1>& a)
     }
 
     Eigen::Matrix4f se3 = Eigen::Matrix4f::Identity();
-    se3.block<3, 3>(0, 0) = so3;
-    se3.block<3, 1>(0, 3) = V * a.head<3>();
+    se3.topLeftCorner<3, 3>() = so3;
+    se3.topRightCorner<3, 1>() = V * a.head<3>();
     return se3;
 }
 
