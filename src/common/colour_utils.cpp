@@ -71,21 +71,25 @@ void se::depth_to_rgba(uint32_t* depth_RGBA_image_data,
                        const float min_depth,
                        const float max_depth)
 {
-    const float range_scale = 1.0f / (max_depth - min_depth);
+    const float inv_depth_range = 1.0f / (max_depth - min_depth);
 #pragma omp parallel for
     for (int y = 0; y < depth_image_res.y(); y++) {
         const int row_offset = y * depth_image_res.x();
         for (int x = 0; x < depth_image_res.x(); x++) {
-            const int pixel_idx = row_offset + x;
-            if (depth_image_data[pixel_idx] < min_depth) {
-                depth_RGBA_image_data[pixel_idx] = 0xFFFFFFFF; // White
-            }
-            else if (depth_image_data[pixel_idx] > max_depth) {
+            const int pixel_idx = x + row_offset;
+            const float depth = depth_image_data[pixel_idx];
+            if (depth <= 0.0f || std::isnan(depth)) {
                 depth_RGBA_image_data[pixel_idx] = 0xFF000000; // Black
             }
+            else if (depth < min_depth) {
+                depth_RGBA_image_data[pixel_idx] = 0xFF808080; // Gray
+            }
+            else if (depth > max_depth) {
+                depth_RGBA_image_data[pixel_idx] = 0xFFFFFFFF; // White
+            }
             else {
-                const float depth_value = (depth_image_data[pixel_idx] - min_depth) * range_scale;
-                depth_RGBA_image_data[pixel_idx] = gray_to_rgba(depth_value);
+                const float normalized_depth = (depth - min_depth) * inv_depth_range;
+                depth_RGBA_image_data[pixel_idx] = gray_to_rgba(normalized_depth);
             }
         }
     }
