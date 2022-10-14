@@ -397,8 +397,6 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                    recommended_stride)
                       .finished()));
 
-        auto valid_predicate = [&](float depth_value) { return depth_value >= sensor_.near_plane; };
-
         for (unsigned int z = 0; z < size_at_recommended_scale_li; z++) {
             for (unsigned int y = 0; y < size_at_recommended_scale_li; y++) {
 #pragma omp simd
@@ -406,10 +404,18 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                     const Eigen::Vector3f sample_point_C = sample_point_base_S
                         + sample_point_delta_matrix_S * Eigen::Vector3f(x, y, z);
 
+                    // Project sample point to the image plane.
+                    Eigen::Vector2f pixel_f;
+                    if (sensor_.model.project(sample_point_C, &pixel_f)
+                        != srl::projection::ProjectionStatus::Successful) {
+                        continue;
+                    }
+                    const Eigen::Vector2i pixel = se::round_pixel(pixel_f);
+                    const int pixel_idx = pixel.x() + depth_img_.width() * pixel.y();
+
                     // Fetch image value
-                    float depth_value(0);
-                    if (!sensor_.projectToPixelValue(
-                            sample_point_C, depth_img_, depth_value, valid_predicate)) {
+                    const float depth_value = depth_img_[pixel_idx];
+                    if (depth_value < sensor_.near_plane) {
                         continue;
                     }
 
@@ -477,8 +483,6 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                integration_stride)
                   .finished()));
 
-    auto valid_predicate = [&](float depth_value) { return depth_value >= sensor_.near_plane; };
-
     for (unsigned int z = 0; z < size_at_integration_scale_li; z++) {
         for (unsigned int y = 0; y < size_at_integration_scale_li; y++) {
 #pragma omp simd
@@ -486,10 +490,18 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                 const Eigen::Vector3f sample_point_C =
                     sample_point_base_S + sample_point_delta_matrix_S * Eigen::Vector3f(x, y, z);
 
+                // Project sample point to the image plane.
+                Eigen::Vector2f pixel_f;
+                if (sensor_.model.project(sample_point_C, &pixel_f)
+                    != srl::projection::ProjectionStatus::Successful) {
+                    continue;
+                }
+                const Eigen::Vector2i pixel = se::round_pixel(pixel_f);
+                const int pixel_idx = pixel.x() + depth_img_.width() * pixel.y();
+
                 // Fetch image value
-                float depth_value(0);
-                if (!sensor_.projectToPixelValue(
-                        sample_point_C, depth_img_, depth_value, valid_predicate)) {
+                const float depth_value = depth_img_[pixel_idx];
+                if (depth_value < sensor_.near_plane) {
                     continue;
                 }
 

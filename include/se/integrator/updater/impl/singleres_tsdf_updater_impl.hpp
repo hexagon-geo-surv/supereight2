@@ -37,8 +37,6 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
     const Eigen::Matrix4f T_SW = math::to_inverse_transformation(T_WS_);
     const Eigen::Matrix3f C_SW = math::to_rotation(T_SW);
 
-    auto valid_predicate = [&](float depth_value) { return depth_value >= sensor_.near_plane; };
-
 #pragma omp parallel for
     for (unsigned int i = 0; i < block_ptrs.size(); i++) {
         BlockType& block = *static_cast<BlockType*>(block_ptrs[i]);
@@ -63,10 +61,18 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
                         continue;
                     }
 
-                    // Fetch image value
-                    float depth_value(0);
-                    if (!sensor_.projectToPixelValue(
-                            point_S, depth_img_, depth_value, valid_predicate)) {
+                    // Project sample point to the image plane.
+                    Eigen::Vector2f pixel_f;
+                    if (sensor_.model.project(point_S, &pixel_f)
+                        != srl::projection::ProjectionStatus::Successful) {
+                        continue;
+                    }
+                    const Eigen::Vector2i pixel = se::round_pixel(pixel_f);
+                    const int pixel_idx = pixel.x() + depth_img_.width() * pixel.y();
+
+                    // Fetch the image value.
+                    const float depth_value = depth_img_[pixel_idx];
+                    if (depth_value < sensor_.near_plane) {
                         continue;
                     }
 
