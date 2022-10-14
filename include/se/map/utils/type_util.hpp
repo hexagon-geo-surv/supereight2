@@ -57,7 +57,7 @@ typedef float time_stamp_t; ///< The type of the time stamp
 
 typedef uint32_t rgba_t; ///< The type of the colour
 
-typedef short semantics_t; ///< The type of the semantic class
+typedef uint8_t semantics_t; ///< The type of the semantic class
 
 } // namespace se
 
