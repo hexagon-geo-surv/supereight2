@@ -24,7 +24,7 @@ int main(int argc, char** argv)
 
         // ========= Config & I/O INITIALIZATION  =========
         const std::string config_filename = argv[1];
-        const se::Config<se::TSDFDataConfig, se::PinholeCameraConfig> config(config_filename);
+        const se::Config<se::TSDFColDataConfig, se::PinholeCameraConfig> config(config_filename);
         std::cout << config;
 
         // Create the mesh output directory
@@ -46,7 +46,7 @@ int main(int argc, char** argv)
         // Setup input images
         const Eigen::Vector2i input_img_res(config.sensor.width, config.sensor.height);
         se::Image<float> input_depth_img(input_img_res.x(), input_img_res.y());
-        se::Image<se::rgb_t> input_colour_img(input_img_res.x(), input_img_res.y());
+        se::Image<se::rgb_t> input_colour_img(input_img_res.x(), input_img_res.y(), {0, 0, 0});
 
         // Setup processed images
         const Eigen::Vector2i processed_img_res =
@@ -69,7 +69,7 @@ int main(int argc, char** argv)
         // Custom way of setting up the same map:
         // se::Map<se::Data<se::Field::TSDF, se::Colour::Off, se::Semantics::Off>, se::Res::Single, 8>
         // See end of map.hpp and data.hpp for more details
-        se::TSDFMap<se::Res::Single> map(config.map, config.data);
+        se::TSDFColMap<se::Res::Single> map(config.map, config.data);
 
         // ========= Sensor INITIALIZATION  =========
         // Create a pinhole camera and downsample the intrinsics
@@ -97,7 +97,9 @@ int main(int argc, char** argv)
         se::Image<Eigen::Vector3f> surface_point_cloud_W(processed_img_res.x(),
                                                          processed_img_res.y());
         se::Image<Eigen::Vector3f> surface_normals_W(processed_img_res.x(), processed_img_res.y());
-        se::Image<int8_t> surface_scale(processed_img_res.x(), processed_img_res.y());
+        se::Image<int8_t> surface_scale(processed_img_res.x(), processed_img_res.y(), 0);
+        se::Image<se::rgb_t> surface_colour(
+            processed_img_res.x(), processed_img_res.y(), se::rgb_t{0, 0, 0});
 
         int frame = 0;
         while (frame != config.app.max_frames) {
@@ -143,15 +145,21 @@ int main(int argc, char** argv)
             // method.
             TICK("integration")
             if (frame % config.app.integration_rate == 0) {
-                se::integrator::integrate(map, processed_depth_img, sensor, T_WS, frame);
+                se::integrator::integrate(
+                    map, processed_depth_img, processed_colour_img, sensor, T_WS, frame);
             }
             TOCK("integration")
 
             // Raycast from T_MS
             TICK("raycast")
             if (config.app.enable_rendering || !config.app.enable_ground_truth) {
-                se::raycaster::raycast_volume(
-                    map, surface_point_cloud_W, surface_normals_W, surface_scale, T_WS, sensor);
+                se::raycaster::raycast_volume(map,
+                                              surface_point_cloud_W,
+                                              surface_normals_W,
+                                              surface_scale,
+                                              surface_colour,
+                                              T_WS,
+                                              sensor);
             }
             TOCK("raycast")
 
@@ -166,12 +174,12 @@ int main(int argc, char** argv)
                                             output_depth_img_data.get());
                 tracker.renderTrackingResult(output_tracking_img_data.get());
                 if (frame % config.app.rendering_rate == 0) {
-                    se::raycaster::render_volume_scale(output_volume_img_data.get(),
-                                                       processed_img_res,
-                                                       surface_point_cloud_W,
-                                                       surface_normals_W,
-                                                       surface_scale,
-                                                       se::math::to_translation(T_WS));
+                    se::raycaster::render_volume_colour(output_volume_img_data.get(),
+                                                        processed_img_res,
+                                                        surface_point_cloud_W,
+                                                        surface_normals_W,
+                                                        surface_colour,
+                                                        se::math::to_translation(T_WS));
                 }
             }
             TOCK("render")
