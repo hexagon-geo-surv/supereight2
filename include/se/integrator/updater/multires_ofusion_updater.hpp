@@ -48,12 +48,14 @@ class Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Se
      * \param[in]  map                  The reference to the map to be updated.
      * \param[in]  sensor               The sensor model.
      * \param[in]  depth_img            The depth image to be integrated.
+     * \param[in]  colour_img           The colour image to be integrated or nullptr if none.
      * \param[in]  T_WS                 The transformation from sensor to world frame.
      * \param[in]  frame                The frame number to be integrated.
      */
     Updater(MapType& map,
             const SensorT& sensor,
             const Image<float>& depth_img,
+            const Image<rgb_t>* colour_img,
             const Eigen::Matrix4f& T_WS,
             const int frame);
 

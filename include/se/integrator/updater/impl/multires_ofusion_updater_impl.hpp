@@ -20,6 +20,7 @@ Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
     MapType& map,
     const SensorT& sensor,
     const Image<float>& depth_img,
+    const Image<rgb_t>* colour_img,
     const Eigen::Matrix4f& T_WS,
     const int frame) :
         map_(map),

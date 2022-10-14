@@ -20,6 +20,7 @@ class Updater {
     Updater(MapT& map,
             const SensorT& sensor,
             const se::Image<float>& depth_img,
+            const se::Image<rgb_t>* colour_img,
             const Eigen::Matrix4f& T_WS,
             const int frame);
 

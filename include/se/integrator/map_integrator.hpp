@@ -101,6 +101,28 @@ void integrate(MapT& map,
                const Eigen::Matrix4f& T_WS,
                const unsigned int frame);
 
+/**
+ * \brief Integrate a depth and corresponding colour image into the map.
+ * The two images must be registered.
+ *
+ * \tparam MapT
+ * \tparam SensorT
+ * \param[in] map       The map to integrate the depth image into.
+ * \param[in] depth_img The depth image to integrate containing values in metres.
+ * \param[in] colour_img The colour image to integrate containing RGB values.
+ * \param[in] sensor    The sensor that captured the depth image.
+ * \param[in] T_WS      The sensor pose expressed in the world frame the image was captured from.
+ * \param[in] frame     The number of the frame to be integrated.
+ */
+template<typename MapT, typename SensorT>
+typename std::enable_if_t<MapT::col_ == Colour::On> integrate(MapT& map,
+                                                              const se::Image<float>& depth_img,
+                                                              const se::Image<rgb_t>& colour_img,
+                                                              const SensorT& sensor,
+                                                              const Eigen::Matrix4f& T_WS,
+                                                              const unsigned int frame);
+
+
 } // namespace integrator
 
 } // namespace se

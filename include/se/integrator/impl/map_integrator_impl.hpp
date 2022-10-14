@@ -35,6 +35,7 @@ struct IntegrateImplD {
     static void integrate(MapT& map,
                           const SensorT& sensor,
                           const Image<float>& depth_img,
+                          const Image<rgb_t>* colour_img,
                           const Eigen::Matrix4f& T_WS,
                           const unsigned int frame);
     // No implementation needed since all potential overloads have been implemented.
@@ -51,6 +52,7 @@ struct IntegrateImplD<Field::TSDF, Res::Single> {
     static void integrate(MapT& map,
                           const SensorT& sensor,
                           const Image<float>& depth_img,
+                          const Image<rgb_t>* colour_img,
                           const Eigen::Matrix4f& T_WS,
                           const unsigned int frame)
     {
@@ -62,7 +64,7 @@ struct IntegrateImplD<Field::TSDF, Res::Single> {
 
         // Update
         TICK("update")
-        Updater updater(map, sensor, depth_img, T_WS, frame);
+        Updater updater(map, sensor, depth_img, colour_img, T_WS, frame);
         updater(block_ptrs);
         TOCK("update")
     }
@@ -79,6 +81,7 @@ struct IntegrateImplD<Field::TSDF, Res::Multi> {
     static void integrate(MapT& map,
                           const SensorT& sensor,
                           const Image<float>& depth_img,
+                          const Image<rgb_t>* colour_img,
                           const Eigen::Matrix4f& T_WS,
                           const unsigned int frame)
     {
@@ -90,7 +93,7 @@ struct IntegrateImplD<Field::TSDF, Res::Multi> {
 
         // Update
         TICK("update")
-        Updater updater(map, sensor, depth_img, T_WS, frame);
+        Updater updater(map, sensor, depth_img, colour_img, T_WS, frame);
         updater(block_ptrs);
         TOCK("update")
     }
@@ -107,6 +110,7 @@ struct IntegrateImplD<Field::Occupancy, Res::Multi> {
     static void integrate(MapT& map,
                           const SensorT& sensor,
                           const Image<float>& depth_img,
+                          const Image<rgb_t>* colour_img,
                           const Eigen::Matrix4f& T_WS,
                           const unsigned int frame)
     {
@@ -123,7 +127,7 @@ struct IntegrateImplD<Field::Occupancy, Res::Multi> {
 
         // Update
         TICK("update")
-        Updater updater(map, sensor, depth_img, T_WS, frame);
+        Updater updater(map, sensor, depth_img, colour_img, T_WS, frame);
         updater(allocation_list);
         TOCK("update")
     }
@@ -149,7 +153,26 @@ void integrate(MapT& map,
                const Eigen::Matrix4f& T_WS,
                const unsigned int frame)
 {
-    details::IntegrateImpl<MapT>::integrate(map, sensor, depth_img, T_WS, frame);
+    details::IntegrateImpl<MapT>::integrate(map, sensor, depth_img, nullptr, T_WS, frame);
+}
+
+
+
+template<typename MapT, typename SensorT>
+typename std::enable_if_t<MapT::col_ == Colour::On> integrate(MapT& map,
+                                                              const Image<float>& depth_img,
+                                                              const Image<rgb_t>& colour_img,
+                                                              const SensorT& sensor,
+                                                              const Eigen::Matrix4f& T_WS,
+                                                              const unsigned int frame)
+{
+    if (depth_img.width() != colour_img.width() || depth_img.height() != colour_img.height()) {
+        std::ostringstream oss;
+        oss << "depth (" << depth_img.width() << "x" << depth_img.height() << ") and colour ("
+            << colour_img.width() << "x" << colour_img.height() << ") image dimensions differ";
+        throw std::invalid_argument(oss.str());
+    }
+    details::IntegrateImpl<MapT>::integrate(map, sensor, depth_img, &colour_img, T_WS, frame);
 }
 
 } // namespace integrator
