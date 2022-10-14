@@ -46,8 +46,7 @@ TEST(Map, Gradient)
     const se::PinholeCamera sensor(sensor_config, 2);
     const se::Image<float> depth_img(sensor_config.width, sensor_config.height, surface_distance);
     // Integrate depth image from an identity T_WS.
-    se::MapIntegrator integrator(map);
-    integrator.integrateDepth(sensor, depth_img, Eigen::Matrix4f::Identity(), 0);
+    se::integrator::integrate(map, depth_img, sensor, Eigen::Matrix4f::Identity(), 0);
 
     // Test that points in free space have 0 gradients
     const std::array free_points{

@@ -81,33 +81,27 @@ static inline Eigen::Vector3f get_sample_coord(const Eigen::Vector3i& octant_coo
 
 
 
-template<typename MapT>
-class MapIntegrator {
-    public:
-    MapIntegrator(MapT& map);
+namespace integrator {
 
-    /**
-     * \brief Integrate depth image into the maps field representation.
-     *
-     * \tparam SensorT
-     * \param[in] depth_img   The sensor depth image
-     * \param[in] sensor      The sensor use for the projection
-     * \param[in] T_WS        The transformation from sensor to world frame
-     * \param[in] frame       The frame number to be integrated
-     */
-    template<typename SensorT>
-    void integrateDepth(const SensorT& sensor,
-                        const se::Image<float>& depth_img,
-                        const Eigen::Matrix4f& T_WS,
-                        const unsigned int frame);
+/**
+ * \brief Integrate a depth image into the map.
+ *
+ * \tparam MapT
+ * \tparam SensorT
+ * \param[in] map       The map to integrate the depth image into.
+ * \param[in] depth_img The depth image to integrate containing values in metres.
+ * \param[in] sensor    The sensor that captured the depth image.
+ * \param[in] T_WS      The sensor pose expressed in the world frame the image was captured from.
+ * \param[in] frame     The number of the frame to be integrated.
+ */
+template<typename MapT, typename SensorT>
+void integrate(MapT& map,
+               const se::Image<float>& depth_img,
+               const SensorT& sensor,
+               const Eigen::Matrix4f& T_WS,
+               const unsigned int frame);
 
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
-    private:
-    MapT& map_;
-};
-
-
+} // namespace integrator
 
 } // namespace se
 

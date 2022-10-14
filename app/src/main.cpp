@@ -93,10 +93,6 @@ int main(int argc, char** argv)
         se::Tracker tracker(map, sensor, config.tracker);
 
         // ========= Integrator INITIALIZATION  =========
-        // The integrator uses a field dependent allocation (TSDF: ray-casting; occupancy: volume-carving)
-        // and updating method
-        se::MapIntegrator integrator(map);
-
         // Setup surface pointcloud, normals and scale
         se::Image<Eigen::Vector3f> surface_point_cloud_W(processed_img_res.x(),
                                                          processed_img_res.y());
@@ -142,10 +138,12 @@ int main(int argc, char** argv)
             se::perfstats.sampleT_WB(T_WB);
             TOCK("tracking")
 
-            // Integrate depth for a given sensor, depth image, pose and frame number
+            // Integrate depth for a given sensor, depth image, pose and frame number using a field
+            // dependent allocation (TSDF: ray-casting; occupancy: volume-carving) and updating
+            // method.
             TICK("integration")
             if (frame % config.app.integration_rate == 0) {
-                integrator.integrateDepth(sensor, processed_depth_img, T_WS, frame);
+                se::integrator::integrate(map, processed_depth_img, sensor, T_WS, frame);
             }
             TOCK("integration")
 

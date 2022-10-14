@@ -25,8 +25,7 @@ void integrate_wall(MapT& map, const se::PinholeCamera& sensor, float depth_valu
     const se::Image<float> depth(
         sensor.model.imageWidth(), sensor.model.imageHeight(), depth_value);
     const Eigen::Matrix4f T_WB = Eigen::Matrix4f::Identity();
-    se::MapIntegrator integrator_stsdf(map);
-    integrator_stsdf.integrateDepth(sensor, depth, T_WB * sensor.T_BS, 0);
+    se::integrator::integrate(map, depth, sensor, T_WB * sensor.T_BS, 0);
 }
 
 int dim_to_blocks(float dim, float block_dim)

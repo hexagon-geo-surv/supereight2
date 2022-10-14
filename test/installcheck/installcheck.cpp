@@ -22,8 +22,7 @@ int main(int argc, char** argv)
         const se::PinholeCamera sensor(sensor_config);
         const se::Image<float> depth(sensor_config.width, sensor_config.height, 2.0f);
 
-        se::MapIntegrator integrator(map);
-        integrator.integrateDepth(sensor, depth, Eigen::Matrix4f::Identity(), 0);
+        se::integrator::integrate(map, depth, sensor, Eigen::Matrix4f::Identity(), 0);
 
         std::cout << "Supereight2 v" << SE_VERSION << " install successful\n";
         return EXIT_SUCCESS;

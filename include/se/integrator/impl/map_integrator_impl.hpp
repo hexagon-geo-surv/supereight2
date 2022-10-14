@@ -140,24 +140,19 @@ using IntegrateImpl = IntegrateImplD<MapT::fld_, MapT::res_>;
 
 
 
-template<typename MapT>
-MapIntegrator<MapT>::MapIntegrator(MapT& map) : map_(map)
+namespace integrator {
+
+template<typename MapT, typename SensorT>
+void integrate(MapT& map,
+               const Image<float>& depth_img,
+               const SensorT& sensor,
+               const Eigen::Matrix4f& T_WS,
+               const unsigned int frame)
 {
+    details::IntegrateImpl<MapT>::integrate(map, sensor, depth_img, T_WS, frame);
 }
 
-
-
-template<typename MapT>
-template<typename SensorT>
-void MapIntegrator<MapT>::integrateDepth(const SensorT& sensor,
-                                         const Image<float>& depth_img,
-                                         const Eigen::Matrix4f& T_WS,
-                                         const unsigned int frame)
-{
-    details::IntegrateImpl<MapT>::integrate(map_, sensor, depth_img, T_WS, frame);
-}
-
-
+} // namespace integrator
 
 } // namespace se
 
