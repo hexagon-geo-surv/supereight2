@@ -61,10 +61,12 @@ class Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, Sensor
 
     private:
     void updateVoxel(DataType& data, field_t sdf_value);
+    void updateVoxelColour(DataType& data, rgb_t colour_value);
 
     MapType& map_;
     const SensorT& sensor_;
     const Image<float>& depth_img_;
+    const Image<rgb_t>* colour_img_;
     const Eigen::Matrix4f& T_WS_;
     const int frame_;
     const UpdaterConfig config_;

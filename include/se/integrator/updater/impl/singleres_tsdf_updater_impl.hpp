@@ -24,7 +24,13 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::Up
     const Image<rgb_t>* colour_img,
     const Eigen::Matrix4f& T_WS,
     const int frame) :
-        map_(map), sensor_(sensor), depth_img_(depth_img), T_WS_(T_WS), frame_(frame), config_(map)
+        map_(map),
+        sensor_(sensor),
+        depth_img_(depth_img),
+        colour_img_(colour_img),
+        T_WS_(T_WS),
+        frame_(frame),
+        config_(map)
 {
 }
 
@@ -34,6 +40,7 @@ template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
 void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::operator()(
     std::vector<OctantBase*>& block_ptrs)
 {
+    const bool has_colour = colour_img_;
     constexpr int block_size = BlockType::getSize();
     const Eigen::Matrix4f T_SW = math::to_inverse_transformation(T_WS_);
     const Eigen::Matrix3f C_SW = math::to_rotation(T_SW);
@@ -84,6 +91,11 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
                     if (sdf_value > -config_.truncation_boundary) {
                         DataType& data = block.getData(voxel_coord);
                         updateVoxel(data, sdf_value);
+                        if constexpr (MapType::col_ == Colour::On) {
+                            if (has_colour) {
+                                updateVoxelColour(data, (*colour_img_)[pixel_idx]);
+                            }
+                        }
                     }
                 } // x
             }     // y
@@ -104,6 +116,23 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
     const field_t tsdf_value = std::min(field_t(1), sdf_value / config_.truncation_boundary);
     data.tsdf = (data.tsdf * (data.weight - 1) + tsdf_value) / data.weight;
     data.tsdf = math::clamp(data.tsdf, field_t(-1), field_t(1));
+}
+
+
+
+template<Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
+void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Single, BlockSize>,
+             SensorT>::updateVoxelColour(DataType& data, rgb_t colour_value)
+{
+    // Use if instead of std::min to prevent overflow.
+    if (data.rgb_weight < map_.getDataConfig().max_weight) {
+        data.rgb_weight++;
+    }
+    // No overflow occurs due to integral promotion to int or unsigned int during arithmetic
+    // operations.
+    data.rgb.r = (data.rgb.r * (data.rgb_weight - 1) + colour_value.r) / data.rgb_weight;
+    data.rgb.g = (data.rgb.g * (data.rgb_weight - 1) + colour_value.g) / data.rgb_weight;
+    data.rgb.b = (data.rgb.b * (data.rgb_weight - 1) + colour_value.b) / data.rgb_weight;
 }
 
 
