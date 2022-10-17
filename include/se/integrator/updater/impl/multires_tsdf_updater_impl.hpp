@@ -10,6 +10,7 @@
 #define SE_MULTIRES_TSDF_UPDATER_IMPL_HPP
 
 
+
 namespace se {
 
 
@@ -23,7 +24,13 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Upd
     const Image<rgb_t>* colour_img,
     const Eigen::Matrix4f& T_WS,
     const int frame) :
-        map_(map), sensor_(sensor), depth_img_(depth_img), T_WS_(T_WS), frame_(frame), config_(map)
+        map_(map),
+        sensor_(sensor),
+        depth_img_(depth_img),
+        colour_img_(colour_img),
+        T_WS_(T_WS),
+        frame_(frame),
+        config_(map)
 {
 }
 
@@ -33,6 +40,7 @@ template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
 void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::operator()(
     std::vector<OctantBase*>& block_ptrs)
 {
+    const bool has_colour = colour_img_;
     constexpr int block_size = BlockType::getSize();
     const Eigen::Matrix4f T_SW = math::to_inverse_transformation(T_WS_);
     const Eigen::Matrix3f C_SW = math::to_rotation(T_SW);
@@ -66,6 +74,10 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
                                         typename BlockType::DataUnion& data_union) {
                 data_union.prop_data.delta_tsdf = data_union.data.tsdf;
                 data_union.prop_data.delta_weight = 0;
+                if constexpr (MapType::col_ == Colour::On) {
+                    data_union.prop_data.delta_rgb = data_union.data.rgb.template cast<int16_t>();
+                    data_union.prop_data.delta_rgb_weight = 0;
+                }
             };
 
             auto child_down_funct = [&](const OctreeType& octree,
@@ -84,6 +96,24 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
                     }
                     child_data_union.prop_data.delta_weight =
                         parent_data_union.prop_data.delta_weight;
+                    if constexpr (MapType::col_ == Colour::On) {
+                        const rgb16s_t delta = parent_data_union.data.rgb.template cast<int16_t>()
+                            - parent_data_union.prop_data.delta_rgb;
+                        child_data_union.data.rgb.r =
+                            math::add_clamp(child_data_union.data.rgb.r, delta.r, 0, UINT8_MAX);
+                        child_data_union.data.rgb.g =
+                            math::add_clamp(child_data_union.data.rgb.g, delta.g, 0, UINT8_MAX);
+                        child_data_union.data.rgb.b =
+                            math::add_clamp(child_data_union.data.rgb.b, delta.b, 0, UINT8_MAX);
+                        // Use if instead of std::min to prevent overflow.
+                        if (child_data_union.data.rgb_weight < map_.getDataConfig().max_weight
+                                - parent_data_union.prop_data.delta_rgb_weight) {
+                            child_data_union.data.rgb_weight +=
+                                parent_data_union.prop_data.delta_rgb_weight;
+                        }
+                        child_data_union.prop_data.delta_rgb_weight =
+                            parent_data_union.prop_data.delta_rgb_weight;
+                    }
                 }
                 else {
                     const Eigen::Vector3f child_sample_coord_f =
@@ -95,9 +125,20 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
                     if (interp_field_value) {
                         child_data_union.data.tsdf = *interp_field_value;
                         child_data_union.data.weight = parent_data_union.data.weight;
-
                         child_data_union.prop_data.delta_tsdf = child_data_union.data.tsdf;
                         child_data_union.prop_data.delta_weight = 0;
+                        if constexpr (MapType::col_ == Colour::On) {
+                            child_data_union.data.rgb =
+                                *visitor::getInterp(octree,
+                                                    child_sample_coord_f,
+                                                    child_data_union.scale,
+                                                    _,
+                                                    [](const auto& x) { return x.rgb; });
+                            child_data_union.data.rgb_weight = parent_data_union.data.rgb_weight;
+                            child_data_union.prop_data.delta_rgb =
+                                child_data_union.data.rgb.template cast<int16_t>();
+                            child_data_union.prop_data.delta_rgb_weight = 0;
+                        }
                     }
                 }
             };
@@ -154,6 +195,11 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
                         typename BlockType::DataUnion data_union =
                             block.getDataUnion(voxel_coord, block.getCurrentScale());
                         updateVoxel(data_union, sdf_value);
+                        if constexpr (MapType::col_ == Colour::On) {
+                            if (has_colour) {
+                                updateVoxelColour(data_union, (*colour_img_)[pixel_idx]);
+                            }
+                        }
                         block.setDataUnion(data_union);
                     }
                 } // x
@@ -172,6 +218,15 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
                 parent_data_union.prop_data.delta_tsdf = child_data_sum.delta_tsdf;
                 parent_data_union.data.weight = child_data_sum.delta_weight;
                 parent_data_union.prop_data.delta_weight = 0;
+                if constexpr (MapType::col_ == Colour::On) {
+                    child_data_sum.delta_rgb /= sample_count;
+                    child_data_sum.delta_rgb_weight = weight::div(
+                        child_data_sum.delta_rgb_weight, static_cast<delta_weight_t>(sample_count));
+                    parent_data_union.data.rgb = child_data_sum.delta_rgb.template cast<uint8_t>();
+                    parent_data_union.prop_data.delta_rgb = child_data_sum.delta_rgb;
+                    parent_data_union.data.rgb_weight = child_data_sum.delta_rgb_weight;
+                    parent_data_union.prop_data.delta_rgb_weight = 0;
+                }
             }
             else {
                 parent_data_union.data = typename BlockType::DataType();
@@ -184,6 +239,10 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
             if (child_data_union.data.weight != 0) {
                 child_data_sum.delta_tsdf += child_data_union.data.tsdf;
                 child_data_sum.delta_weight += child_data_union.data.weight;
+                if constexpr (MapType::col_ == Colour::On) {
+                    child_data_sum.delta_rgb += child_data_union.data.rgb;
+                    child_data_sum.delta_rgb_weight += child_data_union.data.rgb_weight;
+                }
                 return 1;
             }
             return 0;
@@ -209,6 +268,25 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
     data.tsdf = (data.tsdf * (data.weight - 1) + tsdf_value) / data.weight;
     data.tsdf = math::clamp(data.tsdf, field_t(-1), field_t(1));
     data_union.prop_data.delta_weight++;
+}
+
+
+
+template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
+void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::updateVoxelColour(
+    typename BlockType::DataUnion& data_union,
+    rgb_t colour_value)
+{
+    auto& data = data_union.data;
+    // Use if instead of std::min to prevent overflow.
+    if (data.rgb_weight < map_.getDataConfig().max_weight) {
+        data.rgb_weight++;
+    }
+    // No overflow occurs due to integral promotion to int or unsigned int during arithmetic
+    // operations.
+    data.rgb.r = (data.rgb.r * (data.rgb_weight - 1) + colour_value.r) / data.rgb_weight;
+    data.rgb.g = (data.rgb.g * (data.rgb_weight - 1) + colour_value.g) / data.rgb_weight;
+    data.rgb.b = (data.rgb.b * (data.rgb_weight - 1) + colour_value.b) / data.rgb_weight;
 }
 
 

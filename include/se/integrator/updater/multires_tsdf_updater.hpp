@@ -56,16 +56,19 @@ class Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT
             const int frame);
 
 
+
     void operator()(std::vector<OctantBase*>& block_ptrs);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     private:
     void updateVoxel(typename BlockType::DataUnion& data_union, field_t sdf_value);
+    void updateVoxelColour(typename BlockType::DataUnion& data_union, rgb_t colour_value);
 
     MapType& map_;
     const SensorT& sensor_;
     const Image<float>& depth_img_;
+    const Image<rgb_t>* colour_img_;
     const Eigen::Matrix4f& T_WS_;
     const int frame_;
     const UpdaterConfig config_;
