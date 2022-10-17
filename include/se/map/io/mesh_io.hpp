@@ -12,10 +12,9 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
-#include <sstream>
 
 #include "se/common/colour_utils.hpp"
-#include "se/map/algorithms/marching_cube.hpp"
+#include "se/map/algorithms/mesh.hpp"
 
 namespace se {
 namespace io {

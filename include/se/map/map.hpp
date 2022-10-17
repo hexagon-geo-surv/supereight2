@@ -10,6 +10,9 @@
 #define SE_MAP_HPP
 
 #include "se/common/math_util.hpp"
+#include "se/common/str_utils.hpp"
+#include "se/map/algorithms/marching_cube.hpp"
+#include "se/map/algorithms/structure_meshing.hpp"
 #include "se/map/data.hpp"
 #include "se/map/io/mesh_io.hpp"
 #include "se/map/io/octree_io.hpp"

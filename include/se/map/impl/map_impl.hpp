@@ -9,9 +9,6 @@
 #ifndef SE_MAP_IMPL_HPP
 #define SE_MAP_IMPL_HPP
 
-#include "se/common/str_utils.hpp"
-#include "se/map/algorithms/structure_meshing.hpp"
-
 namespace se {
 
 
