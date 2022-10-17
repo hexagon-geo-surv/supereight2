@@ -170,14 +170,12 @@ namespace algorithms {
 
 
 template<typename OctreeT>
-void marching_cube_kernel(OctreeT& octree,
-                          std::vector<typename OctreeT::BlockType*>& block_ptrs,
-                          TriangleMesh& triangles);
+TriangleMesh marching_cube_kernel(OctreeT& octree,
+                                  std::vector<typename OctreeT::BlockType*>& block_ptrs);
 
 template<typename OctreeT>
-void dual_marching_cube_kernel(OctreeT& octree,
-                               std::vector<typename OctreeT::BlockType*>& block_ptrs,
-                               TriangleMesh& triangles);
+TriangleMesh dual_marching_cube_kernel(OctreeT& octree,
+                                       std::vector<typename OctreeT::BlockType*>& block_ptrs);
 
 
 /**
@@ -188,7 +186,7 @@ void dual_marching_cube_kernel(OctreeT& octree,
  * \param[out] triangles    The extracted mesh
  */
 template<typename OctreeT>
-void marching_cube(OctreeT& octree, TriangleMesh& triangles);
+TriangleMesh marching_cube(OctreeT& octree);
 
 /**
  * \brief Generate the triangle mesh using a primal grid marching cube algorithm.
@@ -200,7 +198,7 @@ void marching_cube(OctreeT& octree, TriangleMesh& triangles);
  * \param[in]  frame        The lower frame threshold of voxel values to consider
  */
 template<typename OctreeT>
-void marching_cube(OctreeT& octree, TriangleMesh& triangles, const int frame);
+TriangleMesh marching_cube(OctreeT& octree, const int frame);
 
 /**
  * \brief Generate the triangle mesh using a dual grid marching cube algorithm.
@@ -210,7 +208,7 @@ void marching_cube(OctreeT& octree, TriangleMesh& triangles, const int frame);
  * \param[out] triangles    The extracted mesh
  */
 template<typename OctreeT>
-void dual_marching_cube(OctreeT& octree, TriangleMesh& triangles);
+TriangleMesh dual_marching_cube(OctreeT& octree);
 
 /**
  * \brief Generate the triangle mesh using a dual grid marching cube algorithm.
@@ -222,7 +220,7 @@ void dual_marching_cube(OctreeT& octree, TriangleMesh& triangles);
  * \param[in]  frame        The lower frame threshold of voxel values to consider
  */
 template<typename OctreeT>
-void dual_marching_cube(OctreeT& octree, TriangleMesh& triangles, const int frame);
+TriangleMesh dual_marching_cube(OctreeT& octree, const int frame);
 
 } // namespace algorithms
 } // namespace se

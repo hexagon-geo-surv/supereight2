@@ -363,10 +363,10 @@ int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMesh(const std::string& fi
 {
     se::TriangleMesh mesh;
     if constexpr (ResT == se::Res::Single) {
-        se::algorithms::marching_cube(*octree_ptr_, mesh);
+        mesh = se::algorithms::marching_cube(*octree_ptr_);
     }
     else {
-        se::algorithms::dual_marching_cube(*octree_ptr_, mesh);
+        mesh = se::algorithms::dual_marching_cube(*octree_ptr_);
     }
     Eigen::Matrix4f T_WM_scale = T_WM_;
     T_WM_scale.topLeftCorner<3, 3>() *= resolution_;
@@ -381,10 +381,10 @@ int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMeshVoxel(const std::strin
 {
     se::TriangleMesh mesh;
     if constexpr (ResT == se::Res::Single) {
-        se::algorithms::marching_cube(*octree_ptr_, mesh);
+        mesh = se::algorithms::marching_cube(*octree_ptr_);
     }
     else {
-        se::algorithms::dual_marching_cube(*octree_ptr_, mesh);
+        mesh = se::algorithms::dual_marching_cube(*octree_ptr_);
     }
     return io::save_mesh(mesh, filename);
 }
