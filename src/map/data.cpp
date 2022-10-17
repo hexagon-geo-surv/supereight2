@@ -7,6 +7,8 @@
 
 #include "se/map/data.hpp"
 
+#include <cmath>
+
 #include "se/common/str_utils.hpp"
 #include "se/common/yaml.hpp"
 
@@ -27,7 +29,7 @@ FieldDataConfig<Field::Occupancy>::FieldDataConfig() :
         uncertainty_model(UncertaintyModel::Linear),
         const_surface_thickness(false)
 {
-    max_weight = floor(abs(min_occupancy / (0.97 * log_odd_min)));
+    max_weight = std::floor(std::fabs(min_occupancy / (0.97f * log_odd_min)));
 }
 
 
@@ -86,7 +88,7 @@ FieldDataConfig<Field::Occupancy>::FieldDataConfig(const std::string& yaml_file)
 
     se::yaml::subnode_as_bool(node, "const_surface_thickness", const_surface_thickness);
 
-    max_weight = floor(abs(min_occupancy / (0.97 * log_odd_min)));
+    max_weight = std::floor(std::fabs(min_occupancy / (0.97f * log_odd_min)));
 }
 
 
