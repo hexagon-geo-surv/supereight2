@@ -14,10 +14,35 @@
 #include <cstdint>
 #include <vector>
 
+#include "se/map/utils/setup_util.hpp"
+#include "se/map/utils/type_util.hpp"
+
 namespace se {
 
+template<size_t NumVertexes, Colour ColB>
+struct MeshFaceColourData {
+};
+
 template<size_t NumVertexes>
-struct MeshFace {
+struct MeshFaceColourData<NumVertexes, Colour::On> {
+    std::array<rgb_t, NumVertexes> vertex_colours;
+};
+
+template<size_t NumVertexes, Semantics SemB>
+struct MeshFaceSemanticData {
+};
+
+template<size_t NumVertexes>
+struct MeshFaceSemanticData<NumVertexes, Semantics::On> {
+    // Add per-vertex or per-face semantic data here.
+};
+
+
+
+template<size_t NumVertexes, Colour ColB = Colour::Off, Semantics SemB = Semantics::Off>
+struct MeshFace : MeshFaceColourData<NumVertexes, ColB>, MeshFaceSemanticData<NumVertexes, SemB> {
+    static constexpr bool colour = ColB == Colour::On;
+    static constexpr bool semantics = SemB == Semantics::On;
     static constexpr size_t num_vertexes = NumVertexes;
 
     std::array<Eigen::Vector3f, NumVertexes> vertexes;
@@ -25,6 +50,8 @@ struct MeshFace {
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
+
+
 
 /** \brief Meshes are represented as lists of faces.
  *
@@ -34,12 +61,6 @@ struct MeshFace {
  */
 template<typename FaceT>
 using Mesh = std::vector<FaceT>;
-
-typedef MeshFace<3> Triangle;
-typedef Mesh<Triangle> TriangleMesh;
-
-typedef MeshFace<4> Quad;
-typedef Mesh<Quad> QuadMesh;
 
 } // namespace se
 

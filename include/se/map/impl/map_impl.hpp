@@ -351,7 +351,7 @@ template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveStructure(const std::string& filename,
                                                                 const Eigen::Matrix4f& T_WM) const
 {
-    const QuadMesh mesh = octree_structure_mesh(*octree_ptr_);
+    const typename OctreeType::QuadMeshType mesh = octree_structure_mesh(*octree_ptr_);
     return io::save_mesh(mesh, filename, T_WM);
 }
 
@@ -361,7 +361,7 @@ template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMesh(const std::string& filename,
                                                            const Eigen::Matrix4f& T_OW) const
 {
-    se::TriangleMesh mesh;
+    typename OctreeType::MeshType mesh;
     if constexpr (ResT == se::Res::Single) {
         mesh = se::algorithms::marching_cube(*octree_ptr_);
     }
@@ -379,7 +379,7 @@ int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMesh(const std::string& fi
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMeshVoxel(const std::string& filename) const
 {
-    se::TriangleMesh mesh;
+    typename OctreeType::MeshType mesh;
     if constexpr (ResT == se::Res::Single) {
         mesh = se::algorithms::marching_cube(*octree_ptr_);
     }

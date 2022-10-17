@@ -170,12 +170,12 @@ namespace algorithms {
 
 
 template<typename OctreeT>
-TriangleMesh marching_cube_kernel(OctreeT& octree,
-                                  std::vector<typename OctreeT::BlockType*>& block_ptrs);
+typename OctreeT::MeshType
+marching_cube_kernel(OctreeT& octree, std::vector<typename OctreeT::BlockType*>& block_ptrs);
 
 template<typename OctreeT>
-TriangleMesh dual_marching_cube_kernel(OctreeT& octree,
-                                       std::vector<typename OctreeT::BlockType*>& block_ptrs);
+typename OctreeT::MeshType
+dual_marching_cube_kernel(OctreeT& octree, std::vector<typename OctreeT::BlockType*>& block_ptrs);
 
 
 /**
@@ -186,7 +186,7 @@ TriangleMesh dual_marching_cube_kernel(OctreeT& octree,
  * \param[out] triangles    The extracted mesh
  */
 template<typename OctreeT>
-TriangleMesh marching_cube(OctreeT& octree);
+typename OctreeT::MeshType marching_cube(OctreeT& octree);
 
 /**
  * \brief Generate the triangle mesh using a primal grid marching cube algorithm.
@@ -198,7 +198,7 @@ TriangleMesh marching_cube(OctreeT& octree);
  * \param[in]  frame        The lower frame threshold of voxel values to consider
  */
 template<typename OctreeT>
-TriangleMesh marching_cube(OctreeT& octree, const int frame);
+typename OctreeT::MeshType marching_cube(OctreeT& octree, const int frame);
 
 /**
  * \brief Generate the triangle mesh using a dual grid marching cube algorithm.
@@ -208,7 +208,7 @@ TriangleMesh marching_cube(OctreeT& octree, const int frame);
  * \param[out] triangles    The extracted mesh
  */
 template<typename OctreeT>
-TriangleMesh dual_marching_cube(OctreeT& octree);
+typename OctreeT::MeshType dual_marching_cube(OctreeT& octree);
 
 /**
  * \brief Generate the triangle mesh using a dual grid marching cube algorithm.
@@ -220,7 +220,7 @@ TriangleMesh dual_marching_cube(OctreeT& octree);
  * \param[in]  frame        The lower frame threshold of voxel values to consider
  */
 template<typename OctreeT>
-TriangleMesh dual_marching_cube(OctreeT& octree, const int frame);
+typename OctreeT::MeshType dual_marching_cube(OctreeT& octree, const int frame);
 
 } // namespace algorithms
 } // namespace se

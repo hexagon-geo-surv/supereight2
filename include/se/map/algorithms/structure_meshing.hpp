@@ -22,7 +22,7 @@ namespace se {
  * \return A quadrilateral mesh.
  */
 template<typename OctreeT>
-QuadMesh octree_structure_mesh(OctreeT& octree);
+typename OctreeT::QuadMeshType octree_structure_mesh(OctreeT& octree);
 
 } // namespace se
 
