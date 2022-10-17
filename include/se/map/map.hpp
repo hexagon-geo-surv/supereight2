@@ -11,7 +11,7 @@
 
 #include "se/common/math_util.hpp"
 #include "se/map/data.hpp"
-#include "se/map/io/meshing_io.hpp"
+#include "se/map/io/mesh_io.hpp"
 #include "se/map/io/octree_io.hpp"
 #include "se/map/octree/visitor.hpp"
 #include "se/map/raycaster.hpp"

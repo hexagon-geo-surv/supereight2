@@ -82,6 +82,6 @@ int save_mesh_obj(const Mesh<FaceT>& mesh,
 } // namespace io
 } // namespace se
 
-#include "impl/meshing_io_impl.hpp"
+#include "impl/mesh_io_impl.hpp"
 
 #endif // SE_MESHING_IO_HPP
