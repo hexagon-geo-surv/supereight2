@@ -331,8 +331,8 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \brief Save the octree structure to a file.
      *
      * \param[in] filename The file where the mesh will be saved. The file format will be selected
-     *                     based on the file extension. Allowed file extensions are `.ply`, `.vtk` and
-     *                     `.obj`.
+     *                     based on the file extension. Its extension must be one of those in
+     *                     se::io::mesh_extensions.
      * \param[in] T_WM     Transformation from the world frame where the mesh is generated to the world
      *                     frame. Defaults to identity.
      * \return Zero on success and non-zero on error.
@@ -344,8 +344,8 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \brief Create a mesh in the world frame in units of metres and save it to a file.
      *
      * \param[in] filename The file where the mesh will be saved. The file format will be selected
-     *                     based on the file extension. Allowed file extensions are `.ply`, `.vtk` and
-     *                     `.obj`.
+     *                     based on the file extension. Its extension must be one of those in
+     *                     se::io::mesh_extensions.
      * \param[in] T_OW     Transformation from the world frame in units of metres to the output frame. Defaults to identity.
      * \return Zero on success and non-zero on error.
      */
@@ -356,8 +356,8 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \brief Create a mesh in the map frame in units of voxel and save it to a file.
      *
      * \param[in] filename The file where the mesh will be saved. The file format will be selected
-     *                     based on the file extension. Allowed file extensions are `.ply`, `.vtk` and
-     *                     `.obj`.
+     *                     based on the file extension. Its extension must be one of those in
+     *                     se::io::mesh_extensions.
      * \return Zero on success and non-zero on error.
      */
     int saveMeshVoxel(const std::string& filename) const;

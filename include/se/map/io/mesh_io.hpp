@@ -10,6 +10,7 @@
 #define SE_MESHING_IO_HPP
 
 #include <algorithm>
+#include <array>
 #include <fstream>
 #include <iostream>
 
@@ -19,6 +20,14 @@
 namespace se {
 namespace io {
 
+/** \brief The supported file extensions for mesh files.
+ */
+static const std::array<std::string, 3> mesh_extensions = {".obj", ".ply", ".vtk"};
+
+/** \brief Test whether the suffix of filename is one of the file extensions in
+ * se::io::mesh_extensions.
+ */
+bool has_supported_mesh_extension(const std::string& filename);
 
 /** \brief Save a mesh as a VTK file.
  * The VTK file format is documented here:
