@@ -13,16 +13,18 @@ namespace se {
 namespace io {
 
 template<typename FaceT>
-int save_mesh_vtk(const Mesh<FaceT>& mesh, const std::string& filename, const Eigen::Matrix4f& T_OM)
+int save_mesh_vtk(const Mesh<FaceT>& mesh_M,
+                  const std::string& filename,
+                  const Eigen::Matrix4f& T_OM)
 {
     // Open the file for writing.
     std::ofstream file(filename.c_str());
     if (!file.is_open()) {
-        std::cerr << "Unable to write file " << filename << "\n";
+        std::cerr << "Error writing mesh file " << filename << "\n";
         return 1;
     }
 
-    const size_t num_faces = mesh.size();
+    const size_t num_faces = mesh_M.size();
     const size_t num_vertices = FaceT::num_vertexes * num_faces;
 
     // Write the header.
@@ -33,10 +35,9 @@ int save_mesh_vtk(const Mesh<FaceT>& mesh, const std::string& filename, const Ei
 
     // Write the vertices.
     file << "POINTS " << num_vertices << " FLOAT\n";
-    for (size_t f = 0; f < num_faces; ++f) {
-        for (size_t v = 0; v < FaceT::num_vertexes; ++v) {
-            const Eigen::Vector3f vertex_W =
-                (T_OM * mesh[f].vertexes[v].homogeneous()).template head<3>();
+    for (const auto& face : mesh_M) {
+        for (const auto& vertex_M : face.vertexes) {
+            const Eigen::Vector3f vertex_W = (T_OM * vertex_M.homogeneous()).template head<3>();
             file << vertex_W.x() << " " << vertex_W.y() << " " << vertex_W.z() << "\n";
         }
     }
@@ -54,10 +55,10 @@ int save_mesh_vtk(const Mesh<FaceT>& mesh, const std::string& filename, const Ei
     // Write the face scale colours.
     file << "CELL_DATA " << num_faces << "\n";
     file << "COLOR_SCALARS RGBA 4\n";
-    for (size_t f = 0; f < num_faces; ++f) {
+    for (const auto& face : mesh_M) {
         // Colour the triangle depending on its scale.
-        const Eigen::Vector3f RGB = se::colours::scale[mesh[f].max_vertex_scale] / 255.0f;
-        file << RGB[0] << " " << RGB[1] << " " << RGB[2] << " 1\n";
+        const Eigen::Vector3f RGB = se::colours::scale[face.max_vertex_scale] / 255.0f;
+        file << RGB.x() << " " << RGB.y() << " " << RGB.y() << " 1\n";
     }
 
     file.close();
@@ -67,16 +68,18 @@ int save_mesh_vtk(const Mesh<FaceT>& mesh, const std::string& filename, const Ei
 
 
 template<typename FaceT>
-int save_mesh_ply(const Mesh<FaceT>& mesh, const std::string& filename, const Eigen::Matrix4f& T_OM)
+int save_mesh_ply(const Mesh<FaceT>& mesh_M,
+                  const std::string& filename,
+                  const Eigen::Matrix4f& T_OM)
 {
     // Open the file for writing.
     std::ofstream file(filename.c_str());
     if (!file.is_open()) {
-        std::cerr << "Unable to write file " << filename << "\n";
+        std::cerr << "Error writing mesh file " << filename << "\n";
         return 1;
     }
 
-    const size_t num_faces = mesh.size();
+    const size_t num_faces = mesh_M.size();
     const size_t num_vertices = FaceT::num_vertexes * num_faces;
 
     // Write header
@@ -95,10 +98,9 @@ int save_mesh_ply(const Mesh<FaceT>& mesh, const std::string& filename, const Ei
     file << "end_header\n";
 
     // Write the vertices.
-    for (size_t f = 0; f < num_faces; ++f) {
-        for (size_t v = 0; v < FaceT::num_vertexes; ++v) {
-            const Eigen::Vector3f vertex_W =
-                (T_OM * mesh[f].vertexes[v].homogeneous()).template head<3>();
+    for (const auto& face : mesh_M) {
+        for (const auto& vertex_M : face.vertexes) {
+            const Eigen::Vector3f vertex_W = (T_OM * vertex_M.homogeneous()).template head<3>();
             file << vertex_W.x() << " " << vertex_W.y() << " " << vertex_W.z() << "\n";
         }
     }
@@ -110,9 +112,9 @@ int save_mesh_ply(const Mesh<FaceT>& mesh, const std::string& filename, const Ei
             file << " " << FaceT::num_vertexes * f + v;
         }
         // Write the face scale colour.
-        const Eigen::Vector3i RGB =
-            se::colours::scale[mesh[f].max_vertex_scale].template cast<int>();
-        file << " " << RGB[0] << " " << RGB[1] << " " << RGB[2] << "\n";
+        const Eigen::Vector3i rgb =
+            se::colours::scale[mesh_M[f].max_vertex_scale].template cast<int>();
+        file << " " << rgb.x() << " " << rgb.y() << " " << rgb.z() << "\n";
     }
 
     file.close();
@@ -122,28 +124,29 @@ int save_mesh_ply(const Mesh<FaceT>& mesh, const std::string& filename, const Ei
 
 
 template<typename FaceT>
-int save_mesh_obj(const Mesh<FaceT>& mesh, const std::string& filename, const Eigen::Matrix4f& T_OM)
+int save_mesh_obj(const Mesh<FaceT>& mesh_M,
+                  const std::string& filename,
+                  const Eigen::Matrix4f& T_OM)
 {
     // Open the file for writing.
     std::ofstream file(filename.c_str());
     if (!file.is_open()) {
-        std::cerr << "Unable to write file " << filename << "\n";
+        std::cerr << "Error writing mesh file " << filename << "\n";
         return 1;
     }
 
-    const size_t num_faces = mesh.size();
+    const size_t num_faces = mesh_M.size();
     const size_t num_vertices = FaceT::num_vertexes * num_faces;
 
     // Write the header.
-    file << "# OBJ file format with ext .obj" << std::endl;
-    file << "# vertex count = " << num_vertices << std::endl;
-    file << "# face count = " << num_faces << std::endl;
+    file << "# OBJ file format with ext .obj\n";
+    file << "# vertex count = " << num_vertices << "\n";
+    file << "# face count = " << num_faces << "\n";
 
     // Write the vertices.
-    for (size_t f = 0; f < num_faces; ++f) {
-        for (size_t v = 0; v < FaceT::num_vertexes; ++v) {
-            const Eigen::Vector3f vertex_W =
-                (T_OM * mesh[f].vertexes[v].homogeneous()).template head<3>();
+    for (const auto& face : mesh_M) {
+        for (const auto& vertex_M : face.vertexes) {
+            const Eigen::Vector3f vertex_W = (T_OM * vertex_M.homogeneous()).template head<3>();
             file << "v " << vertex_W.x() << " " << vertex_W.y() << " " << vertex_W.z() << "\n";
         }
     }
