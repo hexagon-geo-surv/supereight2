@@ -37,7 +37,7 @@ namespace io {
 template<typename FaceT>
 int save_mesh_vtk(const Mesh<FaceT>& mesh,
                   const std::string& filename,
-                  const Eigen::Matrix4f& T_OM);
+                  const Eigen::Matrix4f& T_OM = Eigen::Matrix4f::Identity());
 
 /**
  * \brief Save a mesh as a PLY file.
@@ -56,7 +56,7 @@ int save_mesh_vtk(const Mesh<FaceT>& mesh,
 template<typename FaceT>
 int save_mesh_ply(const Mesh<FaceT>& mesh,
                   const std::string& filename,
-                  const Eigen::Matrix4f& T_OM);
+                  const Eigen::Matrix4f& T_OM = Eigen::Matrix4f::Identity());
 
 /**
  * \brief Save a mesh as an OBJ file.
@@ -69,7 +69,7 @@ int save_mesh_ply(const Mesh<FaceT>& mesh,
 template<typename FaceT>
 int save_mesh_obj(const Mesh<FaceT>& mesh,
                   const std::string& filename,
-                  const Eigen::Matrix4f& T_OM);
+                  const Eigen::Matrix4f& T_OM = Eigen::Matrix4f::Identity());
 
 } // namespace io
 } // namespace se
