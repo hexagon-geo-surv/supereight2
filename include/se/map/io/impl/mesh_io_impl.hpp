@@ -71,6 +71,21 @@ int save_mesh_vtk(const Mesh<FaceT>& mesh_M,
     }
     file << "\n";
 
+    if constexpr (FaceT::colour) {
+        file << "POINT_DATA " << num_vertices << "\n\n";
+
+        // Write the vertex colours.
+        file << "COLOR_SCALARS colour 3\n";
+        for (const auto& face : mesh_M) {
+            for (const auto& colour : face.vertex_colours) {
+                file << static_cast<float>(colour.r) / UINT8_MAX << " "
+                     << static_cast<float>(colour.g) / UINT8_MAX << " "
+                     << static_cast<float>(colour.b) / UINT8_MAX << "\n";
+            }
+        }
+        file << "\n";
+    }
+
     file << "CELL_DATA " << num_faces << "\n\n";
 
     // Write the face scale.
@@ -79,6 +94,7 @@ int save_mesh_vtk(const Mesh<FaceT>& mesh_M,
     for (const auto& face : mesh_M) {
         file << static_cast<int>(face.max_vertex_scale) << "\n";
     }
+    file << "\n";
 
     // Write the face scale colours.
     file << "COLOR_SCALARS scale_colour 3\n";
@@ -86,7 +102,6 @@ int save_mesh_vtk(const Mesh<FaceT>& mesh_M,
         const Eigen::Vector3f rgb = se::colours::scale[face.max_vertex_scale] / 255.0f;
         file << rgb.x() << " " << rgb.y() << " " << rgb.z() << "\n";
     }
-    file << "\n";
 
     file.close();
     return 0;
@@ -117,6 +132,11 @@ int save_mesh_ply(const Mesh<FaceT>& mesh_M,
     file << "property float x\n";
     file << "property float y\n";
     file << "property float z\n";
+    if constexpr (FaceT::colour) {
+        file << "property uchar red\n";
+        file << "property uchar green\n";
+        file << "property uchar blue\n";
+    }
     file << "element face " << num_faces << "\n";
     file << "property list uchar int vertex_index\n";
     file << "property uchar red\n";
@@ -126,9 +146,16 @@ int save_mesh_ply(const Mesh<FaceT>& mesh_M,
 
     // Write the vertices.
     for (const auto& face : mesh_M) {
-        for (const auto& vertex_M : face.vertexes) {
+        for (size_t v = 0; v < FaceT::num_vertexes; ++v) {
+            const Eigen::Vector3f& vertex_M = face.vertexes[v];
             const Eigen::Vector3f vertex_W = (T_OM * vertex_M.homogeneous()).template head<3>();
-            file << vertex_W.x() << " " << vertex_W.y() << " " << vertex_W.z() << "\n";
+            file << vertex_W.x() << " " << vertex_W.y() << " " << vertex_W.z();
+            if constexpr (FaceT::colour) {
+                const rgb_t colour = face.vertex_colours[v];
+                file << " " << static_cast<int>(colour.r) << " " << static_cast<int>(colour.g)
+                     << " " << static_cast<int>(colour.b);
+            }
+            file << "\n";
         }
     }
 
