@@ -896,7 +896,7 @@ void marching_cube_kernel(OctreeT& octree,
                             continue;
                         }
 
-                        Triangle temp = Triangle();
+                        Triangle temp;
                         temp.vertexes[0] = vertex_0;
                         temp.vertexes[1] = vertex_1;
                         temp.vertexes[2] = vertex_2;
@@ -972,7 +972,7 @@ void dual_marching_cube_kernel(OctreeT& octree,
                             || checkVertex(vertex_2, octree_size)) {
                             continue;
                         }
-                        Triangle temp = Triangle();
+                        Triangle temp;
                         temp.vertexes[0] = vertex_0;
                         temp.vertexes[1] = vertex_1;
                         temp.vertexes[2] = vertex_2;
