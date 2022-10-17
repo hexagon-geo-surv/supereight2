@@ -13,7 +13,7 @@
 
 #include "edge_tables.hpp"
 #include "se/common/timings.hpp"
-#include "se/map/algorithms/mesh_face.hpp"
+#include "se/map/algorithms/mesh.hpp"
 #include "se/map/octree/fetcher.hpp"
 #include "se/map/octree/iterator.hpp"
 #include "se/map/octree/visitor.hpp"
