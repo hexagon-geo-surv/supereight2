@@ -19,13 +19,9 @@ namespace se {
 template<size_t NumVertexes>
 struct MeshFace {
     std::array<Eigen::Vector3f, NumVertexes> vertexes;
-    int8_t max_vertex_scale;
-    static constexpr size_t num_vertexes = NumVertexes;
+    int8_t max_vertex_scale = 0;
 
-    MeshFace() : max_vertex_scale(0)
-    {
-        vertexes.fill(Eigen::Vector3f::Zero());
-    }
+    static constexpr size_t num_vertexes = NumVertexes;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
