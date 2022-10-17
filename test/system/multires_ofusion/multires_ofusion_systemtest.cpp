@@ -267,7 +267,7 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
     }
 
     map.saveStructure(config.app.structure_path + "/test-max-field-structure_"
-                      + std::to_string(max_frame));
+                      + std::to_string(max_frame) + ".ply");
 }
 
 

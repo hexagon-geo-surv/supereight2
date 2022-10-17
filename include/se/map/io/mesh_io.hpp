@@ -15,6 +15,7 @@
 #include <iostream>
 
 #include "se/common/colour_utils.hpp"
+#include "se/common/str_utils.hpp"
 #include "se/map/algorithms/mesh.hpp"
 
 namespace se {
@@ -28,6 +29,23 @@ static const std::array<std::string, 3> mesh_extensions = {".obj", ".ply", ".vtk
  * se::io::mesh_extensions.
  */
 bool has_supported_mesh_extension(const std::string& filename);
+
+/** \brief Save a mesh to a file whose type is determined by the extension of filename.
+ *
+ * \throws std::invalid_argument Throws std::invalid_argument if a filename with an extension not
+ * contained in se::io::mesh_extensions is provided.
+ *
+ * \param[in] mesh_M   The mesh to be saved expressed in some mesh frame M.
+ * \param[in] filename The file where the mesh will be saved. Its extension must be one of those in
+ *                     se::io::mesh_extensions.
+ * \param[in] T_OM     The transformation from the mesh frame M to some output frame O. The
+ *                     transformation will be applied to each mesh vertex before saving it.
+ * \return Zero on success, non-zero on error.
+ */
+template<typename FaceT>
+int save_mesh(const Mesh<FaceT>& mesh_M,
+              const std::string& filename,
+              const Eigen::Matrix4f& T_OM = Eigen::Matrix4f::Identity());
 
 /** \brief Save a mesh as a VTK file.
  * The VTK file format is documented here:

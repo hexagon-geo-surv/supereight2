@@ -13,6 +13,23 @@ namespace se {
 namespace io {
 
 template<typename FaceT>
+int save_mesh(const Mesh<FaceT>& mesh_M, const std::string& filename, const Eigen::Matrix4f& T_OM)
+{
+    if (str_utils::ends_with(filename, ".ply")) {
+        return save_mesh_ply(mesh_M, filename, T_OM);
+    }
+    else if (str_utils::ends_with(filename, ".vtk")) {
+        return save_mesh_vtk(mesh_M, filename, T_OM);
+    }
+    else if (str_utils::ends_with(filename, ".obj")) {
+        return save_mesh_obj(mesh_M, filename, T_OM);
+    }
+    else {
+        throw std::invalid_argument("unknown file extension: " + filename);
+    }
+}
+
+template<typename FaceT>
 int save_mesh_vtk(const Mesh<FaceT>& mesh_M,
                   const std::string& filename,
                   const Eigen::Matrix4f& T_OM)
