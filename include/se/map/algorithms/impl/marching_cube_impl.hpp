@@ -900,6 +900,12 @@ marching_cube_kernel(OctreeT& octree, std::vector<typename OctreeT::BlockType*>&
                         temp.vertexes[0] = vertex_0;
                         temp.vertexes[1] = vertex_1;
                         temp.vertexes[2] = vertex_2;
+                        if constexpr (OctreeT::TriangleType::colour) {
+                            for (size_t i = 0; i < OctreeT::TriangleType::num_vertexes; i++) {
+                                temp.vertex_colours[i] = *visitor::getInterp(
+                                    octree, temp.vertexes[i], [](const auto& x) { return x.rgb; });
+                            }
+                        }
 #pragma omp critical
                         {
                             triangles.push_back(temp);
@@ -978,6 +984,12 @@ dual_marching_cube_kernel(OctreeT& octree, std::vector<typename OctreeT::BlockTy
                         temp.vertexes[1] = vertex_1;
                         temp.vertexes[2] = vertex_2;
                         temp.max_vertex_scale = voxel_scale;
+                        if constexpr (OctreeT::TriangleType::colour) {
+                            for (size_t i = 0; i < OctreeT::TriangleType::num_vertexes; i++) {
+                                temp.vertex_colours[i] = *visitor::getInterp(
+                                    octree, temp.vertexes[i], [](const auto& x) { return x.rgb; });
+                            }
+                        }
 #pragma omp critical
                         {
                             triangles.push_back(temp);
