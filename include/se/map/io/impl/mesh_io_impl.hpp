@@ -13,11 +13,7 @@ namespace se {
 namespace io {
 
 template<typename FaceT>
-int save_mesh_vtk(const Mesh<FaceT>& mesh,
-                  const std::string& filename,
-                  const Eigen::Matrix4f& T_OM,
-                  const float* point_data,
-                  const float* cell_data)
+int save_mesh_vtk(const Mesh<FaceT>& mesh, const std::string& filename, const Eigen::Matrix4f& T_OM)
 {
     // Open the file for writing.
     std::ofstream file(filename.c_str());
@@ -28,8 +24,6 @@ int save_mesh_vtk(const Mesh<FaceT>& mesh,
 
     const size_t num_faces = mesh.size();
     const size_t num_vertices = FaceT::num_vertexes * num_faces;
-    const bool has_point_data = point_data != nullptr;
-    const bool has_cell_data = cell_data != nullptr;
 
     // Write the header.
     file << "# vtk DataFile Version 1.0\n";
@@ -57,18 +51,6 @@ int save_mesh_vtk(const Mesh<FaceT>& mesh,
         file << "\n";
     }
 
-    // Write the vertex data.
-    if (has_point_data) {
-        file << "POINT_DATA " << num_vertices << "\n";
-        file << "SCALARS vertex_scalars float 1\n";
-        file << "LOOKUP_TABLE default\n";
-        for (size_t f = 0; f < num_faces; ++f) {
-            for (size_t v = 0; v < FaceT::num_vertexes; ++v) {
-                file << point_data[f * FaceT::num_vertexes + v] << "\n";
-            }
-        }
-    }
-
     // Write the face scale colours.
     file << "CELL_DATA " << num_faces << "\n";
     file << "COLOR_SCALARS RGBA 4\n";
@@ -78,15 +60,6 @@ int save_mesh_vtk(const Mesh<FaceT>& mesh,
         file << RGB[0] << " " << RGB[1] << " " << RGB[2] << " 1\n";
     }
 
-    // Write the face data.
-    if (has_cell_data) {
-        file << "SCALARS cell_scalars float 1\n";
-        file << "LOOKUP_TABLE default\n";
-        for (size_t f = 0; f < num_faces; ++f) {
-            file << cell_data[f] << "\n";
-        }
-    }
-
     file.close();
     return 0;
 }
@@ -94,11 +67,7 @@ int save_mesh_vtk(const Mesh<FaceT>& mesh,
 
 
 template<typename FaceT>
-int save_mesh_ply(const Mesh<FaceT>& mesh,
-                  const std::string& filename,
-                  const Eigen::Matrix4f& T_OM,
-                  const float* point_data,
-                  const float* cell_data)
+int save_mesh_ply(const Mesh<FaceT>& mesh, const std::string& filename, const Eigen::Matrix4f& T_OM)
 {
     // Open the file for writing.
     std::ofstream file(filename.c_str());
@@ -109,8 +78,6 @@ int save_mesh_ply(const Mesh<FaceT>& mesh,
 
     const size_t num_faces = mesh.size();
     const size_t num_vertices = FaceT::num_vertexes * num_faces;
-    const bool has_point_data = point_data != nullptr;
-    const bool has_cell_data = cell_data != nullptr;
 
     // Write header
     file << "ply\n";
@@ -120,35 +87,23 @@ int save_mesh_ply(const Mesh<FaceT>& mesh,
     file << "property float x\n";
     file << "property float y\n";
     file << "property float z\n";
-    if (has_point_data) {
-        file << "property float vertex_value\n";
-    }
     file << "element face " << num_faces << "\n";
     file << "property list uchar int vertex_index\n";
     file << "property uchar red\n";
     file << "property uchar green\n";
     file << "property uchar blue\n";
-    if (has_cell_data) {
-        file << "property float face_value\n";
-    }
     file << "end_header\n";
 
-    // Write the vertices and the vertex data.
+    // Write the vertices.
     for (size_t f = 0; f < num_faces; ++f) {
         for (size_t v = 0; v < FaceT::num_vertexes; ++v) {
             const Eigen::Vector3f vertex_W =
                 (T_OM * mesh[f].vertexes[v].homogeneous()).template head<3>();
-            file << vertex_W.x() << " " << vertex_W.y() << " " << vertex_W.z();
-            if (has_point_data) {
-                file << " " << point_data[f * FaceT::num_vertexes + v] << "\n";
-            }
-            else {
-                file << "\n";
-            }
+            file << vertex_W.x() << " " << vertex_W.y() << " " << vertex_W.z() << "\n";
         }
     }
 
-    // Write the faces and the face data.
+    // Write the faces.
     for (size_t f = 0; f < num_faces; ++f) {
         file << FaceT::num_vertexes;
         for (size_t v = 0; v < FaceT::num_vertexes; ++v) {
@@ -157,13 +112,7 @@ int save_mesh_ply(const Mesh<FaceT>& mesh,
         // Write the face scale colour.
         const Eigen::Vector3i RGB =
             se::colours::scale[mesh[f].max_vertex_scale].template cast<int>();
-        file << " " << RGB[0] << " " << RGB[1] << " " << RGB[2];
-        if (has_cell_data) {
-            file << " " << cell_data[f] << "\n";
-        }
-        else {
-            file << "\n";
-        }
+        file << " " << RGB[0] << " " << RGB[1] << " " << RGB[2] << "\n";
     }
 
     file.close();

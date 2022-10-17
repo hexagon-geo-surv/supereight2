@@ -32,16 +32,12 @@ namespace io {
  * \param[in] mesh       The mesh in map frame to be saved.
  * \param[in] filename   The output filename.
  * \param[in] T_OM       The transformation from the map frame in units of voxels to the output frame. maybe?
- * \param[in] point_data The scalar values of the points/vertices.
- * \param[in] cell_data  The scalar values of the cells/faces.
  * \return 0 on success, nonzero on error.
  */
 template<typename FaceT>
 int save_mesh_vtk(const Mesh<FaceT>& mesh,
                   const std::string& filename,
-                  const Eigen::Matrix4f& T_OM,
-                  const float* point_data = nullptr,
-                  const float* cell_data = nullptr);
+                  const Eigen::Matrix4f& T_OM);
 
 /**
  * \brief Save a mesh as a PLY file.
@@ -55,16 +51,12 @@ int save_mesh_vtk(const Mesh<FaceT>& mesh,
  * \param[in] mesh       The mesh in map frame to be saved.
  * \param[in] filename   The output filename.
  * \param[in] T_OM       The transformation from the map frame in units of voxels to the output frame. maybe?
- * \param[in] point_data The scalar values of the points/vertices.
- * \param[in] cell_data  The scalar values of the cells/faces.
  * \return 0 on success, nonzero on error.
  */
 template<typename FaceT>
 int save_mesh_ply(const Mesh<FaceT>& mesh,
                   const std::string& filename,
-                  const Eigen::Matrix4f& T_OM,
-                  const float* point_data = nullptr,
-                  const float* cell_data = nullptr);
+                  const Eigen::Matrix4f& T_OM);
 
 /**
  * \brief Save a mesh as an OBJ file.
