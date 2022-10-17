@@ -20,54 +20,49 @@
 namespace se {
 namespace io {
 
-/**
- * \brief Save a mesh as a VTK file.
+
+/** \brief Save a mesh as a VTK file.
+ * The VTK file format is documented here:
+ * https://vtk.org/wp-content/uploads/2015/04/file-formats.pdf
  *
- * Documentation for the VTK file format available here
- * https://vtk.org/wp-content/uploads/2015/04/file-formats.pdf.
- *
- * \note The resulting mesh is unoptimized and contains many duplicate
- * vertices.
- *
- * \param[in] mesh       The mesh in map frame to be saved.
- * \param[in] filename   The output filename.
- * \param[in] T_OM       The transformation from the map frame in units of voxels to the output frame. maybe?
- * \return 0 on success, nonzero on error.
+ * \param[in] mesh_M   The mesh to be saved expressed in some mesh frame M.
+ * \param[in] filename The file where the mesh will be saved.
+ * \param[in] T_OM     The transformation from the mesh frame M to some output frame O. The
+ *                     transformation will be applied to each mesh vertex before saving it.
+ * \return Zero on success, non-zero on error.
  */
 template<typename FaceT>
-int save_mesh_vtk(const Mesh<FaceT>& mesh,
+int save_mesh_vtk(const Mesh<FaceT>& mesh_M,
                   const std::string& filename,
                   const Eigen::Matrix4f& T_OM = Eigen::Matrix4f::Identity());
 
-/**
- * \brief Save a mesh as a PLY file.
- *
- * Documentation for the PLY file format available here
+/** \brief Save a mesh as a PLY file.
+ * The PLY file format is documented here:
  * http://paulbourke.net/dataformats/ply
  *
- * \note The resulting mesh is unoptimized and contains many duplicate
- * vertices.
- *
- * \param[in] mesh       The mesh in map frame to be saved.
- * \param[in] filename   The output filename.
- * \param[in] T_OM       The transformation from the map frame in units of voxels to the output frame. maybe?
- * \return 0 on success, nonzero on error.
+ * \param[in] mesh_M   The mesh to be saved expressed in some mesh frame M.
+ * \param[in] filename The file where the mesh will be saved.
+ * \param[in] T_OM     The transformation from the mesh frame M to some output frame O. The
+ *                     transformation will be applied to each mesh vertex before saving it.
+ * \return Zero on success, non-zero on error.
  */
 template<typename FaceT>
-int save_mesh_ply(const Mesh<FaceT>& mesh,
+int save_mesh_ply(const Mesh<FaceT>& mesh_M,
                   const std::string& filename,
                   const Eigen::Matrix4f& T_OM = Eigen::Matrix4f::Identity());
 
-/**
- * \brief Save a mesh as an OBJ file.
+/** \brief Save a mesh as an Wavefront OBJ file.
+ * The Wavefront OBJ file format is documented here:
+ * http://fegemo.github.io/cefet-cg/attachments/obj-spec.pdf
  *
- * \param[in] mesh     The mesh to be saved.
- * \param[in] filename The output filename.
- * \param[in] T_OM     The transformation from the map frame in units of voxels to the output frame. maybe?
- * \return 0 on success, nonzero on error.
+ * \param[in] mesh_M   The mesh to be saved expressed in some mesh frame M.
+ * \param[in] filename The file where the mesh will be saved.
+ * \param[in] T_OM     The transformation from the mesh frame M to some output frame O. The
+ *                     transformation will be applied to each mesh vertex before saving it.
+ * \return Zero on success, non-zero on error.
  */
 template<typename FaceT>
-int save_mesh_obj(const Mesh<FaceT>& mesh,
+int save_mesh_obj(const Mesh<FaceT>& mesh_M,
                   const std::string& filename,
                   const Eigen::Matrix4f& T_OM = Eigen::Matrix4f::Identity());
 

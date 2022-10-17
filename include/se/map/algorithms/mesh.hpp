@@ -28,6 +28,12 @@ struct MeshFace {
     }
 };
 
+/** \brief Meshes are represented as lists of faces.
+ *
+ * \bug This representation has the inherent problem that there is vertex duplication. A more
+ * advanced representation would be needed to alleviate this, e.g. a list of vertices and a list of
+ * faces with indices to the list of faces.
+ */
 template<typename FaceT>
 using Mesh = std::vector<FaceT>;
 
