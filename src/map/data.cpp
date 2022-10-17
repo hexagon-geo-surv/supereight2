@@ -28,7 +28,6 @@ FieldDataConfig<Field::Occupancy>::FieldDataConfig() :
         const_surface_thickness(false)
 {
     max_weight = floor(abs(min_occupancy / (0.97 * log_odd_min)));
-    factor = (max_weight - 1) / max_weight;
 }
 
 
@@ -88,7 +87,6 @@ FieldDataConfig<Field::Occupancy>::FieldDataConfig(const std::string& yaml_file)
     se::yaml::subnode_as_bool(node, "const_surface_thickness", const_surface_thickness);
 
     max_weight = floor(abs(min_occupancy / (0.97 * log_odd_min)));
-    factor = (max_weight - 1) / max_weight;
 }
 
 

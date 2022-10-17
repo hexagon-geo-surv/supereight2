@@ -84,7 +84,6 @@ struct FieldDataConfig<Field::Occupancy> {
     field_t min_occupancy;
     field_t max_occupancy;
     weight_t max_weight;
-    weight_t factor;
     field_t surface_boundary;
 
     field_t log_odd_min;
