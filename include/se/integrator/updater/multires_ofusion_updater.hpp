@@ -62,29 +62,29 @@ class Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Se
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     private:
-    /**
-   . * \brief Propage all newly integrated values from the voxel block depth up to the root of the octree.
-   . */
+    /** \brief Propage all newly integrated values from the voxel block level up to the root of the
+     * octree.
+     */
     void propagateToRoot(std::vector<OctantBase*>& block_list);
 
-    void freeBlock(OctantBase* octant_ptr);
-
-    /**
-     * \brief Compute integration scale for a given voxel block and update all voxels that project into the image plane.
+    /** \brief Update all voxels of a block that project into the image plane.
      *
-     * \note The minimum integration scale has only an effect if no data has been integrated into the block yet, i.e.
-     *       the integration scale of the block has not been initialised yet.
-     *
-     * \param[out] block                 The block to be updated.
-     * \param[out] min_integration_scale The minimum integration scale.
+     * \param[in,out] octant_ptr The block to be updated.
      */
     void updateBlock(OctantBase* octant_ptr, bool low_variance, bool project_inside);
 
-
-    /**
-     * \brief Recursively reduce all children by the minimum occupancy log-odd for a single integration.
+    /** \brief Update a node and all its children by the minimum occupancy log-odd.
+     *
+     * \param[in,out] octant_ptr The node to be updated.
+     * \param[in]     depth      The depth of the node.
      */
-    void freeNodeRecurse(OctantBase* octant_ptr, int depth);
+    void updateNodeFree(OctantBase* octant_ptr, int depth);
+
+    /** \brief Update all voxels of a block by the minimum occupancy log-odd.
+     *
+     * \param[in,out] octant_ptr The block to be updated.
+     */
+    void updateBlockFree(OctantBase* octant_ptr);
 
     private:
     MapType& map_;

@@ -29,7 +29,7 @@ template<typename ConfigT>
 float compute_three_sigma(const field_t depth_value,
                           const float sigma_min,
                           const float sigma_max,
-                          const ConfigT config);
+                          const ConfigT& config);
 
 
 
@@ -44,7 +44,7 @@ template<typename ConfigT>
 float compute_tau(const field_t depth_value,
                   const float tau_min,
                   const float tau_max,
-                  const ConfigT config);
+                  const ConfigT& config);
 
 
 
@@ -79,7 +79,7 @@ bool update_voxel(DataT& data,
                   const float range_diff,
                   const float tau,
                   const float three_sigma,
-                  const ConfigT config);
+                  const ConfigT& config);
 
 
 
@@ -91,7 +91,7 @@ bool update_voxel(DataT& data,
  * \param[in,out] node_data The reference to the node data.
  */
 template<typename DataT, typename ConfigT>
-void free_node(DataT& node_data, const ConfigT config);
+void update_node_free(DataT& node_data, const ConfigT& config);
 
 
 /**
@@ -102,7 +102,7 @@ void free_node(DataT& node_data, const ConfigT config);
  * \param[in,out] node_data The reference to the node data.
  */
 template<typename DataT, typename ConfigT>
-bool free_voxel(DataT& voxel_data, const ConfigT config);
+bool update_voxel_free(DataT& voxel_data, const ConfigT& config);
 
 
 /**

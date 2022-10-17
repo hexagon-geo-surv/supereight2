@@ -18,7 +18,7 @@ template<typename ConfigT>
 float compute_three_sigma(const field_t depth_value,
                           const float sigma_min,
                           const float sigma_max,
-                          const ConfigT config)
+                          const ConfigT& config)
 {
     if (config.uncertainty_model == UncertaintyModel::Linear) {
         return 3
@@ -38,7 +38,7 @@ template<typename ConfigT>
 float compute_tau(const field_t depth_value,
                   const float tau_min,
                   const float tau_max,
-                  const ConfigT config)
+                  const ConfigT& config)
 {
     if (config.const_surface_thickness) {
         return tau_max; ///<< e.g. used in ICL-NUIM livingroom dataset.
@@ -57,8 +57,8 @@ namespace updater {
 template<typename DataT>
 bool weighted_mean_update(DataT& data, const field_t sample_value, const weight_t max_weight)
 {
-    data.occupancy = (data.occupancy * data.weight + sample_value) / (data.weight + 1);
-    data.weight = std::min((data.weight + 1), max_weight);
+    weight::increment(data.weight, max_weight);
+    data.occupancy = (data.occupancy * (data.weight - 1) + sample_value) / data.weight;
     if (data.observed) {
         return false;
     }
@@ -75,12 +75,12 @@ bool update_voxel(DataT& data,
                   const float range_diff,
                   const float tau,
                   const float three_sigma,
-                  const ConfigT config)
+                  const ConfigT& config)
 {
     float sample_value;
 
     if (range_diff < -three_sigma) {
-        sample_value = config.log_odd_min;
+        return update_voxel_free(data, config);
     }
     else if (range_diff < tau / 2) {
         sample_value = std::min(config.log_odd_min
@@ -100,7 +100,7 @@ bool update_voxel(DataT& data,
 
 
 template<typename DataT, typename ConfigT>
-void free_node(DataT& node_data, const ConfigT config)
+void update_node_free(DataT& node_data, const ConfigT& config)
 {
     weighted_mean_update(node_data, config.log_odd_min, config.max_weight);
 }
@@ -108,7 +108,7 @@ void free_node(DataT& node_data, const ConfigT config)
 
 
 template<typename DataT, typename ConfigT>
-bool free_voxel(DataT& voxel_data, const ConfigT config)
+bool update_voxel_free(DataT& voxel_data, const ConfigT& config)
 {
     return weighted_mean_update(voxel_data, config.log_odd_min, config.max_weight);
 }
@@ -175,17 +175,20 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
 
     BlockT& block = *static_cast<BlockT*>(octant_ptr);
 
-    int child_scale = block.getCurrentScale();
-    int size_at_child_scale_li = BlockT::size >> child_scale;
-    int size_at_child_scale_sq = math::sq(size_at_child_scale_li);
+    const int child_scale = block.getCurrentScale();
+    const int size_at_child_scale_li = BlockT::size >> child_scale;
+    const int size_at_child_scale_sq = math::sq(size_at_child_scale_li);
 
     int parent_scale = child_scale + 1;
-    int size_at_parent_scale_li = BlockT::size >> parent_scale;
-    int size_at_parent_scale_sq = math::sq(size_at_parent_scale_li);
+    const int size_at_parent_scale_li = BlockT::size >> parent_scale;
+    const int size_at_parent_scale_sq = math::sq(size_at_parent_scale_li);
 
     DataType min_data;
     field_t min_occupancy;
 
+    // Up-propagate the current scale data to the immediate parent scale. If the desired scale
+    // buffer is coarser, i.e. it points to the immediate parent scale only up-propagate the max and
+    // not the mean. This prevents overwriting the better quality data already integrated there.
     if (block.buffer_scale() > block.getCurrentScale()) {
         DataType* max_data_at_parent_scale = block.blockMaxDataAtScale(parent_scale);
         DataType* max_data_at_child_scale = block.blockDataAtScale(child_scale);
@@ -215,9 +218,9 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
                                     + (2 * z + k) * size_at_child_scale_sq;
                                 const auto child_data = max_data_at_child_scale[child_max_data_idx];
 
-                                field_t occupancy = (child_data.occupancy * child_data.weight);
-
                                 if (child_data.weight > 0) {
+                                    const field_t occupancy =
+                                        child_data.occupancy * child_data.weight;
                                     if (occupancy > max_occupancy) {
                                         data_count++;
                                         // Update max
@@ -270,7 +273,7 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
                     auto& parent_max_data = max_data_at_parent_scale[parent_data_idx];
 
                     field_t mean_occupancy = 0;
-                    weight_t mean_weight = 0;
+                    delta_weight_t mean_weight = 0;
 
                     field_t max_mean_occupancy = 0;
                     weight_t max_weight = 0;
@@ -285,7 +288,7 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
                                 const int child_data_idx = (2 * x + i)
                                     + (2 * y + j) * size_at_child_scale_li
                                     + (2 * z + k) * size_at_child_scale_sq;
-                                const auto child_data = data_at_child_scale[child_data_idx];
+                                const auto& child_data = data_at_child_scale[child_data_idx];
 
                                 if (child_data.weight > 0) {
                                     // Update mean
@@ -293,7 +296,8 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
                                     mean_occupancy += child_data.occupancy;
                                     mean_weight += child_data.weight;
 
-                                    field_t occupancy = (child_data.occupancy * child_data.weight);
+                                    const field_t occupancy =
+                                        child_data.occupancy * child_data.weight;
 
                                     if (occupancy > max_occupancy) {
                                         // Update max
@@ -319,7 +323,7 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
                     if (data_count > 0) {
                         parent_data.occupancy = mean_occupancy / data_count;
                         parent_data.weight =
-                            weight::div(mean_weight, static_cast<weight_t>(data_count));
+                            weight::div(mean_weight, static_cast<delta_weight_t>(data_count));
                         parent_data.observed = false;
 
                         parent_max_data.occupancy = max_mean_occupancy;
@@ -337,13 +341,14 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
 
 
 
+    // Up-propagate the mean and max data to the remaining parent scales within the block.
     for (parent_scale += 1; parent_scale <= BlockT::getMaxScale(); ++parent_scale) {
-        size_at_parent_scale_li = BlockT::size >> parent_scale;
-        size_at_parent_scale_sq = math::sq(size_at_parent_scale_li);
+        const int size_at_parent_scale_li = BlockT::size >> parent_scale;
+        const int size_at_parent_scale_sq = math::sq(size_at_parent_scale_li);
 
-        child_scale = parent_scale - 1;
-        size_at_child_scale_li = BlockT::size >> child_scale;
-        size_at_child_scale_sq = math::sq(size_at_child_scale_li);
+        const int child_scale = parent_scale - 1;
+        const int size_at_child_scale_li = BlockT::size >> child_scale;
+        const int size_at_child_scale_sq = math::sq(size_at_child_scale_li);
 
         DataType* max_data_at_parent_scale = block.blockMaxDataAtScale(parent_scale);
         DataType* data_at_parent_scale = block.blockDataAtScale(parent_scale);
@@ -359,7 +364,7 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
                     auto& parent_max_data = max_data_at_parent_scale[parent_data_idx];
 
                     field_t mean_occupancy = 0;
-                    weight_t mean_weight = 0;
+                    delta_weight_t mean_weight = 0;
 
                     field_t max_mean_occupancy = 0;
                     weight_t max_weight = 0;
@@ -374,11 +379,12 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
                                 const int child_data_idx = (2 * x + i)
                                     + (2 * y + j) * size_at_child_scale_li
                                     + (2 * z + k) * size_at_child_scale_sq;
-                                const auto child_data = data_at_child_scale[child_data_idx];
-                                const auto child_max_data = max_data_at_child_scale[child_data_idx];
+                                const auto& child_max_data =
+                                    max_data_at_child_scale[child_data_idx];
 
                                 if (child_max_data.weight > 0) {
                                     // Update mean
+                                    const auto& child_data = data_at_child_scale[child_data_idx];
                                     data_count++;
                                     mean_occupancy += child_data.occupancy;
                                     mean_weight += child_data.weight;
@@ -403,7 +409,7 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
                     if (data_count > 0) {
                         parent_data.occupancy = mean_occupancy / data_count;
                         parent_data.weight =
-                            weight::div(mean_weight, static_cast<weight_t>(data_count));
+                            weight::div(mean_weight, static_cast<delta_weight_t>(data_count));
                         parent_data.observed = false;
 
                         parent_max_data.occupancy = max_mean_occupancy;
