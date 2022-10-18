@@ -367,7 +367,7 @@ raycast(MapT& map,
 
     if (!is_valid) {
         // Ray won't intersect with the map
-        return {};
+        return std::nullopt;
     }
 
     const int max_scale = std::min(
@@ -379,7 +379,7 @@ raycast(MapT& map,
 
     if (!is_valid) {
         // Ray passes only through free space or intersects with the map before t_near or after t_far.
-        return {};
+        return std::nullopt;
     }
 
     Eigen::Vector3f ray_pos_W = {};
@@ -394,7 +394,7 @@ raycast(MapT& map,
 
     value_t = find_valid_point(map, ray_origin_W, ray_dir_W, step_size, t_far, t, point_W_t);
     if (!value_t) {
-        return {};
+        return std::nullopt;
     }
     t += step_size;
 
@@ -427,7 +427,7 @@ raycast(MapT& map,
                     value_t = find_valid_point(
                         map, ray_origin_W, ray_dir_W, step_size, t_far, t, point_W_t);
                     if (!value_t) {
-                        return {};
+                        return std::nullopt;
                     }
                     if (*value_t > 0) // MultiresOFusion::surface_boundary
                     {
@@ -454,7 +454,7 @@ raycast(MapT& map,
             return surface_point_W;
         }
     }
-    return {};
+    return std::nullopt;
 }
 
 
@@ -476,7 +476,7 @@ raycast(MapT& map,
 
     const float t_min = ray.tcmin(); /* Get distance to the first intersected block */
     if (t_min <= 0.f) {
-        return {};
+        return std::nullopt;
     }
     const float t_max = ray.tmax();
 
@@ -532,7 +532,7 @@ raycast(MapT& map,
             }
         }
     }
-    return {};
+    return std::nullopt;
 }
 
 

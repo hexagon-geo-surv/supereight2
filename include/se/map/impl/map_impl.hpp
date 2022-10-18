@@ -100,7 +100,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getFieldInterp(const Eigen::Vector
     }
     else {
         if (!pointToVoxel<Safe::On>(point_W, voxel_coord_f)) {
-            return {};
+            return std::nullopt;
         }
     }
 
@@ -123,7 +123,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getFieldInterp(const Eigen::Vector
     }
     else {
         if (!pointToVoxel<Safe::On>(point_W, voxel_coord_f)) {
-            return {};
+            return std::nullopt;
         }
     }
 
@@ -145,7 +145,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getFieldGrad(const Eigen::Vector3f
     }
     else {
         if (!pointToVoxel<Safe::On>(point_W, voxel_coord_f)) {
-            return {};
+            return std::nullopt;
         }
     }
 

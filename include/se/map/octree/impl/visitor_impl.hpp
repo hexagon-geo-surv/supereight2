@@ -820,7 +820,7 @@ inline std::optional<se::field_t> getField(const OctreeT& octree,
         return se::get_field(data);
     }
 
-    return {};
+    return std::nullopt;
 }
 
 
@@ -834,7 +834,7 @@ getField(const OctreeT& octree, BlockT* block_ptr, const Eigen::Vector3i& voxel_
         return se::get_field(data);
     }
 
-    return {};
+    return std::nullopt;
 }
 
 
@@ -853,7 +853,7 @@ getField(const OctreeT& octree,
         return se::get_field(data);
     }
 
-    return {};
+    return std::nullopt;
 }
 
 
@@ -872,7 +872,7 @@ getField(const OctreeT& octree,
         return se::get_field(data);
     }
 
-    return {};
+    return std::nullopt;
 }
 
 
@@ -898,7 +898,7 @@ getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 
     if ((base_coord.array() < 0).any()
         || ((base_coord + Eigen::Vector3i::Constant(stride)).array() >= octree_size).any()) {
-        return {};
+        return std::nullopt;
     }
 
     detail::get_neighbours(octree, base_coord, neighbour_data);
@@ -906,7 +906,7 @@ getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
     for (int n = 0; n < 8; n++) //< 8 neighbours
     {
         if (!se::is_valid(neighbour_data[n])) {
-            return {};
+            return std::nullopt;
         }
     }
 
@@ -948,7 +948,7 @@ inline
     se::OctantBase* octant_ptr =
         se::fetcher::template block<OctreeT>(voxel_coord_f.cast<int>(), octree.getRoot());
     if (!octant_ptr) {
-        return {};
+        return std::nullopt;
     }
 
     typedef typename OctreeT::BlockType BlockType;
@@ -969,7 +969,7 @@ inline
 
         if ((base_coord.array() < 0).any()
             || ((base_coord + Eigen::Vector3i::Constant(stride)).array() >= octree_size).any()) {
-            return {};
+            return std::nullopt;
         }
 
         if (!detail::get_neighbours(octree, base_coord, scale, neighbour_data)) {
@@ -979,7 +979,7 @@ inline
         for (int n = 0; n < 8; n++) //< 8 neighbours
         {
             if (!se::is_valid(neighbour_data[n])) {
-                return {};
+                return std::nullopt;
             }
         }
 
@@ -998,7 +998,7 @@ inline
                        * factor.y())
                     * factor.z());
     }
-    return {};
+    return std::nullopt;
 }
 
 
@@ -1022,7 +1022,7 @@ getFieldInterp(const OctreeT& octree,
         se::fetcher::template leaf<OctreeT>(voxel_coord_f.cast<int>(), octree.getRoot());
 
     if (!octant_ptr) {
-        return {};
+        return std::nullopt;
     }
 
     typedef typename OctreeT::NodeType NodeType;
@@ -1044,7 +1044,7 @@ getFieldInterp(const OctreeT& octree,
         const Eigen::Vector3i base_coord = stride * scaled_voxel_coord_f.template cast<int>();
         if ((base_coord.array() < 0).any()
             || ((base_coord + Eigen::Vector3i::Constant(stride)).array() >= octree_size).any()) {
-            return {};
+            return std::nullopt;
         }
 
         if (!detail::get_neighbours(octree, base_coord, scale, neighbour_data)) {
@@ -1054,7 +1054,7 @@ getFieldInterp(const OctreeT& octree,
         for (int n = 0; n < 8; n++) //< 8 neighbours
         {
             if (!se::is_valid(neighbour_data[n])) {
-                return {};
+                return std::nullopt;
             }
         }
 
@@ -1077,7 +1077,7 @@ getFieldInterp(const OctreeT& octree,
                        * factor.y())
                     * factor.z());
     }
-    return {};
+    return std::nullopt;
 }
 
 
@@ -1125,7 +1125,7 @@ getFieldGrad(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
     const typename OctreeT::BlockType* block_ptr = static_cast<typename OctreeT::BlockType*>(
         se::fetcher::template block<OctreeT>(base_coord, octree.getRoot()));
     if (!block_ptr) {
-        return {};
+        return std::nullopt;
     }
 
     const Eigen::Vector3i grad_coords[32] = {
@@ -1203,7 +1203,7 @@ getFieldGrad(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
     for (unsigned int i = 0; i < 32; i++) {
         auto grad_field_value = se::visitor::getField(octree, block_ptr, grad_coords[i]);
         if (!grad_field_value) {
-            return {};
+            return std::nullopt;
         }
         grad_field_values[i] = *grad_field_value;
     }
@@ -1279,7 +1279,7 @@ getFieldGrad(const OctreeT& octree,
         se::fetcher::template block<OctreeT>(voxel_coord_f.cast<int>(), octree.getRoot()));
     if (!block_ptr) // If this block doesn't exist there's no way to compute a valid gradient
     {
-        return {};
+        return std::nullopt;
     }
 
     int init_scale =
@@ -1461,7 +1461,7 @@ getFieldGrad(const OctreeT& octree,
         return 0.5f * gradient;
     }
 
-    return {};
+    return std::nullopt;
 }
 
 
