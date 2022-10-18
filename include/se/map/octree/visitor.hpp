@@ -199,69 +199,57 @@ getField(const OctreeT& octree,
 
 
 
-/// Single-res get field interpolation functions
-
-/**
- * \brief Get the interplated field value for a given coordinate [float voxel coordinates].
- *        The function returns {}/invalid if the data is invalid.
+/** \brief Interpolate the field value at the supplied coordinates.
  *
- * \tparam OctreeT          The type of the octree used
- * \param[in] octree_ptr    The pointer to the octree
- * \param[in] voxel_coord_f The voxel coordinates to be accessed [float voxel coordiantes]
- *
- * \return The interpolated field value if the data is valid, {}/invalid otherwise
+ * \tparam    OctreeT       The type of the octree used.
+ * \param[in] octree        The single-resolution octree containing the field data.
+ * \param[in] voxel_coord_f The voxel coordinates the field will be interpolated at. The coordinates
+ *                          may have a fractional part.
+ * \return The interpolated field value if the data is valid, std::nullopt otherwise.
  */
 template<typename OctreeT>
 typename std::enable_if_t<OctreeT::res_ == Res::Single, std::optional<field_t>>
 getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f);
 
-
-
-/// Multi-res get field interpolation functions
-
-/**
- * \brief Get the interplated field value for a given coordinate [float voxel coordinates].
- *        The value is interpolated at the finest common scale.
- *        The function returns {}/invalid if the data is invalid.
+/** \brief Interpolate the field value at the supplied coordinates. The value is interpolated at the
+ * finest scale data is available at.
  *
- * \tparam OctreeT          The type of the octree used
- * \param[in] octree_ptr    The pointer to the octree
- * \param[in] voxel_coord_f The voxel coordinates to be accessed [float voxel coordiantes]
- *
- * \return The interpolated field value if the data is valid, {}/invalid otherwise
+ * \tparam    OctreeT       The type of the octree used.
+ * \param[in] octree        The multi-resolution octree containing the field data.
+ * \param[in] voxel_coord_f The voxel coordinates the field will be interpolated at. The coordinates
+ *                          may have a fractional part.
+ * \return The interpolated field value if the data is valid, std::nullopt otherwise.
  */
 template<typename OctreeT>
 typename std::enable_if_t<OctreeT::res_ == Res::Multi, std::optional<field_t>>
 getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f);
 
-/**
- * \brief Get the interplated field value for a given coordinate [float voxel coordinates].
- *        The value is interpolated at the finest common scale (scale_returned).
- *        The function returns {}/invalid if the data is invalid.
+/** \brief Interpolate the field value at the supplied coordinates. The value is interpolated at the
+ * finest scale data is available at.
  *
- * \tparam OctreeT           The type of the octree used
- * \param[in] octree         The reference to the octree
- * \param[in] voxel_coord_f  The voxel coordinates to be accessed [float voxel coordiantes]
- * \param[in] scale_returned The scale the field value has been interpolated at
- *
- * \return The interpolated field value at the returned scale if the data is valid, {}/invalid otherwise
+ * \tparam     OctreeT        The type of the octree used.
+ * \param[in]  octree         The multi-resolution octree containing the field data.
+ * \param[in]  voxel_coord_f  The voxel coordinates the field will be interpolated at. The
+ *                            coordinates may have a fractional part.
+ * \param[out] scale_returned The scale the field value was interpolated at. Only valid if the
+ *                            interpolation succeeded.
+ * \return The interpolated field value if the data is valid, std::nullopt otherwise.
  */
 template<typename OctreeT>
 typename std::enable_if_t<OctreeT::res_ == Res::Multi, std::optional<field_t>>
 getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, int& scale_returned);
 
-/**
- * \brief Get the interplated field value for a given coordinate [float voxel coordinates] and desired scale.
- *        The value is interpolated at the finest common scale (scale_returned).
- *        The function returns {}/invalid if the data is invalid.
+/** \brief Interpolate the field value at the supplied coordinates while limiting the finest scale
+ * at which interpolation is performed.
  *
- * \tparam OctreeT           The type of the octree used
- * \param[in] octree         The reference to the octree
- * \param[in] voxel_coord_f  The voxel coordinates to be accessed [float voxel coordiantes]
- * \param[in] scale_desired  The finest scale to interpolate the data at
- * \param[in] scale_returned The scale the field value has been interpolated at (max (scale desired, finest common neighbour scale)
- *
- * \return The interpolated field value at the returned scale if the data is valid, {}/invalid otherwise
+ * \tparam     OctreeT        The type of the octree used.
+ * \param[in]  octree         The multi-resolution TSDF octree containing the field data.
+ * \param[in]  voxel_coord_f  The voxel coordinates the field will be interpolated at. The
+ *                            coordinates may have a fractional part.
+ * \param[in]  scale_desired  The finest scale to interpolate the data at.
+ * \param[out] scale_returned The scale the field value was interpolated at. Only valid if the
+ *                            interpolation succeeded.
+ * \return The interpolated field value if the data is valid, std::nullopt otherwise.
  */
 template<typename OctreeT>
 typename std::enable_if_t<(OctreeT::fld_ == Field::TSDF && OctreeT::res_ == Res::Multi),
@@ -271,18 +259,17 @@ getFieldInterp(const OctreeT& octree,
                const int scale_desired,
                int& scale_returned);
 
-/**
- * \brief Get the interplated field value for a given coordinate [float voxel coordinates] and desired scale.
- *        The value is interpolated at the finest common scale (scale_returned).
- *        The function returns {}/invalid if the data is invalid.
+/** \brief Interpolate the field value at the supplied coordinates while limiting the finest scale
+ * at which interpolation is performed.
  *
- * \tparam OctreeT           The type of the octree used
- * \param[in] octree         The reference to the octree
- * \param[in] voxel_coord_f  The voxel coordinates to be accessed [float voxel coordiantes]
- * \param[in] scale_desired  The finest scale to interpolate the data at
- * \param[in] scale_returned The scale the field value has been interpolated at (max (scale desired, finest common neighbour scale)
- *
- * \return The interpolated field value at the returned scale if the data is valid, {}/invalid otherwise
+ * \tparam     OctreeT        The type of the octree used.
+ * \param[in]  octree         The multi-resolution occupancy octree containing the field data.
+ * \param[in]  voxel_coord_f  The voxel coordinates the field will be interpolated at. The
+ *                            coordinates may have a fractional part.
+ * \param[in]  scale_desired  The finest scale to interpolate the data at.
+ * \param[out] scale_returned The scale the field value was interpolated at. Only valid if the
+ *                            interpolation succeeded.
+ * \return The interpolated field value if the data is valid, std::nullopt otherwise.
  */
 template<typename OctreeT>
 typename std::enable_if_t<OctreeT::fld_ == Field::Occupancy && OctreeT::res_ == Res::Multi,
