@@ -95,6 +95,22 @@ static constexpr inline Scalar cu(Scalar a)
 
 
 
+template<typename Int>
+constexpr typename std::enable_if_t<std::is_integral_v<Int>, Int> div_ceil(Int a, Int b)
+{
+    return a / b + (a % b != 0);
+}
+
+
+
+template<typename Float>
+typename std::enable_if_t<std::is_floating_point_v<Float>, Float> div_ceil(Float a, Float b)
+{
+    return std::ceil(a / b);
+}
+
+
+
 template<typename Scalar>
 static inline bool in(const Scalar v, const Scalar a, const Scalar b)
 {

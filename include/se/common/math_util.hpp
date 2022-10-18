@@ -46,6 +46,17 @@ static constexpr inline Scalar sq(Scalar a);
 template<typename Scalar>
 static constexpr inline Scalar cu(Scalar a);
 
+/** \brief Perform the integer division a/b and round towards positive infinity.
+ * \note Not tested for negative integers.
+ */
+template<typename Int>
+constexpr typename std::enable_if_t<std::is_integral_v<Int>, Int> div_ceil(Int a, Int b);
+
+/** \brief Perform the division a/b and round towards positive infinity.
+ */
+template<typename Float>
+typename std::enable_if_t<std::is_floating_point_v<Float>, Float> div_ceil(Float a, Float b);
+
 template<typename Scalar>
 static inline bool in(const Scalar v, const Scalar a, const Scalar b);
 
