@@ -158,10 +158,10 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
                                   const int sample_count) {
             if (sample_count != 0) {
                 data_tmp.tsdf /= sample_count;
-                data_tmp.weight /= sample_count;
+                data_tmp.weight = weight::div(data_tmp.weight, static_cast<weight_t>(sample_count));
                 parent_data_union.data.tsdf = data_tmp.tsdf;
                 parent_data_union.prop_data.delta_tsdf = data_tmp.tsdf;
-                parent_data_union.data.weight = ceil(data_tmp.weight);
+                parent_data_union.data.weight = data_tmp.weight;
                 parent_data_union.prop_data.delta_weight = 0;
             }
             else {

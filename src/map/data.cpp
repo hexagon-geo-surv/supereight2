@@ -141,7 +141,10 @@ FieldDataConfig<Field::TSDF>::FieldDataConfig(const std::string& yaml_file) :
     }
 
     se::yaml::subnode_as_float(node, "truncation_boundary_factor", truncation_boundary_factor);
-    se::yaml::subnode_as_float(node, "max_weight", max_weight);
+    // Ensure an integer max_weight is provided even in a float is used as weight_t.
+    int max_weight_int = max_weight;
+    se::yaml::subnode_as_int(node, "max_weight", max_weight_int);
+    max_weight = max_weight_int;
 }
 
 

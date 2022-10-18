@@ -318,7 +318,8 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
 
                     if (data_count > 0) {
                         parent_data.occupancy = mean_occupancy / data_count;
-                        parent_data.weight = ceil((float) mean_weight) / data_count;
+                        parent_data.weight =
+                            weight::div(mean_weight, static_cast<weight_t>(data_count));
                         parent_data.observed = false;
 
                         parent_max_data.occupancy = max_mean_occupancy;
@@ -401,7 +402,8 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
 
                     if (data_count > 0) {
                         parent_data.occupancy = mean_occupancy / data_count;
-                        parent_data.weight = ceil((float) mean_weight) / data_count;
+                        parent_data.weight =
+                            weight::div(mean_weight, static_cast<weight_t>(data_count));
                         parent_data.observed = false;
 
                         parent_max_data.occupancy = max_mean_occupancy;

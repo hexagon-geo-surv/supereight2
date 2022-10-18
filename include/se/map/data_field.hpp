@@ -51,7 +51,7 @@ struct FieldDeltaData<Field::Occupancy> {
 template<>
 struct FieldDeltaData<Field::TSDF> {
     field_t delta_tsdf = 0;
-    weight_t delta_weight = 0;
+    delta_weight_t delta_weight = 0;
 };
 
 ///////////////////
