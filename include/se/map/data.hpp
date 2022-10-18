@@ -111,16 +111,16 @@ inline bool is_valid(const Data<Field::Occupancy, ColB, SemB>& data)
 
 
 template<Field FldT, Colour ColB, Semantics SemB>
-inline float get_field(const Data<FldT, ColB, SemB> data);
+inline field_t get_field(const Data<FldT, ColB, SemB>& data);
 
 template<Colour ColB, Semantics SemB>
-inline float get_field(const Data<Field::TSDF, ColB, SemB> data)
+inline field_t get_field(const Data<Field::TSDF, ColB, SemB>& data)
 {
     return data.tsdf;
 }
 
 template<Colour ColB, Semantics SemB>
-inline float get_field(const Data<Field::Occupancy, ColB, SemB> data)
+inline field_t get_field(const Data<Field::Occupancy, ColB, SemB>& data)
 {
     return data.occupancy;
 }
@@ -128,16 +128,16 @@ inline float get_field(const Data<Field::Occupancy, ColB, SemB> data)
 
 
 template<Field FldT, Colour ColB, Semantics SemB>
-inline float is_inside(const Data<FldT, ColB, SemB>& data);
+inline bool is_inside(const Data<FldT, ColB, SemB>& data);
 
 template<Colour ColB, Semantics SemB>
-inline float is_inside(const Data<Field::TSDF, ColB, SemB>& data)
+inline bool is_inside(const Data<Field::TSDF, ColB, SemB>& data)
 {
     return data.tsdf < 0.f;
 }
 
 template<Colour ColB, Semantics SemB>
-inline float is_inside(const Data<Field::Occupancy, ColB, SemB>& data)
+inline bool is_inside(const Data<Field::Occupancy, ColB, SemB>& data)
 {
     return data.occupancy > 0.f;
 }
