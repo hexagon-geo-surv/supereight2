@@ -867,11 +867,18 @@ getField(const OctreeT& octree,
 
 
 
-/// Single-res get field interp functions
-
 template<typename OctreeT>
 typename std::enable_if_t<OctreeT::res_ == Res::Single, std::optional<field_t>>
 getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
+{
+    field_t (*f)(const typename OctreeT::DataType&) = get_field;
+    return getInterp(octree, voxel_coord_f, f);
+}
+
+template<typename OctreeT, typename GetF>
+typename std::enable_if_t<OctreeT::res_ == Res::Single,
+                          std::optional<std::invoke_result_t<GetF, typename OctreeT::DataType>>>
+getInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, GetF get_value)
 {
     typename OctreeT::DataType init_data;
     typename OctreeT::DataType neighbour_data[8] = {};
@@ -899,25 +906,23 @@ getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
         }
     }
 
-    return (((get_field(neighbour_data[0]) * (1 - factor.x())
-              + get_field(neighbour_data[1]) * factor.x())
+    return (((get_value(neighbour_data[0]) * (1 - factor.x())
+              + get_value(neighbour_data[1]) * factor.x())
                  * (1 - factor.y())
-             + (get_field(neighbour_data[2]) * (1 - factor.x())
-                + get_field(neighbour_data[3]) * factor.x())
+             + (get_value(neighbour_data[2]) * (1 - factor.x())
+                + get_value(neighbour_data[3]) * factor.x())
                  * factor.y())
                 * (1 - factor.z())
-            + ((get_field(neighbour_data[4]) * (1 - factor.x())
-                + get_field(neighbour_data[5]) * factor.x())
+            + ((get_value(neighbour_data[4]) * (1 - factor.x())
+                + get_value(neighbour_data[5]) * factor.x())
                    * (1 - factor.y())
-               + (get_field(neighbour_data[6]) * (1 - factor.x())
-                  + get_field(neighbour_data[7]) * factor.x())
+               + (get_value(neighbour_data[6]) * (1 - factor.x())
+                  + get_value(neighbour_data[7]) * factor.x())
                    * factor.y())
                 * factor.z());
 }
 
 
-
-/// Multi-res get field interp functions
 
 template<typename OctreeT>
 typename std::enable_if_t<(OctreeT::fld_ == Field::TSDF && OctreeT::res_ == Res::Multi),
@@ -926,6 +931,19 @@ getFieldInterp(const OctreeT& octree,
                const Eigen::Vector3f& voxel_coord_f,
                const int scale_desired,
                int& scale_returned)
+{
+    field_t (*f)(const typename OctreeT::DataType&) = get_field;
+    return getInterp(octree, voxel_coord_f, scale_desired, scale_returned, f);
+}
+
+template<typename OctreeT, typename GetF>
+typename std::enable_if_t<(OctreeT::fld_ == Field::TSDF && OctreeT::res_ == Res::Multi),
+                          std::optional<std::invoke_result_t<GetF, typename OctreeT::DataType>>>
+getInterp(const OctreeT& octree,
+          const Eigen::Vector3f& voxel_coord_f,
+          const int scale_desired,
+          int& scale_returned,
+          GetF get_value)
 {
     typename OctreeT::DataType init_data;
     typename OctreeT::DataType neighbour_data[8] = {};
@@ -971,18 +989,18 @@ getFieldInterp(const OctreeT& octree,
             }
         }
 
-        return (((get_field(neighbour_data[0]) * (1 - factor.x())
-                  + get_field(neighbour_data[1]) * factor.x())
+        return (((get_value(neighbour_data[0]) * (1 - factor.x())
+                  + get_value(neighbour_data[1]) * factor.x())
                      * (1 - factor.y())
-                 + (get_field(neighbour_data[2]) * (1 - factor.x())
-                    + get_field(neighbour_data[3]) * factor.x())
+                 + (get_value(neighbour_data[2]) * (1 - factor.x())
+                    + get_value(neighbour_data[3]) * factor.x())
                      * factor.y())
                     * (1 - factor.z())
-                + ((get_field(neighbour_data[4]) * (1 - factor.x())
-                    + get_field(neighbour_data[5]) * factor.x())
+                + ((get_value(neighbour_data[4]) * (1 - factor.x())
+                    + get_value(neighbour_data[5]) * factor.x())
                        * (1 - factor.y())
-                   + (get_field(neighbour_data[6]) * (1 - factor.x())
-                      + get_field(neighbour_data[7]) * factor.x())
+                   + (get_value(neighbour_data[6]) * (1 - factor.x())
+                      + get_value(neighbour_data[7]) * factor.x())
                        * factor.y())
                     * factor.z());
     }
@@ -998,6 +1016,19 @@ getFieldInterp(const OctreeT& octree,
                const Eigen::Vector3f& voxel_coord_f,
                const int scale_desired,
                int& scale_returned)
+{
+    field_t (*f)(const typename OctreeT::DataType&) = get_field;
+    return getInterp(octree, voxel_coord_f, scale_desired, scale_returned, f);
+}
+
+template<typename OctreeT, typename GetF>
+typename std::enable_if_t<OctreeT::fld_ == Field::Occupancy && OctreeT::res_ == Res::Multi,
+                          std::optional<std::invoke_result_t<GetF, typename OctreeT::DataType>>>
+getInterp(const OctreeT& octree,
+          const Eigen::Vector3f& voxel_coord_f,
+          const int scale_desired,
+          int& scale_returned,
+          GetF get_value)
 {
     typename OctreeT::DataType init_data;
     typename OctreeT::DataType neighbour_data[8] = {};
@@ -1049,18 +1080,18 @@ getFieldInterp(const OctreeT& octree,
         scale_returned = octant_ptr->isBlock()
             ? scale
             : math::log2_const(static_cast<NodeType*>(octant_ptr)->getSize());
-        return (((get_field(neighbour_data[0]) * (1 - factor.x())
-                  + get_field(neighbour_data[1]) * factor.x())
+        return (((get_value(neighbour_data[0]) * (1 - factor.x())
+                  + get_value(neighbour_data[1]) * factor.x())
                      * (1 - factor.y())
-                 + (get_field(neighbour_data[2]) * (1 - factor.x())
-                    + get_field(neighbour_data[3]) * factor.x())
+                 + (get_value(neighbour_data[2]) * (1 - factor.x())
+                    + get_value(neighbour_data[3]) * factor.x())
                      * factor.y())
                     * (1 - factor.z())
-                + ((get_field(neighbour_data[4]) * (1 - factor.x())
-                    + get_field(neighbour_data[5]) * factor.x())
+                + ((get_value(neighbour_data[4]) * (1 - factor.x())
+                    + get_value(neighbour_data[5]) * factor.x())
                        * (1 - factor.y())
-                   + (get_field(neighbour_data[6]) * (1 - factor.x())
-                      + get_field(neighbour_data[7]) * factor.x())
+                   + (get_value(neighbour_data[6]) * (1 - factor.x())
+                      + get_value(neighbour_data[7]) * factor.x())
                        * factor.y())
                     * factor.z());
     }
@@ -1073,7 +1104,19 @@ template<typename OctreeT>
 typename std::enable_if_t<OctreeT::res_ == Res::Multi, std::optional<field_t>>
 getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, int& scale_returned)
 {
-    return getFieldInterp(octree, voxel_coord_f, 0, scale_returned);
+    field_t (*f)(const typename OctreeT::DataType&) = get_field;
+    return getInterp(octree, voxel_coord_f, scale_returned, f);
+}
+
+template<typename OctreeT, typename GetF>
+typename std::enable_if_t<OctreeT::res_ == Res::Multi,
+                          std::optional<std::invoke_result_t<GetF, typename OctreeT::DataType>>>
+getInterp(const OctreeT& octree,
+          const Eigen::Vector3f& voxel_coord_f,
+          int& scale_returned,
+          GetF get_value)
+{
+    return getInterp(octree, voxel_coord_f, 0, scale_returned, get_value);
 }
 
 
@@ -1082,8 +1125,17 @@ template<typename OctreeT>
 typename std::enable_if_t<OctreeT::res_ == Res::Multi, std::optional<field_t>>
 getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 {
-    int scale_dummy;
-    return getFieldInterp(octree, voxel_coord_f, 0, scale_dummy);
+    field_t (*f)(const typename OctreeT::DataType&) = get_field;
+    return getInterp(octree, voxel_coord_f, f);
+}
+
+template<typename OctreeT, typename GetF>
+typename std::enable_if_t<OctreeT::res_ == Res::Multi,
+                          std::optional<std::invoke_result_t<GetF, typename OctreeT::DataType>>>
+getInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, GetF get_value)
+{
+    int _;
+    return getInterp(octree, voxel_coord_f, 0, _, get_value);
 }
 
 
