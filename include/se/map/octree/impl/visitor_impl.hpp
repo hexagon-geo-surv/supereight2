@@ -23,8 +23,9 @@ static const Eigen::Vector3i interp_offsets[8] =
 
 
 template<typename BlockT, typename DataT>
-inline void
-gather_local(const BlockT* block_ptr, const Eigen::Vector3i& base_coord, DataT neighbour_data[8])
+void gather_local(const BlockT* block_ptr,
+                  const Eigen::Vector3i& base_coord,
+                  DataT neighbour_data[8])
 {
     neighbour_data[0] = block_ptr->getData(base_coord + interp_offsets[0]);
     neighbour_data[1] = block_ptr->getData(base_coord + interp_offsets[1]);
@@ -38,10 +39,10 @@ gather_local(const BlockT* block_ptr, const Eigen::Vector3i& base_coord, DataT n
 
 
 template<typename BlockT, typename DataT>
-inline void gather_4(const BlockT* block_ptr,
-                     const Eigen::Vector3i& base_coord,
-                     const unsigned int offsets[4],
-                     DataT neighbour_data[8])
+void gather_4(const BlockT* block_ptr,
+              const Eigen::Vector3i& base_coord,
+              const unsigned int offsets[4],
+              DataT neighbour_data[8])
 {
     neighbour_data[offsets[0]] = block_ptr->getData(base_coord + interp_offsets[offsets[0]]);
     neighbour_data[offsets[1]] = block_ptr->getData(base_coord + interp_offsets[offsets[1]]);
@@ -52,10 +53,10 @@ inline void gather_4(const BlockT* block_ptr,
 
 
 template<typename BlockT, typename DataT>
-inline void gather_2(const BlockT* block_ptr,
-                     const Eigen::Vector3i& base_coord,
-                     const unsigned int offsets[2],
-                     DataT neighbour_data[8])
+void gather_2(const BlockT* block_ptr,
+              const Eigen::Vector3i& base_coord,
+              const unsigned int offsets[2],
+              DataT neighbour_data[8])
 {
     neighbour_data[offsets[0]] = block_ptr->getData(base_coord + interp_offsets[offsets[0]]);
     neighbour_data[offsets[1]] = block_ptr->getData(base_coord + interp_offsets[offsets[1]]);
@@ -64,9 +65,9 @@ inline void gather_2(const BlockT* block_ptr,
 
 
 template<typename OctreeT>
-inline bool get_neighbours(const OctreeT& octree,
-                           const Eigen::Vector3i& base_coord,
-                           typename OctreeT::DataType neighbour_data[8])
+bool get_neighbours(const OctreeT& octree,
+                    const Eigen::Vector3i& base_coord,
+                    typename OctreeT::DataType neighbour_data[8])
 {
     unsigned int stride = 1;
     unsigned int block_size = OctreeT::BlockType::getSize();
@@ -298,10 +299,10 @@ inline bool get_neighbours(const OctreeT& octree,
 /////////////////////////////////
 
 template<typename OctreeT, typename DataT>
-inline void gather_local(const se::OctantBase* leaf_ptr,
-                         const Eigen::Vector3i& base_coord,
-                         const int scale,
-                         DataT neighbour_data[8])
+void gather_local(const se::OctantBase* leaf_ptr,
+                  const Eigen::Vector3i& base_coord,
+                  const int scale,
+                  DataT neighbour_data[8])
 {
     if (leaf_ptr->isBlock()) {
         const int stride = 1 << scale;
@@ -328,11 +329,11 @@ inline void gather_local(const se::OctantBase* leaf_ptr,
 
 
 template<typename OctreeT, typename DataT>
-inline void gather_4(const se::OctantBase* leaf_ptr,
-                     const Eigen::Vector3i& base_coord,
-                     const unsigned int offsets[4],
-                     const int scale,
-                     DataT neighbour_data[8])
+void gather_4(const se::OctantBase* leaf_ptr,
+              const Eigen::Vector3i& base_coord,
+              const unsigned int offsets[4],
+              const int scale,
+              DataT neighbour_data[8])
 {
     if (leaf_ptr->isBlock()) {
         const int stride = 1 << scale;
@@ -361,11 +362,11 @@ inline void gather_4(const se::OctantBase* leaf_ptr,
 
 
 template<typename OctreeT, typename DataT>
-inline void gather_2(const se::OctantBase* leaf_ptr,
-                     const Eigen::Vector3i& base_coord,
-                     const unsigned int offsets[2],
-                     const int scale,
-                     DataT neighbour_data[8])
+void gather_2(const se::OctantBase* leaf_ptr,
+              const Eigen::Vector3i& base_coord,
+              const unsigned int offsets[2],
+              const int scale,
+              DataT neighbour_data[8])
 {
     if (leaf_ptr->isBlock()) {
         const int stride = 1 << scale;
@@ -387,10 +388,10 @@ inline void gather_2(const se::OctantBase* leaf_ptr,
 
 
 template<typename OctreeT>
-inline bool get_neighbours(const OctreeT& octree,
-                           const Eigen::Vector3i& base_coord,
-                           const int scale,
-                           typename OctreeT::DataType neighbour_data[8])
+bool get_neighbours(const OctreeT& octree,
+                    const Eigen::Vector3i& base_coord,
+                    const int scale,
+                    typename OctreeT::DataType neighbour_data[8])
 {
     const int stride = 1 << scale; // Multi-res
     const se::OctantBase* base_octant_ptr =
@@ -685,7 +686,7 @@ inline bool get_neighbours(const OctreeT& octree,
 /// Single/multi-res get data functions
 
 template<typename OctreeT>
-inline typename OctreeT::DataType getData(const OctreeT& octree, const Eigen::Vector3i& voxel_coord)
+typename OctreeT::DataType getData(const OctreeT& octree, const Eigen::Vector3i& voxel_coord)
 {
     typename OctreeT::DataType data;
 
@@ -705,7 +706,7 @@ inline typename OctreeT::DataType getData(const OctreeT& octree, const Eigen::Ve
 
 
 template<typename OctreeT, typename BlockT>
-inline typename OctreeT::DataType
+typename OctreeT::DataType
 getData(const OctreeT& octree, BlockT* block_ptr, const Eigen::Vector3i& voxel_coord)
 {
     assert(block_ptr);
@@ -728,7 +729,7 @@ getData(const OctreeT& octree, BlockT* block_ptr, const Eigen::Vector3i& voxel_c
 /// Multi-res get data functions
 
 template<typename OctreeT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, typename OctreeT::DataType>
+typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, typename OctreeT::DataType>
 getData(const OctreeT& octree,
         const Eigen::Vector3i& voxel_coord,
         const int scale_desired,
@@ -758,7 +759,7 @@ getData(const OctreeT& octree,
 
 
 template<typename OctreeT, typename BlockT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, typename OctreeT::DataType>
+typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, typename OctreeT::DataType>
 getData(const OctreeT& octree,
         BlockT* block_ptr,
         const Eigen::Vector3i& voxel_coord,
@@ -783,8 +784,8 @@ getData(const OctreeT& octree,
 
 
 template<typename OctreeT>
-inline typename std::enable_if_t<OctreeT::DataType::fld_ == se::Field::Occupancy,
-                                 typename OctreeT::DataType>
+typename std::enable_if_t<OctreeT::DataType::fld_ == se::Field::Occupancy,
+                          typename OctreeT::DataType>
 getMaxData(const OctreeT& octree, const Eigen::Vector3i& voxel_coord, const int scale_desired)
 {
     typename OctreeT::DataType data;
@@ -812,8 +813,7 @@ getMaxData(const OctreeT& octree, const Eigen::Vector3i& voxel_coord, const int 
 /// Single/Multi-res get field functions
 
 template<typename OctreeT>
-inline std::optional<se::field_t> getField(const OctreeT& octree,
-                                           const Eigen::Vector3i& voxel_coord)
+std::optional<se::field_t> getField(const OctreeT& octree, const Eigen::Vector3i& voxel_coord)
 {
     typename OctreeT::DataType data = getData(octree, voxel_coord);
     if (se::is_valid(data)) {
@@ -826,7 +826,7 @@ inline std::optional<se::field_t> getField(const OctreeT& octree,
 
 
 template<typename OctreeT, typename BlockT>
-inline std::optional<se::field_t>
+std::optional<se::field_t>
 getField(const OctreeT& octree, BlockT* block_ptr, const Eigen::Vector3i& voxel_coord)
 {
     typename OctreeT::DataType data = getData(octree, block_ptr, voxel_coord);
@@ -842,7 +842,7 @@ getField(const OctreeT& octree, BlockT* block_ptr, const Eigen::Vector3i& voxel_
 /// Multi-res get field functions
 
 template<typename OctreeT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
+typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
 getField(const OctreeT& octree,
          const Eigen::Vector3i& voxel_coord,
          const int scale_desired,
@@ -859,7 +859,7 @@ getField(const OctreeT& octree,
 
 
 template<typename OctreeT, typename BlockT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
+typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
 getField(const OctreeT& octree,
          BlockT* block_ptr,
          const Eigen::Vector3i& voxel_coord,
@@ -880,7 +880,7 @@ getField(const OctreeT& octree,
 /// Single-res get field interp functions
 
 template<typename OctreeT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, std::optional<se::field_t>>
+typename std::enable_if_t<OctreeT::res_ == se::Res::Single, std::optional<se::field_t>>
 getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 {
     typename OctreeT::DataType init_data;
@@ -931,13 +931,12 @@ getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 /// Multi-res get field interp functions
 
 template<typename OctreeT>
-inline
-    typename std::enable_if_t<(OctreeT::fld_ == se::Field::TSDF && OctreeT::res_ == se::Res::Multi),
-                              std::optional<se::field_t>>
-    getFieldInterp(const OctreeT& octree,
-                   const Eigen::Vector3f& voxel_coord_f,
-                   const int scale_desired,
-                   int& scale_returned)
+typename std::enable_if_t<(OctreeT::fld_ == se::Field::TSDF && OctreeT::res_ == se::Res::Multi),
+                          std::optional<se::field_t>>
+getFieldInterp(const OctreeT& octree,
+               const Eigen::Vector3f& voxel_coord_f,
+               const int scale_desired,
+               int& scale_returned)
 {
     typename OctreeT::DataType init_data;
     typename OctreeT::DataType neighbour_data[8] = {};
@@ -1004,9 +1003,8 @@ inline
 
 
 template<typename OctreeT>
-inline typename std::enable_if_t<OctreeT::fld_ == se::Field::Occupancy
-                                     && OctreeT::res_ == se::Res::Multi,
-                                 std::optional<se::field_t>>
+typename std::enable_if_t<OctreeT::fld_ == se::Field::Occupancy && OctreeT::res_ == se::Res::Multi,
+                          std::optional<se::field_t>>
 getFieldInterp(const OctreeT& octree,
                const Eigen::Vector3f& voxel_coord_f,
                const int scale_desired,
@@ -1083,7 +1081,7 @@ getFieldInterp(const OctreeT& octree,
 
 
 template<typename OctreeT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
+typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
 getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, int& scale_returned)
 {
     return getFieldInterp(octree, voxel_coord_f, 0, scale_returned);
@@ -1092,7 +1090,7 @@ getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, int&
 
 
 template<typename OctreeT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
+typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
 getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 {
     int scale_dummy;
@@ -1104,7 +1102,7 @@ getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 /// Single-res get field gradient functions
 
 template<typename OctreeT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Single, std::optional<se::field_vec_t>>
+typename std::enable_if_t<OctreeT::res_ == se::Res::Single, std::optional<se::field_vec_t>>
 getFieldGrad(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 {
     const Eigen::Vector3f scaled_voxel_coord_f = voxel_coord_f - se::sample_offset_frac;
@@ -1267,7 +1265,7 @@ getFieldGrad(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 /// Multi-res get field gradient functions
 
 template<typename OctreeT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_vec_t>>
+typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_vec_t>>
 getFieldGrad(const OctreeT& octree,
              const Eigen::Vector3f& voxel_coord_f,
              const int scale_desired,
@@ -1467,7 +1465,7 @@ getFieldGrad(const OctreeT& octree,
 
 
 template<typename OctreeT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_vec_t>>
+typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_vec_t>>
 getFieldGrad(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, int& scale_returned)
 {
     return getFieldGrad(octree, voxel_coord_f, 0, scale_returned);
@@ -1476,7 +1474,7 @@ getFieldGrad(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, int& s
 
 
 template<typename OctreeT>
-inline typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_vec_t>>
+typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_vec_t>>
 getFieldGrad(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 {
     int scale_dummy;
