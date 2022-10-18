@@ -137,21 +137,21 @@ uint8_t compute_index(const OctreeT& octree,
 
     uint8_t index = 0;
 
-    if (is_invalid(data[0]))
+    if (!is_valid(data[0]))
         return 0;
-    if (is_invalid(data[1]))
+    if (!is_valid(data[1]))
         return 0;
-    if (is_invalid(data[2]))
+    if (!is_valid(data[2]))
         return 0;
-    if (is_invalid(data[3]))
+    if (!is_valid(data[3]))
         return 0;
-    if (is_invalid(data[4]))
+    if (!is_valid(data[4]))
         return 0;
-    if (is_invalid(data[5]))
+    if (!is_valid(data[5]))
         return 0;
-    if (is_invalid(data[6]))
+    if (!is_valid(data[6]))
         return 0;
-    if (is_invalid(data[7]))
+    if (!is_valid(data[7]))
         return 0;
 
     if (is_inside(data[0]))

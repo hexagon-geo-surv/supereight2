@@ -905,7 +905,7 @@ getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 
     for (int n = 0; n < 8; n++) //< 8 neighbours
     {
-        if (se::is_invalid(neighbour_data[n])) {
+        if (!se::is_valid(neighbour_data[n])) {
             return {};
         }
     }
@@ -978,7 +978,7 @@ inline
 
         for (int n = 0; n < 8; n++) //< 8 neighbours
         {
-            if (se::is_invalid(neighbour_data[n])) {
+            if (!se::is_valid(neighbour_data[n])) {
                 return {};
             }
         }
@@ -1053,7 +1053,7 @@ getFieldInterp(const OctreeT& octree,
 
         for (int n = 0; n < 8; n++) //< 8 neighbours
         {
-            if (se::is_invalid(neighbour_data[n])) {
+            if (!se::is_valid(neighbour_data[n])) {
                 return {};
             }
         }

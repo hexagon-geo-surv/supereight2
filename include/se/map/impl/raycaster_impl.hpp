@@ -495,7 +495,7 @@ raycast(MapT& map,
         if (f_t >= 0) { // ups, if we were already in it, then don't render anything here
             for (; t < t_far; t += stepsize) {
                 data = map.template getData<se::Safe::On>(point_W);
-                if (se::is_invalid(data)) {
+                if (!se::is_valid(data)) {
                     stepsize = largestep;
                     point_W += stepsize * ray_dir_W;
                     continue;

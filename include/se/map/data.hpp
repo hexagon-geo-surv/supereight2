@@ -111,22 +111,6 @@ inline bool is_valid(const Data<Field::Occupancy, ColB, SemB>& data)
 
 
 template<Field FldT, Colour ColB, Semantics SemB>
-inline bool is_invalid(const Data<FldT, ColB, SemB>& data);
-
-template<Colour ColB, Semantics SemB>
-inline bool is_invalid(const Data<Field::TSDF, ColB, SemB>& data)
-{
-    return data.weight == dflt_weight;
-}
-
-template<Colour ColB, Semantics SemB>
-inline bool is_invalid(const Data<Field::Occupancy, ColB, SemB>& data)
-{
-    return data.weight == dflt_weight;
-}
-
-
-template<Field FldT, Colour ColB, Semantics SemB>
 inline float get_field(const Data<FldT, ColB, SemB> data);
 
 template<Colour ColB, Semantics SemB>
