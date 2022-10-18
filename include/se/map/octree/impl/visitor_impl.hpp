@@ -79,7 +79,7 @@ bool get_neighbours(const OctreeT& octree,
     case 0: /* all local */
     {
         const typename OctreeT::BlockType* block_ptr = static_cast<typename OctreeT::BlockType*>(
-            se::fetcher::template block<OctreeT>(base_coord, octree.getRoot()));
+            fetcher::template block<OctreeT>(base_coord, octree.getRoot()));
         if (!block_ptr) {
             return false;
         }
@@ -91,13 +91,13 @@ bool get_neighbours(const OctreeT& octree,
         const unsigned int offs2[4] = {4, 5, 6, 7};
 
         typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(
-            se::fetcher::template block<OctreeT>(base_coord, octree.getRoot()));
+            fetcher::template block<OctreeT>(base_coord, octree.getRoot()));
         if (!block_1_ptr) {
             return false;
         }
 
         typename OctreeT::BlockType* block_2_ptr =
-            static_cast<typename OctreeT::BlockType*>(se::fetcher::template block<OctreeT>(
+            static_cast<typename OctreeT::BlockType*>(fetcher::template block<OctreeT>(
                 base_coord + interp_offsets[offs2[0]], octree.getRoot()));
         if (!block_2_ptr) {
             return false;
@@ -112,13 +112,13 @@ bool get_neighbours(const OctreeT& octree,
         const unsigned int offs2[4] = {2, 3, 6, 7};
 
         typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(
-            se::fetcher::template block<OctreeT>(base_coord, octree.getRoot()));
+            fetcher::template block<OctreeT>(base_coord, octree.getRoot()));
         if (!block_1_ptr) {
             return false;
         }
 
         typename OctreeT::BlockType* block_2_ptr =
-            static_cast<typename OctreeT::BlockType*>(se::fetcher::template block<OctreeT>(
+            static_cast<typename OctreeT::BlockType*>(fetcher::template block<OctreeT>(
                 base_coord + interp_offsets[offs2[0]], octree.getRoot()));
         if (!block_2_ptr) {
             return false;
@@ -135,27 +135,27 @@ bool get_neighbours(const OctreeT& octree,
         const unsigned int offs4[2] = {6, 7};
 
         typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(
-            se::fetcher::template block<OctreeT>(base_coord, octree.getRoot()));
+            fetcher::template block<OctreeT>(base_coord, octree.getRoot()));
         if (!block_1_ptr) {
             return false;
         }
 
         typename OctreeT::BlockType* block_2_ptr =
-            static_cast<typename OctreeT::BlockType*>(se::fetcher::template block<OctreeT>(
+            static_cast<typename OctreeT::BlockType*>(fetcher::template block<OctreeT>(
                 base_coord + interp_offsets[offs2[0]], octree.getRoot()));
         if (!block_2_ptr) {
             return false;
         }
 
         typename OctreeT::BlockType* block_3_ptr =
-            static_cast<typename OctreeT::BlockType*>(se::fetcher::template block<OctreeT>(
+            static_cast<typename OctreeT::BlockType*>(fetcher::template block<OctreeT>(
                 base_coord + interp_offsets[offs3[0]], octree.getRoot()));
         if (!block_3_ptr) {
             return false;
         }
 
         typename OctreeT::BlockType* block_4_ptr =
-            static_cast<typename OctreeT::BlockType*>(se::fetcher::template block<OctreeT>(
+            static_cast<typename OctreeT::BlockType*>(fetcher::template block<OctreeT>(
                 base_coord + interp_offsets[offs4[0]], octree.getRoot()));
         if (!block_4_ptr) {
             return false;
@@ -172,13 +172,13 @@ bool get_neighbours(const OctreeT& octree,
         const unsigned int offs2[4] = {1, 3, 5, 7};
 
         typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(
-            se::fetcher::template block<OctreeT>(base_coord, octree.getRoot()));
+            fetcher::template block<OctreeT>(base_coord, octree.getRoot()));
         if (!block_1_ptr) {
             return false;
         }
 
         typename OctreeT::BlockType* block_2_ptr =
-            static_cast<typename OctreeT::BlockType*>(se::fetcher::template block<OctreeT>(
+            static_cast<typename OctreeT::BlockType*>(fetcher::template block<OctreeT>(
                 base_coord + interp_offsets[offs2[0]], octree.getRoot()));
         if (!block_2_ptr) {
             return false;
@@ -195,27 +195,27 @@ bool get_neighbours(const OctreeT& octree,
         const unsigned int offs4[2] = {5, 7};
 
         typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(
-            se::fetcher::template block<OctreeT>(base_coord, octree.getRoot()));
+            fetcher::template block<OctreeT>(base_coord, octree.getRoot()));
         if (!block_1_ptr) {
             return false;
         }
 
         typename OctreeT::BlockType* block_2_ptr =
-            static_cast<typename OctreeT::BlockType*>(se::fetcher::template block<OctreeT>(
+            static_cast<typename OctreeT::BlockType*>(fetcher::template block<OctreeT>(
                 base_coord + interp_offsets[offs2[0]], octree.getRoot()));
         if (!block_2_ptr) {
             return false;
         }
 
         typename OctreeT::BlockType* block_3_ptr =
-            static_cast<typename OctreeT::BlockType*>(se::fetcher::template block<OctreeT>(
+            static_cast<typename OctreeT::BlockType*>(fetcher::template block<OctreeT>(
                 base_coord + interp_offsets[offs3[0]], octree.getRoot()));
         if (!block_3_ptr) {
             return false;
         }
 
         typename OctreeT::BlockType* block_4_ptr =
-            static_cast<typename OctreeT::BlockType*>(se::fetcher::template block<OctreeT>(
+            static_cast<typename OctreeT::BlockType*>(fetcher::template block<OctreeT>(
                 base_coord + interp_offsets[offs4[0]], octree.getRoot()));
         if (!block_4_ptr) {
             return false;
@@ -234,27 +234,27 @@ bool get_neighbours(const OctreeT& octree,
         const unsigned int offs4[2] = {3, 7};
 
         typename OctreeT::BlockType* block_1_ptr = static_cast<typename OctreeT::BlockType*>(
-            se::fetcher::template block<OctreeT>(base_coord, octree.getRoot()));
+            fetcher::template block<OctreeT>(base_coord, octree.getRoot()));
         if (!block_1_ptr) {
             return false;
         }
 
         typename OctreeT::BlockType* block_2_ptr =
-            static_cast<typename OctreeT::BlockType*>(se::fetcher::template block<OctreeT>(
+            static_cast<typename OctreeT::BlockType*>(fetcher::template block<OctreeT>(
                 base_coord + interp_offsets[offs2[0]], octree.getRoot()));
         if (!block_2_ptr) {
             return false;
         }
 
         typename OctreeT::BlockType* block_3_ptr =
-            static_cast<typename OctreeT::BlockType*>(se::fetcher::template block<OctreeT>(
+            static_cast<typename OctreeT::BlockType*>(fetcher::template block<OctreeT>(
                 base_coord + interp_offsets[offs3[0]], octree.getRoot()));
         if (!block_3_ptr) {
             return false;
         }
 
         typename OctreeT::BlockType* block_4_ptr =
-            static_cast<typename OctreeT::BlockType*>(se::fetcher::template block<OctreeT>(
+            static_cast<typename OctreeT::BlockType*>(fetcher::template block<OctreeT>(
                 base_coord + interp_offsets[offs4[0]], octree.getRoot()));
         if (!block_4_ptr) {
             return false;
@@ -280,7 +280,7 @@ bool get_neighbours(const OctreeT& octree,
 
         for (int i = 0; i < 8; ++i) {
             typename OctreeT::BlockType* block_ptr = static_cast<typename OctreeT::BlockType*>(
-                se::fetcher::template block<OctreeT>(voxels_coord[i], octree.getRoot()));
+                fetcher::template block<OctreeT>(voxels_coord[i], octree.getRoot()));
 
             if (!block_ptr) {
                 return false;
@@ -299,7 +299,7 @@ bool get_neighbours(const OctreeT& octree,
 /////////////////////////////////
 
 template<typename OctreeT, typename DataT>
-void gather_local(const se::OctantBase* leaf_ptr,
+void gather_local(const OctantBase* leaf_ptr,
                   const Eigen::Vector3i& base_coord,
                   const int scale,
                   DataT neighbour_data[8])
@@ -329,7 +329,7 @@ void gather_local(const se::OctantBase* leaf_ptr,
 
 
 template<typename OctreeT, typename DataT>
-void gather_4(const se::OctantBase* leaf_ptr,
+void gather_4(const OctantBase* leaf_ptr,
               const Eigen::Vector3i& base_coord,
               const unsigned int offsets[4],
               const int scale,
@@ -362,7 +362,7 @@ void gather_4(const se::OctantBase* leaf_ptr,
 
 
 template<typename OctreeT, typename DataT>
-void gather_2(const se::OctantBase* leaf_ptr,
+void gather_2(const OctantBase* leaf_ptr,
               const Eigen::Vector3i& base_coord,
               const unsigned int offsets[2],
               const int scale,
@@ -394,8 +394,8 @@ bool get_neighbours(const OctreeT& octree,
                     typename OctreeT::DataType neighbour_data[8])
 {
     const int stride = 1 << scale; // Multi-res
-    const se::OctantBase* base_octant_ptr =
-        se::fetcher::template leaf<OctreeT>(base_coord, octree.getRoot());
+    const OctantBase* base_octant_ptr =
+        fetcher::template leaf<OctreeT>(base_coord, octree.getRoot());
     if (!base_octant_ptr) {
         return false;
     }
@@ -417,8 +417,7 @@ bool get_neighbours(const OctreeT& octree,
     switch (crossmask) {
     case 0: /* all local */
     {
-        const se::OctantBase* leaf_ptr =
-            se::fetcher::template leaf<OctreeT>(base_coord, octree.getRoot());
+        const OctantBase* leaf_ptr = fetcher::template leaf<OctreeT>(base_coord, octree.getRoot());
         if (!leaf_ptr
             || (leaf_ptr->isBlock()
                 && static_cast<const typename OctreeT::BlockType*>(leaf_ptr)->getCurrentScale()
@@ -434,15 +433,14 @@ bool get_neighbours(const OctreeT& octree,
         const unsigned int offs1[4] = {0, 1, 2, 3};
         const unsigned int offs2[4] = {4, 5, 6, 7};
 
-        se::OctantBase* leaf_1_ptr =
-            se::fetcher::template leaf<OctreeT>(base_coord, octree.getRoot());
+        OctantBase* leaf_1_ptr = fetcher::template leaf<OctreeT>(base_coord, octree.getRoot());
         if (!leaf_1_ptr
             || (leaf_1_ptr->isBlock()
                 && static_cast<const typename OctreeT::BlockType*>(leaf_1_ptr)->getCurrentScale()
                     > scale)) {
             return false;
         }
-        se::OctantBase* leaf_2_ptr = se::fetcher::template leaf<OctreeT>(
+        OctantBase* leaf_2_ptr = fetcher::template leaf<OctreeT>(
             base_coord + stride * interp_offsets[offs2[0]], octree.getRoot());
         if (!leaf_2_ptr
             || (leaf_2_ptr->isBlock()
@@ -460,15 +458,14 @@ bool get_neighbours(const OctreeT& octree,
         const unsigned int offs1[4] = {0, 1, 4, 5};
         const unsigned int offs2[4] = {2, 3, 6, 7};
 
-        se::OctantBase* leaf_1_ptr =
-            se::fetcher::template leaf<OctreeT>(base_coord, octree.getRoot());
+        OctantBase* leaf_1_ptr = fetcher::template leaf<OctreeT>(base_coord, octree.getRoot());
         if (!leaf_1_ptr
             || (leaf_1_ptr->isBlock()
                 && static_cast<const typename OctreeT::BlockType*>(leaf_1_ptr)->getCurrentScale()
                     > scale)) {
             return false;
         }
-        se::OctantBase* leaf_2_ptr = se::fetcher::template leaf<OctreeT>(
+        OctantBase* leaf_2_ptr = fetcher::template leaf<OctreeT>(
             base_coord + stride * interp_offsets[offs2[0]], octree.getRoot());
         if (!leaf_2_ptr
             || (leaf_2_ptr->isBlock()
@@ -488,15 +485,14 @@ bool get_neighbours(const OctreeT& octree,
         const unsigned int offs3[2] = {4, 5};
         const unsigned int offs4[2] = {6, 7};
 
-        se::OctantBase* leaf_1_ptr =
-            se::fetcher::template leaf<OctreeT>(base_coord, octree.getRoot());
+        OctantBase* leaf_1_ptr = fetcher::template leaf<OctreeT>(base_coord, octree.getRoot());
         if (!leaf_1_ptr
             || (leaf_1_ptr->isBlock()
                 && static_cast<const typename OctreeT::BlockType*>(leaf_1_ptr)->getCurrentScale()
                     > scale)) {
             return false;
         }
-        se::OctantBase* leaf_2_ptr = se::fetcher::template leaf<OctreeT>(
+        OctantBase* leaf_2_ptr = fetcher::template leaf<OctreeT>(
             base_coord + stride * interp_offsets[offs2[0]], octree.getRoot());
         if (!leaf_2_ptr
             || (leaf_2_ptr->isBlock()
@@ -504,7 +500,7 @@ bool get_neighbours(const OctreeT& octree,
                     > scale)) {
             return false;
         }
-        se::OctantBase* leaf_3_ptr = se::fetcher::template leaf<OctreeT>(
+        OctantBase* leaf_3_ptr = fetcher::template leaf<OctreeT>(
             base_coord + stride * interp_offsets[offs3[0]], octree.getRoot());
         if (!leaf_3_ptr
             || (leaf_3_ptr->isBlock()
@@ -512,7 +508,7 @@ bool get_neighbours(const OctreeT& octree,
                     > scale)) {
             return false;
         }
-        se::OctantBase* leaf_4_ptr = se::fetcher::template leaf<OctreeT>(
+        OctantBase* leaf_4_ptr = fetcher::template leaf<OctreeT>(
             base_coord + stride * interp_offsets[offs4[0]], octree.getRoot());
         if (!leaf_4_ptr
             || (leaf_4_ptr->isBlock()
@@ -531,15 +527,14 @@ bool get_neighbours(const OctreeT& octree,
         const unsigned int offs1[4] = {0, 2, 4, 6};
         const unsigned int offs2[4] = {1, 3, 5, 7};
 
-        se::OctantBase* leaf_1_ptr =
-            se::fetcher::template leaf<OctreeT>(base_coord, octree.getRoot());
+        OctantBase* leaf_1_ptr = fetcher::template leaf<OctreeT>(base_coord, octree.getRoot());
         if (!leaf_1_ptr
             || (leaf_1_ptr->isBlock()
                 && static_cast<const typename OctreeT::BlockType*>(leaf_1_ptr)->getCurrentScale()
                     > scale)) {
             return false;
         }
-        se::OctantBase* leaf_2_ptr = se::fetcher::template leaf<OctreeT>(
+        OctantBase* leaf_2_ptr = fetcher::template leaf<OctreeT>(
             base_coord + stride * interp_offsets[offs2[0]], octree.getRoot());
         if (!leaf_2_ptr
             || (leaf_2_ptr->isBlock()
@@ -559,15 +554,14 @@ bool get_neighbours(const OctreeT& octree,
         const unsigned int offs3[2] = {4, 6};
         const unsigned int offs4[2] = {5, 7};
 
-        se::OctantBase* leaf_1_ptr =
-            se::fetcher::template leaf<OctreeT>(base_coord, octree.getRoot());
+        OctantBase* leaf_1_ptr = fetcher::template leaf<OctreeT>(base_coord, octree.getRoot());
         if (!leaf_1_ptr
             || (leaf_1_ptr->isBlock()
                 && static_cast<const typename OctreeT::BlockType*>(leaf_1_ptr)->getCurrentScale()
                     > scale)) {
             return false;
         }
-        se::OctantBase* leaf_2_ptr = se::fetcher::template leaf<OctreeT>(
+        OctantBase* leaf_2_ptr = fetcher::template leaf<OctreeT>(
             base_coord + stride * interp_offsets[offs2[0]], octree.getRoot());
         if (!leaf_2_ptr
             || (leaf_2_ptr->isBlock()
@@ -575,7 +569,7 @@ bool get_neighbours(const OctreeT& octree,
                     > scale)) {
             return false;
         }
-        se::OctantBase* leaf_3_ptr = se::fetcher::template leaf<OctreeT>(
+        OctantBase* leaf_3_ptr = fetcher::template leaf<OctreeT>(
             base_coord + stride * interp_offsets[offs3[0]], octree.getRoot());
         if (!leaf_3_ptr
             || (leaf_3_ptr->isBlock()
@@ -583,7 +577,7 @@ bool get_neighbours(const OctreeT& octree,
                     > scale)) {
             return false;
         }
-        se::OctantBase* leaf_4_ptr = se::fetcher::template leaf<OctreeT>(
+        OctantBase* leaf_4_ptr = fetcher::template leaf<OctreeT>(
             base_coord + stride * interp_offsets[offs4[0]], octree.getRoot());
         if (!leaf_4_ptr
             || (leaf_4_ptr->isBlock()
@@ -605,15 +599,14 @@ bool get_neighbours(const OctreeT& octree,
         const unsigned int offs3[2] = {2, 6};
         const unsigned int offs4[2] = {3, 7};
 
-        se::OctantBase* leaf_1_ptr =
-            se::fetcher::template leaf<OctreeT>(base_coord, octree.getRoot());
+        OctantBase* leaf_1_ptr = fetcher::template leaf<OctreeT>(base_coord, octree.getRoot());
         if (!leaf_1_ptr
             || (leaf_1_ptr->isBlock()
                 && static_cast<const typename OctreeT::BlockType*>(leaf_1_ptr)->getCurrentScale()
                     > scale)) {
             return false;
         }
-        se::OctantBase* leaf_2_ptr = se::fetcher::template leaf<OctreeT>(
+        OctantBase* leaf_2_ptr = fetcher::template leaf<OctreeT>(
             base_coord + stride * interp_offsets[offs2[0]], octree.getRoot());
         if (!leaf_2_ptr
             || (leaf_2_ptr->isBlock()
@@ -621,7 +614,7 @@ bool get_neighbours(const OctreeT& octree,
                     > scale)) {
             return false;
         }
-        se::OctantBase* leaf_3_ptr = se::fetcher::template leaf<OctreeT>(
+        OctantBase* leaf_3_ptr = fetcher::template leaf<OctreeT>(
             base_coord + stride * interp_offsets[offs3[0]], octree.getRoot());
         if (!leaf_3_ptr
             || (leaf_3_ptr->isBlock()
@@ -629,7 +622,7 @@ bool get_neighbours(const OctreeT& octree,
                     > scale)) {
             return false;
         }
-        se::OctantBase* leaf_4_ptr = se::fetcher::template leaf<OctreeT>(
+        OctantBase* leaf_4_ptr = fetcher::template leaf<OctreeT>(
             base_coord + stride * interp_offsets[offs4[0]], octree.getRoot());
         if (!leaf_4_ptr
             || (leaf_4_ptr->isBlock()
@@ -657,8 +650,8 @@ bool get_neighbours(const OctreeT& octree,
         voxels_coord[7] = base_coord + stride * interp_offsets[7];
 
         for (int i = 0; i < 8; ++i) {
-            se::OctantBase* leaf_ptr =
-                se::fetcher::template leaf<OctreeT>(voxels_coord[i], octree.getRoot());
+            OctantBase* leaf_ptr =
+                fetcher::template leaf<OctreeT>(voxels_coord[i], octree.getRoot());
             if (!leaf_ptr
                 || (leaf_ptr->isBlock()
                     && static_cast<const typename OctreeT::BlockType*>(leaf_ptr)->getCurrentScale()
@@ -690,8 +683,7 @@ typename OctreeT::DataType getData(const OctreeT& octree, const Eigen::Vector3i&
 {
     typename OctreeT::DataType data;
 
-    const se::OctantBase* octant_ptr =
-        se::fetcher::template leaf<OctreeT>(voxel_coord, octree.getRoot());
+    const OctantBase* octant_ptr = fetcher::template leaf<OctreeT>(voxel_coord, octree.getRoot());
 
     if (!octant_ptr) // not allocated
     {
@@ -721,7 +713,7 @@ getData(const OctreeT& octree, BlockT* block_ptr, const Eigen::Vector3i& voxel_c
         return block_ptr->getData(voxel_coord);
     }
 
-    return se::visitor::getData(octree, voxel_coord);
+    return visitor::getData(octree, voxel_coord);
 }
 
 
@@ -729,7 +721,7 @@ getData(const OctreeT& octree, BlockT* block_ptr, const Eigen::Vector3i& voxel_c
 /// Multi-res get data functions
 
 template<typename OctreeT>
-typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, typename OctreeT::DataType>
+typename std::enable_if_t<OctreeT::res_ == Res::Multi, typename OctreeT::DataType>
 getData(const OctreeT& octree,
         const Eigen::Vector3i& voxel_coord,
         const int scale_desired,
@@ -737,8 +729,7 @@ getData(const OctreeT& octree,
 {
     typename OctreeT::DataType data;
 
-    const se::OctantBase* octant_ptr =
-        se::fetcher::template leaf<OctreeT>(voxel_coord, octree.getRoot());
+    const OctantBase* octant_ptr = fetcher::template leaf<OctreeT>(voxel_coord, octree.getRoot());
 
     if (!octant_ptr) // not allocated
     {
@@ -759,7 +750,7 @@ getData(const OctreeT& octree,
 
 
 template<typename OctreeT, typename BlockT>
-typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, typename OctreeT::DataType>
+typename std::enable_if_t<OctreeT::res_ == Res::Multi, typename OctreeT::DataType>
 getData(const OctreeT& octree,
         BlockT* block_ptr,
         const Eigen::Vector3i& voxel_coord,
@@ -778,20 +769,19 @@ getData(const OctreeT& octree,
         return block_ptr->getData(voxel_coord, scale_desired, scale_returned);
     }
 
-    return se::visitor::getData(octree, voxel_coord, scale_desired, scale_returned);
+    return visitor::getData(octree, voxel_coord, scale_desired, scale_returned);
 }
 
 
 
 template<typename OctreeT>
-typename std::enable_if_t<OctreeT::DataType::fld_ == se::Field::Occupancy,
-                          typename OctreeT::DataType>
+typename std::enable_if_t<OctreeT::DataType::fld_ == Field::Occupancy, typename OctreeT::DataType>
 getMaxData(const OctreeT& octree, const Eigen::Vector3i& voxel_coord, const int scale_desired)
 {
     typename OctreeT::DataType data;
 
-    const se::OctantBase* octant_ptr =
-        se::fetcher::template finest_octant<OctreeT>(voxel_coord, scale_desired, octree.getRoot());
+    const OctantBase* octant_ptr =
+        fetcher::template finest_octant<OctreeT>(voxel_coord, scale_desired, octree.getRoot());
 
     if (!octant_ptr) // not allocated
     {
@@ -813,11 +803,11 @@ getMaxData(const OctreeT& octree, const Eigen::Vector3i& voxel_coord, const int 
 /// Single/Multi-res get field functions
 
 template<typename OctreeT>
-std::optional<se::field_t> getField(const OctreeT& octree, const Eigen::Vector3i& voxel_coord)
+std::optional<field_t> getField(const OctreeT& octree, const Eigen::Vector3i& voxel_coord)
 {
     typename OctreeT::DataType data = getData(octree, voxel_coord);
-    if (se::is_valid(data)) {
-        return se::get_field(data);
+    if (is_valid(data)) {
+        return get_field(data);
     }
 
     return std::nullopt;
@@ -826,12 +816,12 @@ std::optional<se::field_t> getField(const OctreeT& octree, const Eigen::Vector3i
 
 
 template<typename OctreeT, typename BlockT>
-std::optional<se::field_t>
+std::optional<field_t>
 getField(const OctreeT& octree, BlockT* block_ptr, const Eigen::Vector3i& voxel_coord)
 {
     typename OctreeT::DataType data = getData(octree, block_ptr, voxel_coord);
-    if (se::is_valid(data)) {
-        return se::get_field(data);
+    if (is_valid(data)) {
+        return get_field(data);
     }
 
     return std::nullopt;
@@ -842,15 +832,15 @@ getField(const OctreeT& octree, BlockT* block_ptr, const Eigen::Vector3i& voxel_
 /// Multi-res get field functions
 
 template<typename OctreeT>
-typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
+typename std::enable_if_t<OctreeT::res_ == Res::Multi, std::optional<field_t>>
 getField(const OctreeT& octree,
          const Eigen::Vector3i& voxel_coord,
          const int scale_desired,
          int& scale_returned)
 {
     typename OctreeT::DataType data = getData(octree, voxel_coord, scale_desired, scale_returned);
-    if (se::is_valid(data)) {
-        return se::get_field(data);
+    if (is_valid(data)) {
+        return get_field(data);
     }
 
     return std::nullopt;
@@ -859,7 +849,7 @@ getField(const OctreeT& octree,
 
 
 template<typename OctreeT, typename BlockT>
-typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
+typename std::enable_if_t<OctreeT::res_ == Res::Multi, std::optional<field_t>>
 getField(const OctreeT& octree,
          BlockT* block_ptr,
          const Eigen::Vector3i& voxel_coord,
@@ -868,8 +858,8 @@ getField(const OctreeT& octree,
 {
     typename OctreeT::DataType data =
         getData(octree, block_ptr, voxel_coord, scale_desired, scale_returned);
-    if (se::is_valid(data)) {
-        return se::get_field(data);
+    if (is_valid(data)) {
+        return get_field(data);
     }
 
     return std::nullopt;
@@ -880,7 +870,7 @@ getField(const OctreeT& octree,
 /// Single-res get field interp functions
 
 template<typename OctreeT>
-typename std::enable_if_t<OctreeT::res_ == se::Res::Single, std::optional<se::field_t>>
+typename std::enable_if_t<OctreeT::res_ == Res::Single, std::optional<field_t>>
 getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 {
     typename OctreeT::DataType init_data;
@@ -891,8 +881,7 @@ getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
     Eigen::Vector3f factor;
 
     const int stride = 1; // Single-res
-    const Eigen::Vector3f scaled_voxel_coord_f =
-        1.f / stride * voxel_coord_f - se::sample_offset_frac;
+    const Eigen::Vector3f scaled_voxel_coord_f = 1.f / stride * voxel_coord_f - sample_offset_frac;
     factor = math::fracf(scaled_voxel_coord_f);
     const Eigen::Vector3i base_coord = stride * scaled_voxel_coord_f.template cast<int>();
 
@@ -905,23 +894,23 @@ getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 
     for (int n = 0; n < 8; n++) //< 8 neighbours
     {
-        if (!se::is_valid(neighbour_data[n])) {
+        if (!is_valid(neighbour_data[n])) {
             return std::nullopt;
         }
     }
 
-    return (((se::get_field(neighbour_data[0]) * (1 - factor.x())
-              + se::get_field(neighbour_data[1]) * factor.x())
+    return (((get_field(neighbour_data[0]) * (1 - factor.x())
+              + get_field(neighbour_data[1]) * factor.x())
                  * (1 - factor.y())
-             + (se::get_field(neighbour_data[2]) * (1 - factor.x())
-                + se::get_field(neighbour_data[3]) * factor.x())
+             + (get_field(neighbour_data[2]) * (1 - factor.x())
+                + get_field(neighbour_data[3]) * factor.x())
                  * factor.y())
                 * (1 - factor.z())
-            + ((se::get_field(neighbour_data[4]) * (1 - factor.x())
-                + se::get_field(neighbour_data[5]) * factor.x())
+            + ((get_field(neighbour_data[4]) * (1 - factor.x())
+                + get_field(neighbour_data[5]) * factor.x())
                    * (1 - factor.y())
-               + (se::get_field(neighbour_data[6]) * (1 - factor.x())
-                  + se::get_field(neighbour_data[7]) * factor.x())
+               + (get_field(neighbour_data[6]) * (1 - factor.x())
+                  + get_field(neighbour_data[7]) * factor.x())
                    * factor.y())
                 * factor.z());
 }
@@ -931,8 +920,8 @@ getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 /// Multi-res get field interp functions
 
 template<typename OctreeT>
-typename std::enable_if_t<(OctreeT::fld_ == se::Field::TSDF && OctreeT::res_ == se::Res::Multi),
-                          std::optional<se::field_t>>
+typename std::enable_if_t<(OctreeT::fld_ == Field::TSDF && OctreeT::res_ == Res::Multi),
+                          std::optional<field_t>>
 getFieldInterp(const OctreeT& octree,
                const Eigen::Vector3f& voxel_coord_f,
                const int scale_desired,
@@ -944,8 +933,8 @@ getFieldInterp(const OctreeT& octree,
     const unsigned int octree_size = octree.getSize();
 
     // TODO: Adjust for MultiresOFusion where data is not necessarily stored in a block!
-    se::OctantBase* octant_ptr =
-        se::fetcher::template block<OctreeT>(voxel_coord_f.cast<int>(), octree.getRoot());
+    OctantBase* octant_ptr =
+        fetcher::template block<OctreeT>(voxel_coord_f.cast<int>(), octree.getRoot());
     if (!octant_ptr) {
         return std::nullopt;
     }
@@ -962,7 +951,7 @@ getFieldInterp(const OctreeT& octree,
         Eigen::Vector3f factor;
         const int stride = 1 << scale; // Multi-res
         const Eigen::Vector3f scaled_voxel_coord_f =
-            1.f / stride * voxel_coord_f - se::sample_offset_frac;
+            1.f / stride * voxel_coord_f - sample_offset_frac;
         factor = math::fracf(scaled_voxel_coord_f);
         const Eigen::Vector3i base_coord = stride * scaled_voxel_coord_f.template cast<int>();
 
@@ -977,23 +966,23 @@ getFieldInterp(const OctreeT& octree,
 
         for (int n = 0; n < 8; n++) //< 8 neighbours
         {
-            if (!se::is_valid(neighbour_data[n])) {
+            if (!is_valid(neighbour_data[n])) {
                 return std::nullopt;
             }
         }
 
-        return (((se::get_field(neighbour_data[0]) * (1 - factor.x())
-                  + se::get_field(neighbour_data[1]) * factor.x())
+        return (((get_field(neighbour_data[0]) * (1 - factor.x())
+                  + get_field(neighbour_data[1]) * factor.x())
                      * (1 - factor.y())
-                 + (se::get_field(neighbour_data[2]) * (1 - factor.x())
-                    + se::get_field(neighbour_data[3]) * factor.x())
+                 + (get_field(neighbour_data[2]) * (1 - factor.x())
+                    + get_field(neighbour_data[3]) * factor.x())
                      * factor.y())
                     * (1 - factor.z())
-                + ((se::get_field(neighbour_data[4]) * (1 - factor.x())
-                    + se::get_field(neighbour_data[5]) * factor.x())
+                + ((get_field(neighbour_data[4]) * (1 - factor.x())
+                    + get_field(neighbour_data[5]) * factor.x())
                        * (1 - factor.y())
-                   + (se::get_field(neighbour_data[6]) * (1 - factor.x())
-                      + se::get_field(neighbour_data[7]) * factor.x())
+                   + (get_field(neighbour_data[6]) * (1 - factor.x())
+                      + get_field(neighbour_data[7]) * factor.x())
                        * factor.y())
                     * factor.z());
     }
@@ -1003,8 +992,8 @@ getFieldInterp(const OctreeT& octree,
 
 
 template<typename OctreeT>
-typename std::enable_if_t<OctreeT::fld_ == se::Field::Occupancy && OctreeT::res_ == se::Res::Multi,
-                          std::optional<se::field_t>>
+typename std::enable_if_t<OctreeT::fld_ == Field::Occupancy && OctreeT::res_ == Res::Multi,
+                          std::optional<field_t>>
 getFieldInterp(const OctreeT& octree,
                const Eigen::Vector3f& voxel_coord_f,
                const int scale_desired,
@@ -1016,8 +1005,8 @@ getFieldInterp(const OctreeT& octree,
     const unsigned int octree_size = octree.getSize();
 
     // TODO: Adjust for MultiresOFusion where data is not necessarily stored in a block!
-    se::OctantBase* octant_ptr =
-        se::fetcher::template leaf<OctreeT>(voxel_coord_f.cast<int>(), octree.getRoot());
+    OctantBase* octant_ptr =
+        fetcher::template leaf<OctreeT>(voxel_coord_f.cast<int>(), octree.getRoot());
 
     if (!octant_ptr) {
         return std::nullopt;
@@ -1037,7 +1026,7 @@ getFieldInterp(const OctreeT& octree,
         Eigen::Vector3f factor;
         const int stride = 1 << scale; // Multi-res
         const Eigen::Vector3f scaled_voxel_coord_f =
-            1.f / stride * voxel_coord_f - se::sample_offset_frac;
+            1.f / stride * voxel_coord_f - sample_offset_frac;
         factor = math::fracf(scaled_voxel_coord_f);
         const Eigen::Vector3i base_coord = stride * scaled_voxel_coord_f.template cast<int>();
         if ((base_coord.array() < 0).any()
@@ -1051,7 +1040,7 @@ getFieldInterp(const OctreeT& octree,
 
         for (int n = 0; n < 8; n++) //< 8 neighbours
         {
-            if (!se::is_valid(neighbour_data[n])) {
+            if (!is_valid(neighbour_data[n])) {
                 return std::nullopt;
             }
         }
@@ -1060,18 +1049,18 @@ getFieldInterp(const OctreeT& octree,
         scale_returned = octant_ptr->isBlock()
             ? scale
             : math::log2_const(static_cast<NodeType*>(octant_ptr)->getSize());
-        return (((se::get_field(neighbour_data[0]) * (1 - factor.x())
-                  + se::get_field(neighbour_data[1]) * factor.x())
+        return (((get_field(neighbour_data[0]) * (1 - factor.x())
+                  + get_field(neighbour_data[1]) * factor.x())
                      * (1 - factor.y())
-                 + (se::get_field(neighbour_data[2]) * (1 - factor.x())
-                    + se::get_field(neighbour_data[3]) * factor.x())
+                 + (get_field(neighbour_data[2]) * (1 - factor.x())
+                    + get_field(neighbour_data[3]) * factor.x())
                      * factor.y())
                     * (1 - factor.z())
-                + ((se::get_field(neighbour_data[4]) * (1 - factor.x())
-                    + se::get_field(neighbour_data[5]) * factor.x())
+                + ((get_field(neighbour_data[4]) * (1 - factor.x())
+                    + get_field(neighbour_data[5]) * factor.x())
                        * (1 - factor.y())
-                   + (se::get_field(neighbour_data[6]) * (1 - factor.x())
-                      + se::get_field(neighbour_data[7]) * factor.x())
+                   + (get_field(neighbour_data[6]) * (1 - factor.x())
+                      + get_field(neighbour_data[7]) * factor.x())
                        * factor.y())
                     * factor.z());
     }
@@ -1081,7 +1070,7 @@ getFieldInterp(const OctreeT& octree,
 
 
 template<typename OctreeT>
-typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
+typename std::enable_if_t<OctreeT::res_ == Res::Multi, std::optional<field_t>>
 getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, int& scale_returned)
 {
     return getFieldInterp(octree, voxel_coord_f, 0, scale_returned);
@@ -1090,7 +1079,7 @@ getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, int&
 
 
 template<typename OctreeT>
-typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_t>>
+typename std::enable_if_t<OctreeT::res_ == Res::Multi, std::optional<field_t>>
 getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 {
     int scale_dummy;
@@ -1102,11 +1091,11 @@ getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 /// Single-res get field gradient functions
 
 template<typename OctreeT>
-typename std::enable_if_t<OctreeT::res_ == se::Res::Single, std::optional<se::field_vec_t>>
+typename std::enable_if_t<OctreeT::res_ == Res::Single, std::optional<field_vec_t>>
 getFieldGrad(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 {
-    const Eigen::Vector3f scaled_voxel_coord_f = voxel_coord_f - se::sample_offset_frac;
-    Eigen::Vector3f factor = se::math::fracf(scaled_voxel_coord_f);
+    const Eigen::Vector3f scaled_voxel_coord_f = voxel_coord_f - sample_offset_frac;
+    Eigen::Vector3f factor = math::fracf(scaled_voxel_coord_f);
     const Eigen::Vector3i base_coord = scaled_voxel_coord_f.template cast<int>();
 
     Eigen::Vector3i lower_lower_coord =
@@ -1121,7 +1110,7 @@ getFieldGrad(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
             .cwiseMin(Eigen::Vector3i::Constant(octree.getSize()) - Eigen::Vector3i::Constant(1));
 
     const typename OctreeT::BlockType* block_ptr = static_cast<typename OctreeT::BlockType*>(
-        se::fetcher::template block<OctreeT>(base_coord, octree.getRoot()));
+        fetcher::template block<OctreeT>(base_coord, octree.getRoot()));
     if (!block_ptr) {
         return std::nullopt;
     }
@@ -1196,10 +1185,10 @@ getFieldGrad(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
             upper_upper_coord.x(), upper_lower_coord.y(), upper_lower_coord.z()) //< Unique
     };
 
-    se::field_t grad_field_values[32];
+    field_t grad_field_values[32];
 
     for (unsigned int i = 0; i < 32; i++) {
-        auto grad_field_value = se::visitor::getField(octree, block_ptr, grad_coords[i]);
+        auto grad_field_value = visitor::getField(octree, block_ptr, grad_coords[i]);
         if (!grad_field_value) {
             return std::nullopt;
         }
@@ -1210,7 +1199,7 @@ getFieldGrad(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
     const float rev_factor_y = (1 - factor.y());
     const float rev_factor_z = (1 - factor.z());
 
-    se::field_vec_t gradient = Eigen::Vector3f::Constant(0);
+    field_vec_t gradient = Eigen::Vector3f::Constant(0);
 
     gradient.x() = (((grad_field_values[19] - grad_field_values[0]) * rev_factor_x
                      + (grad_field_values[28] - grad_field_values[7]) * factor.x())
@@ -1265,7 +1254,7 @@ getFieldGrad(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 /// Multi-res get field gradient functions
 
 template<typename OctreeT>
-typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_vec_t>>
+typename std::enable_if_t<OctreeT::res_ == Res::Multi, std::optional<field_vec_t>>
 getFieldGrad(const OctreeT& octree,
              const Eigen::Vector3f& voxel_coord_f,
              const int scale_desired,
@@ -1274,7 +1263,7 @@ getFieldGrad(const OctreeT& octree,
     typedef typename OctreeT::BlockType BlockType;
 
     BlockType* block_ptr = static_cast<BlockType*>(
-        se::fetcher::template block<OctreeT>(voxel_coord_f.cast<int>(), octree.getRoot()));
+        fetcher::template block<OctreeT>(voxel_coord_f.cast<int>(), octree.getRoot()));
     if (!block_ptr) // If this block doesn't exist there's no way to compute a valid gradient
     {
         return std::nullopt;
@@ -1288,7 +1277,7 @@ getFieldGrad(const OctreeT& octree,
         scale_returned = scale; // Update returned scale
         const int stride = 1 << scale;
         const Eigen::Vector3f scaled_voxel_coord_f =
-            1.f / stride * voxel_coord_f - se::sample_offset_frac;
+            1.f / stride * voxel_coord_f - sample_offset_frac;
         const Eigen::Vector3f factor = math::fracf(scaled_voxel_coord_f);
         const Eigen::Vector3i base_coord = stride * scaled_voxel_coord_f.template cast<int>();
         Eigen::Vector3i lower_lower_coord = (base_coord - stride * Eigen::Vector3i::Constant(1))
@@ -1303,8 +1292,8 @@ getFieldGrad(const OctreeT& octree,
                 .cwiseMin(Eigen::Vector3i::Constant(octree.getSize())
                           - Eigen::Vector3i::Constant(1));
 
-        block_ptr = static_cast<BlockType*>(
-            se::fetcher::template block<OctreeT>(base_coord, octree.getRoot()));
+        block_ptr =
+            static_cast<BlockType*>(fetcher::template block<OctreeT>(base_coord, octree.getRoot()));
         if (!block_ptr) // If this block doesn't exist there's still a chance a gradient exist at a different scale
         {
             continue;
@@ -1388,12 +1377,12 @@ getFieldGrad(const OctreeT& octree,
                 upper_upper_coord.x(), upper_lower_coord.y(), upper_lower_coord.z()) //< Unique
         };
 
-        se::field_t grad_field_values[32];
+        field_t grad_field_values[32];
 
         bool is_valid = true;
 
         for (unsigned int i = 0; i < 32; i++) {
-            auto grad_field_value = se::visitor::getField(octree, block_ptr, grad_coords[i]);
+            auto grad_field_value = visitor::getField(octree, block_ptr, grad_coords[i]);
             if (!grad_field_value) {
                 is_valid = false;
                 break;
@@ -1465,7 +1454,7 @@ getFieldGrad(const OctreeT& octree,
 
 
 template<typename OctreeT>
-typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_vec_t>>
+typename std::enable_if_t<OctreeT::res_ == Res::Multi, std::optional<field_vec_t>>
 getFieldGrad(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, int& scale_returned)
 {
     return getFieldGrad(octree, voxel_coord_f, 0, scale_returned);
@@ -1474,7 +1463,7 @@ getFieldGrad(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, int& s
 
 
 template<typename OctreeT>
-typename std::enable_if_t<OctreeT::res_ == se::Res::Multi, std::optional<se::field_vec_t>>
+typename std::enable_if_t<OctreeT::res_ == Res::Multi, std::optional<field_vec_t>>
 getFieldGrad(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 {
     int scale_dummy;
