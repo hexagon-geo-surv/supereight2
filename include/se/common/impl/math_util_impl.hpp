@@ -111,6 +111,22 @@ typename std::enable_if_t<std::is_floating_point_v<Float>, Float> div_ceil(Float
 
 
 
+template<typename A, typename B, typename C, typename D>
+constexpr typename std::common_type_t<A, B, C, D> add_clamp(A a, B b, C low, D high)
+{
+    if (a + b > high) {
+        return high;
+    }
+    else if (a + b < low) {
+        return low;
+    }
+    else {
+        return a + b;
+    }
+}
+
+
+
 template<typename Scalar>
 static inline bool in(const Scalar v, const Scalar a, const Scalar b)
 {
