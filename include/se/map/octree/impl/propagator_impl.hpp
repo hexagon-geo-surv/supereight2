@@ -22,7 +22,7 @@ void propagateBlockUp(const OctreeT& /* octree */,
                       ParentF parent_funct)
 {
     typedef typename OctreeT::BlockType BlockType;
-    typedef typename BlockType::DataType DataType;
+    typedef typename BlockType::PropDataType PropDataType;
     typedef typename BlockType::DataUnion DataUnionType;
 
     assert(octant_ptr);
@@ -44,8 +44,7 @@ void propagateBlockUp(const OctreeT& /* octree */,
                     const Eigen::Vector3i parent_coord = block_coord + Eigen::Vector3i(x, y, z);
 
                     size_t sample_count = 0;
-                    DataType data_tmp;
-                    data_tmp.tsdf = 0.f;
+                    PropDataType child_data_sum;
 
                     for (int k = 0; k < parent_stride; k += child_stride) {
                         for (int j = 0; j < parent_stride; j += child_stride) {
@@ -54,7 +53,7 @@ void propagateBlockUp(const OctreeT& /* octree */,
                                     parent_coord + Eigen::Vector3i(i, j, k);
                                 DataUnionType child_data_union =
                                     block_ptr->getDataUnion(child_coord, child_scale);
-                                sample_count += child_funct(child_data_union, data_tmp);
+                                sample_count += child_funct(child_data_union, child_data_sum);
                             } // i
                         }     // j
                     }         // k
@@ -62,7 +61,7 @@ void propagateBlockUp(const OctreeT& /* octree */,
                     DataUnionType parent_data_union =
                         block_ptr->getDataUnion(parent_coord, child_scale + 1);
 
-                    parent_funct(parent_data_union, data_tmp, sample_count);
+                    parent_funct(parent_data_union, child_data_sum, sample_count);
 
                     block_ptr->setDataUnion(parent_data_union);
                 } // x
