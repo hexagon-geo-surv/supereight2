@@ -427,8 +427,17 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                         const float range = sample_point_C.norm();
                         const float range_diff =
                             (sample_point_C_m - depth_value) * (range / sample_point_C_m);
-                        block.incrBufferObservedCount(updater::update_voxel(
-                            buffer_data, range_diff, tau, three_sigma, config));
+                        if (range_diff >= tau) {
+                            continue;
+                        }
+                        else if (range_diff < -three_sigma) {
+                            block.incrBufferObservedCount(
+                                updater::update_voxel_free(buffer_data, config));
+                        }
+                        else {
+                            block.incrBufferObservedCount(updater::update_voxel(
+                                buffer_data, range_diff, tau, three_sigma, config));
+                        }
                     }
                 } // x
             }     // y
@@ -496,8 +505,16 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                     const float range = sample_point_C.norm();
                     const float range_diff =
                         (sample_point_C_m - depth_value) * (range / sample_point_C_m);
-                    block.incrCurrObservedCount(
-                        updater::update_voxel(voxel_data, range_diff, tau, three_sigma, config));
+                    if (range_diff >= tau) {
+                        continue;
+                    }
+                    else if (range_diff < -three_sigma) {
+                        block.incrCurrObservedCount(updater::update_voxel_free(voxel_data, config));
+                    }
+                    else {
+                        block.incrCurrObservedCount(updater::update_voxel(
+                            voxel_data, range_diff, tau, three_sigma, config));
+                    }
                 }
             } // x
         }     // y

@@ -97,13 +97,6 @@ bool update_voxel(DataT& data,
                   const float three_sigma,
                   const ConfigT& config)
 {
-    if (range_diff < -three_sigma) {
-        return update_voxel_free(data, config);
-    }
-    else if (range_diff >= tau) {
-        return false;
-    }
-
     const float sample_value = compute_sample_value(range_diff, tau, three_sigma, config);
     return weighted_mean_update(data, sample_value, config.max_weight);
 }
