@@ -161,7 +161,6 @@ std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::TSDF
 
 ColourDataConfig<se::Colour::On>::ColourDataConfig()
 {
-    // TODO Implement when colour fusion is added.
 }
 
 
@@ -169,14 +168,12 @@ ColourDataConfig<se::Colour::On>::ColourDataConfig()
 ColourDataConfig<se::Colour::On>::ColourDataConfig(const std::string& /* yaml_file */) :
         ColourDataConfig<se::Colour::On>::ColourDataConfig()
 {
-    // TODO Implement when colour fusion is added.
 }
 
 
 
 std::ostream& operator<<(std::ostream& os, const ColourDataConfig<se::Colour::On>& /* c */)
 {
-    // TODO Implement when colour fusion is added.
     return os;
 }
 

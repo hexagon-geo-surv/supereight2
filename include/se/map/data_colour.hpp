@@ -13,10 +13,6 @@
 
 namespace se {
 
-// Defaults
-static constexpr rgba_t dflt_rgba = 0xFFFFFFFF; // White
-static constexpr rgba_t dflt_delta_rgba = 0;
-
 // Colour data
 template<Colour ColB>
 struct ColourData {
@@ -24,7 +20,8 @@ struct ColourData {
 
 template<>
 struct ColourData<Colour::On> {
-    rgba_t rgba = dflt_rgba;
+    rgb_t rgb = {0, 0, 0};
+    weight_t rgb_weight = 0;
 };
 
 ///////////////////
@@ -38,7 +35,8 @@ struct ColourDeltaData {
 
 template<>
 struct ColourDeltaData<Colour::On> {
-    rgba_t delta_rgba = dflt_delta_rgba;
+    rgb16s_t delta_rgb = {0, 0, 0};
+    delta_weight_t delta_rgb_weight = 0;
 };
 
 

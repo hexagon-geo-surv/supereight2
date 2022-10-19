@@ -11,6 +11,7 @@
 #include <Eigen/StdVector>
 #include <cstdint>
 
+#include "se/common/colour_types.hpp"
 #include "se/common/weight.hpp"
 
 EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector2f)
@@ -53,8 +54,6 @@ typedef float field_t; ///< The type of the stored field (e.g. TSDF, ESDF or occ
 typedef Eigen::Matrix<field_t, 3, 1> field_vec_t;
 
 typedef int timestamp_t; ///< The type of the time stamp
-
-typedef uint32_t rgba_t; ///< The type of the colour
 
 typedef uint8_t semantics_t; ///< The type of the semantic class
 
