@@ -26,10 +26,10 @@ namespace se {
  * \return Three sigma uncertainty.
  */
 template<typename ConfigT>
-inline float compute_three_sigma(const se::field_t depth_value,
-                                 const float sigma_min,
-                                 const float sigma_max,
-                                 const ConfigT config);
+float compute_three_sigma(const se::field_t depth_value,
+                          const float sigma_min,
+                          const float sigma_max,
+                          const ConfigT config);
 
 
 
@@ -41,10 +41,10 @@ inline float compute_three_sigma(const se::field_t depth_value,
  * \return The estimated wall thickness.
  */
 template<typename ConfigT>
-inline float compute_tau(const se::field_t depth_value,
-                         const float tau_min,
-                         const float tau_max,
-                         const ConfigT config);
+float compute_tau(const se::field_t depth_value,
+                  const float tau_min,
+                  const float tau_max,
+                  const ConfigT config);
 
 
 
@@ -60,8 +60,9 @@ namespace updater {
  * \return True/false if the voxel has been observed the first time
  */
 template<typename DataT>
-inline bool
-weighted_mean_update(DataT& data, const se::field_t sample_value, const se::weight_t max_weight);
+bool weighted_mean_update(DataT& data,
+                          const se::field_t sample_value,
+                          const se::weight_t max_weight);
 
 
 
@@ -76,11 +77,11 @@ weighted_mean_update(DataT& data, const se::field_t sample_value, const se::weig
  * \return True/false if the node has been observed the first time
  */
 template<typename DataT, typename ConfigT>
-inline bool update_voxel(DataT& data,
-                         const float range_diff,
-                         const float tau,
-                         const float three_sigma,
-                         const ConfigT config);
+bool update_voxel(DataT& data,
+                  const float range_diff,
+                  const float tau,
+                  const float three_sigma,
+                  const ConfigT config);
 
 
 
@@ -92,7 +93,7 @@ inline bool update_voxel(DataT& data,
  * \param[in,out] node_data The reference to the node data.
  */
 template<typename DataT, typename ConfigT>
-inline void free_node(DataT& node_data, const ConfigT config);
+void free_node(DataT& node_data, const ConfigT config);
 
 
 /**
@@ -103,7 +104,7 @@ inline void free_node(DataT& node_data, const ConfigT config);
  * \param[in,out] node_data The reference to the node data.
  */
 template<typename DataT, typename ConfigT>
-inline bool free_voxel(DataT& voxel_data, const ConfigT config);
+bool free_voxel(DataT& voxel_data, const ConfigT config);
 
 
 /**
@@ -116,8 +117,8 @@ inline bool free_voxel(DataT& voxel_data, const ConfigT config);
  * \return data Summary of the node
  */
 template<typename NodeT, typename BlockT>
-inline typename NodeT::DataType propagate_to_parent_node(se::OctantBase* octant_ptr,
-                                                         const unsigned int frame);
+typename NodeT::DataType propagate_to_parent_node(se::OctantBase* octant_ptr,
+                                                  const unsigned int frame);
 
 
 
@@ -129,7 +130,7 @@ inline typename NodeT::DataType propagate_to_parent_node(se::OctantBase* octant_
  * \param[in] initial_scale Scale from which propagate up voxel values
 */
 template<typename BlockT>
-inline void propagate_block_to_coarsest_scale(se::OctantBase* octant_ptr);
+void propagate_block_to_coarsest_scale(se::OctantBase* octant_ptr);
 
 
 

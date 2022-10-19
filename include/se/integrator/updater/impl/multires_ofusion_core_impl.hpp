@@ -15,10 +15,10 @@ namespace se {
 
 
 template<typename ConfigT>
-inline float compute_three_sigma(const se::field_t depth_value,
-                                 const float sigma_min,
-                                 const float sigma_max,
-                                 const ConfigT config)
+float compute_three_sigma(const se::field_t depth_value,
+                          const float sigma_min,
+                          const float sigma_max,
+                          const ConfigT config)
 {
     if (config.uncertainty_model == se::UncertaintyModel::Linear) {
         return 3
@@ -36,10 +36,10 @@ inline float compute_three_sigma(const se::field_t depth_value,
 
 
 template<typename ConfigT>
-inline float compute_tau(const field_t depth_value,
-                         const float tau_min,
-                         const float tau_max,
-                         const ConfigT config)
+float compute_tau(const field_t depth_value,
+                  const float tau_min,
+                  const float tau_max,
+                  const ConfigT config)
 {
     if (config.const_surface_thickness) {
         return tau_max; ///<< e.g. used in ICL-NUIM livingroom dataset.
@@ -56,8 +56,9 @@ namespace updater {
 
 
 template<typename DataT>
-inline bool
-weighted_mean_update(DataT& data, const se::field_t sample_value, const se::weight_t max_weight)
+bool weighted_mean_update(DataT& data,
+                          const se::field_t sample_value,
+                          const se::weight_t max_weight)
 {
     data.occupancy = (data.occupancy * data.weight + sample_value) / (data.weight + 1);
     data.weight = std::min((data.weight + 1), max_weight);
@@ -73,11 +74,11 @@ weighted_mean_update(DataT& data, const se::field_t sample_value, const se::weig
 
 
 template<typename DataT, typename ConfigT>
-inline bool update_voxel(DataT& data,
-                         const float range_diff,
-                         const float tau,
-                         const float three_sigma,
-                         const ConfigT config)
+bool update_voxel(DataT& data,
+                  const float range_diff,
+                  const float tau,
+                  const float three_sigma,
+                  const ConfigT config)
 {
     float sample_value;
 
@@ -102,7 +103,7 @@ inline bool update_voxel(DataT& data,
 
 
 template<typename DataT, typename ConfigT>
-inline void free_node(DataT& node_data, const ConfigT config)
+void free_node(DataT& node_data, const ConfigT config)
 {
     weighted_mean_update(node_data, config.log_odd_min, config.max_weight);
 }
@@ -110,7 +111,7 @@ inline void free_node(DataT& node_data, const ConfigT config)
 
 
 template<typename DataT, typename ConfigT>
-inline bool free_voxel(DataT& voxel_data, const ConfigT config)
+bool free_voxel(DataT& voxel_data, const ConfigT config)
 {
     return weighted_mean_update(voxel_data, config.log_odd_min, config.max_weight);
 }
@@ -118,8 +119,7 @@ inline bool free_voxel(DataT& voxel_data, const ConfigT config)
 
 
 template<typename NodeT, typename BlockT>
-inline typename NodeT::DataType propagate_to_parent_node(se::OctantBase* octant_ptr,
-                                                         const int frame)
+typename NodeT::DataType propagate_to_parent_node(se::OctantBase* octant_ptr, const int frame)
 {
     NodeT* node_ptr = static_cast<NodeT*>(octant_ptr);
 
@@ -170,7 +170,7 @@ inline typename NodeT::DataType propagate_to_parent_node(se::OctantBase* octant_
 
 
 template<typename BlockT>
-inline void propagate_block_to_coarsest_scale(se::OctantBase* octant_ptr)
+void propagate_block_to_coarsest_scale(se::OctantBase* octant_ptr)
 {
     typedef typename BlockT::DataType DataType;
 
