@@ -66,7 +66,7 @@ bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::contains(const Eigen::Vector3
 
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 template<Safe SafeB>
-const typename Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::DataType
+typename Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::DataType
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getData(const Eigen::Vector3f& point_W) const
 {
     Eigen::Vector3i voxel_coord;

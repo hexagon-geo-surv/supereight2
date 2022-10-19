@@ -107,7 +107,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      *
      * \return T_MW
      */
-    Eigen::Matrix4f getTMW() const
+    const Eigen::Matrix4f& getTMW() const
     {
         return T_MW_;
     };
@@ -117,7 +117,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      *
      * \return T_WM
      */
-    Eigen::Matrix4f getTWM() const
+    const Eigen::Matrix4f& getTWM() const
     {
         return T_WM_;
     };
@@ -167,7 +167,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      *
      * \return The dimensions of the map
      */
-    Eigen::Vector3f getDim() const
+    const Eigen::Vector3f& getDim() const
     {
         return dimension_;
     }
@@ -187,7 +187,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      *
      * \return The data configuration of the map
      */
-    DataConfigType getDataConfig() const
+    const DataConfigType& getDataConfig() const
     {
         return data_config_;
     }
@@ -200,7 +200,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \return The data at the provided coordinates
      */
     template<Safe SafeB = Safe::Off>
-    const DataType getData(const Eigen::Vector3f& point_W) const;
+    DataType getData(const Eigen::Vector3f& point_W) const;
 
     /**
      * \brief Get the stored max data at the provided coordinates in [meter] for a given scale.
