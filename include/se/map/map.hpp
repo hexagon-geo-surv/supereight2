@@ -100,14 +100,14 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \param[in] point_W         The point to be verified
      * \return True if the point is inside the map, false otherwise
      */
-    inline bool contains(const Eigen::Vector3f& point_W) const;
+    bool contains(const Eigen::Vector3f& point_W) const;
 
     /**
      * \brief Get the transformation from world to map frame
      *
      * \return T_MW
      */
-    inline Eigen::Matrix4f getTMW() const
+    Eigen::Matrix4f getTMW() const
     {
         return T_MW_;
     };
@@ -117,7 +117,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      *
      * \return T_WM
      */
-    inline Eigen::Matrix4f getTWM() const
+    Eigen::Matrix4f getTWM() const
     {
         return T_WM_;
     };
@@ -127,7 +127,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      *
      * \return t_MW
      */
-    inline Eigen::Vector3f gettMW() const
+    Eigen::Vector3f gettMW() const
     {
         return se::math::to_translation(T_MW_);
     }
@@ -137,7 +137,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      *
      * \return t_WM
      */
-    inline Eigen::Vector3f gettWM() const
+    Eigen::Vector3f gettWM() const
     {
         return se::math::to_translation(T_WM_);
     }
@@ -147,7 +147,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      *
      * \return R_MW
      */
-    inline Eigen::Matrix3f getRMW() const
+    Eigen::Matrix3f getRMW() const
     {
         return se::math::to_rotation(T_MW_);
     }
@@ -157,7 +157,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      *
      * \return R_WM
      */
-    inline Eigen::Matrix3f getRWM() const
+    Eigen::Matrix3f getRWM() const
     {
         return se::math::to_rotation(T_WM_);
     }
@@ -167,7 +167,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      *
      * \return The dimensions of the map
      */
-    inline Eigen::Vector3f getDim() const
+    Eigen::Vector3f getDim() const
     {
         return dimension_;
     }
@@ -177,7 +177,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      *
      * \return The resolution of the map
      */
-    inline float getRes() const
+    float getRes() const
     {
         return resolution_;
     }
@@ -187,7 +187,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      *
      * \return The data configuration of the map
      */
-    inline DataConfigType getDataConfig() const
+    DataConfigType getDataConfig() const
     {
         return data_config_;
     }
@@ -200,7 +200,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \return The data at the provided coordinates
      */
     template<Safe SafeB = Safe::Off>
-    inline const DataType getData(const Eigen::Vector3f& point_W) const;
+    const DataType getData(const Eigen::Vector3f& point_W) const;
 
     /**
      * \brief Get the stored max data at the provided coordinates in [meter] for a given scale.
@@ -212,7 +212,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \return The max data at the provided coordinates and scale
      */
     template<Safe SafeB = Safe::Off, Res ResTDummy = ResT>
-    inline typename std::enable_if_t<ResTDummy == Res::Multi, DataType>
+    typename std::enable_if_t<ResTDummy == Res::Multi, DataType>
     getMaxData(const Eigen::Vector3f& point_W, const int scale_desired) const
     {
         Eigen::Vector3i voxel_coord;
@@ -239,7 +239,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \return                The interpolated field value at the coordinates
      */
     template<Safe SafeB = Safe::Off>
-    inline std::optional<se::field_t> getFieldInterp(const Eigen::Vector3f& point_W) const;
+    std::optional<se::field_t> getFieldInterp(const Eigen::Vector3f& point_W) const;
 
     /**
      * \brief Get the interpolated field value at the provided coordinates and the scale it is stored at.
@@ -251,7 +251,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \return                    The interpolated field value at the coordinates
      */
     template<Safe SafeB = Safe::Off, Res ResTDummy = ResT>
-    inline typename std::enable_if_t<ResTDummy == Res::Multi, std::optional<se::field_t>>
+    typename std::enable_if_t<ResTDummy == Res::Multi, std::optional<se::field_t>>
     getFieldInterp(const Eigen::Vector3f& point_W, int& returned_scale) const;
 
     /**
@@ -262,7 +262,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \return                The filed gradient at the coordinates
      */
     template<Safe SafeB = Safe::Off>
-    inline std::optional<se::field_vec_t> getFieldGrad(const Eigen::Vector3f& point_W) const;
+    std::optional<se::field_vec_t> getFieldGrad(const Eigen::Vector3f& point_W) const;
 
     /**
      * \brief Save three slices of the field value, each perpendicular to one of the axes (x, y and
@@ -373,7 +373,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \param[in]  voxel_coord    The voxel coordinates in [voxel] to be converted
      * \param[out] point_W        The converted centre point coordinates in [meter]
      */
-    inline void voxelToPoint(const Eigen::Vector3i& voxel_coord, Eigen::Vector3f& point_W) const;
+    void voxelToPoint(const Eigen::Vector3i& voxel_coord, Eigen::Vector3f& point_W) const;
 
     /**
      * \brief Convert voxel coordinates in [voxel] for a given voxel size to its centre point coordinates in [meter].
@@ -382,9 +382,9 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \param[in]  voxel_size     The size of the voxel in [voxel]
      * \param[out] point_W        The converted centre point coordinates in [meter]
      */
-    inline void voxelToPoint(const Eigen::Vector3i& voxel_coord,
-                             const int voxel_size,
-                             Eigen::Vector3f& point_W) const;
+    void voxelToPoint(const Eigen::Vector3i& voxel_coord,
+                      const int voxel_size,
+                      Eigen::Vector3f& point_W) const;
 
     /**
      * \brief Convert voxel coordinates in [voxel] for a given voxel size to its eight corner point coordinates in [meter].
@@ -394,8 +394,8 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \param[in]  voxel_coord        The voxel coordinates in [voxel] to be converted
      * \param[out] corner_points_W    The converted centre point coordinates in [meter]
      */
-    inline void voxelToCornerPoints(const Eigen::Vector3i& voxel_coord,
-                                    Eigen::Matrix<float, 3, 8>& corner_points_W) const;
+    void voxelToCornerPoints(const Eigen::Vector3i& voxel_coord,
+                             Eigen::Matrix<float, 3, 8>& corner_points_W) const;
 
     /**
      * \brief Convert voxel coordinates in [voxel] for a given voxel size to its eight corner point coordinates in [meter].
@@ -404,9 +404,9 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \param[in]  voxel_size         The size of the voxel in [voxel]
      * \param[out] corner_points_W    The converted centre point coordinates in [meter]
      */
-    inline void voxelToCornerPoints(const Eigen::Vector3i& voxel_coord,
-                                    const int voxel_size,
-                                    Eigen::Matrix<float, 3, 8>& corner_points_W) const;
+    void voxelToCornerPoints(const Eigen::Vector3i& voxel_coord,
+                             const int voxel_size,
+                             Eigen::Matrix<float, 3, 8>& corner_points_W) const;
 
     /**
      * \brief Convert point coordinates in [meter] to its voxel coordinates (bottom, front, left corner) in [voxel]
@@ -419,7 +419,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \return True if the point inside the map, false otherwise
      */
     template<se::Safe SafeB = se::Safe::On>
-    inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
+    typename std::enable_if_t<SafeB == se::Safe::On, bool>
     pointToVoxel(const Eigen::Vector3f& point_W, Eigen::Vector3i& voxel_coord) const;
 
     /**
@@ -431,7 +431,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \return True
      */
     template<se::Safe SafeB>
-    inline typename std::enable_if_t<SafeB == se::Safe::Off, bool>
+    typename std::enable_if_t<SafeB == se::Safe::Off, bool>
     pointToVoxel(const Eigen::Vector3f& point_W, Eigen::Vector3i& voxel_coord) const;
 
     /**
@@ -443,7 +443,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \return True if the point inside the map, false otherwise
      */
     template<se::Safe SafeB = se::Safe::On>
-    inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
+    typename std::enable_if_t<SafeB == se::Safe::On, bool>
     pointToVoxel(const Eigen::Vector3f& point_W, Eigen::Vector3f& voxel_coord_f) const;
 
     /**
@@ -455,7 +455,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \return True
      */
     template<se::Safe SafeB>
-    inline typename std::enable_if_t<SafeB == se::Safe::Off, bool>
+    typename std::enable_if_t<SafeB == se::Safe::Off, bool>
     pointToVoxel(const Eigen::Vector3f& point_W, Eigen::Vector3f& voxel_coord_f) const;
 
     /**
@@ -467,7 +467,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \return True if all points are inside the map, false otherwise
      */
     template<se::Safe SafeB = se::Safe::On>
-    inline typename std::enable_if_t<SafeB == se::Safe::On, bool> pointsToVoxels(
+    typename std::enable_if_t<SafeB == se::Safe::On, bool> pointsToVoxels(
         const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& points_W,
         std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>>& voxel_coords)
         const;
@@ -481,7 +481,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \return True
      */
     template<se::Safe SafeB>
-    inline typename std::enable_if_t<SafeB == se::Safe::Off, bool> pointsToVoxels(
+    typename std::enable_if_t<SafeB == se::Safe::Off, bool> pointsToVoxels(
         const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& points_W,
         std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>>& voxel_coords)
         const;
@@ -491,7 +491,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      *
      * \return The shared pointer to the octree
      */
-    inline std::shared_ptr<OctreeType> getOctree()
+    std::shared_ptr<OctreeType> getOctree()
     {
         return octree_ptr_;
     };
@@ -501,7 +501,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      *
      * \return The const shared pointer to the octree
      */
-    inline std::shared_ptr<OctreeType> getOctree() const
+    std::shared_ptr<OctreeType> getOctree() const
     {
         return octree_ptr_;
     };
