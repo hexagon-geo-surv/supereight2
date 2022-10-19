@@ -3,6 +3,7 @@
 
 cmake_minimum_required(VERSION 3.8...3.16)
 
+add_subdirectory(common/colour_types)
 add_subdirectory(common/image_utils)
 add_subdirectory(common/str_utils)
 add_subdirectory(map/keyops)
