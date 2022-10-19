@@ -50,6 +50,26 @@ float compute_tau(const field_t depth_value,
 
 
 
+template<typename ConfigT>
+field_t compute_sample_value(const float range_diff,
+                             const float tau,
+                             const float three_sigma,
+                             const ConfigT& config)
+{
+    assert(range_diff >= -three_sigma);
+    assert(range_diff < tau);
+    if (range_diff < tau / 2) {
+        return std::min(config.log_odd_min
+                            - config.log_odd_min / three_sigma * (range_diff + three_sigma),
+                        config.log_odd_max);
+    }
+    else {
+        return std::min(-config.log_odd_min * tau / (2 * three_sigma), config.log_odd_max);
+    }
+}
+
+
+
 namespace updater {
 
 
@@ -77,23 +97,14 @@ bool update_voxel(DataT& data,
                   const float three_sigma,
                   const ConfigT& config)
 {
-    float sample_value;
-
     if (range_diff < -three_sigma) {
         return update_voxel_free(data, config);
     }
-    else if (range_diff < tau / 2) {
-        sample_value = std::min(config.log_odd_min
-                                    - config.log_odd_min / three_sigma * (range_diff + three_sigma),
-                                config.log_odd_max);
-    }
-    else if (range_diff < tau) {
-        sample_value = std::min(-config.log_odd_min * tau / (2 * three_sigma), config.log_odd_max);
-    }
-    else {
+    else if (range_diff >= tau) {
         return false;
     }
 
+    const float sample_value = compute_sample_value(range_diff, tau, three_sigma, config);
     return weighted_mean_update(data, sample_value, config.max_weight);
 }
 

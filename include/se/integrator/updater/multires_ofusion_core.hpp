@@ -50,6 +50,26 @@ float compute_tau(const field_t depth_value,
 
 
 
+/** \brief Compute the log-odds sample value for a given depth measurement.
+ *
+ * \warning This function assumes that `range_diff >= -three_sigma` and `range_diff < tau` and will
+ * return garbage values if the assumptions don't hold.
+ *
+ * \param[in] range_diff  The range difference between the voxel sample point and the depth value of
+ *                        the reprojection.
+ * \param[in] tau         The estimated wall thickness.
+ * \param[in] three_sigma The 3x sigma uncertainty.
+ * \param[in] config      The occupancy data configuration.
+ * \return The log-odds value corresponding to the depth measurement.
+ */
+template<typename ConfigT>
+field_t compute_sample_value(const float range_diff,
+                             const float tau,
+                             const float three_sigma,
+                             const ConfigT& config);
+
+
+
 namespace updater {
 
 
