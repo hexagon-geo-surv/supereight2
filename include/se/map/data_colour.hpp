@@ -14,17 +14,17 @@
 namespace se {
 
 // Defaults
-static constexpr se::rgba_t dflt_rgba = 0xFFFFFFFF; // White
-static constexpr se::rgba_t dflt_delta_rgba = 0;
+static constexpr rgba_t dflt_rgba = 0xFFFFFFFF; // White
+static constexpr rgba_t dflt_delta_rgba = 0;
 
 // Colour data
-template<se::Colour ColB>
+template<Colour ColB>
 struct ColourData {
 };
 
 template<>
-struct ColourData<se::Colour::On> {
-    se::rgba_t rgba = dflt_rgba;
+struct ColourData<Colour::On> {
+    rgba_t rgba = dflt_rgba;
 };
 
 ///////////////////
@@ -32,13 +32,13 @@ struct ColourData<se::Colour::On> {
 ///////////////////
 
 // Colour data
-template<se::Colour ColB>
+template<Colour ColB>
 struct ColourDeltaData {
 };
 
 template<>
-struct ColourDeltaData<se::Colour::On> {
-    se::rgba_t delta_rgba = dflt_delta_rgba;
+struct ColourDeltaData<Colour::On> {
+    rgba_t delta_rgba = dflt_delta_rgba;
 };
 
 
@@ -48,7 +48,7 @@ struct ColourDeltaData<se::Colour::On> {
 ///////////////////
 
 // Colour data
-template<se::Colour ColB>
+template<Colour ColB>
 struct ColourDataConfig {
     ColourDataConfig()
     {
@@ -58,14 +58,14 @@ struct ColourDataConfig {
     }
 };
 
-template<se::Colour ColB>
+template<Colour ColB>
 std::ostream& operator<<(std::ostream& os, const ColourDataConfig<ColB>& /* c */)
 {
     return os;
 }
 
 template<>
-struct ColourDataConfig<se::Colour::On> {
+struct ColourDataConfig<Colour::On> {
     /** Initializes the config to some sensible defaults.
      */
     ColourDataConfig();
@@ -76,7 +76,7 @@ struct ColourDataConfig<se::Colour::On> {
     ColourDataConfig(const std::string& yaml_file);
 };
 
-std::ostream& operator<<(std::ostream& os, const ColourDataConfig<se::Colour::On>& c);
+std::ostream& operator<<(std::ostream& os, const ColourDataConfig<Colour::On>& c);
 
 } // namespace se
 

@@ -14,17 +14,17 @@
 namespace se {
 
 // Defaults
-static constexpr se::semantics_t dflt_semantics = 0;
+static constexpr semantics_t dflt_semantics = 0;
 
 // Semantic data
-template<se::Semantics SemB>
+template<Semantics SemB>
 struct SemanticData {
 };
 
 // Semantic data
 template<>
-struct SemanticData<se::Semantics::On> {
-    se::semantics_t sem = dflt_semantics;
+struct SemanticData<Semantics::On> {
+    semantics_t sem = dflt_semantics;
 };
 
 
@@ -41,7 +41,7 @@ struct SemanticData<se::Semantics::On> {
 ///////////////////
 
 // Semantic data
-template<se::Semantics SemB>
+template<Semantics SemB>
 struct SemanticDataConfig {
     SemanticDataConfig()
     {
@@ -51,7 +51,7 @@ struct SemanticDataConfig {
     }
 };
 
-template<se::Semantics SemB>
+template<Semantics SemB>
 std::ostream& operator<<(std::ostream& os, const SemanticDataConfig<SemB>& /* c */)
 {
     return os;
@@ -59,7 +59,7 @@ std::ostream& operator<<(std::ostream& os, const SemanticDataConfig<SemB>& /* c 
 
 // Semantic data
 template<>
-struct SemanticDataConfig<se::Semantics::On> {
+struct SemanticDataConfig<Semantics::On> {
     /** Initializes the config to some sensible defaults.
      */
     SemanticDataConfig();
@@ -70,7 +70,7 @@ struct SemanticDataConfig<se::Semantics::On> {
     SemanticDataConfig(const std::string& yaml_file);
 };
 
-std::ostream& operator<<(std::ostream& os, const SemanticDataConfig<se::Semantics::On>& c);
+std::ostream& operator<<(std::ostream& os, const SemanticDataConfig<Semantics::On>& c);
 
 } // namespace se
 

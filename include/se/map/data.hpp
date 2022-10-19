@@ -16,13 +16,11 @@
 
 namespace se {
 
-template<se::Field FldT = se::Field::TSDF,
-         se::Colour ColB = se::Colour::Off,
-         se::Semantics SemB = se::Semantics::Off>
+template<Field FldT = Field::TSDF, Colour ColB = Colour::Off, Semantics SemB = Semantics::Off>
 struct Data : public FieldData<FldT>, ColourData<ColB>, SemanticData<SemB> {
-    static constexpr se::Field fld_ = FldT;
-    static constexpr se::Colour col_ = ColB;
-    static constexpr se::Semantics sem_ = SemB;
+    static constexpr Field fld_ = FldT;
+    static constexpr Colour col_ = ColB;
+    static constexpr Semantics sem_ = SemB;
 };
 
 
@@ -31,13 +29,11 @@ struct Data : public FieldData<FldT>, ColourData<ColB>, SemanticData<SemB> {
 /// DELTA DATA  ///
 ///////////////////
 
-template<se::Field FldT = se::Field::TSDF,
-         se::Colour ColB = se::Colour::Off,
-         se::Semantics SemB = se::Semantics::Off>
+template<Field FldT = Field::TSDF, Colour ColB = Colour::Off, Semantics SemB = Semantics::Off>
 struct DeltaData : public FieldDeltaData<FldT>, ColourDeltaData<ColB> {
-    static constexpr se::Field fld_ = FldT;
-    static constexpr se::Colour col_ = ColB;
-    static constexpr se::Semantics sem_ = SemB;
+    static constexpr Field fld_ = FldT;
+    static constexpr Colour col_ = ColB;
+    static constexpr Semantics sem_ = SemB;
 };
 
 
@@ -46,13 +42,11 @@ struct DeltaData : public FieldDeltaData<FldT>, ColourDeltaData<ColB> {
 /// DATA CONFIG ///
 ///////////////////
 
-template<se::Field FldT = se::Field::TSDF,
-         se::Colour ColB = se::Colour::Off,
-         se::Semantics SemB = se::Semantics::Off>
+template<Field FldT = Field::TSDF, Colour ColB = Colour::Off, Semantics SemB = Semantics::Off>
 struct DataConfig : public FieldDataConfig<FldT>, ColourDataConfig<ColB>, SemanticDataConfig<SemB> {
-    static constexpr se::Field fld_ = FldT;
-    static constexpr se::Colour col_ = ColB;
-    static constexpr se::Semantics sem_ = SemB;
+    static constexpr Field fld_ = FldT;
+    static constexpr Colour col_ = ColB;
+    static constexpr Semantics sem_ = SemB;
 
     /** Initializes all sub-configs to their sensible defaults.
      */
@@ -71,7 +65,7 @@ struct DataConfig : public FieldDataConfig<FldT>, ColourDataConfig<ColB>, Semant
     }
 };
 
-template<se::Field FldT, se::Colour ColB, se::Semantics SemB>
+template<Field FldT, Colour ColB, Semantics SemB>
 std::ostream& operator<<(std::ostream& os, const DataConfig<FldT, ColB, SemB>& c)
 {
     // Call the operator<< of the base classes.
@@ -83,83 +77,83 @@ std::ostream& operator<<(std::ostream& os, const DataConfig<FldT, ColB, SemB>& c
 
 
 
-template<se::Field FldT, se::Colour ColB, se::Semantics SemB>
+template<Field FldT, Colour ColB, Semantics SemB>
 inline void set_invalid(Data<FldT, ColB, SemB>& data);
 
-template<se::Colour ColB, se::Semantics SemB>
-inline void set_invalid(Data<se::Field::TSDF, ColB, SemB>& data)
+template<Colour ColB, Semantics SemB>
+inline void set_invalid(Data<Field::TSDF, ColB, SemB>& data)
 {
-    data = Data<se::Field::TSDF, ColB, SemB>();
+    data = Data<Field::TSDF, ColB, SemB>();
 }
 
-template<se::Colour ColB, se::Semantics SemB>
-inline void set_invalid(Data<se::Field::Occupancy, ColB, SemB>& data)
+template<Colour ColB, Semantics SemB>
+inline void set_invalid(Data<Field::Occupancy, ColB, SemB>& data)
 {
-    data = Data<se::Field::Occupancy, ColB, SemB>();
+    data = Data<Field::Occupancy, ColB, SemB>();
 }
 
 
 
-template<se::Field FldT, se::Colour ColB, se::Semantics SemB>
+template<Field FldT, Colour ColB, Semantics SemB>
 inline bool is_valid(const Data<FldT, ColB, SemB>& data);
 
-template<se::Colour ColB, se::Semantics SemB>
-inline bool is_valid(const Data<se::Field::TSDF, ColB, SemB>& data)
+template<Colour ColB, Semantics SemB>
+inline bool is_valid(const Data<Field::TSDF, ColB, SemB>& data)
 {
     return data.weight != dflt_weight;
 }
 
-template<se::Colour ColB, se::Semantics SemB>
-inline bool is_valid(const Data<se::Field::Occupancy, ColB, SemB>& data)
+template<Colour ColB, Semantics SemB>
+inline bool is_valid(const Data<Field::Occupancy, ColB, SemB>& data)
 {
     return data.weight != dflt_weight;
 }
 
 
-template<se::Field FldT, se::Colour ColB, se::Semantics SemB>
+template<Field FldT, Colour ColB, Semantics SemB>
 inline bool is_invalid(const Data<FldT, ColB, SemB>& data);
 
-template<se::Colour ColB, se::Semantics SemB>
-inline bool is_invalid(const Data<se::Field::TSDF, ColB, SemB>& data)
+template<Colour ColB, Semantics SemB>
+inline bool is_invalid(const Data<Field::TSDF, ColB, SemB>& data)
 {
     return data.weight == dflt_weight;
 }
 
-template<se::Colour ColB, se::Semantics SemB>
-inline bool is_invalid(const Data<se::Field::Occupancy, ColB, SemB>& data)
+template<Colour ColB, Semantics SemB>
+inline bool is_invalid(const Data<Field::Occupancy, ColB, SemB>& data)
 {
     return data.weight == dflt_weight;
 }
 
 
-template<se::Field FldT, se::Colour ColB, se::Semantics SemB>
+template<Field FldT, Colour ColB, Semantics SemB>
 inline float get_field(const Data<FldT, ColB, SemB> data);
 
-template<se::Colour ColB, se::Semantics SemB>
-inline float get_field(const Data<se::Field::TSDF, ColB, SemB> data)
+template<Colour ColB, Semantics SemB>
+inline float get_field(const Data<Field::TSDF, ColB, SemB> data)
 {
     return data.tsdf;
 }
 
-template<se::Colour ColB, se::Semantics SemB>
-inline float get_field(const Data<se::Field::Occupancy, ColB, SemB> data)
+template<Colour ColB, Semantics SemB>
+inline float get_field(const Data<Field::Occupancy, ColB, SemB> data)
 {
     return data.occupancy;
 }
 
 
 
-template<se::Field FldT, se::Colour ColB, se::Semantics SemB>
+template<Field FldT, Colour ColB, Semantics SemB>
 inline float is_inside(const Data<FldT, ColB, SemB>& data);
 
-template<se::Colour ColB, se::Semantics SemB>
-inline float is_inside(const Data<se::Field::TSDF, ColB, SemB>& data)
+template<Colour ColB, Semantics SemB>
+inline float is_inside(const Data<Field::TSDF, ColB, SemB>& data)
 {
     return data.tsdf < 0.f;
 }
 
-template<se::Colour ColB, se::Semantics SemB>
-inline float is_inside(const Data<se::Field::Occupancy, ColB, SemB>& data)
+template<Colour ColB, Semantics SemB>
+inline float is_inside(const Data<Field::Occupancy, ColB, SemB>& data)
 {
     return data.occupancy > 0.f;
 }
@@ -167,28 +161,27 @@ inline float is_inside(const Data<se::Field::Occupancy, ColB, SemB>& data)
 
 
 // Occupancy data setups
-typedef Data<se::Field::Occupancy, se::Colour::Off, se::Semantics::Off> OccupancyData;
-typedef Data<se::Field::Occupancy, se::Colour::On, se::Semantics::Off> OccupancyColData;
-typedef Data<se::Field::Occupancy, se::Colour::Off, se::Semantics::On> OccupancySemData;
-typedef Data<se::Field::Occupancy, se::Colour::On, se::Semantics::On> OccupancyColSemData;
+typedef Data<Field::Occupancy, Colour::Off, Semantics::Off> OccupancyData;
+typedef Data<Field::Occupancy, Colour::On, Semantics::Off> OccupancyColData;
+typedef Data<Field::Occupancy, Colour::Off, Semantics::On> OccupancySemData;
+typedef Data<Field::Occupancy, Colour::On, Semantics::On> OccupancyColSemData;
 
 // Occupancy data setups
-typedef DataConfig<se::Field::Occupancy, se::Colour::Off, se::Semantics::Off> OccupancyDataConfig;
-typedef DataConfig<se::Field::Occupancy, se::Colour::On, se::Semantics::Off> OccupancyColDataConfig;
-typedef DataConfig<se::Field::Occupancy, se::Colour::Off, se::Semantics::On> OccupancySemDataConfig;
-typedef DataConfig<se::Field::Occupancy, se::Colour::On, se::Semantics::On>
-    OccupancyColSemDataConfig;
+typedef DataConfig<Field::Occupancy, Colour::Off, Semantics::Off> OccupancyDataConfig;
+typedef DataConfig<Field::Occupancy, Colour::On, Semantics::Off> OccupancyColDataConfig;
+typedef DataConfig<Field::Occupancy, Colour::Off, Semantics::On> OccupancySemDataConfig;
+typedef DataConfig<Field::Occupancy, Colour::On, Semantics::On> OccupancyColSemDataConfig;
 
 // TSDF data setups
-typedef Data<se::Field::TSDF, se::Colour::Off, se::Semantics::Off> TSDFData;
-typedef Data<se::Field::TSDF, se::Colour::On, se::Semantics::Off> TSDFColData;
-typedef Data<se::Field::TSDF, se::Colour::Off, se::Semantics::On> TSDFSemData;
-typedef Data<se::Field::TSDF, se::Colour::On, se::Semantics::On> TSDFColSemData;
+typedef Data<Field::TSDF, Colour::Off, Semantics::Off> TSDFData;
+typedef Data<Field::TSDF, Colour::On, Semantics::Off> TSDFColData;
+typedef Data<Field::TSDF, Colour::Off, Semantics::On> TSDFSemData;
+typedef Data<Field::TSDF, Colour::On, Semantics::On> TSDFColSemData;
 
-typedef DataConfig<se::Field::TSDF, se::Colour::Off, se::Semantics::Off> TSDFDataConfig;
-typedef DataConfig<se::Field::TSDF, se::Colour::On, se::Semantics::Off> TSDFColDataConfig;
-typedef DataConfig<se::Field::TSDF, se::Colour::Off, se::Semantics::On> TSDFSemDataConfig;
-typedef DataConfig<se::Field::TSDF, se::Colour::On, se::Semantics::On> TSDFColSemDataConfig;
+typedef DataConfig<Field::TSDF, Colour::Off, Semantics::Off> TSDFDataConfig;
+typedef DataConfig<Field::TSDF, Colour::On, Semantics::Off> TSDFColDataConfig;
+typedef DataConfig<Field::TSDF, Colour::Off, Semantics::On> TSDFSemDataConfig;
+typedef DataConfig<Field::TSDF, Colour::On, Semantics::On> TSDFColSemDataConfig;
 
 } // namespace se
 
