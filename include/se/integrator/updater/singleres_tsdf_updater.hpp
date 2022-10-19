@@ -21,10 +21,10 @@ namespace se {
 
 
 // Single-res TSDF updater
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-class Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Single, BlockSize>, SensorT> {
+template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
+class Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT> {
     public:
-    typedef Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Single, BlockSize> MapType;
+    typedef Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize> MapType;
     typedef typename MapType::DataType DataType;
     typedef typename MapType::OctreeType::NodeType NodeType;
     typedef typename MapType::OctreeType::BlockType BlockType;
@@ -47,20 +47,20 @@ class Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Single, BlockSize>
      */
     Updater(MapType& map,
             const SensorT& sensor,
-            const se::Image<float>& depth_img,
+            const Image<float>& depth_img,
             const Eigen::Matrix4f& T_WS,
             const int frame);
 
 
 
-    void operator()(std::vector<se::OctantBase*>& block_ptrs);
+    void operator()(std::vector<OctantBase*>& block_ptrs);
 
     private:
     void updateVoxel(DataType& data, const field_t sdf_value);
 
     MapType& map_;
     const SensorT& sensor_;
-    const se::Image<float>& depth_img_;
+    const Image<float>& depth_img_;
     const Eigen::Matrix4f& T_WS_;
     const int frame_;
     const UpdaterConfig config_;

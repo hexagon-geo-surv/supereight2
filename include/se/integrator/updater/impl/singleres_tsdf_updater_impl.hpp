@@ -16,11 +16,11 @@ namespace se {
 
 
 // Single-res TSDF updater
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Single, BlockSize>, SensorT>::Updater(
+template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
+Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::Updater(
     MapType& map,
     const SensorT& sensor,
-    const se::Image<float>& depth_img,
+    const Image<float>& depth_img,
     const Eigen::Matrix4f& T_WS,
     const int frame) :
         map_(map), sensor_(sensor), depth_img_(depth_img), T_WS_(T_WS), frame_(frame), config_(map)
@@ -29,12 +29,12 @@ Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Single, BlockSize>, Sens
 
 
 
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Single, BlockSize>,
-             SensorT>::operator()(std::vector<se::OctantBase*>& block_ptrs)
+template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
+void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::operator()(
+    std::vector<OctantBase*>& block_ptrs)
 {
     unsigned int block_size = BlockType::getSize();
-    const Eigen::Matrix4f T_SW = se::math::to_inverse_transformation(T_WS_);
+    const Eigen::Matrix4f T_SW = math::to_inverse_transformation(T_WS_);
 
     auto valid_predicate = [&](float depth_value) { return depth_value >= sensor_.near_plane; };
 
@@ -47,7 +47,7 @@ void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Single, BlockSize>,
         map_.voxelToPoint(block_coord, point_base_W);
         const Eigen::Vector3f point_base_S = (T_SW * point_base_W.homogeneous()).head(3);
         const Eigen::Matrix3f point_delta_matrix_S =
-            (se::math::to_rotation(T_SW) * map_.getRes() * Eigen::Matrix3f::Identity());
+            (math::to_rotation(T_SW) * map_.getRes() * Eigen::Matrix3f::Identity());
 
         for (unsigned int i = 0; i < block_size; ++i) {
             for (unsigned int j = 0; j < block_size; ++j) {
@@ -72,7 +72,7 @@ void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Single, BlockSize>,
 
                     // Update the TSDF
                     const float m = sensor_.measurementFromPoint(point_S);
-                    const se::field_t sdf_value = (depth_value - m) / m * point_S.norm();
+                    const field_t sdf_value = (depth_value - m) / m * point_S.norm();
 
                     DataType& data = block_ptr->getData(voxel_coord);
                     updateVoxel(data, sdf_value);
@@ -81,20 +81,21 @@ void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Single, BlockSize>,
         }         // i
     }
 
-    se::propagator::propagateTimeStampToRoot(block_ptrs);
+    propagator::propagateTimeStampToRoot(block_ptrs);
 }
 
 
 
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Single, BlockSize>,
-             SensorT>::updateVoxel(DataType& data, const field_t sdf_value)
+template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
+void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::updateVoxel(
+    DataType& data,
+    const field_t sdf_value)
 {
     if (sdf_value > -config_.truncation_boundary) {
         const float tsdf_value = std::min(1.f, sdf_value / config_.truncation_boundary);
 
         data.tsdf = (data.tsdf * data.weight + tsdf_value) / (data.weight + 1.f);
-        data.tsdf = se::math::clamp(data.tsdf, -1.f, 1.f);
+        data.tsdf = math::clamp(data.tsdf, -1.f, 1.f);
         data.weight = std::min(data.weight + 1, map_.getDataConfig().max_weight);
     }
 }

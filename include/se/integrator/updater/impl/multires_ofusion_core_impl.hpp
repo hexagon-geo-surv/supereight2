@@ -15,21 +15,20 @@ namespace se {
 
 
 template<typename ConfigT>
-float compute_three_sigma(const se::field_t depth_value,
+float compute_three_sigma(const field_t depth_value,
                           const float sigma_min,
                           const float sigma_max,
                           const ConfigT config)
 {
-    if (config.uncertainty_model == se::UncertaintyModel::Linear) {
+    if (config.uncertainty_model == UncertaintyModel::Linear) {
         return 3
-            * se::math::clamp(
-                   config.k_sigma * depth_value, sigma_min, sigma_max); // Livingroom dataset
+            * math::clamp(config.k_sigma * depth_value, sigma_min, sigma_max); // Livingroom dataset
     }
     else {
         return 3
-            * se::math::clamp(config.k_sigma * se::math::sq(depth_value),
-                              sigma_min,
-                              sigma_max); // Cow and lady
+            * math::clamp(config.k_sigma * math::sq(depth_value),
+                          sigma_min,
+                          sigma_max); // Cow and lady
     }
 }
 
@@ -45,7 +44,7 @@ float compute_tau(const field_t depth_value,
         return tau_max; ///<< e.g. used in ICL-NUIM livingroom dataset.
     }
     else {
-        return se::math::clamp(config.k_tau * depth_value, tau_min, tau_max);
+        return math::clamp(config.k_tau * depth_value, tau_min, tau_max);
     }
 }
 
@@ -56,9 +55,7 @@ namespace updater {
 
 
 template<typename DataT>
-bool weighted_mean_update(DataT& data,
-                          const se::field_t sample_value,
-                          const se::weight_t max_weight)
+bool weighted_mean_update(DataT& data, const field_t sample_value, const weight_t max_weight)
 {
     data.occupancy = (data.occupancy * data.weight + sample_value) / (data.weight + 1);
     data.weight = std::min((data.weight + 1), max_weight);
@@ -119,20 +116,20 @@ bool free_voxel(DataT& voxel_data, const ConfigT config)
 
 
 template<typename NodeT, typename BlockT>
-typename NodeT::DataType propagate_to_parent_node(se::OctantBase* octant_ptr, const int frame)
+typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr, const int frame)
 {
     NodeT* node_ptr = static_cast<NodeT*>(octant_ptr);
 
     node_ptr->setTimeStamp(frame);
 
-    se::field_t max_mean_occupancy = 0;
-    se::weight_t max_weight = 0;
-    se::field_t max_occupancy = -std::numeric_limits<se::field_t>::max();
+    field_t max_mean_occupancy = 0;
+    weight_t max_weight = 0;
+    field_t max_occupancy = -std::numeric_limits<field_t>::max();
     size_t observed_count = 0;
     size_t data_count = 0;
 
     for (int child_idx = 0; child_idx < 8; ++child_idx) {
-        se::OctantBase* child_ptr = node_ptr->getChild(child_idx);
+        OctantBase* child_ptr = node_ptr->getChild(child_idx);
 
         if (!child_ptr) {
             continue;
@@ -170,7 +167,7 @@ typename NodeT::DataType propagate_to_parent_node(se::OctantBase* octant_ptr, co
 
 
 template<typename BlockT>
-void propagate_block_to_coarsest_scale(se::OctantBase* octant_ptr)
+void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
 {
     typedef typename BlockT::DataType DataType;
 
@@ -178,14 +175,14 @@ void propagate_block_to_coarsest_scale(se::OctantBase* octant_ptr)
 
     int child_scale = block_ptr->getCurrentScale();
     int size_at_child_scale_li = BlockT::size >> child_scale;
-    int size_at_child_scale_sq = se::math::sq(size_at_child_scale_li);
+    int size_at_child_scale_sq = math::sq(size_at_child_scale_li);
 
     int parent_scale = child_scale + 1;
     int size_at_parent_scale_li = BlockT::size >> parent_scale;
-    int size_at_parent_scale_sq = se::math::sq(size_at_parent_scale_li);
+    int size_at_parent_scale_sq = math::sq(size_at_parent_scale_li);
 
     DataType min_data;
-    se::field_t min_occupancy;
+    field_t min_occupancy;
 
     if (block_ptr->buffer_scale() > block_ptr->getCurrentScale()) {
         DataType* max_data_at_parent_scale = block_ptr->blockMaxDataAtScale(parent_scale);
@@ -201,9 +198,9 @@ void propagate_block_to_coarsest_scale(se::OctantBase* octant_ptr)
                         x + y * size_at_parent_scale_li + z * size_at_parent_scale_sq;
                     auto& parent_max_data = max_data_at_parent_scale[parent_max_data_idx];
 
-                    se::field_t max_mean_occupancy = 0;
-                    se::weight_t max_weight = 0;
-                    se::field_t max_occupancy = -std::numeric_limits<float>::max();
+                    field_t max_mean_occupancy = 0;
+                    weight_t max_weight = 0;
+                    field_t max_occupancy = -std::numeric_limits<float>::max();
 
                     size_t observed_count = 0;
                     size_t data_count = 0;
@@ -216,7 +213,7 @@ void propagate_block_to_coarsest_scale(se::OctantBase* octant_ptr)
                                     + (2 * z + k) * size_at_child_scale_sq;
                                 const auto child_data = max_data_at_child_scale[child_max_data_idx];
 
-                                se::field_t occupancy = (child_data.occupancy * child_data.weight);
+                                field_t occupancy = (child_data.occupancy * child_data.weight);
 
                                 if (child_data.weight > 0) {
                                     if (occupancy > max_occupancy) {
@@ -270,12 +267,12 @@ void propagate_block_to_coarsest_scale(se::OctantBase* octant_ptr)
                     auto& parent_data = data_at_parent_scale[parent_data_idx];
                     auto& parent_max_data = max_data_at_parent_scale[parent_data_idx];
 
-                    se::field_t mean_occupancy = 0;
-                    se::weight_t mean_weight = 0;
+                    field_t mean_occupancy = 0;
+                    weight_t mean_weight = 0;
 
-                    se::field_t max_mean_occupancy = 0;
-                    se::weight_t max_weight = 0;
-                    se::field_t max_occupancy = -std::numeric_limits<se::field_t>::max();
+                    field_t max_mean_occupancy = 0;
+                    weight_t max_weight = 0;
+                    field_t max_occupancy = -std::numeric_limits<field_t>::max();
 
                     size_t observed_count = 0;
                     size_t data_count = 0;
@@ -294,8 +291,7 @@ void propagate_block_to_coarsest_scale(se::OctantBase* octant_ptr)
                                     mean_occupancy += child_data.occupancy;
                                     mean_weight += child_data.weight;
 
-                                    se::field_t occupancy =
-                                        (child_data.occupancy * child_data.weight);
+                                    field_t occupancy = (child_data.occupancy * child_data.weight);
 
                                     if (occupancy > max_occupancy) {
                                         // Update max
@@ -340,11 +336,11 @@ void propagate_block_to_coarsest_scale(se::OctantBase* octant_ptr)
 
     for (parent_scale += 1; parent_scale <= BlockT::getMaxScale(); ++parent_scale) {
         size_at_parent_scale_li = BlockT::size >> parent_scale;
-        size_at_parent_scale_sq = se::math::sq(size_at_parent_scale_li);
+        size_at_parent_scale_sq = math::sq(size_at_parent_scale_li);
 
         child_scale = parent_scale - 1;
         size_at_child_scale_li = BlockT::size >> child_scale;
-        size_at_child_scale_sq = se::math::sq(size_at_child_scale_li);
+        size_at_child_scale_sq = math::sq(size_at_child_scale_li);
 
         DataType* max_data_at_parent_scale = block_ptr->blockMaxDataAtScale(parent_scale);
         DataType* data_at_parent_scale = block_ptr->blockDataAtScale(parent_scale);
@@ -359,12 +355,12 @@ void propagate_block_to_coarsest_scale(se::OctantBase* octant_ptr)
                     auto& parent_data = data_at_parent_scale[parent_data_idx];
                     auto& parent_max_data = max_data_at_parent_scale[parent_data_idx];
 
-                    se::field_t mean_occupancy = 0;
-                    se::weight_t mean_weight = 0;
+                    field_t mean_occupancy = 0;
+                    weight_t mean_weight = 0;
 
-                    se::field_t max_mean_occupancy = 0;
-                    se::weight_t max_weight = 0;
-                    se::field_t max_occupancy = -std::numeric_limits<float>::max();
+                    field_t max_mean_occupancy = 0;
+                    weight_t max_weight = 0;
+                    field_t max_occupancy = -std::numeric_limits<float>::max();
 
                     size_t observed_count = 0;
                     size_t data_count = 0;

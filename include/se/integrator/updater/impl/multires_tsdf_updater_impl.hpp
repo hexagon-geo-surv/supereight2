@@ -15,11 +15,11 @@ namespace se {
 
 
 // Multi-res TSDF updater
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>, SensorT>::Updater(
+template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
+Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Updater(
     MapType& map,
     const SensorT& sensor,
-    const se::Image<float>& depth_img,
+    const Image<float>& depth_img,
     const Eigen::Matrix4f& T_WS,
     const int frame) :
         map_(map), sensor_(sensor), depth_img_(depth_img), T_WS_(T_WS), frame_(frame), config_(map)
@@ -28,14 +28,13 @@ Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>, Senso
 
 
 
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>,
-             SensorT>::operator()(std::vector<se::OctantBase*>& block_ptrs)
+template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
+void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::operator()(
+    std::vector<OctantBase*>& block_ptrs)
 {
     unsigned int block_size = BlockType::getSize();
-    const Eigen::Matrix4f T_SW = se::math::to_inverse_transformation(T_WS_);
-    const Octree<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>& octree =
-        *map_.getOctree();
+    const Eigen::Matrix4f T_SW = math::to_inverse_transformation(T_WS_);
+    const Octree<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>& octree = *map_.getOctree();
 
     auto valid_predicate = [&](float depth_value) { return depth_value >= sensor_.near_plane; };
 
@@ -64,22 +63,22 @@ void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>,
 
         if (curr_scale < last_curr_scale) {
             auto parent_down_funct = [](const OctreeType& /* octree */,
-                                        se::OctantBase* /* octant_ptr */,
+                                        OctantBase* /* octant_ptr */,
                                         typename BlockType::DataUnion& data_union) {
                 data_union.prop_data.delta_tsdf = data_union.data.tsdf;
                 data_union.prop_data.delta_weight = 0;
             };
 
             auto child_down_funct = [&](const OctreeType& octree,
-                                        se::OctantBase* /* octant_ptr */,
+                                        OctantBase* /* octant_ptr */,
                                         typename BlockType::DataUnion& child_data_union,
                                         typename BlockType::DataUnion& parent_data_union) {
-                se::field_t delta_tsdf =
+                field_t delta_tsdf =
                     parent_data_union.data.tsdf - parent_data_union.prop_data.delta_tsdf;
 
                 if (child_data_union.data.weight != 0) {
                     child_data_union.data.tsdf =
-                        std::max(child_data_union.data.tsdf + delta_tsdf, se::field_t(-1));
+                        std::max(child_data_union.data.tsdf + delta_tsdf, field_t(-1));
                     child_data_union.data.weight = fminf(
                         child_data_union.data.weight + parent_data_union.prop_data.delta_weight,
                         map_.getDataConfig().max_weight);
@@ -89,9 +88,9 @@ void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>,
                 }
                 else {
                     const Eigen::Vector3f child_sample_coord_f =
-                        se::get_sample_coord(child_data_union.coord, 1 << child_data_union.scale);
+                        get_sample_coord(child_data_union.coord, 1 << child_data_union.scale);
                     int child_scale_returned;
-                    auto interp_field_value = se::visitor::getFieldInterp(
+                    auto interp_field_value = visitor::getFieldInterp(
                         octree, child_sample_coord_f, child_data_union.scale, child_scale_returned);
 
                     if (interp_field_value) {
@@ -104,11 +103,11 @@ void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>,
                 }
             };
 
-            se::propagator::propagateBlockDown(octree,
-                                               static_cast<se::OctantBase*>(block_ptr),
-                                               curr_scale,
-                                               child_down_funct,
-                                               parent_down_funct);
+            propagator::propagateBlockDown(octree,
+                                           static_cast<OctantBase*>(block_ptr),
+                                           curr_scale,
+                                           child_down_funct,
+                                           parent_down_funct);
         }
 
         block_ptr->setCurrentScale(curr_scale);
@@ -118,7 +117,7 @@ void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>,
         map_.voxelToPoint(block_coord, stride, point_base_W);
         const Eigen::Vector3f point_base_S = (T_SW * point_base_W.homogeneous()).head(3);
         const Eigen::Matrix3f point_delta_matrix_S =
-            (se::math::to_rotation(T_SW) * map_.getRes() * Eigen::Matrix3f::Identity());
+            (math::to_rotation(T_SW) * map_.getRes() * Eigen::Matrix3f::Identity());
 
         for (unsigned int i = 0; i < block_size; i += stride) {
             for (unsigned int j = 0; j < block_size; j += stride) {
@@ -143,7 +142,7 @@ void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>,
 
                     // Update the TSDF
                     const float m = sensor_.measurementFromPoint(point_S);
-                    const se::field_t sdf_value = (depth_value - m) / m * point_S.norm();
+                    const field_t sdf_value = (depth_value - m) / m * point_S.norm();
 
                     typename BlockType::DataUnion data_union =
                         block_ptr->getDataUnion(voxel_coord, block_ptr->getCurrentScale());
@@ -181,32 +180,30 @@ void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>,
             return 0;
         };
 
-        se::propagator::propagateBlockUp(octree,
-                                         static_cast<se::OctantBase*>(block_ptr),
-                                         curr_scale,
-                                         child_up_funct,
-                                         parent_up_funct);
+        propagator::propagateBlockUp(octree,
+                                     static_cast<OctantBase*>(block_ptr),
+                                     curr_scale,
+                                     child_up_funct,
+                                     parent_up_funct);
     }
 
-    se::propagator::propagateTimeStampToRoot(block_ptrs);
+    propagator::propagateTimeStampToRoot(block_ptrs);
 }
 
 
 
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-void Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>,
-             SensorT>::updateVoxel(typename BlockType::DataUnion& data_union,
-                                   const field_t sdf_value)
+template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
+void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::updateVoxel(
+    typename BlockType::DataUnion& data_union,
+    const field_t sdf_value)
 {
     if (sdf_value > -config_.truncation_boundary) {
-        const se::field_t tsdf_value =
-            std::min(se::field_t(1), sdf_value / config_.truncation_boundary);
+        const field_t tsdf_value = std::min(field_t(1), sdf_value / config_.truncation_boundary);
         data_union.data.tsdf = (data_union.data.tsdf * data_union.data.weight + tsdf_value)
-            / (data_union.data.weight + se::weight_t(1));
-        data_union.data.tsdf =
-            se::math::clamp(data_union.data.tsdf, se::field_t(-1), se::field_t(1));
+            / (data_union.data.weight + weight_t(1));
+        data_union.data.tsdf = math::clamp(data_union.data.tsdf, field_t(-1), field_t(1));
         data_union.data.weight =
-            std::min(data_union.data.weight + se::weight_t(1), map_.getDataConfig().max_weight);
+            std::min(data_union.data.weight + weight_t(1), map_.getDataConfig().max_weight);
         data_union.prop_data.delta_weight++;
     }
 }

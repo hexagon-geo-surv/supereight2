@@ -15,18 +15,18 @@ namespace se {
 
 
 // Multi-res Occupancy updater
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>, SensorT>::Updater(
+template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
+Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Updater(
     MapType& map,
     const SensorT& sensor,
-    const se::Image<float>& depth_img,
+    const Image<float>& depth_img,
     const Eigen::Matrix4f& T_WS,
     const int frame) :
         map_(map),
         octree_(*(map.getOctree())),
         sensor_(sensor),
         depth_img_(depth_img),
-        T_SW_(se::math::to_inverse_transformation(T_WS)),
+        T_SW_(math::to_inverse_transformation(T_WS)),
         frame_(frame),
         map_res_(map.getRes()),
         config_(map),
@@ -36,9 +36,9 @@ Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>, 
 
 
 
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
-             SensorT>::operator()(se::VolumeCarverAllocation& allocation_list)
+template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
+void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::operator()(
+    VolumeCarverAllocation& allocation_list)
 {
     TICK("fusion-total")
 
@@ -55,7 +55,7 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
 #pragma omp parallel for
     for (unsigned int i = 0; i < allocation_list.block_list.size(); ++i) {
         updateBlock(allocation_list.block_list[i],
-                    allocation_list.variance_state_list[i] == se::VarianceState::Constant,
+                    allocation_list.variance_state_list[i] == VarianceState::Constant,
                     allocation_list.projects_inside_list[i]);
     }
     TOCK("fusion-blocks")
@@ -85,9 +85,9 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
 
 
 
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
-             SensorT>::propagateToRoot(std::vector<se::OctantBase*>& block_list)
+template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
+void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
+             SensorT>::propagateToRoot(std::vector<OctantBase*>& block_list)
 {
     for (const auto& octant_ptr : block_list) {
         BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
@@ -98,9 +98,9 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
 
     for (int d = octree_.getBlockDepth() - 1; d > 0; d--) // TODO: block depth - 1?
     {
-        std::set<se::OctantBase*>::iterator it;
+        std::set<OctantBase*>::iterator it;
         for (it = node_set_[d].begin(); it != node_set_[d].end(); ++it) {
-            se::OctantBase* octant_ptr = *it;
+            OctantBase* octant_ptr = *it;
             if (octant_ptr->getTimeStamp() == frame_) {
                 continue;
             }
@@ -124,9 +124,9 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
 
 
 
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
-             SensorT>::freeBlock(se::OctantBase* octant_ptr)
+template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
+void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::freeBlock(
+    OctantBase* octant_ptr)
 {
     BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
 
@@ -186,10 +186,10 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
             if (recommended_scale < last_scale) {
                 const int parent_scale = last_scale;
                 const unsigned int size_at_parent_scale_li = block_size >> parent_scale;
-                const unsigned int size_at_parent_scale_sq = se::math::sq(size_at_parent_scale_li);
+                const unsigned int size_at_parent_scale_sq = math::sq(size_at_parent_scale_li);
 
                 const unsigned int size_at_buffer_scale_li = size_at_parent_scale_li << 1;
-                const unsigned int size_at_buffer_scale_sq = se::math::sq(size_at_buffer_scale_li);
+                const unsigned int size_at_buffer_scale_sq = math::sq(size_at_buffer_scale_li);
 
                 for (unsigned int z = 0; z < size_at_parent_scale_li; z++) {
                     for (unsigned int y = 0; y < size_at_parent_scale_li; y++) {
@@ -227,8 +227,7 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
 
         /// Integrate data into buffer.
         const unsigned int size_at_recommended_scale_li = BlockType::size >> recommended_scale;
-        const unsigned int size_at_recommended_scale_sq =
-            se::math::sq(size_at_recommended_scale_li);
+        const unsigned int size_at_recommended_scale_sq = math::sq(size_at_recommended_scale_li);
 
         for (unsigned int z = 0; z < size_at_recommended_scale_li; z++) {
             for (unsigned int y = 0; y < size_at_recommended_scale_li; y++) {
@@ -255,7 +254,7 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
     }
 
     const unsigned int size_at_integration_scale_li = BlockType::size >> integration_scale;
-    const unsigned int size_at_integration_scale_sq = se::math::sq(size_at_integration_scale_li);
+    const unsigned int size_at_integration_scale_sq = math::sq(size_at_integration_scale_li);
 
     for (unsigned int z = 0; z < size_at_integration_scale_li; z++) {
         for (unsigned int y = 0; y < size_at_integration_scale_li; y++) {
@@ -276,11 +275,11 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
 
 
 
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
-             SensorT>::updateBlock(se::OctantBase* octant_ptr,
-                                   bool low_variance,
-                                   bool project_inside)
+template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
+void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::updateBlock(
+    OctantBase* octant_ptr,
+    bool low_variance,
+    bool project_inside)
 {
     // Compute the point of the block centre in the sensor frame
     BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
@@ -349,10 +348,10 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
             if (recommended_scale < last_scale) {
                 const int parent_scale = last_scale;
                 const unsigned int size_at_parent_scale_li = BlockType::size >> parent_scale;
-                const unsigned int size_at_parent_scale_sq = se::math::sq(size_at_parent_scale_li);
+                const unsigned int size_at_parent_scale_sq = math::sq(size_at_parent_scale_li);
 
                 const unsigned int size_at_buffer_scale_li = size_at_parent_scale_li << 1;
-                const unsigned int size_at_buffer_scale_sq = se::math::sq(size_at_buffer_scale_li);
+                const unsigned int size_at_buffer_scale_sq = math::sq(size_at_buffer_scale_li);
 
                 for (unsigned int z = 0; z < size_at_parent_scale_li; z++) {
                     for (unsigned int y = 0; y < size_at_parent_scale_li; y++) {
@@ -391,8 +390,7 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
         /// Integrate data into buffer.
         const unsigned int recommended_stride = 1 << recommended_scale;
         const unsigned int size_at_recommended_scale_li = BlockType::size >> recommended_scale;
-        const unsigned int size_at_recommended_scale_sq =
-            se::math::sq(size_at_recommended_scale_li);
+        const unsigned int size_at_recommended_scale_sq = math::sq(size_at_recommended_scale_li);
 
         const Eigen::Vector3i voxel_coord_base = block_ptr->getCoord();
         Eigen::Vector3f sample_point_base_W;
@@ -401,7 +399,7 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
             (T_SW_ * (sample_point_base_W).homogeneous()).head(3);
 
         const Eigen::Matrix3f sample_point_delta_matrix_S =
-            (se::math::to_rotation(T_SW_)
+            (math::to_rotation(T_SW_)
              * (map_res_
                 * (Eigen::Matrix3f() << recommended_stride,
                    0,
@@ -463,7 +461,7 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
 
     const unsigned int integration_stride = 1 << integration_scale;
     const unsigned int size_at_integration_scale_li = BlockType::size >> integration_scale;
-    const unsigned int size_at_integration_scale_sq = se::math::sq(size_at_integration_scale_li);
+    const unsigned int size_at_integration_scale_sq = math::sq(size_at_integration_scale_li);
 
     const Eigen::Vector3i voxel_coord_base = block_ptr->getCoord();
     Eigen::Vector3f sample_point_base_W;
@@ -472,7 +470,7 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
         (T_SW_ * (sample_point_base_W).homogeneous()).head(3);
 
     const Eigen::Matrix3f sample_point_delta_matrix_S =
-        (se::math::to_rotation(T_SW_)
+        (math::to_rotation(T_SW_)
          * (map_res_
             * (Eigen::Matrix3f() << integration_stride,
                0,
@@ -526,9 +524,9 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
 
 
 
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
-             SensorT>::freeNodeRecurse(se::OctantBase* octant_ptr, int depth)
+template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
+void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
+             SensorT>::freeNodeRecurse(OctantBase* octant_ptr, int depth)
 {
     NodeType* node_ptr = static_cast<NodeType*>(octant_ptr);
 
@@ -543,7 +541,7 @@ void Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
     }
     else {
         for (int child_idx = 0; child_idx < 8; child_idx++) {
-            se::OctantBase* child_ptr = node_ptr->getChild(child_idx);
+            OctantBase* child_ptr = node_ptr->getChild(child_idx);
             if (!child_ptr) {
                 child_ptr = octree_.allocateAll(node_ptr, child_idx); // TODO: Can be optimised
             }
