@@ -33,31 +33,31 @@ template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
 void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::operator()(
     std::vector<OctantBase*>& block_ptrs)
 {
-    unsigned int block_size = BlockType::getSize();
+    constexpr int block_size = BlockType::getSize();
     const Eigen::Matrix4f T_SW = math::to_inverse_transformation(T_WS_);
+    const Eigen::Matrix3f C_SW = math::to_rotation(T_SW);
 
     auto valid_predicate = [&](float depth_value) { return depth_value >= sensor_.near_plane; };
 
 #pragma omp parallel for
     for (unsigned int i = 0; i < block_ptrs.size(); i++) {
-        BlockType* block_ptr = static_cast<BlockType*>(block_ptrs[i]);
-        block_ptr->setTimeStamp(frame_);
-        Eigen::Vector3i block_coord = block_ptr->getCoord();
+        BlockType& block = *static_cast<BlockType*>(block_ptrs[i]);
+        block.setTimeStamp(frame_);
+        const Eigen::Vector3i block_coord = block.getCoord();
         Eigen::Vector3f point_base_W;
         map_.voxelToPoint(block_coord, point_base_W);
-        const Eigen::Vector3f point_base_S = (T_SW * point_base_W.homogeneous()).head(3);
-        const Eigen::Matrix3f point_delta_matrix_S =
-            (math::to_rotation(T_SW) * map_.getRes() * Eigen::Matrix3f::Identity());
+        const Eigen::Vector3f point_base_S = (T_SW * point_base_W.homogeneous()).head<3>();
+        const Eigen::Matrix3f point_delta_matrix_S = C_SW * map_.getRes();
 
-        for (unsigned int i = 0; i < block_size; ++i) {
-            for (unsigned int j = 0; j < block_size; ++j) {
-                for (unsigned int k = 0; k < block_size; ++k) {
+        for (unsigned int z = 0; z < block_size; ++z) {
+            for (unsigned int y = 0; y < block_size; ++y) {
+                for (unsigned int x = 0; x < block_size; ++x) {
                     // Set voxel coordinates
-                    Eigen::Vector3i voxel_coord = block_coord + Eigen::Vector3i(i, j, k);
+                    const Eigen::Vector3i voxel_coord = block_coord + Eigen::Vector3i(x, y, z);
 
                     // Set sample point in camera frame
-                    Eigen::Vector3f point_S =
-                        point_base_S + point_delta_matrix_S * Eigen::Vector3f(i, j, k);
+                    const Eigen::Vector3f point_S =
+                        point_base_S + point_delta_matrix_S * Eigen::Vector3f(x, y, z);
 
                     if (point_S.norm() > sensor_.farDist(point_S)) {
                         continue;
@@ -72,13 +72,15 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
 
                     // Update the TSDF
                     const float m = sensor_.measurementFromPoint(point_S);
-                    const field_t sdf_value = (depth_value - m) / m * point_S.norm();
+                    const field_t sdf_value = point_S.norm() * (depth_value - m) / m;
 
-                    DataType& data = block_ptr->getData(voxel_coord);
-                    updateVoxel(data, sdf_value);
-                } // k
-            }     // j
-        }         // i
+                    if (sdf_value > -config_.truncation_boundary) {
+                        DataType& data = block.getData(voxel_coord);
+                        updateVoxel(data, sdf_value);
+                    }
+                } // x
+            }     // y
+        }         // z
     }
 
     propagator::propagateTimeStampToRoot(block_ptrs);
@@ -89,15 +91,12 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
 template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
 void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::updateVoxel(
     DataType& data,
-    const field_t sdf_value)
+    field_t sdf_value)
 {
-    if (sdf_value > -config_.truncation_boundary) {
-        const float tsdf_value = std::min(1.f, sdf_value / config_.truncation_boundary);
-
-        data.tsdf = (data.tsdf * data.weight + tsdf_value) / (data.weight + 1.f);
-        data.tsdf = math::clamp(data.tsdf, -1.f, 1.f);
-        data.weight = std::min(data.weight + 1, map_.getDataConfig().max_weight);
-    }
+    weight::increment(data.weight, map_.getDataConfig().max_weight);
+    const field_t tsdf_value = std::min(field_t(1), sdf_value / config_.truncation_boundary);
+    data.tsdf = (data.tsdf * (data.weight - 1) + tsdf_value) / data.weight;
+    data.tsdf = math::clamp(data.tsdf, field_t(-1), field_t(1));
 }
 
 
