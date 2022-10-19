@@ -88,6 +88,20 @@ bool weighted_mean_update(DataT& data, const field_t sample_value, const weight_
     }
 }
 
+template<typename DataT>
+void weighted_mean_update_colour(DataT& data, rgb_t colour_value, weight_t max_weight)
+{
+    // Use if instead of std::min to prevent overflow.
+    if (data.rgb_weight < max_weight) {
+        data.rgb_weight++;
+    }
+    // No overflow occurs due to integral promotion to int or unsigned int during arithmetic
+    // operations.
+    data.rgb.r = (data.rgb.r * (data.rgb_weight - 1) + colour_value.r) / data.rgb_weight;
+    data.rgb.g = (data.rgb.g * (data.rgb_weight - 1) + colour_value.g) / data.rgb_weight;
+    data.rgb.b = (data.rgb.b * (data.rgb_weight - 1) + colour_value.b) / data.rgb_weight;
+}
+
 
 
 template<typename DataT, typename ConfigT>
@@ -106,6 +120,10 @@ bool update_voxel(DataT& data,
 template<typename DataT, typename ConfigT>
 void update_node_free(DataT& node_data, const ConfigT& config)
 {
+    if constexpr (DataT::col_ == Colour::On) {
+        // The colour should always be updated towards free even if only depth is integrated.
+        weighted_mean_update_colour(node_data, {0, 0, 0}, config.max_weight);
+    }
     weighted_mean_update(node_data, config.log_odd_min, config.max_weight);
 }
 
@@ -114,6 +132,10 @@ void update_node_free(DataT& node_data, const ConfigT& config)
 template<typename DataT, typename ConfigT>
 bool update_voxel_free(DataT& voxel_data, const ConfigT& config)
 {
+    if constexpr (DataT::col_ == Colour::On) {
+        // The colour should always be updated towards free even if only depth is integrated.
+        weighted_mean_update_colour(voxel_data, {0, 0, 0}, config.max_weight);
+    }
     return weighted_mean_update(voxel_data, config.log_odd_min, config.max_weight);
 }
 
@@ -278,6 +300,9 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
 
                     field_t mean_occupancy = 0;
                     delta_weight_t mean_weight = 0;
+                    // Only used for maps with colour, prevent compiler warning otherwise.
+                    rgb16s_t mean_colour = {0, 0, 0};
+                    (void) mean_colour;
 
                     field_t max_mean_occupancy = 0;
                     weight_t max_weight = 0;
@@ -299,6 +324,9 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
                                     data_count++;
                                     mean_occupancy += child_data.occupancy;
                                     mean_weight += child_data.weight;
+                                    if constexpr (DataType::col_ == Colour::On) {
+                                        mean_colour += child_data.rgb;
+                                    }
 
                                     const field_t occupancy =
                                         child_data.occupancy * child_data.weight;
@@ -329,6 +357,10 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
                         parent_data.weight =
                             weight::div(mean_weight, static_cast<delta_weight_t>(data_count));
                         parent_data.observed = false;
+                        if constexpr (DataType::col_ == Colour::On) {
+                            mean_colour /= data_count;
+                            parent_data.rgb = mean_colour.template cast<uint8_t>();
+                        }
 
                         parent_max_data.occupancy = max_mean_occupancy;
                         parent_max_data.weight = max_weight;
@@ -369,6 +401,9 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
 
                     field_t mean_occupancy = 0;
                     delta_weight_t mean_weight = 0;
+                    // Only used for maps with colour, prevent compiler warning otherwise.
+                    rgb16s_t mean_colour = {0, 0, 0};
+                    (void) mean_colour;
 
                     field_t max_mean_occupancy = 0;
                     weight_t max_weight = 0;
@@ -392,6 +427,9 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
                                     data_count++;
                                     mean_occupancy += child_data.occupancy;
                                     mean_weight += child_data.weight;
+                                    if constexpr (DataType::col_ == Colour::On) {
+                                        mean_colour += child_data.rgb;
+                                    }
 
                                     if ((child_max_data.occupancy * child_max_data.weight)
                                         > max_occupancy) {
@@ -415,6 +453,10 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
                         parent_data.weight =
                             weight::div(mean_weight, static_cast<delta_weight_t>(data_count));
                         parent_data.observed = false;
+                        if constexpr (DataType::col_ == Colour::On) {
+                            mean_colour /= data_count;
+                            parent_data.rgb = mean_colour.template cast<uint8_t>();
+                        }
 
                         parent_max_data.occupancy = max_mean_occupancy;
                         parent_max_data.weight = max_weight;

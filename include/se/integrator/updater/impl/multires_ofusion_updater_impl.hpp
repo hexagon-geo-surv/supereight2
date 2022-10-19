@@ -27,6 +27,7 @@ Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
         octree_(*(map.getOctree())),
         sensor_(sensor),
         depth_img_(depth_img),
+        colour_img_(colour_img),
         T_SW_(math::to_inverse_transformation(T_WS)),
         frame_(frame),
         map_res_(map.getRes()),
@@ -272,6 +273,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
     bool low_variance,
     bool project_inside)
 {
+    const bool has_colour = colour_img_;
     BlockType& block = *static_cast<BlockType*>(octant_ptr);
     const auto& config = map_.getDataConfig();
 
@@ -444,6 +446,12 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                         else {
                             block.incrBufferObservedCount(updater::update_voxel(
                                 buffer_data, range_diff, tau, three_sigma, config));
+                            if constexpr (MapType::col_ == Colour::On) {
+                                if (has_colour) {
+                                    updater::weighted_mean_update_colour(
+                                        buffer_data, (*colour_img_)[pixel_idx], config.max_weight);
+                                }
+                            }
                         }
                     }
                 } // x
@@ -527,6 +535,12 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                     else {
                         block.incrCurrObservedCount(updater::update_voxel(
                             voxel_data, range_diff, tau, three_sigma, config));
+                        if constexpr (MapType::col_ == Colour::On) {
+                            if (has_colour) {
+                                updater::weighted_mean_update_colour(
+                                    voxel_data, (*colour_img_)[pixel_idx], config.max_weight);
+                            }
+                        }
                     }
                 }
             } // x

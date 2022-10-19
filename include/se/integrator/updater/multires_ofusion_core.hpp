@@ -83,6 +83,16 @@ namespace updater {
 template<typename DataT>
 bool weighted_mean_update(DataT& data, const field_t sample_value, const weight_t max_weight);
 
+/**
+ * \brief Update the data with the measured colour value.
+ *
+ * \param[in,out] data         The data to update.
+ * \param[in]     colour_value The colour value to be integrated.
+ * \param[in]     max_weight   The maximum value of the colour weight.
+ */
+template<typename DataT>
+void weighted_mean_update_colour(DataT& data, rgb_t colour_value, weight_t max_weight);
+
 
 
 /**

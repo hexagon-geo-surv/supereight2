@@ -28,7 +28,6 @@ class Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Se
     typedef typename MapType::OctreeType::NodeType NodeType;
     typedef typename MapType::OctreeType::BlockType BlockType;
 
-
     struct UpdaterConfig {
         UpdaterConfig(const MapType& map) :
                 sigma_min(map.getRes() * map.getDataConfig().sigma_min_factor),
@@ -93,6 +92,7 @@ class Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Se
     OctreeType& octree_;
     const SensorT& sensor_;
     const Image<float>& depth_img_;
+    const Image<rgb_t>* colour_img_;
     const Eigen::Matrix4f T_SW_;
     const int frame_;
     const float map_res_;
