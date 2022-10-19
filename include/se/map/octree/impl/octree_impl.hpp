@@ -39,7 +39,7 @@ OctreeIterator<Octree<DataT, ResT, BlockSize>> Octree<DataT, ResT, BlockSize>::e
 
 
 template<typename DataT, Res ResT, int BlockSize>
-inline bool Octree<DataT, ResT, BlockSize>::contains(const Eigen::Vector3i& voxel_coord) const
+bool Octree<DataT, ResT, BlockSize>::contains(const Eigen::Vector3i& voxel_coord) const
 {
     return voxel_coord.x() >= 0 && voxel_coord.x() < size_ && voxel_coord.y() >= 0
         && voxel_coord.y() < size_ && voxel_coord.z() >= 0 && voxel_coord.z() < size_;
@@ -48,9 +48,9 @@ inline bool Octree<DataT, ResT, BlockSize>::contains(const Eigen::Vector3i& voxe
 
 
 template<typename DataT, Res ResT, int BlockSize>
-inline bool Octree<DataT, ResT, BlockSize>::allocate(NodeType* parent_ptr,
-                                                     const int child_idx,
-                                                     OctantBase*& child_ptr)
+bool Octree<DataT, ResT, BlockSize>::allocate(NodeType* parent_ptr,
+                                              const int child_idx,
+                                              OctantBase*& child_ptr)
 {
     assert(!parent_ptr->isBlock()); // Verify that the parent is not a block
     assert(parent_ptr);             // Verify that the parent is not a nullptr
@@ -82,8 +82,7 @@ inline bool Octree<DataT, ResT, BlockSize>::allocate(NodeType* parent_ptr,
 
 
 template<typename DataT, Res ResT, int BlockSize>
-inline OctantBase* Octree<DataT, ResT, BlockSize>::allocate(NodeType* parent_ptr,
-                                                            const int child_idx)
+OctantBase* Octree<DataT, ResT, BlockSize>::allocate(NodeType* parent_ptr, const int child_idx)
 {
     assert(!parent_ptr->isBlock()); // Verify that the parent is not a block
     assert(parent_ptr);             // Verify that the parent is not a nullptr
@@ -115,7 +114,7 @@ inline OctantBase* Octree<DataT, ResT, BlockSize>::allocate(NodeType* parent_ptr
 
 
 template<typename DataT, Res ResT, int BlockSize>
-inline void Octree<DataT, ResT, BlockSize>::deleteChildren(NodeType* parent_ptr)
+void Octree<DataT, ResT, BlockSize>::deleteChildren(NodeType* parent_ptr)
 {
     for (int child_idx = 0; child_idx < 8; child_idx++) {
         se::OctantBase* octant_ptr = parent_ptr->getChild(child_idx);
@@ -138,9 +137,9 @@ inline void Octree<DataT, ResT, BlockSize>::deleteChildren(NodeType* parent_ptr)
 
 
 template<typename DataT, Res ResT, int BlockSize>
-inline bool Octree<DataT, ResT, BlockSize>::allocateAll(NodeType* parent_ptr,
-                                                        const int child_idx,
-                                                        OctantBase*& child_ptr)
+bool Octree<DataT, ResT, BlockSize>::allocateAll(NodeType* parent_ptr,
+                                                 const int child_idx,
+                                                 OctantBase*& child_ptr)
 {
     assert(!parent_ptr->isBlock()); // Verify that the parent is not a block
     assert(parent_ptr);             // Verify that the parent is not a nullptr
@@ -176,8 +175,7 @@ inline bool Octree<DataT, ResT, BlockSize>::allocateAll(NodeType* parent_ptr,
 
 
 template<typename DataT, Res ResT, int BlockSize>
-inline OctantBase* Octree<DataT, ResT, BlockSize>::allocateAll(NodeType* parent_ptr,
-                                                               const int child_idx)
+OctantBase* Octree<DataT, ResT, BlockSize>::allocateAll(NodeType* parent_ptr, const int child_idx)
 {
     assert(!parent_ptr->isBlock()); // Verify that the parent is not a block
     assert(parent_ptr);             // Verify that the parent is not a nullptr

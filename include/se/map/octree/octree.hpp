@@ -70,14 +70,14 @@ class Octree {
    *
    * \return True if contained in the octree, False otherwise
    */
-    inline bool contains(const Eigen::Vector3i& voxel_coord) const;
+    bool contains(const Eigen::Vector3i& voxel_coord) const;
 
     /**
    * \brief Get the node pointer to the root of the octree.
    *
    * \return The pointer to the root of the octree
    */
-    inline se::OctantBase* getRoot()
+    se::OctantBase* getRoot()
     {
         return root_ptr_;
     };
@@ -87,7 +87,7 @@ class Octree {
    *
    * \return The pointer to the root of the octree
    */
-    inline se::OctantBase* getRoot() const
+    se::OctantBase* getRoot() const
     {
         return root_ptr_;
     };
@@ -97,7 +97,7 @@ class Octree {
    *
    * \return The size of the octree
    */
-    inline int getSize() const
+    int getSize() const
     {
         return size_;
     }
@@ -107,7 +107,7 @@ class Octree {
    *
    * \return The max scale of the octree
    */
-    inline int getMaxScale() const
+    int getMaxScale() const
     {
         return se::math::log2_const(size_);
     }
@@ -117,7 +117,7 @@ class Octree {
    *
    * \return The octree depth the blocks are allocated at
    */
-    inline int getBlockDepth() const
+    int getBlockDepth() const
     {
         return se::math::log2_const(size_) - se::math::log2_const(BlockSize);
     }
@@ -136,9 +136,9 @@ class Octree {
    *
    * \return Ture if the node has been newly allocated, False if it has already been allocated
    */
-    inline bool allocate(NodeType* parent_ptr,
-                         const int child_idx,
-                         se::OctantBase*& child_ptr); ///< Allocate child
+    bool allocate(NodeType* parent_ptr,
+                  const int child_idx,
+                  se::OctantBase*& child_ptr); ///< Allocate child
 
     /**
    * \brief Allocate a octant for a given parent node.
@@ -153,7 +153,7 @@ class Octree {
    *
    * \return The pointer ot the allocated / fetched octant
    */
-    inline se::OctantBase* allocate(NodeType* parent_ptr, const int child_idx);
+    se::OctantBase* allocate(NodeType* parent_ptr, const int child_idx);
 
     /**
    * \brief Allocate all of the parent node's child octants.
@@ -166,9 +166,9 @@ class Octree {
    *
    * \return Ture if the node has been newly allocated, False if it has already been allocated
    */
-    inline bool allocateAll(NodeType* parent_ptr,
-                            const int child_idx,
-                            se::OctantBase*& child_ptr); ///< Allocate child
+    bool allocateAll(NodeType* parent_ptr,
+                     const int child_idx,
+                     se::OctantBase*& child_ptr); ///< Allocate child
 
     /**
    * \brief Allocate all of the parent node's child octants.
@@ -181,14 +181,14 @@ class Octree {
    *
    * \return The pointer ot the allocated / fetched octant of the child_idx
    */
-    inline se::OctantBase* allocateAll(NodeType* parent_ptr, const int child_idx);
+    se::OctantBase* allocateAll(NodeType* parent_ptr, const int child_idx);
 
     /**
    * \brief Recursively delete all children of a given node pointer.
    *
    * \param[in] parent_ptr The node pointer to delete the children of
    */
-    inline void deleteChildren(NodeType* parent_ptr);
+    void deleteChildren(NodeType* parent_ptr);
 
     static constexpr se::Field fld_ = DataT::fld_;
     static constexpr se::Colour col_ = DataT::col_;
