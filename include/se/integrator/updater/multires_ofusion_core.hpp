@@ -18,12 +18,13 @@ namespace se {
 
 
 
-/**
- * \brief Compute the estimated uncertainty boundary for a given depth measurement.
+/** \brief Return three times the estimated uncertainty sigma for a given depth measurement.
  *
- * \param[in] depth_value The measured depth of the depth image.
- *
- * \return Three sigma uncertainty.
+ * \param[in] depth_value The depth measurement.
+ * \param[in] sigma_min   The minimum measurement uncertainty.
+ * \param[in] sigma_max   The maximum measurement uncertainty.
+ * \param[in] config      The occupancy data configuration.
+ * \return Three times the uncertainty estimate.
  */
 template<typename ConfigT>
 float compute_three_sigma(const field_t depth_value,
@@ -33,11 +34,12 @@ float compute_three_sigma(const field_t depth_value,
 
 
 
-/**
- * \brief Compute the estimated wall thickness tau for a given depth measurement.
+/** \brief Return the estimated wall thickness tau for a given depth measurement.
  *
  * \param[in] depth_value The measured depth of the depth image.
- *
+ * \param[in] tau_min     The minimum wall thickness.
+ * \param[in] tau_max     The maximum wall thickness.
+ * \param[in] config      The occupancy data configuration.
  * \return The estimated wall thickness.
  */
 template<typename ConfigT>
@@ -51,13 +53,12 @@ float compute_tau(const field_t depth_value,
 namespace updater {
 
 
-/**
- * \brief Update the weighted mean log-odd octant occupancy and set the octant to observed.
+/** \brief Update the weighted mean log-odd octant occupancy and set the octant to observed.
  *
- * \param[in,out] data     The data in the octant.
- * \param[in] sample_value The sample occupancy to be integrated.
- *
- * \return True/false if the voxel has been observed the first time
+ * \param[in,out] data         The data in the octant.
+ * \param[in]     sample_value The sample occupancy to be integrated.
+ * \param[in]     max_weight   The maximum update weight.
+ * \return True if the voxel was observed for the first time.
  */
 template<typename DataT>
 bool weighted_mean_update(DataT& data, const field_t sample_value, const weight_t max_weight);
