@@ -538,12 +538,12 @@ raycast(MapT& map,
 
 
 template<typename MapT, typename SensorT>
-void raycast_volume(const MapT& map,
-                    se::Image<Eigen::Vector3f>& surface_point_cloud_W,
-                    se::Image<Eigen::Vector3f>& surface_normals_W,
-                    se::Image<int8_t>& surface_scale,
-                    const Eigen::Matrix4f& T_WS,
-                    const SensorT& sensor)
+void raycast_volume_kernel(const MapT& map,
+                           se::Image<Eigen::Vector3f>& surface_point_cloud_W,
+                           se::Image<Eigen::Vector3f>& surface_normals_W,
+                           se::Image<int8_t>& surface_scale,
+                           const Eigen::Matrix4f& T_WS,
+                           const SensorT& sensor)
 {
     const typename MapT::OctreeType& octree = *(map.getOctree());
 #pragma omp parallel for
@@ -593,6 +593,18 @@ void raycast_volume(const MapT& map,
 }
 
 
+
+template<typename MapT, typename SensorT>
+void raycast_volume(const MapT& map,
+                    se::Image<Eigen::Vector3f>& surface_point_cloud_W,
+                    se::Image<Eigen::Vector3f>& surface_normals_W,
+                    se::Image<int8_t>& surface_scale,
+                    const Eigen::Matrix4f& T_WS,
+                    const SensorT& sensor)
+{
+    raycast_volume_kernel(
+        map, surface_point_cloud_W, surface_normals_W, surface_scale, T_WS, sensor);
+}
 
 } // namespace raycaster
 } // namespace se
