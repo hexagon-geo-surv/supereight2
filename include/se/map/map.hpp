@@ -249,6 +249,45 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
     typename std::enable_if_t<ResTDummy == Res::Multi, std::optional<se::field_t>>
     getFieldInterp(const Eigen::Vector3f& point_W, int& returned_scale) const;
 
+    /** \brief Interpolate a value at the supplied coordinates.
+     *
+     * \tparam GetF           The type of the function returning the value to be interpolated.
+     * \tparam SafeB          The parameter turning "contains point" verification on and off (Off by default)
+     * \param[in] point_W     The coordinates of the point in world frame [meter] to accessed
+     * \param[in] get_value   A function returning the value of type `T` to be interpolated with the
+     *                        following prototype:
+     *                        \code{.cpp}
+     *                        template<typename OctreeT>
+     *                        T get_value(const typename OctreeT::DataType& data);
+     *                        \endcode
+     * \return                The interpolated value if the data is valid, std::nullopt otherwise.
+     */
+    template<typename GetF, Safe SafeB = Safe::Off>
+    std::optional<std::invoke_result_t<GetF, DataType>> getInterp(const Eigen::Vector3f& point_W,
+                                                                  GetF get_value) const;
+
+    /** \brief Interpolate a value at the supplied coordinates and return the scale it was
+     * interpolated at.
+     *
+     * \tparam GetF               The type of the function returning the value to be interpolated.
+     * \tparam SafeB              The parameter turning "contains point" verification on and off (Off by default)
+     * \tparam ResTDummy          The dummy parameter disabling the function off for single res maps // TODO: Clean up with C++20 using required
+     * \param[in] point_W         The coordinates of the point in world frame [meter] to accessed
+     * \param[out] returned_scale The scale the data is stored at
+     * \param[in] get_value       A function returning the value of type `T` to be interpolated with
+     *                            the following prototype:
+     *                            \code{.cpp}
+     *                            template<typename OctreeT>
+     *                            T get_value(const typename OctreeT::DataType& data);
+     *                            \endcode
+     * \return                    The interpolated value if the data is valid, std::nullopt
+     *                            otherwise.
+     */
+    template<typename GetF, Safe SafeB = Safe::Off, Res ResTDummy = ResT>
+    typename std::enable_if_t<ResTDummy == Res::Multi,
+                              std::optional<std::invoke_result_t<GetF, DataType>>>
+    getInterp(const Eigen::Vector3f& point_W, int& returned_scale, GetF get_value) const;
+
     /**
      * \brief Get the field gradient at the provided coordinates.
      *

@@ -132,6 +132,48 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getFieldInterp(const Eigen::Vector
 
 
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
+template<typename GetF, Safe SafeB>
+std::optional<std::invoke_result_t<GetF, Data<FldT, ColB, SemB>>>
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getInterp(const Eigen::Vector3f& point_W,
+                                                        GetF get_value) const
+{
+    Eigen::Vector3f voxel_coord_f;
+    if constexpr (SafeB == Safe::Off) {
+        pointToVoxel<Safe::Off>(point_W, voxel_coord_f);
+    }
+    else {
+        if (!pointToVoxel<Safe::On>(point_W, voxel_coord_f)) {
+            return std::nullopt;
+        }
+    }
+    return se::visitor::getInterp(*octree_ptr_, voxel_coord_f, get_value);
+}
+
+
+
+template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
+template<typename GetF, Safe SafeB, Res ResTDummy>
+typename std::enable_if_t<ResTDummy == Res::Multi,
+                          std::optional<std::invoke_result_t<GetF, Data<FldT, ColB, SemB>>>>
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getInterp(const Eigen::Vector3f& point_W,
+                                                        int& returned_scale,
+                                                        GetF get_value) const
+{
+    Eigen::Vector3f voxel_coord_f;
+    if constexpr (SafeB == Safe::Off) {
+        pointToVoxel<Safe::Off>(point_W, voxel_coord_f);
+    }
+    else {
+        if (!pointToVoxel<Safe::On>(point_W, voxel_coord_f)) {
+            return std::nullopt;
+        }
+    }
+    return se::visitor::getInterp(*octree_ptr_, voxel_coord_f, returned_scale, get_value);
+}
+
+
+
+template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 template<Safe SafeB>
 std::optional<se::field_vec_t>
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getFieldGrad(const Eigen::Vector3f& point_W) const
