@@ -63,6 +63,8 @@ void point_cloud_to_normal(se::Image<Eigen::Vector3f>& normals,
 
 
 
+// Shading using the Phong reflection model without specular reflections:
+// https://en.wikipedia.org/wiki/Phong_reflection_model#Description
 void render_volume_kernel(uint32_t* volume_RGBA_image_data,
                           const Eigen::Vector2i& volume_RGBA_image_res,
                           const Eigen::Vector3f& light_M,
@@ -71,33 +73,24 @@ void render_volume_kernel(uint32_t* volume_RGBA_image_data,
                           const se::Image<Eigen::Vector3f>& surface_normals_M,
                           const se::Image<int8_t>& surface_scale)
 {
-    const int h = volume_RGBA_image_res.y(); // clang complains if this is inside the for loop
-    const int w = volume_RGBA_image_res.x(); // clang complains if this is inside the for loop
-
 #pragma omp parallel for
-    for (int y = 0; y < h; y++) {
-#pragma omp simd
-        for (int x = 0; x < w; x++) {
-            const size_t pixel_idx = x + w * y;
-
-            const Eigen::Vector3f surface_point_M = surface_point_cloud_M[pixel_idx];
-            const Eigen::Vector3f surface_normal_M = surface_normals_M[pixel_idx];
-
-            if (surface_normal_M.x() != INVALID && surface_normal_M.norm() > 0.f) {
-                const Eigen::Vector3f diff = (surface_point_M - light_M).normalized();
-                const Eigen::Vector3f dir = Eigen::Vector3f::Constant(
-                    std::max(surface_normal_M.normalized().dot(diff), 0.f));
-                Eigen::Vector3f col = dir + ambient_M;
-                se::math::clamp(col, Eigen::Vector3f::Zero(), Eigen::Vector3f::Ones());
-
-                col = col.cwiseProduct(se::colours::scale[surface_scale(x, y)]);
-                volume_RGBA_image_data[pixel_idx] = se::pack_rgba(col.x(), col.y(), col.z(), 0xFF);
-            }
-            else {
-                volume_RGBA_image_data[pixel_idx] = 0xFF000000;
-            }
-        } // x
-    }     // y
+    for (int pixel_idx = 0; pixel_idx < volume_RGBA_image_res.prod(); pixel_idx++) {
+        const Eigen::Vector3f& surface_point_M = surface_point_cloud_M[pixel_idx];
+        const Eigen::Vector3f& N = surface_normals_M[pixel_idx];
+        if (N.x() != INVALID && N.norm() > 0.0f) {
+            const Eigen::Vector3f L = (surface_point_M - light_M).normalized();
+            const Eigen::Vector3f diffuse =
+                Eigen::Vector3f::Constant(std::max(L.dot(N.normalized()), 0.0f));
+            Eigen::Vector3f illumination = diffuse + ambient_M;
+            se::math::clamp(illumination, Eigen::Vector3f::Zero(), Eigen::Vector3f::Ones());
+            const Eigen::Vector3i colour =
+                illumination.cwiseProduct(se::colours::scale[surface_scale[pixel_idx]]).cast<int>();
+            volume_RGBA_image_data[pixel_idx] = se::pack_rgba(colour);
+        }
+        else {
+            volume_RGBA_image_data[pixel_idx] = 0xFF000000;
+        }
+    }
 }
 
 } // namespace raycaster
