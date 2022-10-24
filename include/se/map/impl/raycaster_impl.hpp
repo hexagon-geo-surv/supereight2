@@ -542,6 +542,7 @@ void raycast_volume_kernel(const MapT& map,
                            se::Image<Eigen::Vector3f>& surface_point_cloud_W,
                            se::Image<Eigen::Vector3f>& surface_normals_W,
                            se::Image<int8_t>& surface_scale,
+                           se::Image<rgb_t>* surface_colour,
                            const Eigen::Matrix4f& T_WS,
                            const SensorT& sensor)
 {
@@ -553,8 +554,12 @@ void raycast_volume_kernel(const MapT& map,
     if (surface_scale.width() != w || surface_scale.height() != h) {
         surface_scale = Image<int8_t>(w, h);
     }
+    if (surface_colour && (surface_colour->width() != w || surface_colour->height() != h)) {
+        *surface_colour = Image<rgb_t>(w, h);
+    }
 
     const typename MapT::OctreeType& octree = *(map.getOctree());
+    const bool has_colour = surface_colour;
 #pragma omp parallel for
     for (int y = 0; y < h; y++) {
 #pragma omp simd
@@ -591,11 +596,21 @@ void raycast_volume_kernel(const MapT& map,
                         ? -surface_normal_W->normalized()
                         : surface_normal_W->normalized();
                 }
+                if constexpr (MapT::col_ == Colour::On) {
+                    if (has_colour) {
+                        auto colour = map.template getInterp(surface_intersection_W->head<3>(),
+                                                             [](const auto& x) { return x.rgb; });
+                        (*surface_colour)[pixel_idx] = colour ? *colour : rgb_t{0, 0, 0};
+                    }
+                }
             }
             else {
                 surface_point_cloud_W[pixel_idx] = Eigen::Vector3f::Zero();
                 surface_normals_W[pixel_idx] = Eigen::Vector3f::Constant(INVALID);
                 surface_scale[pixel_idx] = 0;
+                if (has_colour) {
+                    (*surface_colour)[pixel_idx] = rgb_t{0, 0, 0};
+                }
             }
         } // x
     }     // y
@@ -612,7 +627,28 @@ void raycast_volume(const MapT& map,
                     const SensorT& sensor)
 {
     raycast_volume_kernel(
-        map, surface_point_cloud_W, surface_normals_W, surface_scale, T_WS, sensor);
+        map, surface_point_cloud_W, surface_normals_W, surface_scale, nullptr, T_WS, sensor);
+}
+
+
+
+template<typename MapT, typename SensorT>
+typename std::enable_if_t<MapT::col_ == Colour::On>
+raycast_volume(const MapT& map,
+               se::Image<Eigen::Vector3f>& surface_point_cloud_W,
+               se::Image<Eigen::Vector3f>& surface_normals_W,
+               se::Image<int8_t>& surface_scale,
+               se::Image<rgb_t>& surface_colour,
+               const Eigen::Matrix4f& T_WS,
+               const SensorT& sensor)
+{
+    raycast_volume_kernel(map,
+                          surface_point_cloud_W,
+                          surface_normals_W,
+                          surface_scale,
+                          &surface_colour,
+                          T_WS,
+                          sensor);
 }
 
 

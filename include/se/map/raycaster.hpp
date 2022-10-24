@@ -59,6 +59,16 @@ void raycast_volume(const MapT& map,
                     const Eigen::Matrix4f& T_WS,
                     const SensorT& sensor);
 
+template<typename MapT, typename SensorT>
+typename std::enable_if_t<MapT::col_ == Colour::On>
+raycast_volume(const MapT& map,
+               se::Image<Eigen::Vector3f>& surface_point_cloud_W,
+               se::Image<Eigen::Vector3f>& surface_normals_W,
+               se::Image<int8_t>& surface_scale,
+               se::Image<rgb_t>& surface_colour,
+               const Eigen::Matrix4f& T_WS,
+               const SensorT& sensor);
+
 void render_volume(uint32_t* volume_RGBA_image_data,
                    const Eigen::Vector2i& volume_RGBA_image_res,
                    const se::Image<Eigen::Vector3f>& surface_point_cloud_W,
