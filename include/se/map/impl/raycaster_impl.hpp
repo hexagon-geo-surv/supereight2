@@ -545,12 +545,21 @@ void raycast_volume_kernel(const MapT& map,
                            const Eigen::Matrix4f& T_WS,
                            const SensorT& sensor)
 {
+    const int w = surface_point_cloud_W.width();
+    const int h = surface_point_cloud_W.height();
+    if (surface_normals_W.width() != w || surface_normals_W.height() != h) {
+        surface_normals_W = Image<Eigen::Vector3f>(w, h);
+    }
+    if (surface_scale.width() != w || surface_scale.height() != h) {
+        surface_scale = Image<int8_t>(w, h);
+    }
+
     const typename MapT::OctreeType& octree = *(map.getOctree());
 #pragma omp parallel for
-    for (int y = 0; y < surface_point_cloud_W.height(); y++) {
+    for (int y = 0; y < h; y++) {
 #pragma omp simd
-        for (int x = 0; x < surface_point_cloud_W.width(); x++) {
-            const size_t pixel_idx = x + y * surface_normals_W.width();
+        for (int x = 0; x < w; x++) {
+            const size_t pixel_idx = x + y * w;
             const Eigen::Vector2f pixel_f(x, y);
             Eigen::Vector3f ray_dir_S; //< Ray direction in sensor frame
             sensor.model.backProject(pixel_f, &ray_dir_S);
