@@ -105,5 +105,31 @@ void render_volume_scale(uint32_t* volume_RGBA_image_data,
             return se::pack_rgba(colour);
         });
 }
+
+
+
+void render_volume_colour(uint32_t* volume_RGBA_image_data,
+                          const Eigen::Vector2i& volume_RGBA_image_res,
+                          const se::Image<Eigen::Vector3f>& surface_point_cloud_M,
+                          const se::Image<Eigen::Vector3f>& surface_normals_M,
+                          const se::Image<rgb_t>& surface_colour,
+                          const Eigen::Vector3f& light_M,
+                          const Eigen::Vector3f& ambient_M)
+{
+    render_volume_kernel(
+        volume_RGBA_image_data,
+        volume_RGBA_image_res,
+        surface_point_cloud_M,
+        surface_normals_M,
+        light_M,
+        ambient_M,
+        [&](int pixel_idx, const Eigen::Vector3f& illumination) {
+            const rgb_t c = surface_colour[pixel_idx];
+            const Eigen::Vector3i colour =
+                illumination.cwiseProduct(Eigen::Vector3f(c.r, c.g, c.b)).cast<int>();
+            return se::pack_rgba(colour);
+        });
+}
+
 } // namespace raycaster
 } // namespace se
