@@ -65,13 +65,13 @@ void point_cloud_to_normal(se::Image<Eigen::Vector3f>& normals,
 
 // Shading using the Phong reflection model without specular reflections:
 // https://en.wikipedia.org/wiki/Phong_reflection_model#Description
-void render_volume_kernel(uint32_t* volume_RGBA_image_data,
-                          const Eigen::Vector2i& volume_RGBA_image_res,
-                          const Eigen::Vector3f& light_M,
-                          const Eigen::Vector3f& ambient_M,
-                          const se::Image<Eigen::Vector3f>& surface_point_cloud_M,
-                          const se::Image<Eigen::Vector3f>& surface_normals_M,
-                          const se::Image<int8_t>& surface_scale)
+void render_volume(uint32_t* volume_RGBA_image_data,
+                   const Eigen::Vector2i& volume_RGBA_image_res,
+                   const se::Image<Eigen::Vector3f>& surface_point_cloud_M,
+                   const se::Image<Eigen::Vector3f>& surface_normals_M,
+                   const se::Image<int8_t>& surface_scale,
+                   const Eigen::Vector3f& light_M,
+                   const Eigen::Vector3f& ambient_M)
 {
 #pragma omp parallel for
     for (int pixel_idx = 0; pixel_idx < volume_RGBA_image_res.prod(); pixel_idx++) {
