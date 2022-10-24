@@ -419,12 +419,12 @@ TEST(MultiResOFusionSystemTest, Raycasting)
 
     convert_to_output_colour_img(processed_colour_img, output_rgba_img_data);
     convert_to_output_depth_img(processed_depth_img, output_depth_img_data);
-    se::raycaster::render_volume(output_volume_img_data,
-                                 processed_img_res,
-                                 surface_point_cloud_W,
-                                 surface_normals_W,
-                                 surface_scale,
-                                 se::math::to_translation(T_WS));
+    se::raycaster::render_volume_scale(output_volume_img_data,
+                                       processed_img_res,
+                                       surface_point_cloud_W,
+                                       surface_normals_W,
+                                       surface_scale,
+                                       se::math::to_translation(T_WS));
 
     map.saveStructure(config.app.structure_path + "/test-raycasting-structure_"
                       + std::to_string(frame) + ".ply");

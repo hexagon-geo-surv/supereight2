@@ -615,6 +615,37 @@ void raycast_volume(const MapT& map,
         map, surface_point_cloud_W, surface_normals_W, surface_scale, T_WS, sensor);
 }
 
+
+
+// Shading using the Phong reflection model without specular reflections:
+// https://en.wikipedia.org/wiki/Phong_reflection_model#Description
+template<typename PixelF>
+void render_volume_kernel(uint32_t* volume_RGBA_image_data,
+                          const Eigen::Vector2i& volume_RGBA_image_res,
+                          const se::Image<Eigen::Vector3f>& surface_point_cloud_M,
+                          const se::Image<Eigen::Vector3f>& surface_normals_M,
+                          const Eigen::Vector3f& light_M,
+                          const Eigen::Vector3f& ambient_M,
+                          PixelF compute_pixel)
+{
+#pragma omp parallel for
+    for (int pixel_idx = 0; pixel_idx < volume_RGBA_image_res.prod(); pixel_idx++) {
+        const Eigen::Vector3f& surface_point_M = surface_point_cloud_M[pixel_idx];
+        const Eigen::Vector3f& N = surface_normals_M[pixel_idx];
+        if (N.x() != INVALID && N.norm() > 0.0f) {
+            const Eigen::Vector3f L = (surface_point_M - light_M).normalized();
+            const Eigen::Vector3f diffuse =
+                Eigen::Vector3f::Constant(std::max(L.dot(N.normalized()), 0.0f));
+            Eigen::Vector3f illumination = diffuse + ambient_M;
+            se::math::clamp(illumination, Eigen::Vector3f::Zero(), Eigen::Vector3f::Ones());
+            volume_RGBA_image_data[pixel_idx] = compute_pixel(pixel_idx, illumination);
+        }
+        else {
+            volume_RGBA_image_data[pixel_idx] = 0xFF000000;
+        }
+    }
+}
+
 } // namespace raycaster
 } // namespace se
 

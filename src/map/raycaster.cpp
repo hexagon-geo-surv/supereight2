@@ -63,35 +63,47 @@ void point_cloud_to_normal(se::Image<Eigen::Vector3f>& normals,
 
 
 
-// Shading using the Phong reflection model without specular reflections:
-// https://en.wikipedia.org/wiki/Phong_reflection_model#Description
 void render_volume(uint32_t* volume_RGBA_image_data,
                    const Eigen::Vector2i& volume_RGBA_image_res,
                    const se::Image<Eigen::Vector3f>& surface_point_cloud_M,
                    const se::Image<Eigen::Vector3f>& surface_normals_M,
-                   const se::Image<int8_t>& surface_scale,
                    const Eigen::Vector3f& light_M,
                    const Eigen::Vector3f& ambient_M)
 {
-#pragma omp parallel for
-    for (int pixel_idx = 0; pixel_idx < volume_RGBA_image_res.prod(); pixel_idx++) {
-        const Eigen::Vector3f& surface_point_M = surface_point_cloud_M[pixel_idx];
-        const Eigen::Vector3f& N = surface_normals_M[pixel_idx];
-        if (N.x() != INVALID && N.norm() > 0.0f) {
-            const Eigen::Vector3f L = (surface_point_M - light_M).normalized();
-            const Eigen::Vector3f diffuse =
-                Eigen::Vector3f::Constant(std::max(L.dot(N.normalized()), 0.0f));
-            Eigen::Vector3f illumination = diffuse + ambient_M;
-            se::math::clamp(illumination, Eigen::Vector3f::Zero(), Eigen::Vector3f::Ones());
-            const Eigen::Vector3i colour =
-                illumination.cwiseProduct(se::colours::scale[surface_scale[pixel_idx]]).cast<int>();
-            volume_RGBA_image_data[pixel_idx] = se::pack_rgba(colour);
-        }
-        else {
-            volume_RGBA_image_data[pixel_idx] = 0xFF000000;
-        }
-    }
+    render_volume_kernel(volume_RGBA_image_data,
+                         volume_RGBA_image_res,
+                         surface_point_cloud_M,
+                         surface_normals_M,
+                         light_M,
+                         ambient_M,
+                         [&](int /*pixel_idx*/, const Eigen::Vector3f& illumination) {
+                             const Eigen::Vector3i colour = (illumination * 255.0f).cast<int>();
+                             return se::pack_rgba(colour);
+                         });
 }
 
+
+
+void render_volume_scale(uint32_t* volume_RGBA_image_data,
+                         const Eigen::Vector2i& volume_RGBA_image_res,
+                         const se::Image<Eigen::Vector3f>& surface_point_cloud_M,
+                         const se::Image<Eigen::Vector3f>& surface_normals_M,
+                         const se::Image<int8_t>& surface_scale,
+                         const Eigen::Vector3f& light_M,
+                         const Eigen::Vector3f& ambient_M)
+{
+    render_volume_kernel(
+        volume_RGBA_image_data,
+        volume_RGBA_image_res,
+        surface_point_cloud_M,
+        surface_normals_M,
+        light_M,
+        ambient_M,
+        [&](int pixel_idx, const Eigen::Vector3f& illumination) {
+            const Eigen::Vector3i colour =
+                illumination.cwiseProduct(se::colours::scale[surface_scale[pixel_idx]]).cast<int>();
+            return se::pack_rgba(colour);
+        });
+}
 } // namespace raycaster
 } // namespace se

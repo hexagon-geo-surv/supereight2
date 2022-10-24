@@ -63,9 +63,16 @@ void render_volume(uint32_t* volume_RGBA_image_data,
                    const Eigen::Vector2i& volume_RGBA_image_res,
                    const se::Image<Eigen::Vector3f>& surface_point_cloud_W,
                    const se::Image<Eigen::Vector3f>& surface_normals_W,
-                   const se::Image<int8_t>& surface_scale,
                    const Eigen::Vector3f& light_W = Eigen::Vector3f::Ones(),
                    const Eigen::Vector3f& ambient_W = Eigen::Vector3f::Constant(0.1));
+
+void render_volume_scale(uint32_t* volume_RGBA_image_data,
+                         const Eigen::Vector2i& volume_RGBA_image_res,
+                         const se::Image<Eigen::Vector3f>& surface_point_cloud_W,
+                         const se::Image<Eigen::Vector3f>& surface_normals_W,
+                         const se::Image<int8_t>& surface_scale,
+                         const Eigen::Vector3f& light_W = Eigen::Vector3f::Ones(),
+                         const Eigen::Vector3f& ambient_W = Eigen::Vector3f::Constant(0.1));
 
 
 
