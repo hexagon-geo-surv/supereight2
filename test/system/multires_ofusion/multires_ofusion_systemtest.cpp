@@ -370,12 +370,12 @@ TEST(MultiResOFusionSystemTest, Raycasting)
     // Setup input images
     const Eigen::Vector2i input_img_res(config.sensor.width, config.sensor.height);
     se::Image<float> input_depth_img(input_img_res.x(), input_img_res.y());
-    se::Image<uint32_t> input_rgba_img(input_img_res.x(), input_img_res.y());
+    se::Image<uint32_t> input_colour_img(input_img_res.x(), input_img_res.y());
 
     // Setup processed images
     const Eigen::Vector2i processed_img_res = input_img_res / config.app.sensor_downsampling_factor;
     se::Image<float> processed_depth_img(processed_img_res.x(), processed_img_res.y());
-    se::Image<uint32_t> processed_rgba_img(processed_img_res.x(), processed_img_res.y());
+    se::Image<uint32_t> processed_colour_img(processed_img_res.x(), processed_img_res.y());
 
     // Setup output images / renders
     uint32_t* output_rgba_img_data = new uint32_t[processed_img_res.x() * processed_img_res.y()];
@@ -404,11 +404,11 @@ TEST(MultiResOFusionSystemTest, Raycasting)
     se::Image<int8_t> surface_scale(processed_img_res.x(), processed_img_res.y());
 
     Eigen::Matrix4f T_WS;
-    reader->nextData(input_depth_img, input_rgba_img, T_WS);
+    reader->nextData(input_depth_img, input_colour_img, T_WS);
 
     // Preprocess depth
     se::preprocessor::downsample_depth(input_depth_img, processed_depth_img);
-    se::preprocessor::downsample_rgba(input_rgba_img, processed_rgba_img);
+    se::preprocessor::downsample_colour(input_colour_img, processed_colour_img);
 
     se::MapIntegrator integrator(map);
     integrator.integrateDepth(sensor, processed_depth_img, T_WS, frame);
@@ -417,7 +417,7 @@ TEST(MultiResOFusionSystemTest, Raycasting)
         map, surface_point_cloud_W, surface_normals_W, surface_scale, T_WS, sensor);
 
     const Eigen::Vector3f ambient{0.1, 0.1, 0.1};
-    convert_to_output_rgba_img(processed_rgba_img, output_rgba_img_data);
+    convert_to_output_colour_img(processed_colour_img, output_rgba_img_data);
     convert_to_output_depth_img(processed_depth_img, output_depth_img_data);
     se::raycaster::render_volume_kernel(output_volume_img_data,
                                         processed_img_res,

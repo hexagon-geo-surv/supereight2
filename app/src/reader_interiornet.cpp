@@ -26,7 +26,7 @@ struct InteriorNetIntrinsics {
     static constexpr float c_y = 240;
 };
 
-/** The filename of a depth or RGB image and its timestamp.
+/** The filename of a depth or colour image and its timestamp.
  */
 struct InteriorNetImageEntry {
     double timestamp;
@@ -55,14 +55,14 @@ struct InteriorNetImageEntry {
 
 
 
-/** A timestamped ground truth pose and its associated depth and RGB images.
+/** A timestamped ground truth pose and its associated depth and colour images.
  */
 struct InteriorNetPoseEntry {
     double timestamp;
     Eigen::Vector3f position;
     Eigen::Quaternionf orientation;
     std::string depth_filename;
-    std::string rgb_filename;
+    std::string colour_filename;
 
     /** Initialize an invalid InteriorNetPoseEntry.
      */
@@ -74,13 +74,13 @@ struct InteriorNetPoseEntry {
                          const Eigen::Vector3f& p,
                          const Eigen::Quaternionf& o,
                          const std::string& df,
-                         const std::string& rf) :
-            timestamp(t), position(p), orientation(o), depth_filename(df), rgb_filename(rf)
+                         const std::string& cf) :
+            timestamp(t), position(p), orientation(o), depth_filename(df), colour_filename(cf)
     {
     }
 
     /** Initialize using a single-line string from a InteriorNet groundtruth.txt.
-     * depth_filename and rgb_filename will not be initialized.
+     * depth_filename and colour_filename will not be initialized.
      * \warning No error checking is performed in this function, it should be
      * performed by the caller.
      */
@@ -103,11 +103,11 @@ struct InteriorNetPoseEntry {
      */
     std::string string() const
     {
-        const std::string s = std::to_string(timestamp) + " " + rgb_filename + " " + depth_filename
-            + " " + std::to_string(position.x()) + " " + std::to_string(position.y()) + " "
-            + std::to_string(position.z()) + " " + std::to_string(orientation.x()) + " "
-            + std::to_string(orientation.y()) + " " + std::to_string(orientation.z()) + " "
-            + std::to_string(orientation.w());
+        const std::string s = std::to_string(timestamp) + " " + colour_filename + " "
+            + depth_filename + " " + std::to_string(position.x()) + " "
+            + std::to_string(position.y()) + " " + std::to_string(position.z()) + " "
+            + std::to_string(orientation.x()) + " " + std::to_string(orientation.y()) + " "
+            + std::to_string(orientation.z()) + " " + std::to_string(orientation.w());
         return s;
     }
 
@@ -231,8 +231,8 @@ std::string write_ground_truth_tmp(const std::vector<InteriorNetPoseEntry>& pose
         return "";
     }
     // Write the header
-    fs << "# Association of rgb images, depth images and ground truth poses\n";
-    fs << "# ID timestamp rgb_filename depth_filename tx ty tz qx qy qz qw\n";
+    fs << "# Association of colour images, depth images and ground truth poses\n";
+    fs << "# ID timestamp colour_filename depth_filename tx ty tz qx qy qz qw\n";
     // Write each of the associated poses
     for (size_t i = 0; i < poses.size(); ++i) {
         fs << std::setw(6) << std::setfill('0') << i << " " << poses[i].string() << "\n";
@@ -244,12 +244,12 @@ std::string write_ground_truth_tmp(const std::vector<InteriorNetPoseEntry>& pose
 
 void association(std::vector<InteriorNetPoseEntry>& gt_poses,
                  const std::vector<InteriorNetImageEntry>& depth_images,
-                 const std::vector<InteriorNetImageEntry>& rgb_images)
+                 const std::vector<InteriorNetImageEntry>& colour_images)
 {
     for (unsigned int i = 0; i < gt_poses.size(); i++) {
         gt_poses[i].timestamp = depth_images[i].timestamp;
         gt_poses[i].depth_filename = depth_images[i].filename;
-        gt_poses[i].rgb_filename = rgb_images[i].filename;
+        gt_poses[i].colour_filename = colour_images[i].filename;
     }
 }
 
@@ -281,7 +281,7 @@ se::InteriorNetReader::InteriorNetReader(const se::ReaderConfig& c) : se::Reader
     // Read the image information from the data.csv.
     std::vector<InteriorNetImageEntry> depth_images =
         read_interiornet_image_list(sequence_path_ + "/depth0/data.csv");
-    std::vector<InteriorNetImageEntry> rgb_images =
+    std::vector<InteriorNetImageEntry> colour_images =
         read_interiornet_image_list(sequence_path_ + "/cam0/data.csv");
     // Read and associate the ground truth file if needed
     if (!ground_truth_file_.empty()) {
@@ -292,7 +292,7 @@ se::InteriorNetReader::InteriorNetReader(const se::ReaderConfig& c) : se::Reader
             status_ = se::ReaderStatus::error;
             return;
         }
-        association(gt_poses, depth_images, rgb_images);
+        association(gt_poses, depth_images, colour_images);
 
         // Generate the associated ground truth file
         const std::string generated_filename = write_ground_truth_tmp(gt_poses);
@@ -312,11 +312,12 @@ se::InteriorNetReader::InteriorNetReader(const se::ReaderConfig& c) : se::Reader
                    depth_images.end(),
                    depth_filenames_.begin(),
                    [](const auto& e) { return e.filename; });
-    // Get the filenames of the RGB images.
-    rgb_filenames_.resize(rgb_images.size());
-    std::transform(rgb_images.begin(), rgb_images.end(), rgb_filenames_.begin(), [](const auto& e) {
-        return e.filename;
-    });
+    // Get the filenames of the colour images.
+    colour_filenames_.resize(colour_images.size());
+    std::transform(colour_images.begin(),
+                   colour_images.end(),
+                   colour_filenames_.begin(),
+                   [](const auto& e) { return e.filename; });
     // Get the total number of frames.
     num_frames_ = depth_filenames_.size();
     // Set the depth image resolution to that of the first depth image.
@@ -347,17 +348,18 @@ se::InteriorNetReader::InteriorNetReader(const se::ReaderConfig& c) : se::Reader
         }
     }
 
-    // Set the RGBA image resolution to that of the first RGBA image.
-    if (!rgb_filenames_.empty()) {
-        const std::string first_rgb_filename = sequence_path_ + "/cam0/data/" + rgb_filenames_[0];
-        cv::Mat image_data = cv::imread(first_rgb_filename.c_str(), cv::IMREAD_COLOR);
+    // Set the colour image resolution to that of the first colour image.
+    if (!colour_filenames_.empty()) {
+        const std::string first_colour_filename =
+            sequence_path_ + "/cam0/data/" + colour_filenames_[0];
+        cv::Mat image_data = cv::imread(first_colour_filename.c_str(), cv::IMREAD_COLOR);
 
         if (image_data.data == NULL) {
-            std::cerr << "Error: Could not read RGB image " << first_rgb_filename << "\n";
+            std::cerr << "Error: Could not read colour image " << first_colour_filename << "\n";
             status_ = se::ReaderStatus::error;
             return;
         }
-        rgba_image_res_ = Eigen::Vector2i(image_data.cols, image_data.rows);
+        colour_image_res_ = Eigen::Vector2i(image_data.cols, image_data.rows);
     }
 }
 
@@ -416,12 +418,12 @@ se::ReaderStatus se::InteriorNetReader::nextDepth(se::Image<float>& depth_image)
 
 
 
-se::ReaderStatus se::InteriorNetReader::nextRGBA(se::Image<uint32_t>& rgba_image)
+se::ReaderStatus se::InteriorNetReader::nextColour(se::Image<uint32_t>& colour_image)
 {
     if (frame_ >= num_frames_) {
         return se::ReaderStatus::error;
     }
-    const std::string filename = sequence_path_ + "/cam0/data/" + rgb_filenames_[frame_];
+    const std::string filename = sequence_path_ + "/cam0/data/" + colour_filenames_[frame_];
 
     cv::Mat image_data = cv::imread(filename.c_str(), cv::IMREAD_COLOR);
 
@@ -429,18 +431,18 @@ se::ReaderStatus se::InteriorNetReader::nextRGBA(se::Image<uint32_t>& rgba_image
         return se::ReaderStatus::error;
     }
 
-    cv::Mat rgba_data;
-    cv::cvtColor(image_data, rgba_data, cv::COLOR_BGR2RGBA);
+    cv::Mat colour_data;
+    cv::cvtColor(image_data, colour_data, cv::COLOR_BGR2RGBA);
 
-    assert(rgba_image_res_.x() == static_cast<int>(rgba_data.cols));
-    assert(rgba_image_res_.y() == static_cast<int>(rgba_data.rows));
+    assert(colour_image_res_.x() == static_cast<int>(colour_data.cols));
+    assert(colour_image_res_.y() == static_cast<int>(colour_data.rows));
     // Resize the output image if needed.
-    if ((rgba_image.width() != rgba_image_res_.x())
-        || (rgba_image.height() != rgba_image_res_.y())) {
-        rgba_image = se::Image<uint32_t>(rgba_image_res_.x(), rgba_image_res_.y());
+    if ((colour_image.width() != colour_image_res_.x())
+        || (colour_image.height() != colour_image_res_.y())) {
+        colour_image = se::Image<uint32_t>(colour_image_res_.x(), colour_image_res_.y());
     }
 
-    cv::Mat wrapper_mat(rgba_data.rows, rgba_data.cols, CV_8UC4, rgba_image.data());
-    rgba_data.copyTo(wrapper_mat);
+    cv::Mat wrapper_mat(colour_data.rows, colour_data.cols, CV_8UC4, colour_image.data());
+    colour_data.copyTo(wrapper_mat);
     return se::ReaderStatus::ok;
 }

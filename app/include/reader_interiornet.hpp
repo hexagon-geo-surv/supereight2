@@ -65,11 +65,11 @@ class InteriorNetReader : public Reader {
 
     std::vector<std::string> depth_filenames_;
 
-    std::vector<std::string> rgb_filenames_;
+    std::vector<std::string> colour_filenames_;
 
     ReaderStatus nextDepth(Image<float>& depth_image);
 
-    ReaderStatus nextRGBA(Image<uint32_t>& rgba_image);
+    ReaderStatus nextColour(Image<uint32_t>& colour_image);
 };
 
 

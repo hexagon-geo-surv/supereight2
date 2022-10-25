@@ -24,7 +24,7 @@ namespace preprocessor {
 void downsample_depth(se::Image<float>& input_depth_img, se::Image<float>& output_depth_img);
 
 /**
- * Downsample an RGBA image and copy into an se::Image class.
+ * Downsample a colour image and copy into an se::Image class.
  *
  * \param[in] input_RGBA Pointer to the RGBA image data, 4 channels, 8 bits
  * per channel.
@@ -34,7 +34,7 @@ void downsample_depth(se::Image<float>& input_depth_img, se::Image<float>& outpu
  * data for each pixel is stored in ARGB order, with the alpha channel in the
  * MSB of the uint32_t and the red channel in the LSB of the uint32_t.
  */
-void downsample_rgba(se::Image<uint32_t>& input_RGBA_img, se::Image<uint32_t>& output_RGBA_img);
+void downsample_colour(Image<uint32_t>& input_colour_img, Image<uint32_t>& output_colour_img);
 
 template<typename SensorT>
 void depth_to_point_cloud(se::Image<Eigen::Vector3f>& point_cloud_C,

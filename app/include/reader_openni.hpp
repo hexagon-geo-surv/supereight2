@@ -72,21 +72,21 @@ class OpenNIReader : public Reader {
     };
 
     std::unique_ptr<MyFrameAllocator<uint16_t>> depth_allocator_;
-    std::unique_ptr<MyFrameAllocator<uint8_t>> rgb_allocator_;
+    std::unique_ptr<MyFrameAllocator<uint8_t>> colour_allocator_;
 
     openni::Status rc_;
     openni::Device device_;
     openni::VideoStream depth_stream_;
-    openni::VideoStream rgb_stream_;
+    openni::VideoStream colour_stream_;
     openni::VideoFrameRef depth_frame_;
-    openni::VideoFrameRef rgb_frame_;
+    openni::VideoFrameRef colour_frame_;
     std::unique_ptr<uint16_t> depth_image_;
-    std::unique_ptr<uint8_t> rgb_image_;
+    std::unique_ptr<uint8_t> colour_image_;
 #endif
 
     ReaderStatus nextDepth(Image<float>& depth_image);
 
-    ReaderStatus nextRGBA(Image<uint32_t>& rgba_image);
+    ReaderStatus nextColour(Image<uint32_t>& colour_image);
 };
 
 } // namespace se

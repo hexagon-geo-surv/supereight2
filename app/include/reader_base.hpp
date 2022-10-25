@@ -100,7 +100,7 @@ std::ostream& operator<<(std::ostream& os, const ReaderConfig& c);
 
 
 
-/** The result of trying to read a depth/RGB image or a pose.
+/** The result of trying to read a depth/colour image or a pose.
  */
 enum class ReaderStatus : int {
     /** Data read successfully. */
@@ -158,31 +158,31 @@ class Reader {
      */
     ReaderStatus nextData(Image<float>& depth_image);
 
-    /** Read the next depth and RGBA images.
+    /** Read the next depth and colour images.
      *
      * \note The frame number is incremented when calling this function.
      *
-     * \param[out] depth_image The next depth image.
-     * \param[out] rgba_image  The next RGBA image.
+     * \param[out] depth_image  The next depth image.
+     * \param[out] colour_image The next colour image.
      * \return An appropriate status code.
      */
-    ReaderStatus nextData(Image<float>& depth_image, Image<uint32_t>& rgba_image);
+    ReaderStatus nextData(Image<float>& depth_image, Image<uint32_t>& colour_image);
 
-    /** Read the next depth and RGBA images and ground truth pose.
+    /** Read the next depth and colour images and ground truth pose.
      *
      * \note The frame number is incremented when calling this function.
      *
-     * \param[out] depth_image The next depth image.
-     * \param[out] rgba_image  The next RGBA image.
-     * \param[out] T_WB        The next ground truth pose.
+     * \param[out] depth_image  The next depth image.
+     * \param[out] colour_image The next colour image.
+     * \param[out] T_WB         The next ground truth pose.
      * \return An appropriate status code.
      */
     ReaderStatus
-    nextData(Image<float>& depth_image, Image<uint32_t>& rgba_image, Eigen::Matrix4f& T_WB);
+    nextData(Image<float>& depth_image, Image<uint32_t>& colour_image, Eigen::Matrix4f& T_WB);
 
     /** Read the ground truth pose at the provided frame number.
      * Each line in the ground truth file should correspond to a single
-     * depth/RGBA image pair and have a format<br>
+     * depth/colour image pair and have a format<br>
      * `... tx ty tz qx qy qz qw`,<br>
      * that is the pose is encoded in the last 7 columns of the line.
      *
@@ -237,11 +237,11 @@ class Reader {
      */
     Eigen::Vector2i depthImageRes() const;
 
-    /** The dimensions of the RGBA images.
+    /** The dimensions of the colour images.
      *
      * \return A 2D vector containing the width and height of the images.
      */
-    Eigen::Vector2i RGBAImageRes() const;
+    Eigen::Vector2i colourImageRes() const;
 
     /** Whether the reader uses a live camera as input.
      *
@@ -264,7 +264,7 @@ class Reader {
     std::string ground_truth_file_;
     std::ifstream ground_truth_fs_;
     Eigen::Vector2i depth_image_res_;
-    Eigen::Vector2i rgba_image_res_;
+    Eigen::Vector2i colour_image_res_;
     float fps_;
     double spf_;
     bool drop_frames_;
@@ -281,7 +281,7 @@ class Reader {
 
     /** Read the ground truth pose at the provided frame number.
      * Each line in the ground truth file should correspond to a single
-     * depth/RGBA image pair and have a format<br>
+     * depth/colour image pair and have a format<br>
      * `... tx ty tz qx qy qz qw`,<br>
      * that is the pose is encoded in the last 7 columns of the line.
      *
@@ -298,7 +298,7 @@ class Reader {
 
     /** Read the next ground truth pose.
      * Each line in the ground truth file should correspond to a single
-     * depth/RGBA image pair and have a format<br>
+     * depth/colour image pair and have a format<br>
      * `... tx ty tz qx qy qz qw`,<br>
      * that is the pose is encoded in the last 7 columns of the line.
      *
@@ -329,12 +329,12 @@ class Reader {
      */
     virtual ReaderStatus nextDepth(Image<float>& depth_image) = 0;
 
-    /** Read the next RGBA image.
+    /** Read the next colour image.
      *
-     * \param[out] rgba_image The next RGBA image.
+     * \param[out] colour_image The next colour image.
      * \return An appropriate status code.
      */
-    virtual ReaderStatus nextRGBA(Image<uint32_t>& rgba_image) = 0;
+    virtual ReaderStatus nextColour(Image<uint32_t>& colour_image) = 0;
 };
 
 } // namespace se

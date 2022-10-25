@@ -168,7 +168,7 @@ se::Reader::Reader(const se::ReaderConfig& c) :
         sequence_path_(c.sequence_path),
         ground_truth_file_(c.ground_truth_file),
         depth_image_res_(1, 1),
-        rgba_image_res_(1, 1),
+        colour_image_res_(1, 1),
         fps_(c.fps),
         spf_(1.0 / c.fps),
         drop_frames_(c.drop_frames),
@@ -231,7 +231,7 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image)
 
 
 se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
-                                      se::Image<uint32_t>& rgba_image)
+                                      se::Image<uint32_t>& colour_image)
 {
     if (!good()) {
         if (verbose_ >= 1) {
@@ -247,10 +247,10 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
         }
         return status_;
     }
-    status_ = mergeStatus(nextRGBA(rgba_image), status_);
+    status_ = mergeStatus(nextColour(colour_image), status_);
     if (!good()) {
         if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to nextRGBA() status: " << status_ << "\n";
+            std::clog << "Stopping reading due to nextColour() status: " << status_ << "\n";
         }
     }
     return status_;
@@ -259,7 +259,7 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
 
 
 se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
-                                      se::Image<uint32_t>& rgba_image,
+                                      se::Image<uint32_t>& colour_image,
                                       Eigen::Matrix4f& T_WB)
 {
     if (!good()) {
@@ -276,10 +276,10 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
         }
         return status_;
     }
-    status_ = mergeStatus(nextRGBA(rgba_image), status_);
+    status_ = mergeStatus(nextColour(colour_image), status_);
     if (!good()) {
         if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to nextRGBA() status: " << status_ << "\n";
+            std::clog << "Stopping reading due to nextColour() status: " << status_ << "\n";
         }
         return status_;
     }
@@ -335,9 +335,9 @@ Eigen::Vector2i se::Reader::depthImageRes() const
 
 
 
-Eigen::Vector2i se::Reader::RGBAImageRes() const
+Eigen::Vector2i se::Reader::colourImageRes() const
 {
-    return rgba_image_res_;
+    return colour_image_res_;
 }
 
 

@@ -46,13 +46,13 @@ int main(int argc, char** argv)
         // Setup input images
         const Eigen::Vector2i input_img_res(config.sensor.width, config.sensor.height);
         se::Image<float> input_depth_img(input_img_res.x(), input_img_res.y());
-        se::Image<uint32_t> input_rgba_img(input_img_res.x(), input_img_res.y());
+        se::Image<uint32_t> input_colour_img(input_img_res.x(), input_img_res.y());
 
         // Setup processed images
         const Eigen::Vector2i processed_img_res =
             input_img_res / config.app.sensor_downsampling_factor;
         se::Image<float> processed_depth_img(processed_img_res.x(), processed_img_res.y());
-        se::Image<uint32_t> processed_rgba_img(processed_img_res.x(), processed_img_res.y());
+        se::Image<uint32_t> processed_colour_img(processed_img_res.x(), processed_img_res.y());
 
         // Setup output images / renders
         std::unique_ptr<uint32_t[]> output_rgba_img_data(
@@ -112,11 +112,11 @@ int main(int argc, char** argv)
             TICK("read")
             se::ReaderStatus read_ok = se::ReaderStatus::ok;
             if (config.app.enable_ground_truth || frame == 1) {
-                read_ok = reader->nextData(input_depth_img, input_rgba_img, T_WB);
+                read_ok = reader->nextData(input_depth_img, input_colour_img, T_WB);
                 T_WS = T_WB * T_BS;
             }
             else {
-                read_ok = reader->nextData(input_depth_img, input_rgba_img);
+                read_ok = reader->nextData(input_depth_img, input_colour_img);
             }
             if (read_ok != se::ReaderStatus::ok) {
                 break;
@@ -127,9 +127,9 @@ int main(int argc, char** argv)
             TICK("ds-depth")
             se::preprocessor::downsample_depth(input_depth_img, processed_depth_img);
             TOCK("ds-depth")
-            TICK("ds-rgba")
-            se::preprocessor::downsample_rgba(input_rgba_img, processed_rgba_img);
-            TOCK("ds-rgba")
+            TICK("ds-colour")
+            se::preprocessor::downsample_colour(input_colour_img, processed_colour_img);
+            TOCK("ds-colour")
 
             // Track pose (if enabled)
             // Initial pose (frame == 0) is initialised with the identity matrix
@@ -161,7 +161,7 @@ int main(int argc, char** argv)
             TICK("render")
             if (config.app.enable_rendering) {
                 const Eigen::Vector3f ambient{0.1, 0.1, 0.1};
-                convert_to_output_rgba_img(processed_rgba_img, output_rgba_img_data.get());
+                convert_to_output_colour_img(processed_colour_img, output_rgba_img_data.get());
                 convert_to_output_depth_img(processed_depth_img,
                                             sensor.near_plane,
                                             sensor.far_plane,

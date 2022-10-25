@@ -17,7 +17,7 @@
 
 
 constexpr size_t se::RAWReader::depth_pixel_size_;
-constexpr size_t se::RAWReader::rgba_pixel_size_;
+constexpr size_t se::RAWReader::colour_pixel_size_;
 constexpr size_t se::RAWReader::res_size_;
 
 se::RAWReader::RAWReader(const se::ReaderConfig& c) : se::Reader(c)
@@ -40,22 +40,22 @@ se::RAWReader::RAWReader(const se::ReaderConfig& c) : se::Reader(c)
     depth_image_total_ = depth_image_res_.prod();
     depth_data_size_ = depth_pixel_size_ * depth_image_total_;
     depth_total_size_ = res_size_ + depth_data_size_;
-    // Read the resolution of the first RGBA image.
+    // Read the resolution of the first colour image.
     raw_fs_.seekg(depth_total_size_);
-    if (!readResolution(raw_fs_, rgba_image_res_)) {
-        std::cerr << "Error: Could not read RGBA image size\n";
+    if (!readResolution(raw_fs_, colour_image_res_)) {
+        std::cerr << "Error: Could not read colour image size\n";
         status_ = se::ReaderStatus::error;
         return;
     }
-    // Pre-compute RGBA image sizes.
-    rgba_image_total_ = rgba_image_res_.prod();
-    rgba_data_size_ = rgba_pixel_size_ * rgba_image_total_;
-    rgba_total_size_ = res_size_ + rgba_data_size_;
+    // Pre-compute colour image sizes.
+    colour_image_total_ = colour_image_res_.prod();
+    colour_data_size_ = colour_pixel_size_ * colour_image_total_;
+    colour_total_size_ = res_size_ + colour_data_size_;
     // Start reading from the beginning of the .raw file again.
     raw_fs_.seekg(0);
     // Compute the total number of frames from the size of the .raw file.
     const uintmax_t raw_size = stdfs::file_size(sequence_path_);
-    num_frames_ = raw_size / (depth_total_size_ + rgba_total_size_);
+    num_frames_ = raw_size / (depth_total_size_ + colour_total_size_);
 }
 
 
@@ -103,7 +103,7 @@ bool se::RAWReader::readResolution(std::ifstream& fs, Eigen::Vector2i& res)
 se::ReaderStatus se::RAWReader::nextDepth(se::Image<float>& depth_image)
 {
     // Seek to the appropriate place in the file.
-    raw_fs_.seekg(frame_ * (depth_total_size_ + rgba_total_size_));
+    raw_fs_.seekg(frame_ * (depth_total_size_ + colour_total_size_));
     // Read the image dimensions.
     Eigen::Vector2i size;
     if (!readResolution(raw_fs_, size)) {
@@ -129,26 +129,26 @@ se::ReaderStatus se::RAWReader::nextDepth(se::Image<float>& depth_image)
 
 
 
-se::ReaderStatus se::RAWReader::nextRGBA(se::Image<uint32_t>& rgba_image)
+se::ReaderStatus se::RAWReader::nextColour(se::Image<uint32_t>& colour_image)
 {
     // Seek to the appropriate place in the file.
-    raw_fs_.seekg(frame_ * (depth_total_size_ + rgba_total_size_) + depth_total_size_);
+    raw_fs_.seekg(frame_ * (depth_total_size_ + colour_total_size_) + depth_total_size_);
     // Read the image dimensions.
     Eigen::Vector2i size;
     if (!readResolution(raw_fs_, size)) {
         return se::ReaderStatus::error;
     }
     // Resize the output image if needed.
-    if ((rgba_image.width() != size.x()) || (rgba_image.height() != size.y())) {
-        rgba_image = se::Image<uint32_t>(size.x(), size.y());
+    if ((colour_image.width() != size.x()) || (colour_image.height() != size.y())) {
+        colour_image = se::Image<uint32_t>(size.x(), size.y());
     }
     // Read the whole image into a buffer.
-    const size_t image_size = rgba_image.size();
+    const size_t image_size = colour_image.size();
     std::vector<uint8_t> buffer(3 * image_size);
     if (!raw_fs_.read(reinterpret_cast<char*>(buffer.data()), image_size * 3 * sizeof(uint8_t))) {
         return se::ReaderStatus::error;
     }
     // Convert the RGB image in the buffer to RGBA.
-    rgb_to_rgba(buffer.data(), rgba_image.data(), image_size);
+    rgb_to_rgba(buffer.data(), colour_image.data(), image_size);
     return se::ReaderStatus::ok;
 }
