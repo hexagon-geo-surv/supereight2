@@ -16,6 +16,7 @@
 #include <fstream>
 #include <string>
 
+#include "se/common/colour_types.hpp"
 #include "se/common/str_utils.hpp"
 #include "se/image/image.hpp"
 
@@ -166,7 +167,7 @@ class Reader {
      * \param[out] colour_image The next colour image.
      * \return An appropriate status code.
      */
-    ReaderStatus nextData(Image<float>& depth_image, Image<uint32_t>& colour_image);
+    ReaderStatus nextData(Image<float>& depth_image, Image<rgb_t>& colour_image);
 
     /** Read the next depth and colour images and ground truth pose.
      *
@@ -178,7 +179,7 @@ class Reader {
      * \return An appropriate status code.
      */
     ReaderStatus
-    nextData(Image<float>& depth_image, Image<uint32_t>& colour_image, Eigen::Matrix4f& T_WB);
+    nextData(Image<float>& depth_image, Image<rgb_t>& colour_image, Eigen::Matrix4f& T_WB);
 
     /** Read the ground truth pose at the provided frame number.
      * Each line in the ground truth file should correspond to a single
@@ -334,7 +335,7 @@ class Reader {
      * \param[out] colour_image The next colour image.
      * \return An appropriate status code.
      */
-    virtual ReaderStatus nextColour(Image<uint32_t>& colour_image) = 0;
+    virtual ReaderStatus nextColour(Image<rgb_t>& colour_image) = 0;
 };
 
 } // namespace se

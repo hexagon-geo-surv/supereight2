@@ -10,6 +10,7 @@
 #ifndef SE_PREPROCESSOR_HPP
 #define SE_PREPROCESSOR_HPP
 
+#include "se/common/colour_types.hpp"
 #include "se/image/image.hpp"
 
 namespace se {
@@ -26,15 +27,13 @@ void downsample_depth(se::Image<float>& input_depth_img, se::Image<float>& outpu
 /**
  * Downsample a colour image and copy into an se::Image class.
  *
- * \param[in] input_RGBA Pointer to the RGBA image data, 4 channels, 8 bits
- * per channel.
- * \param[in] input_res Size of the RGBA image in pixels (width and height).
- * \param[out] output_RGB Object to store the output image to. The output image
- * dimensions must be an integer multiple of the input image dimensions. The
- * data for each pixel is stored in ARGB order, with the alpha channel in the
- * MSB of the uint32_t and the red channel in the LSB of the uint32_t.
+ * \param[in] input_colour_img   The image to downsample.
+ * \param[out] output_colour_img The image where the downsampled data will be saved to. The
+ *                               dimensions of this image determine the output resolution. The
+ *                               output image dimensions must be an integer multiple of the input
+ *                               image dimensions.
  */
-void downsample_colour(Image<uint32_t>& input_colour_img, Image<uint32_t>& output_colour_img);
+void downsample_colour(Image<rgb_t>& input_colour_img, Image<rgb_t>& output_colour_img);
 
 template<typename SensorT>
 void depth_to_point_cloud(se::Image<Eigen::Vector3f>& point_cloud_C,

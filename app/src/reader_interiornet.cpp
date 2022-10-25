@@ -418,7 +418,7 @@ se::ReaderStatus se::InteriorNetReader::nextDepth(se::Image<float>& depth_image)
 
 
 
-se::ReaderStatus se::InteriorNetReader::nextColour(se::Image<uint32_t>& colour_image)
+se::ReaderStatus se::InteriorNetReader::nextColour(se::Image<rgb_t>& colour_image)
 {
     if (frame_ >= num_frames_) {
         return se::ReaderStatus::error;
@@ -432,17 +432,17 @@ se::ReaderStatus se::InteriorNetReader::nextColour(se::Image<uint32_t>& colour_i
     }
 
     cv::Mat colour_data;
-    cv::cvtColor(image_data, colour_data, cv::COLOR_BGR2RGBA);
+    cv::cvtColor(image_data, colour_data, cv::COLOR_BGR2RGB);
 
     assert(colour_image_res_.x() == static_cast<int>(colour_data.cols));
     assert(colour_image_res_.y() == static_cast<int>(colour_data.rows));
     // Resize the output image if needed.
     if ((colour_image.width() != colour_image_res_.x())
         || (colour_image.height() != colour_image_res_.y())) {
-        colour_image = se::Image<uint32_t>(colour_image_res_.x(), colour_image_res_.y());
+        colour_image = se::Image<rgb_t>(colour_image_res_.x(), colour_image_res_.y());
     }
 
-    cv::Mat wrapper_mat(colour_data.rows, colour_data.cols, CV_8UC4, colour_image.data());
+    cv::Mat wrapper_mat(colour_data.rows, colour_data.cols, CV_8UC3, colour_image.data());
     colour_data.copyTo(wrapper_mat);
     return se::ReaderStatus::ok;
 }

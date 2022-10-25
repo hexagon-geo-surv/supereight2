@@ -12,6 +12,7 @@
 #include <Eigen/StdVector>
 #include <cassert>
 
+#include "se/common/colour_types.hpp"
 #include "se/common/colour_utils.hpp"
 
 namespace se {
@@ -83,12 +84,12 @@ class Image {
 
 
 
-static void convert_to_output_colour_img(const se::Image<uint32_t>& input_colour_img,
+static void convert_to_output_colour_img(const Image<rgb_t>& input_colour_img,
                                          uint32_t* output_colour_img_data)
 {
-    memcpy(output_colour_img_data,
-           input_colour_img.data(),
-           input_colour_img.width() * input_colour_img.height() * sizeof(uint32_t));
+    rgb_to_rgba(reinterpret_cast<const uint8_t*>(input_colour_img.data()),
+                output_colour_img_data,
+                input_colour_img.width() * input_colour_img.height());
 }
 
 

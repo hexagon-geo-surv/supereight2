@@ -141,15 +141,15 @@ se::ReaderStatus se::NewerCollegeReader::nextDepth(se::Image<float>& depth_image
 
 
 
-se::ReaderStatus se::NewerCollegeReader::nextColour(se::Image<uint32_t>& colour_image)
+se::ReaderStatus se::NewerCollegeReader::nextColour(se::Image<rgb_t>& colour_image)
 {
     // Resize the output image if needed.
     if ((colour_image.width() != colour_image_res_.x())
         || (colour_image.height() != colour_image_res_.y())) {
-        colour_image = se::Image<uint32_t>(colour_image_res_.x(), colour_image_res_.y());
+        colour_image = se::Image<rgb_t>(colour_image_res_.x(), colour_image_res_.y());
     }
     // Create a blank image
-    std::memset(colour_image.data(), 0, colour_image_res_.prod() * sizeof(uint32_t));
+    std::memset(colour_image.data(), 0, colour_image_res_.prod() * sizeof(rgb_t));
     return se::ReaderStatus::ok;
 }
 
@@ -209,7 +209,7 @@ se::ReaderStatus se::NewerCollegeReader::nextDepth(se::Image<float>&)
 
 
 
-se::ReaderStatus se::NewerCollegeReader::nextColour(se::Image<uint32_t>&)
+se::ReaderStatus se::NewerCollegeReader::nextColour(se::Image<rgb_t>&)
 {
     return se::ReaderStatus::error;
 }
