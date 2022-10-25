@@ -745,13 +745,13 @@ getData(const OctreeT& octree,
     }
 
     if (octant_ptr->isBlock()) {
-        static_cast<const typename OctreeT::BlockType*>(octant_ptr)
+        return static_cast<const typename OctreeT::BlockType*>(octant_ptr)
             ->getData(voxel_coord, scale_desired, scale_returned);
     }
     else {
         scale_returned =
             scale_desired; // TODO: Verify if it should be the node scale or the desired scale.
-        static_cast<const typename OctreeT::NodeType*>(octant_ptr)->getData();
+        return static_cast<const typename OctreeT::NodeType*>(octant_ptr)->getData();
     }
 }
 
