@@ -278,6 +278,9 @@ void associate_images(std::vector<TUMImageEntry>& depth_images,
                       std::vector<TUMImageEntry>& rgb_images,
                       const double max_timestamp_dist)
 {
+    if (rgb_images.empty()) {
+        return;
+    }
     // Compute the timestamps of all depth images
     std::vector<double> depth_timestamps(depth_images.size());
     std::transform(depth_images.begin(),
@@ -343,7 +346,9 @@ std::vector<TUMPoseEntry> interpolate_poses(std::vector<TUMImageEntry>& depth_im
         }
         // Matched a ground truth pose, keep the image pair
         output_depth_images.push_back(depth_images[i]);
-        output_rgb_images.push_back(rgb_images[i]);
+        if (!rgb_images.empty()) {
+            output_rgb_images.push_back(rgb_images[i]);
+        }
         // Compute the interpolation parameter in the interval [0, 1]. Just set it
         // to 0 if an exact match was found.
         const double t = (poses.second.timestamp != poses.first.timestamp)
@@ -353,8 +358,11 @@ std::vector<TUMPoseEntry> interpolate_poses(std::vector<TUMImageEntry>& depth_im
         const Eigen::Vector3f p = (1.0f - t) * poses.first.position + t * poses.second.position;
         const Eigen::Quaternionf o = poses.first.orientation.slerp(t, poses.second.orientation);
         // Create a new TUMPoseEntry containing also the depth and RGB image filenames
-        associated_poses.emplace_back(
-            depth_timestamp, p, o, depth_images[i].filename, rgb_images[i].filename);
+        associated_poses.emplace_back(depth_timestamp,
+                                      p,
+                                      o,
+                                      depth_images[i].filename,
+                                      rgb_images.empty() ? "" : rgb_images[i].filename);
     }
     // Update the input vectors
     depth_images = output_depth_images;
@@ -398,21 +406,73 @@ se::TUMReader::TUMReader(const se::ReaderConfig& c) : se::Reader(c)
 {
     inverse_scale_ = (c.inverse_scale != 0) ? c.inverse_scale : tum_inverse_scale_;
 
-    // Ensure sequence_path_ refers to a valid TUM directory structure.
+    // Ensure sequence_path_ refers to a valid TUM directory structure. Only depth data is required
+    // to exist.
     if (!stdfs::is_directory(sequence_path_) || !stdfs::is_directory(sequence_path_ + "/depth")
-        || !stdfs::is_directory(sequence_path_ + "/rgb")
-        || !stdfs::is_regular_file(sequence_path_ + "/depth.txt")
-        || !stdfs::is_regular_file(sequence_path_ + "/rgb.txt")) {
-        status_ = se::ReaderStatus::error;
+        || !stdfs::is_regular_file(sequence_path_ + "/depth.txt")) {
         std::cerr << "Error: The TUM sequence path must be a directory that contains"
-                  << " depth and rgb subdirectories and depth.txt and rgb.txt files\n";
+                  << " a depth subdirectory and a depth.txt file\n";
+        status_ = se::ReaderStatus::error;
         return;
     }
-    // Read the image information from depth.txt and rgb.txt.
+    // Read the image information from depth.txt.
     std::vector<TUMImageEntry> depth_images = read_tum_image_list(sequence_path_ + "/depth.txt");
-    std::vector<TUMImageEntry> rgb_images = read_tum_image_list(sequence_path_ + "/rgb.txt");
-    // Associate the depth with the RGB images
-    associate_images(depth_images, rgb_images, max_match_timestamp_dist_);
+    if (depth_images.empty()) {
+        std::cerr << "Error: No TUM depth images found in depth.txt\n";
+        status_ = se::ReaderStatus::error;
+        return;
+    }
+    // Get the filenames of the depth images.
+    depth_filenames_.resize(depth_images.size());
+    std::transform(depth_images.begin(),
+                   depth_images.end(),
+                   depth_filenames_.begin(),
+                   [](const auto& e) { return e.filename; });
+    // Set the depth image resolution to that of the first depth image.
+    const std::string first_depth_filename = sequence_path_ + "/" + depth_filenames_[0];
+    cv::Mat image_data = cv::imread(first_depth_filename.c_str(), cv::IMREAD_UNCHANGED);
+    if (image_data.empty()) {
+        std::cerr << "Error: Could not read depth image " << first_depth_filename << "\n";
+        status_ = se::ReaderStatus::error;
+        return;
+    }
+    depth_image_res_ = Eigen::Vector2i(image_data.cols, image_data.rows);
+
+    // Load colour image data if available.
+    std::vector<TUMImageEntry> rgb_images;
+    if (stdfs::is_directory(sequence_path_ + "/rgb")
+        && stdfs::is_regular_file(sequence_path_ + "/rgb.txt")) {
+        // Read the image information from rgb.txt.
+        rgb_images = read_tum_image_list(sequence_path_ + "/rgb.txt");
+        if (rgb_images.empty()) {
+            std::cerr << "Error: No TUM colour images found in rgb.txt\n";
+        }
+        else {
+            // Associate the depth with the RGB images.
+            associate_images(depth_images, rgb_images, max_match_timestamp_dist_);
+            // Get the filenames of the RGB images.
+            rgb_filenames_.resize(rgb_images.size());
+            std::transform(rgb_images.begin(),
+                           rgb_images.end(),
+                           rgb_filenames_.begin(),
+                           [](const auto& e) { return e.filename; });
+            // Set the colour image resolution to that of the first colour image.
+            const std::string first_rgb_filename = sequence_path_ + "/" + rgb_filenames_[0];
+            cv::Mat image_data = cv::imread(first_rgb_filename.c_str(), cv::IMREAD_COLOR);
+            if (image_data.empty()) {
+                std::cerr << "Error: Could not read RGB image " << first_rgb_filename << "\n";
+                rgb_filenames_.clear();
+            }
+            else {
+                colour_image_res_ = Eigen::Vector2i(image_data.cols, image_data.rows);
+            }
+        }
+    }
+    else {
+        std::cerr << "Warning: Colour images are unavailable, the TUM sequence doesn't"
+                  << " contain an rgb subdirectory or an rgb.txt file\n";
+    }
+
     // Read and associate the ground truth file if needed
     if (!ground_truth_file_.empty()) {
         // Read the the ground truth poses and timestamps
@@ -441,47 +501,8 @@ se::TUMReader::TUMReader(const se::ReaderConfig& c) : se::Reader(c)
             return;
         }
     }
-    // Get the filenames of the depth images.
-    depth_filenames_.resize(depth_images.size());
-    std::transform(depth_images.begin(),
-                   depth_images.end(),
-                   depth_filenames_.begin(),
-                   [](const auto& e) { return e.filename; });
-    // Get the filenames of the RGB images.
-    rgb_filenames_.resize(rgb_images.size());
-    std::transform(rgb_images.begin(), rgb_images.end(), rgb_filenames_.begin(), [](const auto& e) {
-        return e.filename;
-    });
-    // Get the total number of frames.
+
     num_frames_ = depth_filenames_.size();
-
-    // Set the depth image resolution to that of the first depth image.
-    if (!depth_filenames_.empty()) {
-        const std::string first_depth_filename = sequence_path_ + "/" + depth_filenames_[0];
-
-        cv::Mat image_data = cv::imread(first_depth_filename.c_str(), cv::IMREAD_UNCHANGED);
-
-        if (image_data.empty()) {
-            std::cerr << "Error: Could not read depth image " << first_depth_filename << "\n";
-            status_ = se::ReaderStatus::error;
-            return;
-        }
-
-        depth_image_res_ = Eigen::Vector2i(image_data.cols, image_data.rows);
-    }
-    // Set the colour image resolution to that of the first colour image.
-    if (!rgb_filenames_.empty()) {
-        const std::string first_rgb_filename = sequence_path_ + "/" + rgb_filenames_[0];
-
-        cv::Mat image_data = cv::imread(first_rgb_filename.c_str(), cv::IMREAD_COLOR);
-
-        if (image_data.empty()) {
-            std::cerr << "Error: Could not read RGB image " << first_rgb_filename << "\n";
-            status_ = se::ReaderStatus::error;
-            return;
-        }
-        colour_image_res_ = Eigen::Vector2i(image_data.cols, image_data.rows);
-    }
 }
 
 
@@ -541,6 +562,9 @@ se::ReaderStatus se::TUMReader::nextColour(se::Image<rgb_t>& colour_image)
 {
     if (frame_ >= num_frames_) {
         return se::ReaderStatus::error;
+    }
+    if (rgb_filenames_.empty()) {
+        return se::Reader::nextColour(colour_image);
     }
     const std::string filename = sequence_path_ + "/" + rgb_filenames_[frame_];
 
