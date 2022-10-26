@@ -342,7 +342,7 @@ se::InteriorNetReader::InteriorNetReader(const se::ReaderConfig& c) : se::Reader
                         + (x - InteriorNetIntrinsics::c_x) * (x - InteriorNetIntrinsics::c_x)
                             / (InteriorNetIntrinsics::f_x * InteriorNetIntrinsics::f_x)
                         + (y - InteriorNetIntrinsics::c_y) * (y - InteriorNetIntrinsics::c_y)
-                            / (InteriorNetIntrinsics::f_x * InteriorNetIntrinsics::f_x)));
+                            / (InteriorNetIntrinsics::f_y * InteriorNetIntrinsics::f_y)));
         }
     }
 
