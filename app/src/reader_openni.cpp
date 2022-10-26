@@ -15,7 +15,7 @@
 
 
 
-#ifdef SE_USE_OPENNI
+#ifdef SE_OPENNI2
 
 se::OpenNIReader::OpenNIReader(const se::ReaderConfig& c) :
         se::Reader(c), depth_image_(nullptr), rgb_image_(nullptr)
@@ -271,4 +271,4 @@ se::ReaderStatus se::OpenNIReader::nextRGBA(se::Image<uint32_t>&)
     return se::ReaderStatus::error;
 }
 
-#endif // SE_USE_OPENNI
+#endif // SE_OPENNI2

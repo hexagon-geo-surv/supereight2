@@ -6,6 +6,12 @@ cmake_minimum_required(VERSION 3.10...3.16)
 find_package(GLUT)
 find_package(OpenGL)
 find_package(PCL COMPONENTS io)
+find_package(PkgConfig) # For OpenNI2
+if(PKG_CONFIG_FOUND)
+    pkg_check_modules(OPENNI2 libopenni2)
+else()
+    set(OPENNI2_FOUND OFF)
+endif()
 
 # Compile the reader as a library so that it isn't recompiled for each app.
 set(LIB_NAME reader)
@@ -31,6 +37,11 @@ if(PCL_FOUND)
   add_definitions(${PCL_DEFINITIONS})
   target_link_libraries(${LIB_NAME} PUBLIC ${PCL_LIBRARIES})
   target_compile_definitions(${LIB_NAME} PUBLIC "-DSE_PCL")
+endif()
+if(OPENNI2_FOUND)
+    target_include_directories(${LIB_NAME} PRIVATE ${OPENNI2_INCLUDE_DIRS})
+    target_link_libraries(${LIB_NAME} PRIVATE ${OPENNI2_LIBRARIES})
+    target_compile_definitions(${LIB_NAME} PRIVATE "-DSE_OPENNI2")
 endif()
 
 
