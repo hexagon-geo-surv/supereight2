@@ -141,20 +141,6 @@ se::ReaderStatus se::NewerCollegeReader::nextDepth(se::Image<float>& depth_image
 
 
 
-se::ReaderStatus se::NewerCollegeReader::nextColour(se::Image<RGBA>& colour_image)
-{
-    // Resize the output image if needed.
-    if ((colour_image.width() != colour_image_res_.x())
-        || (colour_image.height() != colour_image_res_.y())) {
-        colour_image = se::Image<RGBA>(colour_image_res_.x(), colour_image_res_.y());
-    }
-    // Create a blank image
-    std::memset(colour_image.data(), 0, colour_image_res_.prod() * sizeof(RGBA));
-    return se::ReaderStatus::ok;
-}
-
-
-
 std::vector<std::string> se::NewerCollegeReader::getScanFilenames(const std::string& dir)
 {
     static const std::string regex_pattern = ".*cloud_[[:digit:]]{10}_[[:digit:]]{9}.pcd";
@@ -203,13 +189,6 @@ std::string se::NewerCollegeReader::name() const
 
 
 se::ReaderStatus se::NewerCollegeReader::nextDepth(se::Image<float>&)
-{
-    return se::ReaderStatus::error;
-}
-
-
-
-se::ReaderStatus se::NewerCollegeReader::nextColour(se::Image<RGBA>&)
 {
     return se::ReaderStatus::error;
 }

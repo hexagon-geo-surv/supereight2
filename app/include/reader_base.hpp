@@ -345,6 +345,12 @@ class Reader {
      */
     virtual ReaderStatus nextPose(Eigen::Isometry3f& T_WB);
 
+    /** Read the next colour image into \p colour_image. Sets \p colour_image to opaque black if no
+     * colour data is available.
+     */
+    virtual ReaderStatus nextColour(Image<RGBA>& colour_image);
+
+
     private:
     size_t ground_truth_frame_;
     char ground_truth_delimiter_;
@@ -382,13 +388,6 @@ class Reader {
      * \return An appropriate status code.
      */
     virtual ReaderStatus nextDepth(Image<float>& depth_image) = 0;
-
-    /** Read the next colour image.
-     *
-     * \param[out] colour_image The next colour image.
-     * \return An appropriate status code.
-     */
-    virtual ReaderStatus nextColour(Image<RGBA>& colour_image) = 0;
 };
 
 std::ostream& operator<<(std::ostream& os, const Reader::Config& c);

@@ -424,6 +424,17 @@ se::ReaderStatus se::Reader::nextPose(Eigen::Isometry3f& T_WB)
     return readPose(T_WB, frame_, ground_truth_delimiter_);
 }
 
+
+
+se::ReaderStatus se::Reader::nextColour(se::Image<se::RGBA>& colour_image)
+{
+    // Set to a default-initialized (opaque black) image.
+    colour_image = se::Image<RGBA>(colour_image_res_.x(), colour_image_res_.y(), RGBA());
+    return se::ReaderStatus::ok;
+}
+
+
+
 se::ReaderStatus se::Reader::getPose(Eigen::Isometry3f& T_WB, const size_t frame)
 {
     // Store and reset current ground truth frame
