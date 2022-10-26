@@ -249,7 +249,9 @@ void association(std::vector<InteriorNetPoseEntry>& gt_poses,
     for (unsigned int i = 0; i < gt_poses.size(); i++) {
         gt_poses[i].timestamp = depth_images[i].timestamp;
         gt_poses[i].depth_filename = depth_images[i].filename;
-        gt_poses[i].colour_filename = colour_images[i].filename;
+        if (!colour_images.empty()) {
+            gt_poses[i].colour_filename = colour_images[i].filename;
+        }
     }
 }
 
@@ -262,25 +264,74 @@ constexpr float se::InteriorNetReader::interiornet_inverse_scale_;
 
 se::InteriorNetReader::InteriorNetReader(const se::ReaderConfig& c) : se::Reader(c)
 {
-    inverse_scale_ = (c.inverse_scale != 0) ? c.inverse_scale : interiornet_inverse_scale_;
-
-    // Ensure sequence_path_ refers to a valid InteriorNet directory structure.
+    // Ensure sequence_path_ refers to a valid InteriorNet directory structure. Only depth data is
+    // required to exist.
     if (!stdfs::is_directory(sequence_path_)
         || !stdfs::is_directory(sequence_path_ + "/depth0/data")
-        || !stdfs::is_directory(sequence_path_ + "/cam0/data")
-        || !stdfs::is_regular_file(sequence_path_ + "/depth0/data.csv")
-        || !stdfs::is_regular_file(sequence_path_ + "/cam0/data.csv")) {
+        || !stdfs::is_regular_file(sequence_path_ + "/depth0/data.csv")) {
+        std::cerr << "Error: The InteriorNet sequence path must be a directory that contains"
+                  << " a depth0/data subdirectory and a depth0/data.csv file\n";
         status_ = se::ReaderStatus::error;
-        std::cerr
-            << "Error: The InteriorNet sequence path must be a directory that contains"
-            << " depth0/data and cam0/data subdirectories and depth0/data.csv and cam0/data.csv files\n";
         return;
     }
-    // Read the image information from the data.csv.
-    std::vector<InteriorNetImageEntry> depth_images =
+    // Read the depth image information from data.csv.
+    const std::vector<InteriorNetImageEntry> depth_images =
         read_interiornet_image_list(sequence_path_ + "/depth0/data.csv");
-    std::vector<InteriorNetImageEntry> colour_images =
-        read_interiornet_image_list(sequence_path_ + "/cam0/data.csv");
+    if (depth_images.empty()) {
+        std::cerr << "Error: No InteriorNet depth images found in depth0/data.csv\n";
+        status_ = se::ReaderStatus::error;
+        return;
+    }
+    // Get the filenames of the depth images.
+    depth_filenames_.resize(depth_images.size());
+    std::transform(depth_images.begin(),
+                   depth_images.end(),
+                   depth_filenames_.begin(),
+                   [](const auto& e) { return e.filename; });
+    // Set the depth image resolution to that of the first depth image.
+    const std::string first_depth_filename = sequence_path_ + "/depth0/data/" + depth_filenames_[0];
+    cv::Mat image_data = cv::imread(first_depth_filename.c_str(), cv::IMREAD_UNCHANGED);
+    if (image_data.data == NULL) {
+        std::cerr << "Error: Could not read depth image " << first_depth_filename << "\n";
+        status_ = se::ReaderStatus::error;
+        return;
+    }
+    depth_image_res_ = Eigen::Vector2i(image_data.cols, image_data.rows);
+
+    // Load colour image data if available.
+    std::vector<InteriorNetImageEntry> colour_images;
+    if (stdfs::is_directory(sequence_path_ + "/cam0/data")
+        && stdfs::is_regular_file(sequence_path_ + "/cam0/data.csv")) {
+        // Read the colour image information from data.csv.
+        colour_images = read_interiornet_image_list(sequence_path_ + "/cam0/data.csv");
+        if (colour_images.empty()) {
+            std::cerr << "Error: No InteriorNet colour images found in cam0/data.csv\n";
+        }
+        else {
+            // Get the filenames of the colour images.
+            colour_filenames_.resize(colour_images.size());
+            std::transform(colour_images.begin(),
+                           colour_images.end(),
+                           colour_filenames_.begin(),
+                           [](const auto& e) { return e.filename; });
+            // Set the colour image resolution to that of the first colour image.
+            const std::string first_colour_filename =
+                sequence_path_ + "/cam0/data/" + colour_filenames_[0];
+            cv::Mat image_data = cv::imread(first_colour_filename.c_str(), cv::IMREAD_COLOR);
+            if (image_data.data == NULL) {
+                std::cerr << "Error: Could not read colour image " << first_colour_filename << "\n";
+                colour_filenames_.clear();
+            }
+            else {
+                colour_image_res_ = Eigen::Vector2i(image_data.cols, image_data.rows);
+            }
+        }
+    }
+    else {
+        std::cerr << "Warning: Colour images are unavailable, the InteriorNet sequence doesn't"
+                  << " contain a cam0/data subdirectory or a cam0/data.csv file\n";
+    }
+
     // Read and associate the ground truth file if needed
     if (!ground_truth_file_.empty()) {
         // Read the the ground truth poses and timestamps
@@ -291,7 +342,6 @@ se::InteriorNetReader::InteriorNetReader(const se::ReaderConfig& c) : se::Reader
             return;
         }
         association(gt_poses, depth_images, colour_images);
-
         // Generate the associated ground truth file
         const std::string generated_filename = write_ground_truth_tmp(gt_poses);
         // Close the original ground truth file and open the generated one
@@ -304,37 +354,10 @@ se::InteriorNetReader::InteriorNetReader(const se::ReaderConfig& c) : se::Reader
             return;
         }
     }
-    // Get the filenames of the depth images.
-    depth_filenames_.resize(depth_images.size());
-    std::transform(depth_images.begin(),
-                   depth_images.end(),
-                   depth_filenames_.begin(),
-                   [](const auto& e) { return e.filename; });
-    // Get the filenames of the colour images.
-    colour_filenames_.resize(colour_images.size());
-    std::transform(colour_images.begin(),
-                   colour_images.end(),
-                   colour_filenames_.begin(),
-                   [](const auto& e) { return e.filename; });
-    // Get the total number of frames.
-    num_frames_ = depth_filenames_.size();
-    // Set the depth image resolution to that of the first depth image.
-    if (!depth_filenames_.empty()) {
-        const std::string first_depth_filename =
-            sequence_path_ + "/depth0/data/" + depth_filenames_[0];
-        cv::Mat image_data = cv::imread(first_depth_filename.c_str(), cv::IMREAD_UNCHANGED);
 
-        if (image_data.data == NULL) {
-            std::cerr << "Error: Could not read depth image " << first_depth_filename << "\n";
-            status_ = se::ReaderStatus::error;
-            return;
-        }
-
-        depth_image_res_ = Eigen::Vector2i(image_data.cols, image_data.rows);
-    }
+    inverse_scale_ = (c.inverse_scale != 0) ? c.inverse_scale : interiornet_inverse_scale_;
 
     projection_inv_ = cv::Mat(depth_image_res_.y(), depth_image_res_.x(), CV_32FC1);
-
     for (int y = 0; y < depth_image_res_.y(); y++) {
         for (int x = 0; x < depth_image_res_.x(); x++) {
             projection_inv_.at<float>(y, x) = 1
@@ -346,19 +369,7 @@ se::InteriorNetReader::InteriorNetReader(const se::ReaderConfig& c) : se::Reader
         }
     }
 
-    // Set the colour image resolution to that of the first colour image.
-    if (!colour_filenames_.empty()) {
-        const std::string first_colour_filename =
-            sequence_path_ + "/cam0/data/" + colour_filenames_[0];
-        cv::Mat image_data = cv::imread(first_colour_filename.c_str(), cv::IMREAD_COLOR);
-
-        if (image_data.data == NULL) {
-            std::cerr << "Error: Could not read colour image " << first_colour_filename << "\n";
-            status_ = se::ReaderStatus::error;
-            return;
-        }
-        colour_image_res_ = Eigen::Vector2i(image_data.cols, image_data.rows);
-    }
+    num_frames_ = depth_filenames_.size();
 }
 
 
@@ -420,6 +431,9 @@ se::ReaderStatus se::InteriorNetReader::nextColour(se::Image<rgb_t>& colour_imag
 {
     if (frame_ >= num_frames_) {
         return se::ReaderStatus::error;
+    }
+    if (colour_filenames_.empty()) {
+        return se::Reader::nextColour(colour_image);
     }
     const std::string filename = sequence_path_ + "/cam0/data/" + colour_filenames_[frame_];
 
