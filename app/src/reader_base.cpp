@@ -496,3 +496,16 @@ void se::Reader::nextFrame()
     // curr_frame_timestamp.
     prev_frame_timestamp_ = chr::steady_clock::now();
 }
+
+
+se::ReaderStatus se::Reader::nextColour(se::Image<se::rgb_t>& colour_image)
+{
+    // Resize the output image if needed.
+    if ((colour_image.width() != colour_image_res_.x())
+        || (colour_image.height() != colour_image_res_.y())) {
+        colour_image = se::Image<rgb_t>(colour_image_res_.x(), colour_image_res_.y());
+    }
+    // Create a black image
+    std::memset(colour_image.data(), 0, colour_image_res_.prod() * sizeof(rgb_t));
+    return se::ReaderStatus::ok;
+}

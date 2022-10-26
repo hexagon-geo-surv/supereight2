@@ -310,6 +310,14 @@ class Reader {
      */
     ReaderStatus nextPose(Eigen::Matrix4f& T_WB);
 
+    /** Read the next colour image.
+     *
+     * \param[out] colour_image The next colour image.
+     * \return An appropriate status code.
+     */
+    virtual ReaderStatus nextColour(Image<rgb_t>& colour_image);
+
+
     private:
     size_t ground_truth_frame_;
     char ground_truth_delimiter_;
@@ -329,13 +337,6 @@ class Reader {
      * \return An appropriate status code.
      */
     virtual ReaderStatus nextDepth(Image<float>& depth_image) = 0;
-
-    /** Read the next colour image.
-     *
-     * \param[out] colour_image The next colour image.
-     * \return An appropriate status code.
-     */
-    virtual ReaderStatus nextColour(Image<rgb_t>& colour_image) = 0;
 };
 
 } // namespace se
