@@ -257,8 +257,6 @@ void association(std::vector<InteriorNetPoseEntry>& gt_poses,
 
 // InteriorNetReader implementation
 constexpr float se::InteriorNetReader::interiornet_inverse_scale_;
-constexpr double se::InteriorNetReader::max_match_timestamp_dist_;
-constexpr double se::InteriorNetReader::max_interp_timestamp_dist_;
 
 
 
