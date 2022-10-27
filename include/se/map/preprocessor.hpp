@@ -16,13 +16,21 @@
 namespace se {
 namespace preprocessor {
 
-/**
- * Downsample the input depth to match the resolution of the output depth. The ration between the
- * resolutions must be a power of 2. Median downsampling is used to prevent creating new depth
- * values which create artifacts behind object edges. Depth values of 0 are considered invalid and
- * are ignored when computing the median.
+/** \brief Perform median downsampling on a depth image to avoid introducing new depth values.
+ * Introducing new depth values can create artifacts behind object edges. Depth values of 0 or NaN
+ * are considered invalid and are ignored when computing the median.
+ *
+ * \note The ratio between the input and output resolutions must be a power of 2.
+ *
+ * \param[in]  input_depth_img  The depth image to be downsampled.
+ * \param[out] output_depth_img The downsampled depth image. The downsampled image resolution is
+ *                              determined by the resolution of the image passed in this parameter.
+ * \return A map with the same dimensions as output_depth_img that contains indices to
+ * input_depth_img. It can be used to downsample another image (e.g. colour) and select the same
+ * pixels as the ones used for depth downsampling.
  */
-void downsample_depth(se::Image<float>& input_depth_img, se::Image<float>& output_depth_img);
+Image<Eigen::Vector2i> downsample_depth(const Image<float>& input_depth_img,
+                                        Image<float>& output_depth_img);
 
 /**
  * Downsample a colour image and copy into an se::Image class.

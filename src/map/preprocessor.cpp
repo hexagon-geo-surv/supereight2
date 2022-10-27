@@ -9,6 +9,7 @@
 
 #include "se/map/preprocessor.hpp"
 
+#include <Eigen/StdVector>
 #include <iostream>
 
 #include "se/common/math_util.hpp"
@@ -18,48 +19,60 @@
 namespace se {
 namespace preprocessor {
 
-void downsample_depth(se::Image<float>& input_depth_img, se::Image<float>& output_depth_img)
+Image<Eigen::Vector2i> downsample_depth(const Image<float>& input_depth_img,
+                                        Image<float>& output_depth_img)
 {
-    const float* input_depth_data = input_depth_img.data();
+    const int w_in = input_depth_img.width();
+    const int w_out = output_depth_img.width();
+    const int h_out = output_depth_img.height();
 
-    assert((input_depth_img.width() >= output_depth_img.width())
-           && "Error: input width must be greater than output width");
-    assert((input_depth_img.height() >= output_depth_img.height())
-           && "Error: input height must be greater than output height");
-    assert((input_depth_img.width() % output_depth_img.width() == 0)
-           && "Error: input width must be an integer multiple of output width");
-    assert((input_depth_img.height() % output_depth_img.height() == 0)
-           && "Error: input height must be an integer multiple of output height");
-    assert((input_depth_img.width() / output_depth_img.width()
-            == input_depth_img.height() / output_depth_img.height())
-           && "Error: input and output image aspect ratios must be the same");
+    assert((w_in >= w_out) && "The input width isn't smaller than the output width");
+    assert((input_depth_img.height() >= h_out)
+           && "The input height isn't smaller than the output height");
+    assert((w_in % w_out == 0) && "The input width is an integer multiple of the output width");
+    assert((input_depth_img.height() % h_out == 0)
+           && "The input height is an integer multiple of the output height");
+    assert((w_in / w_out == input_depth_img.height() / h_out)
+           && "The input and output image aspect ratios are the same");
 
-    const int ratio = input_depth_img.width() / output_depth_img.width();
+    Image<Eigen::Vector2i> map(w_out, h_out);
+    const int ratio = w_in / w_out;
 #pragma omp parallel for
-    for (int y_out = 0; y_out < output_depth_img.height(); y_out++) {
-        for (int x_out = 0; x_out < output_depth_img.width(); x_out++) {
-            std::vector<float> box_values;
-            box_values.reserve(ratio * ratio);
-            for (int b = 0; b < ratio; b++) {
-                for (int a = 0; a < ratio; a++) {
-                    const int y_in = y_out * ratio + b;
-                    const int x_in = x_out * ratio + a;
-                    const float depth_value =
-                        input_depth_data[x_in + input_depth_img.width() * y_in];
-                    // Only consider positive, non-NaN values for the median
-                    if ((depth_value < 1e-5) || std::isnan(depth_value)) {
-                        continue;
-                    }
-                    else {
-                        box_values.push_back(depth_value);
+    for (int y_out = 0; y_out < h_out; y_out++) {
+        std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> box_values;
+        box_values.reserve(ratio * ratio);
+        for (int x_out = 0; x_out < w_out; x_out++) {
+            for (int y_box = 0; y_box < ratio; y_box++) {
+                for (int x_box = 0; x_box < ratio; x_box++) {
+                    const int y_in = y_out * ratio + y_box;
+                    const int x_in = x_out * ratio + x_box;
+                    const float depth_value = input_depth_img(x_in, y_in);
+                    // Only consider positive, non-NaN values for the median.
+                    if (depth_value >= 1e-5) {
+                        box_values.emplace_back(x_in, y_in, depth_value);
                     }
                 }
             }
-            output_depth_img(x_out, y_out) =
-                box_values.empty() ? 0.0f : se::math::almost_median(box_values);
+            if (box_values.empty()) {
+                // All values in the box were invalid, map to the first one.
+                map(x_out, y_out) = Eigen::Vector2i(x_out * ratio, y_out * ratio);
+                output_depth_img(x_out, y_out) = 0.0f;
+            }
+            else {
+                // Sort the box value based on depth.
+                std::sort(box_values.begin(), box_values.end(), [](const auto& a, const auto& b) {
+                    return a.z() < b.z();
+                });
+                // Don't average the midpoints when box_values contains an even number of elements
+                // to avoid introducing unobserved depth values.
+                const Eigen::Vector3f& value = box_values[box_values.size() / 2];
+                map(x_out, y_out) = value.head<2>().cast<int>();
+                output_depth_img(x_out, y_out) = value.z();
+            }
             box_values.clear();
         }
     }
+    return map;
 }
 
 void downsample_colour(Image<rgb_t>& input_colour_img, Image<rgb_t>& output_colour_img)
