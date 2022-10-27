@@ -32,17 +32,6 @@ namespace preprocessor {
 Image<Eigen::Vector2i> downsample_depth(const Image<float>& input_depth_img,
                                         Image<float>& output_depth_img);
 
-/**
- * Downsample a colour image and copy into an se::Image class.
- *
- * \param[in] input_colour_img   The image to downsample.
- * \param[out] output_colour_img The image where the downsampled data will be saved to. The
- *                               dimensions of this image determine the output resolution. The
- *                               output image dimensions must be an integer multiple of the input
- *                               image dimensions.
- */
-void downsample_colour(Image<rgb_t>& input_colour_img, Image<rgb_t>& output_colour_img);
-
 template<typename SensorT>
 void depth_to_point_cloud(se::Image<Eigen::Vector3f>& point_cloud_C,
                           const se::Image<float>& depth_image,

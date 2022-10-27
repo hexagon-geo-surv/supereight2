@@ -75,53 +75,6 @@ Image<Eigen::Vector2i> downsample_depth(const Image<float>& input_depth_img,
     return map;
 }
 
-void downsample_colour(Image<rgb_t>& input_colour_img, Image<rgb_t>& output_colour_img)
-{
-    const rgb_t* input_colour_data = input_colour_img.data();
-
-    // Check for correct image sizes.
-    assert((input_colour_img.width() >= output_colour_img.width())
-           && "Error: input width must be greater than output width");
-    assert((input_colour_img.height() >= output_colour_img.height())
-           && "Error: input height must be greater than output height");
-    assert((input_colour_img.width() % output_colour_img.width() == 0)
-           && "Error: input width must be an integer multiple of output width");
-    assert((input_colour_img.height() % output_colour_img.height() == 0)
-           && "Error: input height must be an integer multiple of output height");
-    assert((input_colour_img.width() / output_colour_img.width()
-            == input_colour_img.height() / output_colour_img.height())
-           && "Error: input and output image aspect ratios must be the same");
-
-    const int ratio = input_colour_img.width() / output_colour_img.width();
-    const int area = ratio * ratio;
-    // Iterate over each output pixel.
-#pragma omp parallel for
-    for (int y_out = 0; y_out < output_colour_img.height(); ++y_out) {
-        for (int x_out = 0; x_out < output_colour_img.width(); ++x_out) {
-            // Average the neighboring pixels by iterating over the nearby input
-            // pixels.
-            int r = 0, g = 0, b = 0;
-            for (int yy = 0; yy < ratio; ++yy) {
-                for (int xx = 0; xx < ratio; ++xx) {
-                    const int x_in = x_out * ratio + xx;
-                    const int y_in = y_out * ratio + yy;
-                    const rgb_t& pixel_value =
-                        input_colour_data[x_in + input_colour_img.width() * y_in];
-                    r += pixel_value.r;
-                    g += pixel_value.g;
-                    b += pixel_value.b;
-                }
-            }
-            r /= area;
-            g /= area;
-            b /= area;
-
-            output_colour_img(x_out, y_out) = {
-                static_cast<uint8_t>(r), static_cast<uint8_t>(g), static_cast<uint8_t>(b)};
-        }
-    }
-}
-
 
 
 void point_cloud_to_depth(se::Image<float>& depth_image,
