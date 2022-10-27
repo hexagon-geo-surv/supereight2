@@ -419,8 +419,9 @@ TEST(MultiResOFusionSystemTest, Raycasting)
     reader->nextData(input_depth_img, input_rgba_img, T_WS);
 
     // Preprocess depth
-    se::preprocessor::downsample_depth(input_depth_img, processed_depth_img);
-    se::preprocessor::downsample_rgba(input_rgba_img, processed_rgba_img);
+    const se::Image<size_t> downsample_map =
+        se::preprocessor::downsample_depth(input_depth_img, processed_depth_img);
+    se::image::remap(input_rgba_img, processed_rgba_img, downsample_map);
 
     se::MapIntegrator integrator(map);
     integrator.integrateDepth(sensor, processed_depth_img, T_WS, frame);

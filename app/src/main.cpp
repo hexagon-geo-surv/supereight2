@@ -125,10 +125,11 @@ int main(int argc, char** argv)
 
             // Preprocess depth
             TICK("ds-depth")
-            se::preprocessor::downsample_depth(input_depth_img, processed_depth_img);
+            const se::Image<size_t> downsample_map =
+                se::preprocessor::downsample_depth(input_depth_img, processed_depth_img);
             TOCK("ds-depth")
             TICK("ds-rgba")
-            se::preprocessor::downsample_rgba(input_rgba_img, processed_rgba_img);
+            se::image::remap(input_rgba_img, processed_rgba_img, downsample_map);
             TOCK("ds-rgba")
 
             // Track pose (if enabled)
