@@ -119,6 +119,18 @@ static inline void convert_to_output_depth_img(const se::Image<float>& input_dep
 
 
 
+namespace image {
+
+/** Remap \p input to \p output by using a \p map which contains and index into \p input for each
+ * element of \p output.
+ */
+template<typename T>
+void remap(const Image<T>& input, Image<T>& output, const Image<size_t>& map);
+
+} // namespace image
+
 } // end namespace se
+
+#include "impl/image_impl.hpp"
 
 #endif // SE_IMAGE_HPP
