@@ -388,6 +388,9 @@ class Reader {
      * \return An appropriate status code.
      */
     virtual ReaderStatus nextDepth(Image<float>& depth_image) = 0;
+
+    ReaderStatus
+    nextDataImpl(Image<float>& depth_image, Image<RGBA>* colour_image, Eigen::Isometry3f* T_WB);
 };
 
 std::ostream& operator<<(std::ostream& os, const Reader::Config& c);

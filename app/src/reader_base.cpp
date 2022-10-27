@@ -226,47 +226,14 @@ se::Reader::Reader(const se::Reader::Config& c) :
 
 se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image)
 {
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to reader status: " << status_ << "\n";
-        }
-        return status_;
-    }
-    nextFrame();
-    status_ = nextDepth(depth_image);
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to nextDepth() status: " << status_ << "\n";
-        }
-    }
-    return status_;
+    return nextDataImpl(depth_image, nullptr, nullptr);
 }
 
 
 
 se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image, se::Image<RGBA>& colour_image)
 {
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to reader status: " << status_ << "\n";
-        }
-        return status_;
-    }
-    nextFrame();
-    status_ = nextDepth(depth_image);
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to nextDepth() status: " << status_ << "\n";
-        }
-        return status_;
-    }
-    status_ = mergeStatus(nextColour(colour_image), status_);
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to nextColour() status: " << status_ << "\n";
-        }
-    }
-    return status_;
+    return nextDataImpl(depth_image, &colour_image, nullptr);
 }
 
 
@@ -275,34 +242,7 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
                                       se::Image<RGBA>& colour_image,
                                       Eigen::Isometry3f& T_WB)
 {
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to reader status: " << status_ << "\n";
-        }
-        return status_;
-    }
-    nextFrame();
-    status_ = nextDepth(depth_image);
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to nextDepth() status: " << status_ << "\n";
-        }
-        return status_;
-    }
-    status_ = mergeStatus(nextColour(colour_image), status_);
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to nextColour() status: " << status_ << "\n";
-        }
-        return status_;
-    }
-    status_ = mergeStatus(nextPose(T_WB), status_);
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to nextPose() status: " << status_ << "\n";
-        }
-    }
-    return status_;
+    return nextDataImpl(depth_image, &colour_image, &T_WB);
 }
 
 se::ReaderStatus se::Reader::nextData(Eigen::Vector3f& ray_measurement, Eigen::Isometry3f& T_WB)
@@ -582,4 +522,43 @@ se::ReaderStatus se::Reader::nextRayBatch(
         Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>& /*rayPoseBatch*/)
 {
     return se::ReaderStatus::error;
+}
+
+
+se::ReaderStatus se::Reader::nextDataImpl(se::Image<float>& depth_image,
+                                          se::Image<se::RGBA>* colour_image,
+                                          Eigen::Isometry3f* T_WB)
+{
+    if (!good()) {
+        if (verbose_ >= 1) {
+            std::clog << "Stopping reading due to reader status: " << status_ << "\n";
+        }
+        return status_;
+    }
+    nextFrame();
+    status_ = nextDepth(depth_image);
+    if (!good()) {
+        if (verbose_ >= 1) {
+            std::clog << "Stopping reading due to nextDepth() status: " << status_ << "\n";
+        }
+        return status_;
+    }
+    if (colour_image) {
+        status_ = mergeStatus(nextColour(*colour_image), status_);
+        if (!good()) {
+            if (verbose_ >= 1) {
+                std::clog << "Stopping reading due to nextColour() status: " << status_ << "\n";
+            }
+            return status_;
+        }
+    }
+    if (T_WB) {
+        status_ = mergeStatus(nextPose(*T_WB), status_);
+        if (!good()) {
+            if (verbose_ >= 1) {
+                std::clog << "Stopping reading due to nextPose() status: " << status_ << "\n";
+            }
+        }
+    }
+    return status_;
 }
