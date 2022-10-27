@@ -159,6 +159,16 @@ class Reader {
      */
     ReaderStatus nextData(Image<float>& depth_image);
 
+    /** Read the next depth image and ground truth pose.
+     *
+     * \note The frame number is incremented when calling this function.
+     *
+     * \param[out] depth_image The next depth image.
+     * \param[out] T_WB         The next ground truth pose.
+     * \return An appropriate status code.
+     */
+    ReaderStatus nextData(Image<float>& depth_image, Eigen::Matrix4f& T_WB);
+
     /** Read the next depth and colour images.
      *
      * \note The frame number is incremented when calling this function.

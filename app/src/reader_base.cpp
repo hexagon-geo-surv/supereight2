@@ -217,6 +217,13 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image)
 
 
 
+se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image, Eigen::Matrix4f& T_WB)
+{
+    return nextData(depth_image, nullptr, &T_WB);
+}
+
+
+
 se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image, se::Image<rgb_t>& colour_image)
 {
     return nextData(depth_image, &colour_image, nullptr);
