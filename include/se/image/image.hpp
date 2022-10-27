@@ -84,6 +84,20 @@ class Image {
 
 
 
+template<typename T>
+void remap(const Image<T>& input, Image<T>& output, const Image<Eigen::Vector2i>& map)
+{
+    assert((output.width() == map.width()) && "The output and map have the same width");
+    assert((output.height() == map.height()) && "The output and map have the same height");
+#pragma omp parallel for
+    for (size_t i = 0; i < output.size(); i++) {
+        const Eigen::Vector2i& idx = map[i];
+        output[i] = input(idx.x(), idx.y());
+    }
+}
+
+
+
 static void convert_to_output_colour_img(const Image<rgb_t>& input_colour_img,
                                          uint32_t* output_colour_img_data)
 {
