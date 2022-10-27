@@ -212,47 +212,14 @@ se::Reader::Reader(const se::ReaderConfig& c) :
 
 se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image)
 {
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to reader status: " << status_ << "\n";
-        }
-        return status_;
-    }
-    nextFrame();
-    status_ = nextDepth(depth_image);
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to nextDepth() status: " << status_ << "\n";
-        }
-    }
-    return status_;
+    return nextData(depth_image, nullptr, nullptr);
 }
 
 
 
 se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image, se::Image<rgb_t>& colour_image)
 {
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to reader status: " << status_ << "\n";
-        }
-        return status_;
-    }
-    nextFrame();
-    status_ = nextDepth(depth_image);
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to nextDepth() status: " << status_ << "\n";
-        }
-        return status_;
-    }
-    status_ = mergeStatus(nextColour(colour_image), status_);
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to nextColour() status: " << status_ << "\n";
-        }
-    }
-    return status_;
+    return nextData(depth_image, &colour_image, nullptr);
 }
 
 
@@ -261,34 +228,7 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
                                       se::Image<rgb_t>& colour_image,
                                       Eigen::Matrix4f& T_WB)
 {
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to reader status: " << status_ << "\n";
-        }
-        return status_;
-    }
-    nextFrame();
-    status_ = nextDepth(depth_image);
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to nextDepth() status: " << status_ << "\n";
-        }
-        return status_;
-    }
-    status_ = mergeStatus(nextColour(colour_image), status_);
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to nextColour() status: " << status_ << "\n";
-        }
-        return status_;
-    }
-    status_ = mergeStatus(nextPose(T_WB), status_);
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to nextPose() status: " << status_ << "\n";
-        }
-    }
-    return status_;
+    return nextData(depth_image, &colour_image, &T_WB);
 }
 
 
@@ -508,4 +448,43 @@ se::ReaderStatus se::Reader::nextColour(se::Image<se::rgb_t>& colour_image)
     // Create a black image
     std::memset(colour_image.data(), 0, colour_image_res_.prod() * sizeof(rgb_t));
     return se::ReaderStatus::ok;
+}
+
+
+se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
+                                      se::Image<se::rgb_t>* colour_image,
+                                      Eigen::Matrix4f* T_WB)
+{
+    if (!good()) {
+        if (verbose_ >= 1) {
+            std::clog << "Stopping reading due to reader status: " << status_ << "\n";
+        }
+        return status_;
+    }
+    nextFrame();
+    status_ = nextDepth(depth_image);
+    if (!good()) {
+        if (verbose_ >= 1) {
+            std::clog << "Stopping reading due to nextDepth() status: " << status_ << "\n";
+        }
+        return status_;
+    }
+    if (colour_image) {
+        status_ = mergeStatus(nextColour(*colour_image), status_);
+        if (!good()) {
+            if (verbose_ >= 1) {
+                std::clog << "Stopping reading due to nextColour() status: " << status_ << "\n";
+            }
+            return status_;
+        }
+    }
+    if (T_WB) {
+        status_ = mergeStatus(nextPose(*T_WB), status_);
+        if (!good()) {
+            if (verbose_ >= 1) {
+                std::clog << "Stopping reading due to nextPose() status: " << status_ << "\n";
+            }
+        }
+    }
+    return status_;
 }

@@ -337,6 +337,9 @@ class Reader {
      * \return An appropriate status code.
      */
     virtual ReaderStatus nextDepth(Image<float>& depth_image) = 0;
+
+    ReaderStatus
+    nextData(Image<float>& depth_image, Image<rgb_t>* colour_image, Eigen::Matrix4f* T_WB);
 };
 
 } // namespace se
