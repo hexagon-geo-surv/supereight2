@@ -231,6 +231,13 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image)
 
 
 
+se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image, Eigen::Isometry3f& T_WB)
+{
+    return nextDataImpl(depth_image, nullptr, &T_WB);
+}
+
+
+
 se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image, se::Image<RGBA>& colour_image)
 {
     return nextDataImpl(depth_image, &colour_image, nullptr);
