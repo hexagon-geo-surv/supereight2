@@ -357,6 +357,7 @@ se::InteriorNetReader::InteriorNetReader(const se::Reader::Config& c) : se::Read
         }
         colour_image_res_ = Eigen::Vector2i(image_data.cols, image_data.rows);
     }
+    has_colour_ = true;
 }
 
 

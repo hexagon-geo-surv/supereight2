@@ -191,6 +191,7 @@ se::Reader::Reader(const se::Reader::Config& c) :
         status_(se::ReaderStatus::ok),
         frame_(SIZE_MAX),
         num_frames_(0),
+        has_colour_(false),
         ground_truth_frame_(SIZE_MAX),
         ground_truth_delimiter_(' ')
 {
@@ -353,6 +354,13 @@ Eigen::Vector2i se::Reader::colourImageRes() const
 bool se::Reader::isLiveReader() const
 {
     return is_live_reader_;
+}
+
+
+
+bool se::Reader::hasColour() const
+{
+    return has_colour_;
 }
 
 
