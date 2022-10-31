@@ -56,6 +56,7 @@ se::RAWReader::RAWReader(const se::ReaderConfig& c) : se::Reader(c)
     // Compute the total number of frames from the size of the .raw file.
     const uintmax_t raw_size = stdfs::file_size(sequence_path_);
     num_frames_ = raw_size / (depth_total_size_ + colour_total_size_);
+    has_colour_ = true;
 }
 
 

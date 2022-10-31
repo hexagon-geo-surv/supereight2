@@ -260,6 +260,12 @@ class Reader {
      */
     bool isLiveReader() const;
 
+    /** Whether the loaded dataset contains colour images.
+     *
+     * \return True if the loaded dataset contains colour images, false otherwise.
+     */
+    bool hasColour() const;
+
     /** Merge se::ReaderStatus values keeping the worst one.
      *
      * \param[in] status_1 The first se::ReaderStatus to merge.
@@ -288,6 +294,7 @@ class Reader {
      */
     size_t frame_;
     size_t num_frames_;
+    bool has_colour_;
 
 
     /** Read the ground truth pose at the provided frame number.

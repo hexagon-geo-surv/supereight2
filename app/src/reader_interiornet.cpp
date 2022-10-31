@@ -370,6 +370,7 @@ se::InteriorNetReader::InteriorNetReader(const se::ReaderConfig& c) : se::Reader
     }
 
     num_frames_ = depth_filenames_.size();
+    has_colour_ = !colour_images.empty();
 }
 
 

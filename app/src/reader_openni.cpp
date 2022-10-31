@@ -140,6 +140,7 @@ se::OpenNIReader::OpenNIReader(const se::ReaderConfig& c) :
     // Start the streams
     depth_stream_.start();
     colour_stream_.start();
+    has_colour_ = true;
 }
 
 

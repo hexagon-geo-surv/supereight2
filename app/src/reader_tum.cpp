@@ -503,6 +503,7 @@ se::TUMReader::TUMReader(const se::ReaderConfig& c) : se::Reader(c)
     }
 
     num_frames_ = depth_filenames_.size();
+    has_colour_ = !rgb_images.empty();
 }
 
 
