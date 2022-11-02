@@ -12,6 +12,7 @@
 #include "montage.hpp"
 #include "reader.hpp"
 #include "se/common/filesystem.hpp"
+#include "se/common/system_utils.hpp"
 
 int main(int argc, char** argv)
 {
@@ -222,6 +223,9 @@ int main(int argc, char** argv)
                 }
             }
 
+            se::perfstats.sample("memory usage",
+                                 se::system::memory_usage_self() / 1024.0 / 1024.0,
+                                 PerfStats::MEMORY);
             se::perfstats.writeToFilestream();
         }
 
