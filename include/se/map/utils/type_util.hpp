@@ -11,6 +11,8 @@
 #include <Eigen/StdVector>
 #include <cstdint>
 
+#include "se/common/weight.hpp"
+
 EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector2f)
 EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector3f)
 EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector2d)
@@ -49,8 +51,6 @@ typedef unsigned int idx_t; ///< Child or voxel index type
 typedef float field_t; ///< The type of the stored field (e.g. TSDF, ESDF or occupancy)
 
 typedef Eigen::Matrix<field_t, 3, 1> field_vec_t;
-
-typedef se::field_t weight_t; ///< The type of the field type weight
 
 typedef int timestamp_t; ///< The type of the time stamp
 
