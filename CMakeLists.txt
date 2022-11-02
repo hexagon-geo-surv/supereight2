@@ -40,6 +40,7 @@ add_subdirectory(third_party)
 set(LIB_NAME "supereight2")
 add_library(${LIB_NAME} STATIC
     "src/common/colour_utils.cpp"
+    "src/common/system_utils.cpp"
     "src/common/image_utils.cpp"
     "src/common/perfstats.cpp"
     "src/common/str_utils.cpp"
