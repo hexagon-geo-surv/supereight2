@@ -26,6 +26,13 @@ add_compile_options(
     -Wno-unused-function
 )
 
+# Enable interprocedural optimization (IPO/LTO) for Release if supported
+include(CheckIPOSupported)
+check_ipo_supported(RESULT IPO_SUPPORTED)
+if(IPO_SUPPORTED)
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
+endif()
+
 # Compile the dependencies
 add_subdirectory(third_party)
 
