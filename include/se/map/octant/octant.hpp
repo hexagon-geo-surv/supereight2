@@ -72,7 +72,7 @@ class OctantBase {
      *
      * \return The time stamp of the octant
      */
-    int getTimeStamp() const
+    timestamp_t getTimeStamp() const
     {
         return time_stamp_;
     }
@@ -84,7 +84,7 @@ class OctantBase {
      *
      * \param[in] time_stamp  The time stamp of the octant
      */
-    void setTimeStamp(const int time_stamp)
+    void setTimeStamp(timestamp_t time_stamp)
     {
         time_stamp_ = time_stamp;
     }
@@ -136,7 +136,7 @@ class OctantBase {
 
     protected:
     const Eigen::Vector3i coord_; ///< The coordinates of the block (left, front , bottom corner)
-    int time_stamp_;              ///< The frame of the last update
+    timestamp_t time_stamp_;      ///< The frame of the last update
     OctantBase* parent_ptr_;      ///< Every node/block (other than root) needs a parent
     std::uint8_t children_mask_;  ///< The allocated children
     bool is_active_;              ///< The active state of the octant

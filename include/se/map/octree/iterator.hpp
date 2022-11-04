@@ -194,7 +194,7 @@ class UpdateIterator : public BaseIterator<UpdateIterator<OctreeT>> {
     public:
     UpdateIterator() : BaseIterator<UpdateIterator<OctreeT>>(), time_stamp_(0){};
 
-    UpdateIterator(OctreeT* octree_ptr, const unsigned int time_stamp) :
+    UpdateIterator(OctreeT* octree_ptr, timestamp_t time_stamp) :
             BaseIterator<UpdateIterator<OctreeT>>(octree_ptr), time_stamp_(time_stamp)
     {
         this->init();
@@ -212,7 +212,7 @@ class UpdateIterator : public BaseIterator<UpdateIterator<OctreeT>> {
         return octant_ptr->getTimeStamp() < time_stamp_;
     }
 
-    const unsigned int time_stamp_;
+    const timestamp_t time_stamp_;
 
     protected:
     friend class BaseIterator<UpdateIterator<OctreeT>>;

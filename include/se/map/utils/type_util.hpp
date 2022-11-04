@@ -52,7 +52,7 @@ typedef Eigen::Matrix<field_t, 3, 1> field_vec_t;
 
 typedef se::field_t weight_t; ///< The type of the field type weight
 
-typedef float time_stamp_t; ///< The type of the time stamp
+typedef int timestamp_t; ///< The type of the time stamp
 
 typedef uint32_t rgba_t; ///< The type of the colour
 
