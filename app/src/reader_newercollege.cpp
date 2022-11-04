@@ -69,7 +69,7 @@ se::NewerCollegeReader::NewerCollegeReader(const se::ReaderConfig& c) : se::Read
     }
     // Set the depth and colour image resolutions.
     depth_image_res_ = Eigen::Vector2i(1024, 64);
-    colour_image_res_ = Eigen::Vector2i(1024, 64);
+    colour_image_res_ = depth_image_res_;
     // Get the scan filenames and total number of frames.
     scan_filenames_ = getScanFilenames(sequence_path_);
     num_frames_ = scan_filenames_.size();

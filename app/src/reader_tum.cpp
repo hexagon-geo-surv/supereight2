@@ -437,6 +437,7 @@ se::TUMReader::TUMReader(const se::ReaderConfig& c) : se::Reader(c)
         return;
     }
     depth_image_res_ = Eigen::Vector2i(image_data.cols, image_data.rows);
+    colour_image_res_ = depth_image_res_;
 
     // Load colour image data if available.
     std::vector<TUMImageEntry> rgb_images;

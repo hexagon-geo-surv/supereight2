@@ -297,6 +297,7 @@ se::InteriorNetReader::InteriorNetReader(const se::ReaderConfig& c) : se::Reader
         return;
     }
     depth_image_res_ = Eigen::Vector2i(image_data.cols, image_data.rows);
+    colour_image_res_ = depth_image_res_;
 
     // Load colour image data if available.
     std::vector<InteriorNetImageEntry> colour_images;
