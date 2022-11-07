@@ -13,22 +13,14 @@
 
 namespace se {
 
-// Defaults
-static constexpr field_t dflt_tsdf = 1.0f;
-static constexpr field_t dflt_delta_tsdf = 0.0f;
-static constexpr field_t dflt_occupancy = 0.0f;
-static constexpr field_t dflt_delta_occupancy = 0.0f;
-static constexpr weight_t dflt_weight = 0.0f;
-static constexpr weight_t dflt_delta_weight = 0.0f;
-
 template<Field FieldT>
 struct FieldData {
 };
 
 template<>
 struct FieldData<Field::Occupancy> {
-    field_t occupancy = dflt_occupancy;
-    weight_t weight = dflt_weight;
+    field_t occupancy = 0;
+    weight_t weight = 0;
     bool observed = false;
     static constexpr bool invert_normals = false;
     static constexpr field_t surface_boundary = 0;
@@ -38,8 +30,8 @@ struct FieldData<Field::Occupancy> {
 
 template<>
 struct FieldData<Field::TSDF> {
-    field_t tsdf = dflt_tsdf;
-    weight_t weight = dflt_weight;
+    field_t tsdf = 1;
+    weight_t weight = 0;
     static constexpr bool invert_normals = true;
 };
 
@@ -53,13 +45,13 @@ struct FieldDeltaData {
 
 template<>
 struct FieldDeltaData<Field::Occupancy> {
-    field_t delta_occupancy = dflt_delta_occupancy;
+    field_t delta_occupancy = 0;
 };
 
 template<>
 struct FieldDeltaData<Field::TSDF> {
-    field_t delta_tsdf = dflt_delta_tsdf;
-    weight_t delta_weight = dflt_delta_weight;
+    field_t delta_tsdf = 0;
+    weight_t delta_weight = 0;
 };
 
 ///////////////////

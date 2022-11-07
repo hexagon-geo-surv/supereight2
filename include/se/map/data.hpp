@@ -100,13 +100,13 @@ inline bool is_valid(const Data<FldT, ColB, SemB>& data);
 template<Colour ColB, Semantics SemB>
 inline bool is_valid(const Data<Field::TSDF, ColB, SemB>& data)
 {
-    return data.weight != dflt_weight;
+    return data.weight != Data<Field::TSDF, ColB, SemB>{}.weight;
 }
 
 template<Colour ColB, Semantics SemB>
 inline bool is_valid(const Data<Field::Occupancy, ColB, SemB>& data)
 {
-    return data.weight != dflt_weight;
+    return data.weight != Data<Field::Occupancy, ColB, SemB>{}.weight;
 }
 
 
