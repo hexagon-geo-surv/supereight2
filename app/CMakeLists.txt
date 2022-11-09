@@ -38,7 +38,6 @@ endif()
 # Compile the apps for each configuration in SE_APP_CONFIG.
 set(SE_APP_CONFIG
   "TSDF Single PinholeCamera"
-  "TSDF Single OusterLidar"
   "TSDF Multi PinholeCamera"
   "TSDF Multi OusterLidar"
   "Occupancy Multi PinholeCamera"
