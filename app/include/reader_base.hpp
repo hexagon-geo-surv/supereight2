@@ -325,7 +325,7 @@ class Reader {
      * \param[out] T_WB The next ground truth pose.
      * \return An appropriate status code.
      */
-    ReaderStatus nextPose(Eigen::Matrix4f& T_WB);
+    virtual ReaderStatus nextPose(Eigen::Matrix4f& T_WB);
 
     /** Read the next colour image.
      *
