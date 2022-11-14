@@ -10,7 +10,7 @@ option(SE_APP "Compile the supereight application" ON)
 
 # Find dependencies
 find_package(Eigen3 3.3 REQUIRED)
-find_package(OpenCV REQUIRED COMPONENTS imgproc core)
+find_package(OpenCV REQUIRED COMPONENTS core imgcodecs imgproc)
 find_package(Boost REQUIRED) # We only need Boost.Pool which is a header-only library.
 find_package(TBB COMPONENTS tbb)
 if(TBB_tbb_FOUND)
