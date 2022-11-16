@@ -31,6 +31,7 @@ struct FieldData<Field::Occupancy> {
     weight_t weight = dflt_weight;
     bool observed = false;
     static constexpr bool invert_normals = false;
+    static constexpr field_t surface_boundary = 0;
 };
 
 template<>
@@ -82,7 +83,6 @@ struct FieldDataConfig<Field::Occupancy> {
     field_t min_occupancy;
     field_t max_occupancy;
     weight_t max_weight;
-    field_t surface_boundary;
 
     field_t log_odd_min;
     field_t log_odd_max;

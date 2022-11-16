@@ -8,7 +8,6 @@ map:
 
 data:
   # occupancy
-  surface_boundary:           0
   min_occupancy:              -100
   max_occupancy:               100
   log_odd_min:                -5.015

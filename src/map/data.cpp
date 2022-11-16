@@ -22,7 +22,6 @@ FieldDataConfig<Field::Occupancy>::FieldDataConfig() :
         tau_max_factor(16.f),
         min_occupancy(-100.f),
         max_occupancy(100.f),
-        surface_boundary(0.f),
         log_odd_min(-5.015),
         log_odd_max(5.015),
         fs_integr_scale(1),
@@ -71,7 +70,6 @@ FieldDataConfig<Field::Occupancy>::FieldDataConfig(const std::string& yaml_file)
         node,
         "max_occupancy",
         max_occupancy); // TODO: Compute based on min_occupancy and log_odd_min
-    se::yaml::subnode_as_float(node, "surface_boundary", surface_boundary);
     se::yaml::subnode_as_float(node, "log_odd_min", log_odd_min);
     se::yaml::subnode_as_float(node, "log_odd_max", log_odd_max);
     se::yaml::subnode_as_int(node, "fs_integr_scale", fs_integr_scale);
@@ -103,7 +101,6 @@ std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::Occu
     os << str_utils::value_to_pretty_str(c.tau_max_factor, "tau_max_factor") << "\n";
     os << str_utils::value_to_pretty_str(c.min_occupancy, "min_occupancy") << "\n";
     os << str_utils::value_to_pretty_str(c.max_occupancy, "max_occupancy") << "\n";
-    os << str_utils::value_to_pretty_str(c.surface_boundary, "surface_boundary") << "\n";
     os << str_utils::value_to_pretty_str(c.log_odd_min, "log_odd_min") << "\n";
     os << str_utils::value_to_pretty_str(c.log_odd_max, "log_odd_max") << "\n";
     os << str_utils::value_to_pretty_str(c.max_weight, "max_weight") << "\n";
