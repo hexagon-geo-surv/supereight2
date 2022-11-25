@@ -749,7 +749,7 @@ class Block
     public:
     typedef DataT DataType;
     static constexpr int size = BlockSize;
-    static constexpr int size_qu = BlockSize * BlockSize;
+    static constexpr int size_sq = BlockSize * BlockSize;
     static constexpr int size_cu = BlockSize * BlockSize * BlockSize;
 
     /**

@@ -46,7 +46,7 @@ BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const Eigen::Vector3i& voxel
 {
     Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
     return block_data_[voxel_offset.x() + voxel_offset.y() * this->underlying().size
-                       + voxel_offset.z() * this->underlying().size_qu];
+                       + voxel_offset.z() * this->underlying().size_sq];
 }
 
 
@@ -57,7 +57,7 @@ BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const Eigen::Vector3i& voxel
 {
     Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
     return block_data_[voxel_offset.x() + voxel_offset.y() * this->underlying().size
-                       + voxel_offset.z() * this->underlying().size_qu];
+                       + voxel_offset.z() * this->underlying().size_sq];
 }
 
 
@@ -68,7 +68,7 @@ inline void BlockSingleRes<DerivedT, DataT, BlockSize>::setData(const Eigen::Vec
 {
     Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
     block_data_[voxel_offset.x() + voxel_offset.y() * this->underlying().size
-                + voxel_offset.z() * this->underlying().size_qu] = data;
+                + voxel_offset.z() * this->underlying().size_sq] = data;
 }
 
 
