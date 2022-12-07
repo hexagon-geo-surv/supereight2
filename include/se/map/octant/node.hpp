@@ -227,6 +227,11 @@ class Node : public OctantBase,
      */
     OctantBase* setChild(const int child_idx, OctantBase* child_ptr);
 
+    /**
+     * \brief Return the coordinates in voxels of the child with index \p child_idx.
+     */
+    Eigen::Vector3i getChildCoord(const int child_idx) const;
+
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     private:

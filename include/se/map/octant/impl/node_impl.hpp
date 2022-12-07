@@ -93,6 +93,17 @@ OctantBase* Node<DataT, ResT>::setChild(const int child_idx, OctantBase* child_p
     return child_ptr;
 }
 
+
+
+template<typename DataT, Res ResT>
+Eigen::Vector3i Node<DataT, ResT>::getChildCoord(const int child_idx) const
+{
+    const Eigen::Vector3i child_offset(
+        (child_idx & 1) != 0, (child_idx & 2) != 0, (child_idx & 4) != 0);
+    const int child_size = getSize() / 2;
+    return getCoord() + child_size * child_offset;
+}
+
 } // namespace se
 
 #endif // SE_NODE_IMPL_HPP
