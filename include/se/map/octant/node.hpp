@@ -93,7 +93,7 @@ class NodeMultiRes<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
      */
     const DataType getData() const
     {
-        return (data_.observed && this->underlying().children_mask_ == 0) ? data_ : DataType();
+        return (data_.observed && this->underlying().isLeaf()) ? data_ : DataType();
     }
 
     /**

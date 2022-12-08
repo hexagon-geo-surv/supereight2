@@ -124,6 +124,14 @@ class OctantBase {
         children_mask_ = 0;
     }
 
+    /**
+     * \brief Test if this octant is a leaf, i.e. it has no children.
+     */
+    bool isLeaf() const
+    {
+        return children_mask_ == 0u;
+    }
+
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     protected:

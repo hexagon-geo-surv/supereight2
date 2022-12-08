@@ -530,7 +530,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
 {
     NodeType* node_ptr = static_cast<NodeType*>(octant_ptr);
 
-    if (node_ptr->getChildrenMask() == 0) {
+    if (node_ptr->isLeaf()) {
         typename NodeType::DataType node_data = node_ptr->getData();
         updater::free_node(node_data, map_.getDataConfig());
         node_ptr->setData(node_data);

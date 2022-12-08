@@ -277,9 +277,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveScaleSlices(const std::string&
         else {
             const typename OctreeType::NodeType* node_ptr =
                 static_cast<const typename OctreeType::NodeType*>(leaf_ptr);
-            return (node_ptr->getChildrenMask() == 0)
-                ? se::octantops::size_to_scale(node_ptr->getSize())
-                : -1;
+            return (node_ptr->isLeaf()) ? se::octantops::size_to_scale(node_ptr->getSize()) : -1;
         }
     };
 

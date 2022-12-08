@@ -180,7 +180,7 @@ class LeavesIterator : public BaseIterator<LeavesIterator<OctreeT>> {
 
     bool isNext(se::OctantBase* octant_ptr)
     {
-        return octant_ptr->getChildrenMask() == 0;
+        return octant_ptr->isLeaf();
     }
 
     protected:

@@ -61,7 +61,7 @@ inline se::OctantBase* finest_octant(const Eigen::Vector3i& octant_coord,
         child_ptr = parent_ptr->getChild(child_idx);
 
         if (!child_ptr) {
-            se::OctantBase* leaf_ptr = (parent_ptr->getChildrenMask() == 0) ? parent_ptr : nullptr;
+            se::OctantBase* leaf_ptr = (parent_ptr->isLeaf()) ? parent_ptr : nullptr;
             return leaf_ptr; // leaf is either a block or a parent with no children!
         }
 
@@ -110,7 +110,7 @@ inline se::OctantBase* leaf(const Eigen::Vector3i& leaf_coord, se::OctantBase* b
         child_ptr = parent_ptr->getChild(child_idx);
 
         if (!child_ptr) {
-            se::OctantBase* leaf_ptr = (parent_ptr->getChildrenMask() == 0) ? parent_ptr : nullptr;
+            se::OctantBase* leaf_ptr = (parent_ptr->isLeaf()) ? parent_ptr : nullptr;
             return leaf_ptr; // leaf is either a block or a parent with no children!
         }
 
