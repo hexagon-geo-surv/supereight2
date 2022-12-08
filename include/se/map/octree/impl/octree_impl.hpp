@@ -30,9 +30,41 @@ OctreeIterator<Octree<DataT, ResT, BlockSize>> Octree<DataT, ResT, BlockSize>::b
 
 
 template<typename DataT, Res ResT, int BlockSize>
+OctreeIterator<const Octree<DataT, ResT, BlockSize>> Octree<DataT, ResT, BlockSize>::begin() const
+{
+    return cbegin();
+}
+
+
+
+template<typename DataT, Res ResT, int BlockSize>
+OctreeIterator<const Octree<DataT, ResT, BlockSize>> Octree<DataT, ResT, BlockSize>::cbegin() const
+{
+    return OctreeIterator<const Octree<DataT, ResT, BlockSize>>(this);
+}
+
+
+
+template<typename DataT, Res ResT, int BlockSize>
 OctreeIterator<Octree<DataT, ResT, BlockSize>> Octree<DataT, ResT, BlockSize>::end()
 {
     return OctreeIterator<Octree<DataT, ResT, BlockSize>>();
+}
+
+
+
+template<typename DataT, Res ResT, int BlockSize>
+OctreeIterator<const Octree<DataT, ResT, BlockSize>> Octree<DataT, ResT, BlockSize>::end() const
+{
+    return cend();
+}
+
+
+
+template<typename DataT, Res ResT, int BlockSize>
+OctreeIterator<const Octree<DataT, ResT, BlockSize>> Octree<DataT, ResT, BlockSize>::cend() const
+{
+    return OctreeIterator<const Octree<DataT, ResT, BlockSize>>();
 }
 
 

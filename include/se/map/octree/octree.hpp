@@ -58,7 +58,11 @@ class Octree {
     Octree& operator=(const Octree&) = delete; ///< Delete copy assignment operator
 
     OctreeIterator<Octree<DataT, ResT, BlockSize>> begin();
+    OctreeIterator<const Octree<DataT, ResT, BlockSize>> begin() const;
+    OctreeIterator<const Octree<DataT, ResT, BlockSize>> cbegin() const;
     OctreeIterator<Octree<DataT, ResT, BlockSize>> end();
+    OctreeIterator<const Octree<DataT, ResT, BlockSize>> end() const;
+    OctreeIterator<const Octree<DataT, ResT, BlockSize>> cend() const;
 
     /**
    * \brief Verify if the voxel coordinates are contained in the octree.
