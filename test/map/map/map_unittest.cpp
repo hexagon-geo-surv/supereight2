@@ -9,6 +9,8 @@
 
 #include <Eigen/StdVector>
 #include <gtest/gtest.h>
+#include <se/map/map.hpp>
+#include <vector>
 
 #include "se/integrator/map_integrator.hpp"
 
@@ -216,4 +218,32 @@ TEST(Map, Interpolation)
 
     interp_field_value = map_tsdf.getFieldInterp(Eigen::Vector3f(+2, +2, +2));
     EXPECT_FALSE(interp_field_value);
+}
+
+TEST(Map, initialization)
+{
+    struct TestData {
+        float dim;
+        float res;
+        int size;
+    };
+
+    const std::vector<TestData> data{
+        {12.8f, 0.1f, 128},
+        {25.6f, 0.1f, 256},
+        {51.2f, 0.1f, 512},
+        {10.24f, 0.01f, 1024},
+        {20.48f, 0.01f, 2048},
+        {10.24f, 0.02f, 512},
+        {20.48f, 0.02f, 1024},
+        {10.0f, 0.05f, 256},
+        {100.0f, 0.05f, 2048},
+    };
+
+    for (const auto& d : data) {
+        se::TSDFMap<se::Res::Single> map(Eigen::Vector3f::Constant(d.dim), d.res);
+        EXPECT_GE(map.getDim().x(), d.dim);
+        EXPECT_FLOAT_EQ(map.getRes(), d.res);
+        EXPECT_EQ(map.getOctree()->getSize(), d.size);
+    }
 }
