@@ -505,13 +505,13 @@ template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::initialiseOctree()
 {
     if (octree_ptr_ != nullptr) {
-        std::cerr << "Octree has already been initialised" << std::endl;
+        std::cerr << "Octree has already been initialised\n";
         return false;
     }
 
-    float max_dim = dimension_.maxCoeff();
-    unsigned max_size = ceil(max_dim / resolution_);
-    unsigned oct_size = math::power_two_up(max_size);
+    const float max_dim = dimension_.maxCoeff();
+    const int max_size = std::ceil(max_dim / resolution_);
+    const int oct_size = math::power_two_up(max_size);
     octree_ptr_ = std::shared_ptr<se::Octree<DataType, ResT, BlockSize>>(
         new se::Octree<DataType, ResT, BlockSize>(oct_size));
     return true;

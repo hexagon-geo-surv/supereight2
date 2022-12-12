@@ -49,8 +49,8 @@ constexpr int log2_const(int n)
 
 static inline unsigned power_two_up(const float x)
 {
-    int p = ceil(log(x) / log(2));
-    return (1 << p);
+    const int p = std::ceil(std::log2(x));
+    return 1 << p;
 }
 
 
