@@ -560,16 +560,16 @@ using MapD = Map<Data<FldT, ColB, SemB>, ResT, BlockSize>;
 
 
 // Occupancy map setups
-template<se::Res ResT = se::Res::Single, int BlockSize = 8>
+template<se::Res ResT = se::Res::Multi, int BlockSize = 8>
 using OccupancyMap = Map<OccupancyData, ResT, BlockSize>;
 
-template<se::Res ResT = se::Res::Single, int BlockSize = 8>
+template<se::Res ResT = se::Res::Multi, int BlockSize = 8>
 using OccupancyColMap = Map<OccupancyColData, ResT, BlockSize>;
 
-template<se::Res ResT = se::Res::Single, int BlockSize = 8>
+template<se::Res ResT = se::Res::Multi, int BlockSize = 8>
 using OccupancySemMap = Map<OccupancySemData, ResT, BlockSize>;
 
-template<se::Res ResT = se::Res::Single, int BlockSize = 8>
+template<se::Res ResT = se::Res::Multi, int BlockSize = 8>
 using OccupancyColSemMap = Map<OccupancyColSemData, ResT, BlockSize>;
 
 

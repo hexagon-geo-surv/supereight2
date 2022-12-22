@@ -26,6 +26,9 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(
         ub_M_(dimension_),
         data_config_(data_config)
 {
+    if constexpr (FldT == se::Field::Occupancy) {
+        static_assert(ResT == se::Res::Multi, "Only se::Res::Multi occupancy maps are supported");
+    }
     corner_rel_steps_ << 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1;
     initialiseOctree();
 }
