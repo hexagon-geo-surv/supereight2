@@ -36,7 +36,7 @@ test-debug: debug
 
 
 .PHONY: install
-install: release
+install:
 	cmake --install build/release
 
 .PHONY: installcheck
