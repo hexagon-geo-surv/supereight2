@@ -23,12 +23,6 @@
 namespace se {
 namespace meshing {
 
-enum status : uint8_t {
-    OUTSIDE = 0x0,
-    UNKNOWN = 0xFE, // 254
-    INSIDE = 0xFF,  // 255
-};
-
 /// Single-res marching cube implementation
 
 template<typename OctreeT>

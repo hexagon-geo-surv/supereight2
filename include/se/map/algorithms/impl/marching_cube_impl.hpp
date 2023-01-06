@@ -170,7 +170,6 @@ uint8_t compute_index(const OctreeT& octree,
         index |= 64;
     if (is_inside(data[7]))
         index |= 128;
-    // std::cerr << std::endl << std::endl;
 
     return index;
 }
@@ -819,20 +818,11 @@ void compute_dual_index(
         }
     }
 
-    // if(inside(data[0])) edge_pattern_idx |= 1;
-    // if(inside(data[1])) edge_pattern_idx |= 2;
-    // if(inside(data[2])) edge_pattern_idx |= 4;
-    // if(inside(data[3])) edge_pattern_idx |= 8;
-    // if(inside(data[4])) edge_pattern_idx |= 16;
-    // if(inside(data[5])) edge_pattern_idx |= 32;
-    // if(inside(data[6])) edge_pattern_idx |= 64;
-    // if(inside(data[7])) edge_pattern_idx |= 128;
     for (int corner_idx = 0; corner_idx < 8; corner_idx++) {
         if (is_inside(data[corner_idx])) {
             edge_pattern_idx |= (1 << corner_idx);
         }
     }
-    // std::cerr << std::endl << std::endl;
 }
 
 
