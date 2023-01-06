@@ -13,6 +13,68 @@ namespace se {
 
 namespace meshing {
 
+/** Functors to select which isosurface to mesh using marching cubes. They return an index to
+ * triTable given the data of the 8 neighbouring vertices. See also here:
+ * https://en.wikipedia.org/wiki/Marching_cubes#Algorithm
+ */
+namespace isosurface {
+
+/** Mesh the surface between occupied and free space. This is what's typically wanted when meshing.
+ * The mesh faces are oriented away from occupied space.
+ */
+static constexpr auto occupied = [](const auto data[8]) -> std::uint8_t {
+    // A face should be meshed if there are no unknown vertices (not valid) and if there is at least
+    // 1 occupied vertex (valid and inside).
+    std::uint8_t edge_index = 0;
+    for (int i = 0; i < 8; i++) {
+        if (!is_valid(data[i])) {
+            return 0;
+        }
+        if (is_inside(data[i])) {
+            edge_index |= 1 << i;
+        }
+    }
+    return edge_index;
+};
+
+/** Mesh the surface between free and occupied or unknown space. This will create a mesh that
+ * encloses all free space in the map. The mesh faces are oriented away from free space.
+ */
+static constexpr auto free = [](const auto data[8]) -> std::uint8_t {
+    // A face should be meshed if there is at least 1 free vertex (valid and not inside). Since both
+    // the boundaries between free and unknown, and free and occupied are needed there's no early
+    // exit on invalid data.
+    std::uint8_t edge_index = 0;
+    for (int i = 0; i < 8; i++) {
+        if (is_valid(data[i]) && !is_inside(data[i])) {
+            edge_index |= 1 << i;
+        }
+    }
+    return edge_index;
+};
+
+/** Mesh the surface between free and unknown space, also known as frontiers. The mesh faces are
+ * oriented towards unknown space.
+ */
+static constexpr auto frontier = [](const auto data[8]) -> std::uint8_t {
+    // Frontiers are the boundaries between free and unknown space. This means there should be at
+    // least 1 free vertex (valid and not inside) and at least 1 unknown vertex (not valid) for a
+    // face to be meshed.
+    std::uint8_t edge_index = 0;
+    int num_valid = 0;
+    for (int i = 0; i < 8; i++) {
+        if (is_valid(data[i])) {
+            num_valid++;
+            if (!is_inside(data[i])) {
+                edge_index |= 1 << i;
+            }
+        }
+    }
+    return num_valid == 8 ? 0 : edge_index;
+};
+
+} // namespace isosurface
+
 
 
 /// Single-res marching cube implementation
@@ -118,60 +180,27 @@ inline void gather_data(const OctreeT& octree,
 
 
 
-template<typename OctreeT>
+template<typename OctreeT, typename DataToIndexF>
 uint8_t compute_index(const OctreeT& octree,
                       const typename OctreeT::BlockType* block_ptr,
                       const unsigned x,
                       const unsigned y,
-                      const unsigned z)
+                      const unsigned z,
+                      DataToIndexF data_to_index)
 {
     unsigned int block_size = block_ptr->getSize();
     unsigned int local = ((x % block_size == block_size - 1) << 2)
         | ((y % block_size == block_size - 1) << 1) | ((z % block_size) == block_size - 1);
 
     typename OctreeT::DataType data[8];
-    if (!local)
+    if (!local) {
         gather_data(block_ptr, data, x, y, z);
-    else
+    }
+    else {
         gather_data(octree, data, x, y, z);
+    }
 
-    uint8_t index = 0;
-
-    if (!is_valid(data[0]))
-        return 0;
-    if (!is_valid(data[1]))
-        return 0;
-    if (!is_valid(data[2]))
-        return 0;
-    if (!is_valid(data[3]))
-        return 0;
-    if (!is_valid(data[4]))
-        return 0;
-    if (!is_valid(data[5]))
-        return 0;
-    if (!is_valid(data[6]))
-        return 0;
-    if (!is_valid(data[7]))
-        return 0;
-
-    if (is_inside(data[0]))
-        index |= 1;
-    if (is_inside(data[1]))
-        index |= 2;
-    if (is_inside(data[2]))
-        index |= 4;
-    if (is_inside(data[3]))
-        index |= 8;
-    if (is_inside(data[4]))
-        index |= 16;
-    if (is_inside(data[5]))
-        index |= 32;
-    if (is_inside(data[6]))
-        index |= 64;
-    if (is_inside(data[7]))
-        index |= 128;
-
-    return index;
+    return data_to_index(data);
 }
 
 
@@ -775,7 +804,7 @@ inline void gather_dual_data(
 
 
 
-template<typename OctreeT, typename DataT>
+template<typename OctreeT, typename DataT, typename DataToIndexF>
 void compute_dual_index(
     const OctreeT& octree,
     const typename OctreeT::BlockType* block_ptr,
@@ -783,7 +812,8 @@ void compute_dual_index(
     const Eigen::Vector3i& primal_corner_coord,
     uint8_t& edge_pattern_idx,
     DataT data[8],
-    std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& dual_corner_coords_f)
+    std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& dual_corner_coords_f,
+    DataToIndexF data_to_index)
 {
     const unsigned int block_size = block_ptr->getSize();
     // The local case is independent of the scale.
@@ -802,7 +832,6 @@ void compute_dual_index(
         | ((primal_corner_coord.y() % block_size == 0) << 1)
         | (primal_corner_coord.z() % block_size == 0);
 
-    edge_pattern_idx = 0;
     if (!local) {
         gather_dual_data(
             block_ptr, scale, primal_corner_coord.cast<float>(), data, dual_corner_coords_f);
@@ -811,18 +840,7 @@ void compute_dual_index(
         gather_dual_data(octree, block_ptr, scale, primal_corner_coord, data, dual_corner_coords_f);
     }
 
-    // Only compute dual index if all data is valid/observed
-    for (int corner_idx = 0; corner_idx < 8; corner_idx++) {
-        if (!is_valid(data[corner_idx])) {
-            return;
-        }
-    }
-
-    for (int corner_idx = 0; corner_idx < 8; corner_idx++) {
-        if (is_inside(data[corner_idx])) {
-            edge_pattern_idx |= (1 << corner_idx);
-        }
-    }
+    edge_pattern_idx = data_to_index(data);
 }
 
 
@@ -866,7 +884,7 @@ void marching_cube_kernel(OctreeT& octree,
             for (int y = start_coord.y(); y < last_coord.y(); y++) {
                 for (int z = start_coord.z(); z < last_coord.z(); z++) {
                     const uint8_t edge_pattern_idx =
-                        meshing::compute_index(octree, block_ptr, x, y, z);
+                        meshing::compute_index(octree, block_ptr, x, y, z, isosurface::occupied);
                     const int* edges = triTable[edge_pattern_idx];
                     for (unsigned int e = 0; edges[e] != -1 && e < 16; e += 3) {
                         Eigen::Vector3f vertex_0 = interp_vertexes(octree, x, y, z, edges[e]);
@@ -939,7 +957,8 @@ void dual_marching_cube_kernel(OctreeT& octree,
                                                 primal_corner_coord,
                                                 edge_pattern_idx,
                                                 data,
-                                                dual_corner_coords_f);
+                                                dual_corner_coords_f,
+                                                isosurface::occupied);
                     const int* edges = triTable[edge_pattern_idx];
                     for (unsigned int e = 0; edges[e] != -1 && e < 16; e += 3) {
                         Eigen::Vector3f vertex_0 =
