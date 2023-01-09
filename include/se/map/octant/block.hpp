@@ -748,7 +748,7 @@ class Block
      */
     Block(Node<DataT, ResT>* parent_ptr, const int child_idx, const DataT init_data);
 
-    static constexpr unsigned int getSize()
+    static constexpr int getSize()
     {
         return BlockSize;
     }

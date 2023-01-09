@@ -26,8 +26,8 @@ inline se::OctantBase* octant(const Eigen::Vector3i& octant_coord,
     int child_size = parent_ptr->getSize() >> 1;
     se::OctantBase* child_ptr = nullptr;
 
-    int size_desired = std::max(
-        1 << scale_desired, (int) OctreeT::BlockType::getSize()); // Note smaller than block size
+    int size_desired =
+        std::max(1 << scale_desired, OctreeT::BlockType::getSize()); // Not smaller than block size
     for (; child_size >= size_desired; child_size = child_size >> 1) {
         se::idx_t child_idx = ((octant_coord.x() & child_size) > 0)
             + 2 * ((octant_coord.y() & child_size) > 0) + 4 * ((octant_coord.z() & child_size) > 0);
@@ -53,8 +53,8 @@ inline se::OctantBase* finest_octant(const Eigen::Vector3i& octant_coord,
     int child_size = parent_ptr->getSize() >> 1;
     se::OctantBase* child_ptr = nullptr;
 
-    int size_desired = std::max(
-        1 << scale_desired, (int) OctreeT::BlockType::getSize()); // Note smaller than block size
+    int size_desired =
+        std::max(1 << scale_desired, OctreeT::BlockType::getSize()); // Not smaller than block size
     for (; child_size >= size_desired; child_size = child_size >> 1) {
         se::idx_t child_idx = ((octant_coord.x() & child_size) > 0)
             + 2 * ((octant_coord.y() & child_size) > 0) + 4 * ((octant_coord.z() & child_size) > 0);
@@ -78,7 +78,7 @@ inline se::OctantBase* block(const Eigen::Vector3i& block_coord, se::OctantBase*
 {
     typename OctreeT::NodeType* parent_ptr =
         static_cast<typename OctreeT::NodeType*>(base_parent_ptr);
-    unsigned child_size = parent_ptr->getSize() >> 1;
+    int child_size = parent_ptr->getSize() >> 1;
     se::OctantBase* child_ptr = nullptr;
 
     for (; child_size >= OctreeT::BlockType::getSize(); child_size = child_size >> 1) {
