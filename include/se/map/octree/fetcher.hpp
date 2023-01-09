@@ -72,7 +72,7 @@ inline se::OctantBase* block(const Eigen::Vector3i& block_coord, se::OctantBase*
  * \return The pointer to the leaf
  */
 template<typename OctreeT>
-inline se::OctantBase* leaf(const Eigen::Vector3i& leaf_coord, se::OctantBase* base_parent_ptr);
+inline OctantBase* leaf(const Eigen::Vector3i& leaf_coord, OctantBase* base_parent_ptr);
 
 
 

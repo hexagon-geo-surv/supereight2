@@ -97,27 +97,20 @@ inline se::OctantBase* block(const Eigen::Vector3i& block_coord, se::OctantBase*
 
 
 template<typename OctreeT>
-inline se::OctantBase* leaf(const Eigen::Vector3i& leaf_coord, se::OctantBase* base_parent_ptr)
+inline OctantBase* leaf(const Eigen::Vector3i& leaf_coord, OctantBase* base_parent_ptr)
 {
-    typename OctreeT::NodeType* parent_ptr =
-        static_cast<typename OctreeT::NodeType*>(base_parent_ptr);
-    unsigned child_size = parent_ptr->getSize() >> 1;
-    se::OctantBase* child_ptr = nullptr;
-
-    for (; child_size >= OctreeT::BlockType::getSize(); child_size = child_size >> 1) {
-        se::idx_t child_idx = ((leaf_coord.x() & child_size) > 0)
-            + 2 * ((leaf_coord.y() & child_size) > 0) + 4 * ((leaf_coord.z() & child_size) > 0);
-        child_ptr = parent_ptr->getChild(child_idx);
-
-        if (!child_ptr) {
-            se::OctantBase* leaf_ptr = (parent_ptr->isLeaf()) ? parent_ptr : nullptr;
-            return leaf_ptr; // leaf is either a block or a parent with no children!
+    assert(base_parent_ptr);
+    OctantBase* octant = base_parent_ptr;
+    while (!octant->isLeaf()) {
+        // Only Nodes can be non-leaves so the following cast is safe.
+        typename OctreeT::NodeType* node = static_cast<typename OctreeT::NodeType*>(octant);
+        OctantBase* child = node->getChild(get_child_idx(leaf_coord, node));
+        if (!child) {
+            return octant;
         }
-
-        parent_ptr = static_cast<typename OctreeT::NodeType*>(child_ptr);
+        octant = child;
     }
-
-    return child_ptr;
+    return octant;
 }
 
 
