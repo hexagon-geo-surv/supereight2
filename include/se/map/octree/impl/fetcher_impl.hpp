@@ -1,8 +1,8 @@
 /*
  * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
- * SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2021-2023 Smart Robotics Lab, Imperial College London, Technical University of Munich
  * SPDX-FileCopyrightText: 2021 Nils Funk
- * SPDX-FileCopyrightText: 2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2021-2023 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -141,6 +141,42 @@ const OctantBase* leaf(const Eigen::Vector3i& leaf_coord, const OctantBase* cons
 {
     // The finest possible leaves are at the block scale.
     return finest_octant<OctreeT>(leaf_coord, OctreeT::max_block_scale, base_parent_ptr);
+}
+
+
+
+template<typename OctreeT>
+std::vector<const OctantBase*> face_neighbours(const OctantBase* const octant_ptr,
+                                               const OctreeT& octree)
+{
+    assert(octant_ptr);
+    const Eigen::Vector3i& octant_coord = octant_ptr->getCoord();
+    const int octant_size = octant_ptr->isBlock()
+        ? static_cast<const typename OctreeT::BlockType*>(octant_ptr)->getSize()
+        : static_cast<const typename OctreeT::NodeType*>(octant_ptr)->getSize();
+    const int octant_scale = octantops::size_to_scale(octant_size);
+    const Eigen::Matrix<int, 3, 6> neighbour_coords =
+        (octant_size * face_neighbour_offsets).colwise() + octant_coord;
+    std::vector<const OctantBase*> neighbours;
+    for (int i = 0; i < neighbour_coords.cols(); i++) {
+        const Eigen::Vector3i& neighbour_coord = neighbour_coords.col(i);
+        if (!octree.contains(neighbour_coord)) {
+            continue;
+        }
+        const OctantBase* neighbour =
+            finest_octant<OctreeT>(neighbour_coord, octant_scale, octree.getRoot());
+        if (neighbour) {
+            // If the returned neighbour contains the octant it means that no neighbouring octant
+            // has been allocated.
+            const Eigen::Vector3i& nc = neighbour->getCoord();
+            if ((octant_coord.array() >= nc.array()).all()
+                && (octant_coord.array() < nc.array() + octant_size).all()) {
+                neighbour = nullptr;
+            }
+        }
+        neighbours.push_back(neighbour);
+    }
+    return neighbours;
 }
 
 } // namespace fetcher

@@ -1,8 +1,8 @@
 /*
  * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
- * SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2021-2023 Smart Robotics Lab, Imperial College London, Technical University of Munich
  * SPDX-FileCopyrightText: 2021 Nils Funk
- * SPDX-FileCopyrightText: 2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2021-2023 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -14,6 +14,16 @@
 
 namespace se {
 namespace fetcher {
+
+/** Unit-less relative offsets to the 6 face neighbours of an octant. */
+// clang-format off
+static const Eigen::Matrix<int, 3, 6> face_neighbour_offsets = (Eigen::Matrix<int, 3, 6>() <<
+     0,  0, -1,  1,  0,  0,
+     0, -1,  0,  0,  1,  0,
+    -1,  0,  0,  0,  0,  1).finished();
+// clang-format on
+
+
 
 /** Return the octant with coordinates in voxels \p octant_coord and scale \p scale_desired.
  *
@@ -90,6 +100,16 @@ OctantBase* leaf(const Eigen::Vector3i& leaf_coord, OctantBase* const base_paren
  */
 template<typename OctreeT>
 const OctantBase* leaf(const Eigen::Vector3i& leaf_coord, const OctantBase* const base_parent_ptr);
+
+/** Return the face neighbours of \p octant_ptr which is an octant of \p octree. The returned face
+ * neighbours will be at the same or higher scale than \p octant_ptr. A nullptr is returned for each
+ * unallocated face neighbour. Face neighbours outside the octree are ignored. Octants at the faces,
+ * edges and corners of the octree volume have 5, 4 and 3 face neighbours respectively, thus the
+ * function will return between 3 and 6, potentially null, pointers to neighbours.
+ */
+template<typename OctreeT>
+std::vector<const OctantBase*> face_neighbours(const OctantBase* const octant_ptr,
+                                               const OctreeT& octree);
 
 } // namespace fetcher
 } // namespace se
