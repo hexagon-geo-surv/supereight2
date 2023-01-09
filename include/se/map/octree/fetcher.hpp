@@ -9,6 +9,8 @@
 #ifndef SE_FETCHER_HPP
 #define SE_FETCHER_HPP
 
+#include <vector>
+
 #include "octree.hpp"
 #include "se/map/utils/type_util.hpp"
 
@@ -94,7 +96,11 @@ inline OctantBase* leaf(const Eigen::Vector3i& leaf_coord, OctantBase* base_pare
 template<typename OctreeT>
 inline const OctantBase* leaf(const Eigen::Vector3i& leaf_coord, const OctantBase* base_parent_ptr);
 
+inline const Eigen::Matrix<int, 3, 6>& face_neighbour_offsets();
 
+template<typename OctreeT>
+inline std::vector<const OctantBase*>
+face_neighbours(const OctantBase* octant, const OctantBase* common_parent, const OctreeT& octree);
 
 } // namespace fetcher
 } // namespace se

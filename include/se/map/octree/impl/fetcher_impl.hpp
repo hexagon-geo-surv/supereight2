@@ -144,6 +144,47 @@ inline const OctantBase* leaf(const Eigen::Vector3i& leaf_coord, const OctantBas
     return octant;
 }
 
+
+
+inline const Eigen::Matrix<int, 3, 6>& face_neighbour_offsets()
+{
+    static const Eigen::Matrix<int, 3, 6> offsets =
+        (Eigen::Matrix<int, 3, 6>() << 0, 0, -1, 1, 0, 0, 0, -1, 0, 0, 1, 0, -1, 0, 0, 0, 0, 1)
+            .finished();
+    return offsets;
+}
+
+
+
+template<typename OctreeT>
+inline std::vector<const OctantBase*>
+face_neighbours(const OctantBase* octant, const OctantBase* common_parent, const OctreeT& octree)
+{
+    assert(octant);
+    assert(common_parent);
+    const Eigen::Vector3i& coord = octant->getCoord();
+    const int size = octant->isBlock()
+        ? static_cast<const typename OctreeT::BlockType*>(octant)->getSize()
+        : static_cast<const typename OctreeT::NodeType*>(octant)->getSize();
+    const int scale = octantops::size_to_scale(size);
+    std::vector<const OctantBase*> neighbours;
+    for (int i = 0; i < 6; i++) {
+        const Eigen::Vector3i neighbour_coord = coord + size * face_neighbour_offsets().col(i);
+        if (!octree.contains(neighbour_coord)) {
+            continue;
+        }
+        const OctantBase* neighbour = finest_octant<OctreeT>(neighbour_coord, scale, common_parent);
+        const Eigen::Array3i nc = neighbour->getCoord().array();
+        if (neighbour && ((nc <= coord.array()).all() && (coord.array() <= nc + size).all())) {
+            // The returned neighbour contains the octant meaning that no neighbouring octant has
+            // been allocated.
+            neighbour = nullptr;
+        }
+        neighbours.push_back(neighbour);
+    }
+    return neighbours;
+}
+
 } // namespace fetcher
 } // namespace se
 
