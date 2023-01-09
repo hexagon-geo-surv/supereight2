@@ -14,10 +14,10 @@ namespace se {
 
 
 template<typename NodeT>
-inline int get_child_idx(const Eigen::Vector3i& child_coord, NodeT* parent_ptr)
+inline int get_child_idx(const Eigen::Vector3i& child_coord, const NodeT* parent_ptr)
 {
     const Eigen::Vector3i parent_coord = parent_ptr->getCoord();
-    const int parent_size = parent_ptr->getSize;
+    const int parent_size = parent_ptr->getSize();
 
     assert(se::keyops::is_child(
         se::keyops::encode_key(parent_coord, se::math::log2_const(parent_size)),

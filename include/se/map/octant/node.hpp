@@ -25,8 +25,7 @@ namespace se {
  * \return The child index
  */
 template<typename NodeT>
-inline void
-get_child_idx(const Eigen::Vector3i& octant_coord, NodeT* node_ptr, unsigned int& child_idx);
+inline int get_child_idx(const Eigen::Vector3i& octant_coord, const NodeT* node_ptr);
 
 
 
