@@ -130,10 +130,18 @@ const OctantBase* block(const Eigen::Vector3i& block_coord, const OctantBase* co
 template<typename OctreeT>
 OctantBase* leaf(const Eigen::Vector3i& leaf_coord, OctantBase* const base_parent_ptr)
 {
+    return const_cast<OctantBase*>(
+        leaf<OctreeT>(leaf_coord, static_cast<const OctantBase*>(base_parent_ptr)));
+}
+
+
+
+template<typename OctreeT>
+const OctantBase* leaf(const Eigen::Vector3i& leaf_coord, const OctantBase* const base_parent_ptr)
+{
     // The finest possible leaves are at the block scale.
     return finest_octant<OctreeT>(leaf_coord, OctreeT::max_block_scale, base_parent_ptr);
 }
-
 
 } // namespace fetcher
 } // namespace se

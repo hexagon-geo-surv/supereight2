@@ -92,6 +92,11 @@ const OctantBase* block(const Eigen::Vector3i& block_coord,
 template<typename OctreeT>
 OctantBase* leaf(const Eigen::Vector3i& leaf_coord, OctantBase* const base_parent_ptr);
 
+/** Same as se::fetcher::leaf() but returning a pointer to const.
+ */
+template<typename OctreeT>
+const OctantBase* leaf(const Eigen::Vector3i& leaf_coord, const OctantBase* const base_parent_ptr);
+
 
 
 } // namespace fetcher
