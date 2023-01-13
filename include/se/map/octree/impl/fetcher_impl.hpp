@@ -120,12 +120,22 @@ inline se::OctantBase* block(const Eigen::Vector3i& block_coord, se::OctantBase*
 template<typename OctreeT>
 inline OctantBase* leaf(const Eigen::Vector3i& leaf_coord, OctantBase* base_parent_ptr)
 {
+    return const_cast<OctantBase*>(
+        leaf<OctreeT>(leaf_coord, const_cast<const OctantBase*>(base_parent_ptr)));
+}
+
+
+
+template<typename OctreeT>
+inline const OctantBase* leaf(const Eigen::Vector3i& leaf_coord, const OctantBase* base_parent_ptr)
+{
     assert(base_parent_ptr);
-    OctantBase* octant = base_parent_ptr;
+    const OctantBase* octant = base_parent_ptr;
     while (!octant->isLeaf()) {
+        typedef typename OctreeT::NodeType NodeType;
         // Only Nodes can be non-leaves so the following cast is safe.
-        typename OctreeT::NodeType* node = static_cast<typename OctreeT::NodeType*>(octant);
-        OctantBase* child = node->getChild(get_child_idx(leaf_coord, node));
+        const NodeType* node = static_cast<const NodeType*>(octant);
+        const OctantBase* child = node->getChild(get_child_idx(leaf_coord, node));
         if (!child) {
             return octant;
         }
@@ -133,7 +143,6 @@ inline OctantBase* leaf(const Eigen::Vector3i& leaf_coord, OctantBase* base_pare
     }
     return octant;
 }
-
 
 } // namespace fetcher
 } // namespace se

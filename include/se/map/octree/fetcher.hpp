@@ -88,6 +88,12 @@ inline se::OctantBase* block(const Eigen::Vector3i& block_coord, se::OctantBase*
 template<typename OctreeT>
 inline OctantBase* leaf(const Eigen::Vector3i& leaf_coord, OctantBase* base_parent_ptr);
 
+/**
+ * \brief Same as se::fetcher::leaf() but returning a const pointer.
+ */
+template<typename OctreeT>
+inline const OctantBase* leaf(const Eigen::Vector3i& leaf_coord, const OctantBase* base_parent_ptr);
+
 
 
 } // namespace fetcher
