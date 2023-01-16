@@ -17,8 +17,6 @@
 namespace se {
 namespace fetcher {
 
-
-
 /**
  * \brief Fetch the octant for given coordinates and scale.
  *
@@ -33,6 +31,14 @@ template<typename OctreeT>
 inline se::OctantBase* octant(const Eigen::Vector3i& octant_coord,
                               const se::scale_t scale_desired,
                               se::OctantBase* base_parent_ptr);
+
+/**
+ * \brief Same as se::fetcher::octant() but returning a const pointer.
+ */
+template<typename OctreeT>
+inline const se::OctantBase* octant(const Eigen::Vector3i& octant_coord,
+                                    const se::scale_t scale_desired,
+                                    const se::OctantBase* base_parent_ptr);
 
 /**
  * \brief Fetch the octant for given coordinates and scale.
