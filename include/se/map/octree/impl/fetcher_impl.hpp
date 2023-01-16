@@ -59,10 +59,21 @@ OctantBase* finest_octant(const Eigen::Vector3i& octant_coord,
                           const scale_t scale_desired,
                           OctantBase* const base_parent_ptr)
 {
-    typename OctreeT::NodeType* parent_ptr =
-        static_cast<typename OctreeT::NodeType*>(base_parent_ptr);
+    return const_cast<OctantBase*>(finest_octant<OctreeT>(
+        octant_coord, scale_desired, static_cast<const OctantBase*>(base_parent_ptr)));
+}
+
+
+
+template<typename OctreeT>
+const OctantBase* finest_octant(const Eigen::Vector3i& octant_coord,
+                                const scale_t scale_desired,
+                                const OctantBase* const base_parent_ptr)
+{
+    const typename OctreeT::NodeType* parent_ptr =
+        static_cast<const typename OctreeT::NodeType*>(base_parent_ptr);
     int child_size = parent_ptr->getSize() >> 1;
-    OctantBase* child_ptr = nullptr;
+    const OctantBase* child_ptr = nullptr;
 
     int size_desired =
         std::max(1 << scale_desired, OctreeT::BlockType::getSize()); // Not smaller than block size
@@ -72,11 +83,11 @@ OctantBase* finest_octant(const Eigen::Vector3i& octant_coord,
         child_ptr = parent_ptr->getChild(child_idx);
 
         if (!child_ptr) {
-            OctantBase* leaf_ptr = (parent_ptr->isLeaf()) ? parent_ptr : nullptr;
+            const OctantBase* leaf_ptr = (parent_ptr->isLeaf()) ? parent_ptr : nullptr;
             return leaf_ptr; // leaf is either a block or a parent with no children!
         }
 
-        parent_ptr = static_cast<typename OctreeT::NodeType*>(child_ptr);
+        parent_ptr = static_cast<const typename OctreeT::NodeType*>(child_ptr);
     }
 
     return child_ptr;
