@@ -57,6 +57,14 @@ inline se::OctantBase* finest_octant(const Eigen::Vector3i& octant_coord,
                                      se::OctantBase* base_parent_ptr);
 
 /**
+ * \brief Same as se::fetcher::finest_octant() but returning a const pointer.
+ */
+template<typename OctreeT>
+inline const se::OctantBase* finest_octant(const Eigen::Vector3i& octant_coord,
+                                           const se::scale_t scale_desired,
+                                           const se::OctantBase* base_parent_ptr);
+
+/**
  * \brief Fetch the block for given block coordinates.
  *
  * \tparam OctreeT
