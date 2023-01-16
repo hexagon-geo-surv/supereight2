@@ -602,7 +602,7 @@ class BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, Deriv
      *
      * \return `const` reference to the voxel data in the buffer for the provided voxel index.
      */
-    DataType& currData(const int voxel_idx) const
+    const DataType& currData(const int voxel_idx) const
     {
         return curr_data_[voxel_idx];
     }
