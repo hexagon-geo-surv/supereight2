@@ -55,7 +55,6 @@ target_include_directories(${LIB_NAME}
 target_link_libraries(${LIB_NAME}
     PUBLIC
       m
-      stdc++fs
       Eigen3::Eigen
       Boost::boost
       ${OpenCV_LIBS}
@@ -74,6 +73,11 @@ if(SE_OPENMP)
     endif()
 else()
     message(WARNING "Building without OpenMP. Performance may be terrible.")
+endif()
+if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") AND ("${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS 9.0))
+    target_link_libraries(${LIB_NAME} PUBLIC stdc++fs)
+elseif(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") AND ("${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS 9.1))
+    target_link_libraries(${LIB_NAME} PUBLIC stdc++fs)
 endif()
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     # Link against the GNU C++ library even when using clang.
