@@ -1,6 +1,6 @@
 #!/bin/sh
-# SPDX-FileCopyrightText: 2021 Smart Robotics Lab
-# SPDX-FileCopyrightText: 2021 Sotiris Papatheodorou, Imperial College London
+# SPDX-FileCopyrightText: 2021-2023 Smart Robotics Lab
+# SPDX-FileCopyrightText: 2021-2023 Sotiris Papatheodorou, Imperial College London
 # SPDX-License-Identifier: BSD-3-Clause
 set -eu
 
@@ -38,7 +38,7 @@ average_tsv() {
 	# 1. Strip leading and trailing whitespace to avoid having empty columns.
 	# 2. Remove the first column.
 	# 3. Compute and print the column means.
-	sed -E -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' "$1" \
+	sed -e 's/^[ \t]*//' -e 's/[ \t]*$//' "$1" \
 		| cut -f 2- \
 		| awk "$average_tsv_awk"
 }
