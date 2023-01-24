@@ -21,6 +21,11 @@ add_library(${LIB_NAME} STATIC
 )
 target_include_directories(${LIB_NAME} PUBLIC include)
 target_link_libraries(${LIB_NAME} PUBLIC SRL::Supereight2)
+if(OPENMP_FOUND)
+    target_compile_options(${LIB_NAME} PUBLIC ${OpenMP_CXX_FLAGS})
+    target_include_directories(${LIB_NAME} PUBLIC ${OpenMP_CXX_INCLUDE_DIRS})
+    target_link_libraries(${LIB_NAME} PUBLIC ${OpenMP_CXX_LIBRARIES})
+endif()
 if(PCL_FOUND)
   # These have to be added globaly for compatibility with PCL 1.8.1 on Ubuntu 18.04.
   include_directories(${PCL_INCLUDE_DIRS})
@@ -69,6 +74,11 @@ foreach(APP_CONFIG ${SE_APP_CONFIG})
   add_executable(${EXE_NAME} ${GENERATED_MAIN} "src/montage.cpp")
   target_include_directories(${EXE_NAME} BEFORE PRIVATE include)
   target_link_libraries(${EXE_NAME} PRIVATE SRL::Supereight2 ${LIB_NAME})
+  if(OPENMP_FOUND)
+    target_compile_options(${EXE_NAME} PRIVATE ${OpenMP_CXX_FLAGS})
+    target_include_directories(${EXE_NAME} PRIVATE ${OpenMP_CXX_INCLUDE_DIRS})
+    target_link_libraries(${EXE_NAME} PRIVATE ${OpenMP_CXX_LIBRARIES})
+  endif()
   # Allow handling large files in 32-bit systems
   target_compile_definitions(${EXE_NAME} PRIVATE _FILE_OFFSET_BITS=64)
 
