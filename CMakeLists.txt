@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+# SPDX-FileCopyrightText: 2021-2023 Smart Robotics Lab, Imperial College London, Technical University of Munich
 # SPDX-License-Identifier: CC0-1.0
 
 cmake_minimum_required(VERSION 3.8...3.16)
@@ -11,6 +11,7 @@ option(SE_APP "Compile the supereight application" ON)
 # Find dependencies
 find_package(Eigen3 3.3 REQUIRED)
 find_package(OpenCV REQUIRED COMPONENTS imgproc core)
+find_package(Boost REQUIRED) # We only need Boost.Pool which is a header-only library.
 
 # Compiler options
 add_compile_options(
@@ -56,6 +57,7 @@ target_link_libraries(${LIB_NAME}
       m
       stdc++fs
       Eigen3::Eigen
+      Boost::boost
       ${OpenCV_LIBS}
       SRL::Projection
 )
