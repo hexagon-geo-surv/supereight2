@@ -4,9 +4,16 @@
 # SPDX-License-Identifier: BSD-3-Clause
 set -eu
 
-average_tsv_awk='
+# Usage: average_tsv FILE
+average_tsv() {
+	# 1. Strip leading and trailing whitespace to avoid having empty columns.
+	# 2. Remove the first column.
+	# 3. Compute and print the column means using awk.
+	sed -e 's/^[ \t]*//' -e 's/[ \t]*$//' "$1" \
+		| cut -f 2- \
+		| awk '
 # This is the awk way of testing whether something is a number.
-function is_num(x) { return x + 0 == x }
+function is_number(x) { return x + 0 == x }
 # Set the input and output column (field) separator to tab. Use 6 decimal digits
 # for printing numbers.
 BEGIN { FS = "\t"; OFS = "\t"; CONVFMT = "%.6f" }
@@ -15,7 +22,7 @@ NR == 1
 # Accumulate the numerical values of each column for all other lines.
 NR > 1 {
 	for (i = 1; i <= NF; i++) {
-		if (is_num($i)) {
+		if (is_number($i)) {
 			s[i] += $i
 			n[i]++
 		}
@@ -32,15 +39,6 @@ END {
 	}
 	print
 }'
-
-# Usage: average_tsv FILE
-average_tsv() {
-	# 1. Strip leading and trailing whitespace to avoid having empty columns.
-	# 2. Remove the first column.
-	# 3. Compute and print the column means.
-	sed -e 's/^[ \t]*//' -e 's/[ \t]*$//' "$1" \
-		| cut -f 2- \
-		| awk "$average_tsv_awk"
 }
 
 # Usage: align_tsv < FILE
@@ -68,31 +66,36 @@ END { printf "\n" }'
 }
 
 usage() {
-	printf 'Usage: %s [OPTIONS] [FILE]...\n' "$(basename "$0")"
-	printf 'Show the per-frame averages from a supereight TSV log.\n'
-	printf 'With no FILE read from standard input.'
-	printf '\n-f FORMAT Select the output format. FORMAT can be aligned, tsv or markdown.'
-	printf '\n-h        Show this help message.\n'
+	cat <<- EOF
+	Usage: $(basename "$0") [OPTIONS] [FILE] ...
+
+	Show the per-frame averages from one or more supereight TSV logs. With
+	no FILE read from standard input.
+
+	  -f FORMAT Select the output format. FORMAT can be aligned, tsv or markdown.
+	  -h        Show this help message.
+	EOF
 }
 
 # Parse command line options.
 format_converter='align_tsv'
-while getopts 'f:h' opt_name; do
-	case "$opt_name" in
+while getopts 'f:h' option
+do
+	case "$option" in
 		f)
 			case "$OPTARG" in
-				a*) # a[lign]
+				a*)
 					format_converter='align_tsv'
 					;;
-				t*) # t[sv]
+				t*)
 					format_converter='cat'
 					;;
-				m*) # m[arkdown]
+				m*)
 					format_converter='tsv_to_markdown'
 					;;
 				*)
 					printf 'Error: unknown FORMAT %s\n' "$OPTARG"
-					usage
+					usage >&2
 					exit 2
 					;;
 			esac
@@ -102,7 +105,7 @@ while getopts 'f:h' opt_name; do
 			exit 0
 			;;
 		*)
-			usage
+			usage >&2
 			exit 2
 			;;
 	esac
@@ -110,13 +113,14 @@ done
 # Make $1 the first non-option argument.
 shift "$((OPTIND - 1))"
 # Read from standard input if no arguments were provided.
-if [ "$#" -eq 0 ]; then
+if [ "$#" -eq 0 ]
+then
 	set -- '-'
 fi
 
 # Process all input files and convert the combined output.
-while [ "$#" -gt 0 ]; do
+while [ "$#" -gt 0 ]
+do
 	average_tsv "$1"
 	shift
 done | $format_converter
-
