@@ -1,8 +1,8 @@
 /*
  * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
- * SPDX-FileCopyrightText: 2020-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
- * SPDX-FileCopyrightText: 2020-2021 Nils Funk
- * SPDX-FileCopyrightText: 2020-2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2020-2023 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2020-2023 Nils Funk
+ * SPDX-FileCopyrightText: 2020-2023 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -10,6 +10,8 @@
 #define SE_RAYCASTER_HPP
 
 #define INVALID -2
+
+#include <optional>
 
 #include "se/common/colour_utils.hpp"
 #include "se/image/image.hpp"
