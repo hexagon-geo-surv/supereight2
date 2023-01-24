@@ -17,6 +17,21 @@ usage() {
 	printf '  -h Show this help message\n'
 }
 
+# Usage: sedi [OPTIONS] FILE
+# Run sed in-place on FILE (like sed -i would).
+sedi() {
+	# Get the last argument.
+	for file in "$@"; do :; done
+	[ -f "$file" ] || return 1
+	# The TUM format doesn't contain any .temp files so this should be
+	# relatively safe.
+	out_file="$file".temp
+	# Store the output of sed in a different file and then move it over the
+	# processed file.
+	sed "$@" > "$out_file"
+	mv "$out_file" "$file"
+}
+
 generate_filename_list() {
 	input_dir="$1"
 	output_file="$2"
@@ -44,14 +59,14 @@ post_process_tum() {
 	rm -f "$dir/rgb/0.png"
 	rm -f "$dir/depth/0.png"
 	# Remove it from the association file too.
-	sed -i '/^0 depth\/0\.png 0 rgb\/0\.png$/d' "$dir/associations.txt"
+	sedi '/^0 depth\/0\.png 0 rgb\/0\.png$/d' "$dir/associations.txt"
 	# Remove frame 1 if it has no corresponding ground truth pose. This is only
 	# needed for traj0_frei_png.
 	if ! grep -q '^1 ' "$dir/groundtruth.txt"; then
 		rm -f "$dir/rgb/1.png"
 		rm -f "$dir/depth/1.png"
 		# Remove it from the association file too.
-		sed -i '/^1 depth\/1\.png 1 rgb\/1\.png$/d' "$dir/associations.txt"
+		sedi '/^1 depth\/1\.png 1 rgb\/1\.png$/d' "$dir/associations.txt"
 	fi
 	# Generate rgb.txt and depth.txt.
 	generate_filename_list "$dir/rgb" "$dir/rgb.txt"
