@@ -1,20 +1,26 @@
 #!/bin/sh
-# SPDX-FileCopyrightText: 2019-2021 Smart Robotics Lab, Imperial College London
-# SPDX-FileCopyrightText: 2019-2021 Sotiris Papatheodorou, Imperial College London
+# icl-nuim-download.sh - Download the ICL-NUIM dataset living room sequences
+# SPDX-FileCopyrightText: 2019-2023 Smart Robotics Lab, Imperial College London, Technical University of Munich
+# SPDX-FileCopyrightText: 2019-2023 Sotiris Papatheodorou
 # SPDX-License-Identifier: BSD-3-Clause
-
 set -eu
-IFS="$(printf '%b_' '\t\n')"; IFS="${IFS%_}"
 
 # Show the program usage on standard output.
 usage() {
-	printf 'Usage: %s [OPTION]... DIRECTORY\n' "$(basename "$0")"
-	printf 'Download the ICL-NUIM dataset living room sequences in the TUM\n'
-	printf 'format inside DIRECTORY.\n'
-	printf '  -o Optimize the downloaded PNG images using optipng to reduce\n'
-	printf '     their size. This will take some time but it will speed up\n'
-	printf '     reading the images when the dataset is run.\n'
-	printf '  -h Show this help message\n'
+	name=$(basename "$0")
+	cat <<- EOF
+	Usage: $name [-o] DIRECTORY [SEQUENCE_ID] ...
+	       $name -h
+
+	Download the ICL-NUIM dataset living room sequences in the TUM format
+	inside DIRECTORY. SEQUENCE_ID may be 0, 1, 2 or 3. If no SEQUENCE_ID is
+	supplied then all 4 living room sequences are downloaded.
+
+	  -o Optimize the downloaded PNG images using optipng to reduce their
+	     size. This will take some time but will speed up reading the
+	     images when the dataset is run.
+	  -h Show this help message.
+	EOF
 }
 
 # Usage: sedi [OPTIONS] FILE
@@ -32,67 +38,88 @@ sedi() {
 	mv "$out_file" "$file"
 }
 
+# Usage: download_sequence URL FILE
+# Download the dataset sequence from URL into FILE.
+download_sequence() {
+	printf 'Downloading %s into %s\n' "$1" "$2"
+	mkdir -p "$(dirname "$2")"
+	wget --no-verbose --continue --output-document "$2" "$1"
+}
+
+# Usage: extract_sequence FILE DIRECTORY
+# Extract the dataset sequence from FILE into DIRECTORY.
+extract_sequence() {
+	printf 'Extracting %s into %s\n' "$1" "$2"
+	mkdir -p "$2"
+	tar -xzf "$1" -C "$2"
+}
+
+# Usage: remove_frame_without_gt DIRECTORY FRAME
+remove_frame_without_gt() {
+	if ! grep -q '^'"$2"' ' "$1/groundtruth.txt"
+	then
+		# Delete the frame's images.
+		rm -f "$1/depth/$2.png" "$1/rgb/$2.png"
+		# Remove the frame line from the associations file.
+		sed_script=$(printf '/^%s depth\\/%s\\.png %s rgb\\/%s\\.png$/d' \
+			"$2" "$2" "$2" "$2")
+		sedi "$sed_script" "$1/associations.txt"
+	fi
+}
+
+# Usage: generate_filename_list DIRECTORY
+# Generate a txt file named DIRECTORY.txt listing all the PNG images in
+# DIRECTORY as required by the TUM RGB-D dataset format.
 generate_filename_list() {
 	input_dir="$1"
-	output_file="$2"
+	output_file="${input_dir%%/}.txt"
 	input_dir_name=$(basename "$input_dir")
-	# Write the file header in the output file.
+	# Write the header to the output file.
 	printf '# timestamp filename\n' > "$output_file"
-	# Loop over all PNG images in the input directory.
-	for file in "$input_dir"/*.png ; do
+	# Generate a line for each PNG image in the input directory, sort them
+	# because they might have been processed in any order and append them to the
+	# output file.
+	for file in "$input_dir"/*.png
+	do
 		[ -f "$file" ] || continue
 		file=$(basename "$file")
-		filename_no_ext=$(basename "$file" .png)
-		# Print the entry for this file.
-		printf '%s %s/%s\n' "$filename_no_ext" "$input_dir_name" "$file"
-	# Sort the entries and append to the output file.
+		timestamp=$(basename "$file" .png)
+		printf '%s %s/%s\n' "$timestamp" "$input_dir_name" "$file"
 	done | sort -n >> "$output_file"
 }
 
-post_process_tum() {
+# process_sequence DIRECTORY
+# Post-process an ICL-NUIM dataset in the TUM format stored inside DIRECTORY.
+process_sequence() {
 	dir="$1"
-	# Rename the ground truth file to groundtruth.txt.
-	mv "$dir"/*.gt.freiburg "$dir/groundtruth.txt"
+	printf 'Post-processing %s\n' "$dir"
+	# Rename the ground truth file to groundtruth.txt. Ignore errors to allow
+	# re-processing a processed sequence.
+	mv "$dir"/*.gt.freiburg "$dir/groundtruth.txt" 2>/dev/null || true
 	# Remove execute permissions from the ground truth file.
 	chmod -x "$dir/groundtruth.txt"
-	# Remove frame 0 because it has no corresponding ground truth pose.
-	rm -f "$dir/rgb/0.png"
-	rm -f "$dir/depth/0.png"
-	# Remove it from the association file too.
-	sedi '/^0 depth\/0\.png 0 rgb\/0\.png$/d' "$dir/associations.txt"
-	# Remove frame 1 if it has no corresponding ground truth pose. This is only
-	# needed for traj0_frei_png.
-	if ! grep -q '^1 ' "$dir/groundtruth.txt"; then
-		rm -f "$dir/rgb/1.png"
-		rm -f "$dir/depth/1.png"
-		# Remove it from the association file too.
-		sedi '/^1 depth\/1\.png 1 rgb\/1\.png$/d' "$dir/associations.txt"
-	fi
-	# Generate rgb.txt and depth.txt.
-	generate_filename_list "$dir/rgb" "$dir/rgb.txt"
-	generate_filename_list "$dir/depth" "$dir/depth.txt"
+	# Remove frames without corresponding ground truth.
+	remove_frame_without_gt "$dir" 0
+	remove_frame_without_gt "$dir" 1
+	# Generate depth.txt and rgb.txt.
+	generate_filename_list "$dir/depth"
+	generate_filename_list "$dir/rgb"
 }
 
-
-
+# Usage: optimize_pngs DIRECTORY
+# Run optipng on all PNG images in DIRECTORY in parallel.
 optimize_pngs() {
-	# Find all PNG files and run optipng on them in parallel.
+	printf 'Optimizing %s\n' "$1"
 	find "$1" -type f -name '*.png' | parallel optipng > /dev/null 2>&1
 }
 
 
 
-sequence_urls_tum='https://www.doc.ic.ac.uk/~ahanda/living_room_traj0_frei_png.tar.gz
-https://www.doc.ic.ac.uk/~ahanda/living_room_traj1_frei_png.tar.gz
-https://www.doc.ic.ac.uk/~ahanda/living_room_traj2_frei_png.tar.gz
-https://www.doc.ic.ac.uk/~ahanda/living_room_traj3_frei_png.tar.gz'
-
-
-
 # Parse the options.
 optimize=0
-while getopts 'oh' opt_name; do
-	case "$opt_name" in
+while getopts 'oh' option
+do
+	case "$option" in
 		o)
 			optimize=1
 			;;
@@ -101,7 +128,7 @@ while getopts 'oh' opt_name; do
 			exit 0
 			;;
 		*)
-			usage
+			usage >&2
 			exit 2
 			;;
 	esac
@@ -110,59 +137,43 @@ done
 shift "$((OPTIND - 1))"
 
 # Parse the arguments.
-case "$#" in
-	0)
-		output_dir='.'
-		;;
-	1)
-		# Remove trailing slashes.
-		output_dir="${1%%/}"
-		;;
-	*)
-		usage
-		exit 2
-esac
+if [ "$#" -lt 1 ]
+then
+	usage >&2
+	exit 2
+fi
+# Remove trailing slashes.
+output_dir="${1%%/}"
+shift
 
-# Create the output directory.
-mkdir -p "$output_dir"
-# The file where wget output is logged.
-log_file="$output_dir/$(basename "$0").log"
-# Clean up the log from any previous invocation.
-rm -f "$log_file"
+# Download all 4 living room sequences by default.
+if [ "$#" -eq 0 ]
+then
+	set -- 0 1 2 3
+fi
 
-# Download each sequence.
-for url in $sequence_urls_tum; do
-	filename="$output_dir/$(basename "$url")"
-	sequence_name="$(basename "$url")"
-	sequence_name="${sequence_name%%.*}"
+# Download the living room sequences.
+for i in "$@"
+do
+	url=$(printf 'https://www.doc.ic.ac.uk/~ahanda/living_room_traj%d_frei_png.tar.gz\n' "$i")
+	sequence_name="$(basename "$url" '.tar.gz')"
 	sequence_dir="$output_dir/$sequence_name"
 
-	# Skip the sequence if its directory already exists.
-	if [ -d "$sequence_dir" ] ; then
-		printf 'Skipping sequence %s, directory %s already exists\n' \
+	if [ -d "$sequence_dir" ]
+	then
+		printf 'Skipping sequence %s download, directory %s already exists\n' \
 			"$sequence_name" "$sequence_dir"
-		continue
+	else
+		sequence_archive="$output_dir/$(basename "$url")"
+		download_sequence "$url" "$sequence_archive"
+		extract_sequence "$sequence_archive" "$sequence_dir"
+		rm -f "$sequence_archive"
 	fi
 
-	# Download the sequence.
-	printf 'Downloading %s to %s\n' "$url" "$filename"
-	wget --no-verbose --append-output "$log_file" --continue \
-		--output-document "$filename" "$url"
+	process_sequence "$sequence_dir"
 
-	# Extract the sequence into its own directory.
-	printf 'Extracting %s into %s\n' "$filename" "$sequence_dir"
-	mkdir -p "$sequence_dir"
-	tar -xzf "$filename" -C "$sequence_dir"
-
-	# Post-process the sequence.
-	printf 'Post-processing %s\n' "$sequence_dir"
-	post_process_tum "$sequence_dir"
-	if [ "$optimize" -eq 1 ]; then
-		printf 'Optimizing %s\n' "$sequence_dir"
+	if [ "$optimize" -eq 1 ]
+	then
 		optimize_pngs "$sequence_dir"
 	fi
-
-	# Remove the downloaded file.
-	rm "$filename"
 done
-
