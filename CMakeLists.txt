@@ -12,6 +12,10 @@ option(SE_APP "Compile the supereight application" ON)
 find_package(Eigen3 3.3 REQUIRED)
 find_package(OpenCV REQUIRED COMPONENTS imgproc core)
 find_package(Boost REQUIRED) # We only need Boost.Pool which is a header-only library.
+find_package(TBB COMPONENTS tbb)
+if(TBB_tbb_FOUND)
+    set(SE_TBB 1)
+endif()
 
 # Compiler options
 add_compile_options(
@@ -60,6 +64,7 @@ target_link_libraries(${LIB_NAME}
       Eigen3::Eigen
       Boost::boost
       ${OpenCV_LIBS}
+      ${TBB_IMPORTED_TARGETS}
       SRL::Projection
 )
 # Find OpenMP, warn if disabled.
@@ -80,10 +85,6 @@ if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") AND ("${CMAKE_CXX_COMPILER_VERS
     target_link_libraries(${LIB_NAME} PUBLIC stdc++fs)
 elseif(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") AND ("${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS 9.1))
     target_link_libraries(${LIB_NAME} PUBLIC stdc++fs)
-endif()
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    # Link against the GNU C++ library even when using clang.
-    target_link_libraries(${LIB_NAME} PUBLIC stdc++)
 endif()
 # Add an alias so that the library can be used inside the build tree, e.g. when testing.
 add_library(SRL::${PROJECT_NAME} ALIAS ${LIB_NAME})

@@ -1,13 +1,24 @@
 /*
  * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
- * SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
- * SPDX-FileCopyrightText: 2021 Nils Funk
- * SPDX-FileCopyrightText: 2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2021-2023 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2021-2023 Nils Funk
+ * SPDX-FileCopyrightText: 2021-2023 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #ifndef SE_KEY_UTIL_IMPL_HPP
 #define SE_KEY_UTIL_IMPL_HPP
+
+#include "se/supereight_config.hpp"
+#if defined(SE_TBB) && SE_TBB
+#    include <execution>
+#    define SE_PARALLEL_SORT(keys) std::sort(std::execution::par_unseq, keys.begin(), keys.end())
+#elif __has_include(<parallel/algorithm>)
+#    include <parallel/algorithm>
+#    define SE_PARALLEL_SORT(keys) __gnu_parallel::sort(keys.begin(), keys.end())
+#else
+#    define SE_PARALLEL_SORT(keys) se::keyops::sort_keys<se::Sort::SmallToLarge>(keys);
+#endif
 
 namespace se {
 namespace keyops {
@@ -325,11 +336,7 @@ inline void unique_keys(std::vector<se::key_t>& keys, std::vector<se::key_t>& un
 
     if constexpr (SafeB == se::Safe::On) {
         // Sort keys smallest to largest
-#if defined(_OPENMP) && !defined(__clang__)
-        __gnu_parallel::sort(keys.begin(), keys.end());
-#else
-        se::keyops::sort_keys<se::Sort::SmallToLarge>(keys);
-#endif
+        SE_PARALLEL_SORT(keys);
     }
 
     unique_keys.push_back(keys.front());
@@ -351,11 +358,7 @@ inline void unique_codes(std::vector<se::key_t>& keys, std::vector<se::key_t>& u
 
     if constexpr (SafeB == se::Safe::On) {
         // Sort keys smallest to largest
-#if defined(_OPENMP) && !defined(__clang__)
-        __gnu_parallel::sort(keys.begin(), keys.end());
-#else
-        se::keyops::sort_keys<se::Sort::SmallToLarge>(keys);
-#endif
+        SE_PARALLEL_SORT(keys);
     }
 
     unique_keys.push_back(keys.front());
@@ -382,11 +385,7 @@ inline void unique_allocation(std::vector<se::key_t>& keys,
 
     if constexpr (SafeB == se::Safe::On) {
         // Sort keys smallest to largest
-#if defined(_OPENMP) && !defined(__clang__)
-        __gnu_parallel::sort(keys.begin(), keys.end());
-#else
-        se::keyops::sort_keys<se::Sort::SmallToLarge>(keys);
-#endif
+        SE_PARALLEL_SORT(keys);
     }
 
     const se::key_t init_key = se::keyops::block_key(keys.front(), max_block_scale);
@@ -416,11 +415,7 @@ inline void unique_at_scale(std::vector<se::key_t>& keys,
 
     if constexpr (SafeB == se::Safe::On) {
         // Sort keys smallest to largest
-#if defined(_OPENMP) && !defined(__clang__)
-        __gnu_parallel::sort(keys.begin(), keys.end());
-#else
-        se::keyops::sort_keys<se::Sort::SmallToLarge>(keys);
-#endif
+        SE_PARALLEL_SORT(keys);
     }
 
     se::key_t key_at_scale;
@@ -446,4 +441,6 @@ inline void unique_at_scale(std::vector<se::key_t>& keys,
 } // namespace keyops
 } // namespace se
 
-#endif // SE_KEY_UTIL_IMPL_HPP
+#undef SE_PARALLEL_SORT
+
+#    endif // SE_KEY_UTIL_IMPL_HPP

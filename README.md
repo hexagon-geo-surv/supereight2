@@ -19,6 +19,7 @@ Install the dependencies
 * CMake 3.8+
 * Eigen 3
 * OpenCV 3+
+* Threading Building Blocks (TBB) (optional, for some C++ 17 features)
 * GLut (optional, for the GUI)
 * OpenNI2 (optional, for Microsoft Kinect/Asus Xtion input)
 * Make (optional, for convenience)
@@ -26,7 +27,7 @@ Install the dependencies
 On Debian/Ubuntu you can install all of the above by running:
 
 ``` sh
-sudo apt --yes install git g++ cmake libeigen3-dev libopencv-dev freeglut3-dev libopenni2-dev make
+sudo apt --yes install git g++ cmake libeigen3-dev libopencv-dev libtbb-dev freeglut3-dev libopenni2-dev make
 ```
 
 Clone the repository and its submodules:

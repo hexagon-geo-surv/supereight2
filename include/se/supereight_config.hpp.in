@@ -13,4 +13,6 @@
 #define SE_VERSION_MINOR @Supereight2_VERSION_MINOR@
 #define SE_VERSION_PATCH @Supereight2_VERSION_PATCH@
 
+#cmakedefine01 SE_TBB
+
 #endif // SE_SUPEREIGHT_CONFIG_HPP

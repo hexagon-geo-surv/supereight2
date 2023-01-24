@@ -1,15 +1,15 @@
 /*
  * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
- * SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
- * SPDX-FileCopyrightText: 2021 Nils Funk
- * SPDX-FileCopyrightText: 2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2021-2023 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2021-2023 Nils Funk
+ * SPDX-FileCopyrightText: 2021-2023 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #ifndef SE_KEY_UTIL_HPP
 #define SE_KEY_UTIL_HPP
 
-#include <parallel/algorithm>
+#include <algorithm>
 
 #include "se/map/utils/setup_util.hpp"
 #include "se/map/utils/type_util.hpp"
