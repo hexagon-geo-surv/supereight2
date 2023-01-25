@@ -1,7 +1,7 @@
 /*
- * SPDX-FileCopyrightText: 2020-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
- * SPDX-FileCopyrightText: 2020-2021 Nils Funk
- * SPDX-FileCopyrightText: 2020-2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2020-2023 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2020-2023 Nils Funk
+ * SPDX-FileCopyrightText: 2020-2023 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -11,14 +11,11 @@
 #ifndef __FILESYSTEM_HPP
 #define __FILESYSTEM_HPP
 
-#if (defined(__GNUC__) && __GNUC__ >= 8) || (defined(__clang_major__) && __clang_major__ >= 7) \
-    || (defined(_MSC_VER) && _MSC_VER >= 1914)
-// Proper std::filesystem support.
+#if __has_include(<filesystem>)
 #    include <filesystem>
 namespace stdfs = std::filesystem;
 
-#elif (defined(__GNUC__) && __GNUC__ >= 6) || (defined(__clang_major__) && __clang_major__ >= 6)
-// Experimental std::filesystem support.
+#elif __has_include(<experimental/filesystem>)
 #    include <experimental/filesystem>
 namespace stdfs = std::experimental::filesystem;
 
