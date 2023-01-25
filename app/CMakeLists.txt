@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2021-2023 Smart Robotics Lab, Imperial College London, Technical University of Munich
 # SPDX-License-Identifier: CC0-1.0
 
-cmake_minimum_required(VERSION 3.8...3.16)
+cmake_minimum_required(VERSION 3.10...3.16)
 
 find_package(GLUT)
 find_package(OpenGL)
@@ -22,9 +22,7 @@ add_library(${LIB_NAME} STATIC
 target_include_directories(${LIB_NAME} PUBLIC include)
 target_link_libraries(${LIB_NAME} PUBLIC SRL::Supereight2)
 if(OPENMP_FOUND)
-    target_compile_options(${LIB_NAME} PUBLIC ${OpenMP_CXX_FLAGS})
-    target_include_directories(${LIB_NAME} PUBLIC ${OpenMP_CXX_INCLUDE_DIRS})
-    target_link_libraries(${LIB_NAME} PUBLIC ${OpenMP_CXX_LIBRARIES})
+    target_link_libraries(${LIB_NAME} PUBLIC OpenMP::OpenMP_CXX)
 endif()
 if(PCL_FOUND)
   # These have to be added globaly for compatibility with PCL 1.8.1 on Ubuntu 18.04.
@@ -75,9 +73,7 @@ foreach(APP_CONFIG ${SE_APP_CONFIG})
   target_include_directories(${EXE_NAME} BEFORE PRIVATE include)
   target_link_libraries(${EXE_NAME} PRIVATE SRL::Supereight2 ${LIB_NAME})
   if(OPENMP_FOUND)
-    target_compile_options(${EXE_NAME} PRIVATE ${OpenMP_CXX_FLAGS})
-    target_include_directories(${EXE_NAME} PRIVATE ${OpenMP_CXX_INCLUDE_DIRS})
-    target_link_libraries(${EXE_NAME} PRIVATE ${OpenMP_CXX_LIBRARIES})
+    target_link_libraries(${EXE_NAME} PRIVATE OpenMP::OpenMP_CXX)
   endif()
   # Allow handling large files in 32-bit systems
   target_compile_definitions(${EXE_NAME} PRIVATE _FILE_OFFSET_BITS=64)

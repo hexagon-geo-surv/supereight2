@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2021-2023 Smart Robotics Lab, Imperial College London, Technical University of Munich
 # SPDX-License-Identifier: CC0-1.0
 
-cmake_minimum_required(VERSION 3.8...3.16)
+cmake_minimum_required(VERSION 3.10...3.16)
 project(Supereight2 VERSION 0.11.0 LANGUAGES C CXX)
 
 option(SE_OPENMP "Compile supereight with OpenMP" ON)
@@ -71,9 +71,7 @@ target_link_libraries(${LIB_NAME}
 if(SE_OPENMP)
     find_package(OpenMP)
     if(OPENMP_FOUND)
-        target_compile_options(${LIB_NAME} PUBLIC ${OpenMP_CXX_FLAGS})
-        target_include_directories(${LIB_NAME} PUBLIC ${OpenMP_CXX_INCLUDE_DIRS})
-        target_link_libraries(${LIB_NAME} PUBLIC ${OpenMP_CXX_LIBRARIES})
+        target_link_libraries(${LIB_NAME} PUBLIC OpenMP::OpenMP_CXX)
         message(STATUS "Compiling with OpenMP support")
     else()
         message(WARNING "OpenMP not found. Performance may be terrible.")
