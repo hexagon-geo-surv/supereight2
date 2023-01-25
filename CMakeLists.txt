@@ -44,11 +44,13 @@ add_library(${LIB_NAME} STATIC
     "src/sensor/sensor.cpp"
     "src/tracker/tracker.cpp"
 )
+configure_file("include/se/supereight_config.hpp.in" "include/se/supereight_config.hpp" @ONLY)
 # Set the C++ standard required by the library.
 target_compile_features(${LIB_NAME} PUBLIC cxx_std_17)
 target_include_directories(${LIB_NAME}
     PUBLIC
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
       $<INSTALL_INTERFACE:include>
       ${OpenCV_INCLUDE_DIRS}
 )
