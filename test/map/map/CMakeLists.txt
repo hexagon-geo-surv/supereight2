@@ -4,6 +4,6 @@
 cmake_minimum_required(VERSION 3.8...3.16)
 
 add_executable(map-unittest map_unittest.cpp)
-target_link_libraries(map-unittest PRIVATE SRL::Supereight2 gtest_main)
+target_link_libraries(map-unittest PRIVATE SRL::Supereight2 GTest::Main)
 add_test(NAME map-unittest COMMAND map-unittest)
 

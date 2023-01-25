@@ -4,6 +4,6 @@
 cmake_minimum_required(VERSION 3.8...3.16)
 
 add_executable(keyops-unittest keyops_unittest.cpp)
-target_link_libraries(keyops-unittest PRIVATE SRL::Supereight2 gtest_main)
+target_link_libraries(keyops-unittest PRIVATE SRL::Supereight2 GTest::Main)
 add_test(NAME keyops-unittest COMMAND keyops-unittest)
 
