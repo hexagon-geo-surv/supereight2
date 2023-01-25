@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+# SPDX-FileCopyrightText: 2021-2023 Smart Robotics Lab, Imperial College London, Technical University of Munich
 # SPDX-License-Identifier: CC0-1.0
 
 cmake_minimum_required(VERSION 3.8...3.16)
@@ -19,15 +19,15 @@ add_library(${LIB_NAME} STATIC
   "src/reader_raw.cpp"
   "src/reader_tum.cpp"
 )
-target_include_directories(${LIB_NAME} PRIVATE include)
-target_link_libraries(${LIB_NAME} PRIVATE SRL::Supereight2)
+target_include_directories(${LIB_NAME} PUBLIC include)
+target_link_libraries(${LIB_NAME} PUBLIC SRL::Supereight2)
 if(PCL_FOUND)
   # These have to be added globaly for compatibility with PCL 1.8.1 on Ubuntu 18.04.
   include_directories(${PCL_INCLUDE_DIRS})
   link_directories(${PCL_LIBRARY_DIRS})
   add_definitions(${PCL_DEFINITIONS})
-  target_link_libraries(${LIB_NAME} PRIVATE ${PCL_LIBRARIES})
-  target_compile_definitions(${LIB_NAME} PRIVATE "-DSE_PCL")
+  target_link_libraries(${LIB_NAME} PUBLIC ${PCL_LIBRARIES})
+  target_compile_definitions(${LIB_NAME} PUBLIC "-DSE_PCL")
 endif()
 
 
