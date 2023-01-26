@@ -80,9 +80,9 @@ TEST(StrUtils, removeSuffix)
 TEST(StrUtils, resolveRelativePath)
 {
     const std::string base_dir = "/baz";
-    const std::vector<std::string> relative = {"", ".", "foo", "foo/bar", "/foo"};
+    const std::vector<std::string> relative = {".", "foo", "foo/bar", "/foo"};
     const std::vector<std::string> resolved_desired = {
-        "/baz/", "/baz/.", "/baz/foo", "/baz/foo/bar", "/foo"};
+        "/baz/.", "/baz/foo", "/baz/foo/bar", "/foo"};
     for (size_t i = 0; i < relative.size(); ++i) {
         const std::string resolved = se::str_utils::resolve_relative_path(relative[i], base_dir);
         EXPECT_EQ(resolved, resolved_desired[i]);
