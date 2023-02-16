@@ -149,12 +149,21 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getFieldGrad(const Eigen::Vector3f
         }
     }
 
-    auto field_grad = se::visitor::getFieldGrad(*octree_ptr_, voxel_coord_f);
-    if (field_grad) {
-        *field_grad *= resolution_;
+    if constexpr (ResT == Res::Multi) {
+        int scale_returned;
+        auto field_grad = se::visitor::getFieldGrad(*octree_ptr_, voxel_coord_f, scale_returned);
+        if (field_grad) {
+            *field_grad /= resolution_ * (1 << scale_returned);
+        }
+        return field_grad;
     }
-
-    return field_grad;
+    else {
+        auto field_grad = se::visitor::getFieldGrad(*octree_ptr_, voxel_coord_f);
+        if (field_grad) {
+            *field_grad /= resolution_;
+        }
+        return field_grad;
+    }
 }
 
 
