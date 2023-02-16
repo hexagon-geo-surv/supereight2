@@ -9,6 +9,116 @@
 
 #include <gtest/gtest.h>
 
+#include "se/integrator/map_integrator.hpp"
+
+TEST(Map, Gradient)
+{
+    // Distance at which surface (plane wall) for test case will be created
+    constexpr float surface_distance = 15;
+    // Map config
+    const Eigen::Vector3f map_dim = Eigen::Vector3f::Constant(32);
+    constexpr float map_res = 0.03;
+    // Sensor config
+    se::PinholeCameraConfig sensor_config;
+    sensor_config.width = 640;
+    sensor_config.height = 480;
+    sensor_config.fx = 525;
+    sensor_config.fy = sensor_config.fx;
+    sensor_config.cx = (sensor_config.width - 1) / 2.0f;
+    sensor_config.cy = (sensor_config.height - 1) / 2.0f;
+    sensor_config.near_plane = 0.4f;
+    sensor_config.far_plane = 20.0f;
+    // Data Config
+    se::OccupancyDataConfig data_config;
+    data_config.tau_min_factor = 20;
+    data_config.tau_max_factor = 20;
+    data_config.k_tau = 1;
+    data_config.sigma_min_factor = 1;
+    data_config.sigma_max_factor = 3;
+    data_config.k_sigma = 0.05f;
+
+    // Create Map
+    se::OccupancyMap<se::Res::Multi> map(map_dim, map_res, data_config);
+    // Create a pinhole camera and uniform depth image
+    const se::PinholeCamera sensor(sensor_config, 2);
+    const se::Image<float> depth_img(sensor_config.width, sensor_config.height, surface_distance);
+    // Integrate depth image from an identity T_WS.
+    se::MapIntegrator integrator(map);
+    integrator.integrateDepth(sensor, depth_img, Eigen::Matrix4f::Identity(), 0);
+
+    // Test that points in free space have 0 gradients
+    const std::array free_points{
+        Eigen::Vector3f(0, 0, 4), Eigen::Vector3f(0, 0, 6), Eigen::Vector3f(0, 0, 8)};
+    for (const auto& point : free_points) {
+        // Check free space occupancy value
+        const std::optional<se::field_t> occupancy = map.getFieldInterp(point);
+        ASSERT_TRUE(occupancy);
+        EXPECT_FLOAT_EQ(*occupancy, data_config.log_odd_min);
+        // Check for zero gradients
+        const std::optional<Eigen::Vector3f> gradient = map.getFieldGrad(point);
+        // TODO: The current gradient computation doesn't work for nodes so we can't test the
+        // gradient value in free space which is pruned. Comment in the tests below once this is
+        // fixed.
+        ASSERT_FALSE(gradient);
+        //ASSERT_TRUE(gradient);
+        //EXPECT_FLOAT_EQ(gradient->norm(), 0.0f);
+    }
+
+    // Test the derivatives of points in the transition between free and occupied space. This is the
+    // linear occupancy increase region of the inverse sensor model. Compare with a simple numerical
+    // gradient.
+    const std::array linear_points{Eigen::Vector3f(0, 0, 14.85f),
+                                   Eigen::Vector3f(0, 0, 14.90f),
+                                   Eigen::Vector3f(0, 0, 14.95f),
+                                   Eigen::Vector3f(0, 0, 15.00f)};
+    for (const auto& point : linear_points) {
+        // Check if gradient matches numeric differences gradient
+        const float delta = map_res / 10;
+        bool gradient_numeric_valid = true;
+        Eigen::Vector3f gradient_numeric = Eigen::Vector3f::Zero();
+
+        // Numeric field gradient using the central difference quotient
+        for (int i = 0; i < gradient_numeric.size(); i++) {
+            const Eigen::Vector3f dir = Eigen::Vector3f::Unit(i);
+            const std::optional<se::field_t> occupancy_m = map.getFieldInterp(point - delta * dir);
+            const std::optional<se::field_t> occupancy_p = map.getFieldInterp(point + delta * dir);
+            if (!occupancy_p || !occupancy_m) {
+                gradient_numeric_valid = false;
+                break;
+            }
+            if (std::fabs(*occupancy_p - *occupancy_m) > 1e-06) {
+                gradient_numeric[i] = (*occupancy_p - *occupancy_m) / (2 * delta);
+            }
+        }
+        ASSERT_TRUE(gradient_numeric_valid);
+
+        // Access Field Gradient
+        const std::optional<Eigen::Vector3f> gradient = map.getFieldGrad(point);
+        ASSERT_TRUE(gradient);
+
+        // The error between the supereight and numerical gradients can be rather big due to
+        // different space discretization and gradient computation methods.
+        EXPECT_NEAR(gradient_numeric.x(), gradient->x(), 1e-02);
+        EXPECT_NEAR(gradient_numeric.y(), gradient->y(), 1e-02);
+        EXPECT_NEAR(gradient_numeric.z(), gradient->z(), 1e-02);
+    }
+
+    // Test that points in occupied space have 0 gradients
+    const std::array occupied_points{Eigen::Vector3f(0, 0, 15.35f)};
+    for (const auto& point : occupied_points) {
+        // Check free space occupancy value
+        const std::optional<se::field_t> occupancy = map.getFieldInterp(point);
+        ASSERT_TRUE(occupancy);
+        EXPECT_GT(*occupancy, 0.0f);
+        // Check for zero gradients
+        const std::optional<Eigen::Vector3f> gradient = map.getFieldGrad(point);
+        ASSERT_TRUE(gradient);
+        EXPECT_FLOAT_EQ(gradient->norm(), 0.0f);
+    }
+}
+
+
+
 // Helper function to create ought values.
 Eigen::Vector3i adapt_to_scale(const Eigen::Vector3i& coord, const se::scale_t scale)
 {
