@@ -121,7 +121,7 @@ configure_package_config_file(cmake/${PACKAGE_NAME}Config.cmake.in
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE_NAME}ConfigVersion.cmake
     COMPATIBILITY SameMajorVersion)
 # Install files
-install(DIRECTORY include/se DESTINATION include)
+install(DIRECTORY include/se ${CMAKE_CURRENT_BINARY_DIR}/include/se DESTINATION include PATTERN "*.in" EXCLUDE)
 install(TARGETS ${LIB_NAME} EXPORT ${PACKAGE_NAME}-targets DESTINATION lib)
 install(EXPORT ${PACKAGE_NAME}-targets
     FILE ${PACKAGE_NAME}Targets.cmake
