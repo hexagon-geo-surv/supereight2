@@ -10,8 +10,22 @@
 int main(int argc, char** argv)
 {
     try {
-        se::TSDFMap<se::Res::Multi> map(se::MapConfig(), se::TSDFDataConfig());
-        std::cout << "Supereight2 install successful\n";
+        se::TSDFMap<se::Res::Multi> map(Eigen::Vector3f::Constant(10.0f), 0.1f);
+
+        se::PinholeCameraConfig sensor_config;
+        sensor_config.width = 320;
+        sensor_config.height = 240;
+        sensor_config.fx = 525.0f;
+        sensor_config.fy = 525.0f;
+        sensor_config.cx = sensor_config.width / 2.0f - 0.5f;
+        sensor_config.cy = sensor_config.height / 2.0f - 0.5f;
+        const se::PinholeCamera sensor(sensor_config);
+        const se::Image<float> depth(sensor_config.width, sensor_config.height, 2.0f);
+
+        se::MapIntegrator integrator(map);
+        integrator.integrateDepth(sensor, depth, Eigen::Matrix4f::Identity(), 0);
+
+        std::cout << "Supereight2 v" << SE_VERSION << " install successful\n";
         return EXIT_SUCCESS;
     }
     catch (const std::exception& e) {
