@@ -5,6 +5,11 @@ set(@PACKAGE_NAME_UC@_VERSION @CMAKE_PROJECT_VERSION@)
 
 include(CMakeFindDependencyMacro)
 find_dependency(SRLProjection)
+find_dependency(Eigen3)
+find_dependency(OpenCV)
+find_dependency(Boost)
+find_dependency(TBB)
+find_dependency(OpenMP)
 
 get_filename_component(DIRNAME "${CMAKE_CURRENT_LIST_FILE}" PATH)
 include("${DIRNAME}/@PACKAGE_NAME@Targets.cmake")
