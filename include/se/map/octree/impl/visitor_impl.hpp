@@ -1025,7 +1025,9 @@ getFieldInterp(const OctreeT& octree,
         return {};
     }
 
+    typedef typename OctreeT::NodeType NodeType;
     typedef typename OctreeT::BlockType BlockType;
+    // XXX: Setting the scale to 0 for Nodes to reuse the Block code is an ugly hack.
     const int init_scale = (octant_ptr->isBlock())
         ? std::max(static_cast<BlockType*>(octant_ptr)->getCurrentScale(), scale_desired)
         : 0;
@@ -1033,7 +1035,6 @@ getFieldInterp(const OctreeT& octree,
     for (int scale = init_scale; scale <= BlockType::getMaxScale(); scale++) {
         // Reset the neighbours. Assigning {} only works during initialization
         std::fill(std::begin(neighbour_data), std::end(neighbour_data), init_data);
-        scale_returned = scale;
 
         Eigen::Vector3f factor;
         const int stride = 1 << scale; // Multi-res
@@ -1057,6 +1058,10 @@ getFieldInterp(const OctreeT& octree,
             }
         }
 
+        // Return the correct scale in the case of Nodes.
+        scale_returned = octant_ptr->isBlock()
+            ? scale
+            : math::log2_const(static_cast<NodeType*>(octant_ptr)->getSize());
         return (((se::get_field(neighbour_data[0]) * (1 - factor.x())
                   + se::get_field(neighbour_data[1]) * factor.x())
                      * (1 - factor.y())
