@@ -59,8 +59,8 @@ inline bool
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::contains(const Eigen::Vector3f& point_W) const
 {
     const Eigen::Vector3f point_M = (T_MW_ * point_W.homogeneous()).template head<3>();
-    return (point_M.x() >= lb_M_.x() && point_M.x() <= ub_M_.x() && point_M.y() >= lb_M_.y()
-            && point_M.y() <= ub_M_.y() && point_M.z() >= lb_M_.z() && point_M.z() <= ub_M_.z());
+    return (point_M.x() >= lb_M_.x() && point_M.x() < ub_M_.x() && point_M.y() >= lb_M_.y()
+            && point_M.y() < ub_M_.y() && point_M.z() >= lb_M_.z() && point_M.z() < ub_M_.z());
 }
 
 
