@@ -10,3 +10,8 @@ add_compile_options(-w)
 option(SRL_PROJECTION_BUILD_TESTS "Enable testing" OFF)
 add_subdirectory(srl_projection)
 
+if(SE_TEST)
+    option(BUILD_GMOCK OFF)
+    option(INSTALL_GTEST OFF)
+    add_subdirectory(googletest)
+endif()
