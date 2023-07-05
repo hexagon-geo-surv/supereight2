@@ -9,6 +9,7 @@
 #ifndef SE_ALLOCATOR_HPP
 #define SE_ALLOCATOR_HPP
 
+#include <Eigen/StdVector>
 #include <set>
 
 #include "octree.hpp"
@@ -43,20 +44,21 @@ block(const se::key_t voxel_key, OctreeT& octree, se::OctantBase* base_parent_pt
  * \brief Allocate Blocks at the provided voxel coordinates.
  *
  * \tparam OctreeT            The Octree template.
- * \param[in] voxel_coord     The 3D coordinates of a voxel within each block.
+ * \param[in] voxel_coords    The 3D coordinates of a voxel within each block.
  * \param[in] octree          The octree to allocate the blocks in.
  * \param[in] base_parent_ptr The starting node pointer. A nullptr will be replaced with the octree
  *                            root.
  * \param[in] only_allocated  Return pointers only for the newly allocated Blocks instead of all the
- *                            Blocks corresponding to the coordinates in voxel_coord.
+ *                            Blocks corresponding to the coordinates in voxel_coords.
  *
  * \return Pointers to the allocated Octants.
  */
 template<typename OctreeT>
-std::vector<se::OctantBase*> blocks(const std::vector<Eigen::Vector3i>& voxel_coord,
-                                    OctreeT& octree,
-                                    se::OctantBase* base_parent_ptr,
-                                    const bool only_allocated = false);
+std::vector<se::OctantBase*>
+blocks(const std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>>& voxel_coords,
+       OctreeT& octree,
+       se::OctantBase* base_parent_ptr,
+       const bool only_allocated = false);
 
 /**
  * \brief Allocate Blocks at the provided voxel Morton codes.

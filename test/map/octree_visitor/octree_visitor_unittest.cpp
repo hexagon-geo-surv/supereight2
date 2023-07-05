@@ -5,6 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <Eigen/StdVector>
 #include <gtest/gtest.h>
 
 #include "se/map/data.hpp"
@@ -40,7 +41,7 @@ TEST(VisitorTSDFSingleRes, Interpolation)
     typedef se::Octree<DataType, se::Res::Single, block_size_3> OctreeType0;
     typedef OctreeType0::BlockType BlockType0;
 
-    std::vector<Eigen::Vector3i> block_coords = {
+    std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> block_coords = {
         Eigen::Vector3i(0, 0, 0),
         Eigen::Vector3i(block_size_3, 0, 0),
         Eigen::Vector3i(0, block_size_3, 0),
@@ -130,7 +131,7 @@ TEST(VisitorTSDFMultiRes, Interpolation)
     typedef se::Octree<DataType, se::Res::Multi, block_size_3> OctreeType0;
     typedef OctreeType0::BlockType BlockType0;
 
-    std::vector<Eigen::Vector3i> block_coords = {
+    std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> block_coords = {
         Eigen::Vector3i(0, 0, 0),
         Eigen::Vector3i(block_size_3, 0, 0),
         Eigen::Vector3i(0, block_size_3, 0),

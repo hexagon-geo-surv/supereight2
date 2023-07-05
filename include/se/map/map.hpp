@@ -9,6 +9,7 @@
 #ifndef SE_MAP_HPP
 #define SE_MAP_HPP
 
+#include <Eigen/StdVector>
 #include <optional>
 
 #include "se/common/math_util.hpp"
@@ -466,9 +467,10 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \return True if all points are inside the map, false otherwise
      */
     template<se::Safe SafeB = se::Safe::On>
-    inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
-    pointsToVoxels(const std::vector<Eigen::Vector3f>& points_W,
-                   std::vector<Eigen::Vector3i>& voxel_coords) const;
+    inline typename std::enable_if_t<SafeB == se::Safe::On, bool> pointsToVoxels(
+        const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& points_W,
+        std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>>& voxel_coords)
+        const;
 
     /**
      * \brief Convert a vector of point coordinates in [meter] to its voxel coordinates in [voxel]
@@ -479,9 +481,10 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \return True
      */
     template<se::Safe SafeB>
-    inline typename std::enable_if_t<SafeB == se::Safe::Off, bool>
-    pointsToVoxels(const std::vector<Eigen::Vector3f>& points_W,
-                   std::vector<Eigen::Vector3i>& voxel_coords) const;
+    inline typename std::enable_if_t<SafeB == se::Safe::Off, bool> pointsToVoxels(
+        const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& points_W,
+        std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>>& voxel_coords)
+        const;
 
     /**
      * \brief Get the shared pointer to the octree.

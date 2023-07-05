@@ -41,10 +41,11 @@ block(const se::key_t voxel_key, OctreeT& octree, OctantBase* base_parent_ptr)
 
 
 template<typename OctreeT>
-inline std::vector<se::OctantBase*> blocks(const std::vector<Eigen::Vector3i>& voxel_coords,
-                                           OctreeT& octree,
-                                           se::OctantBase* base_parent_ptr,
-                                           const bool only_allocated)
+inline std::vector<se::OctantBase*>
+blocks(const std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>>& voxel_coords,
+       OctreeT& octree,
+       se::OctantBase* base_parent_ptr,
+       const bool only_allocated)
 {
     std::set<se::key_t> voxel_key_set;
 

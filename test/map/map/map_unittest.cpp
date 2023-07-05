@@ -7,6 +7,7 @@
 
 #include "se/map/map.hpp"
 
+#include <Eigen/StdVector>
 #include <gtest/gtest.h>
 
 #include "se/integrator/map_integrator.hpp"
@@ -147,7 +148,7 @@ TEST(Map, Interpolation)
 
     int block_size = BlockType::size;
 
-    std::vector<Eigen::Vector3i> block_coords = {
+    std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> block_coords = {
         Eigen::Vector3i(0, 0, 0),
         Eigen::Vector3i(block_size, 0, 0),
         Eigen::Vector3i(0, block_size, 0),

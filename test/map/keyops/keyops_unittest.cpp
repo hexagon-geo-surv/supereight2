@@ -6,6 +6,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <Eigen/StdVector>
 #include <gtest/gtest.h>
 
 #include "se/common/math_util.hpp"
@@ -273,16 +274,17 @@ TEST(KeyOps, UniqueKeys)
 {
     std::vector<se::key_t> keys;
     keys.reserve(10);
-    const std::vector<Eigen::Vector3i> coords = {{56, 12, 12},
-                                                 {56, 12, 12},
-                                                 {128, 128, 128},
-                                                 {128, 132, 130},
-                                                 {128, 132, 130},
-                                                 {300, 21, 829},
-                                                 {628, 36, 227},
-                                                 {436, 18, 436},
-                                                 {128, 241, 136},
-                                                 {128, 241, 136}};
+    const std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> coords = {
+        {56, 12, 12},
+        {56, 12, 12},
+        {128, 128, 128},
+        {128, 132, 130},
+        {128, 132, 130},
+        {300, 21, 829},
+        {628, 36, 227},
+        {436, 18, 436},
+        {128, 241, 136},
+        {128, 241, 136}};
     const std::vector<se::scale_t> scales = {
         0,
         0, // duplicate
@@ -315,16 +317,17 @@ TEST(KeyOps, UniqueCodes)
 {
     std::vector<se::key_t> keys;
     keys.reserve(10);
-    const std::vector<Eigen::Vector3i> coords = {{56, 12, 12},
-                                                 {56, 12, 12},
-                                                 {128, 128, 128},
-                                                 {128, 132, 130},
-                                                 {128, 132, 130},
-                                                 {300, 21, 829},
-                                                 {628, 36, 227},
-                                                 {436, 18, 436},
-                                                 {128, 241, 136},
-                                                 {128, 241, 136}};
+    const std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> coords = {
+        {56, 12, 12},
+        {56, 12, 12},
+        {128, 128, 128},
+        {128, 132, 130},
+        {128, 132, 130},
+        {300, 21, 829},
+        {628, 36, 227},
+        {436, 18, 436},
+        {128, 241, 136},
+        {128, 241, 136}};
     const std::vector<se::scale_t> scales = {
         0,
         0, // duplicate
@@ -370,18 +373,19 @@ TEST(KeyOps, UniqueAllocation)
 
     std::vector<se::key_t> keys;
     keys.reserve(10);
-    const std::vector<Eigen::Vector3i> coords = {// 0  1  2  3   4  5  6   7   8
-                                                 // 1  2  4  8  16 32 64 128 256
-                                                 {0, 0, 0},
-                                                 {32, 16, 32},
-                                                 {40, 24, 32},
-                                                 {128, 128, 128},
-                                                 {144, 128, 160},
-                                                 {144, 132, 164},
-                                                 {512, 512, 1024},
-                                                 {512, 544, 1056},
-                                                 {512, 545, 1056},
-                                                 {512, 544, 1056}};
+    const std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> coords = {
+        // 0  1  2  3   4  5  6   7   8
+        // 1  2  4  8  16 32 64 128 256
+        {0, 0, 0},
+        {32, 16, 32},
+        {40, 24, 32},
+        {128, 128, 128},
+        {144, 128, 160},
+        {144, 132, 164},
+        {512, 512, 1024},
+        {512, 544, 1056},
+        {512, 545, 1056},
+        {512, 544, 1056}};
     const std::vector<se::scale_t> scales = {6, 5, 3, 7, 4, 2, 6, 4, 1, 1};
     for (se::idx_t i = 0; i < coords.size(); ++i) {
         se::key_t key_tmp;
@@ -394,7 +398,7 @@ TEST(KeyOps, UniqueAllocation)
 
     se::keyops::unique_allocation(keys, max_block_scale, unique_keys);
 
-    std::vector<Eigen::Vector3i> coords_ought = {
+    std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> coords_ought = {
         {40, 24, 32}, {144, 132, 164}, {512, 545, 1056}, {512, 544, 1056}};
 
     std::vector<se::scale_t> scales_ought = {3, 2, 1, 1};
@@ -434,18 +438,19 @@ TEST(KeyOps, UniqueAtScale)
 {
     std::vector<se::key_t> keys;
     keys.reserve(10);
-    const std::vector<Eigen::Vector3i> coords = {// 0  1  2  3   4  5  6   7   8
-                                                 // 1  2  4  8  16 32 64 128 256
-                                                 {0, 0, 0},
-                                                 {32, 16, 32},
-                                                 {40, 24, 32},
-                                                 {128, 128, 128},
-                                                 {144, 128, 160},
-                                                 {144, 132, 164},
-                                                 {512, 512, 1024},
-                                                 {512, 544, 1056},
-                                                 {512, 545, 1056},
-                                                 {513, 545, 1056}};
+    const std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> coords = {
+        // 0  1  2  3   4  5  6   7   8
+        // 1  2  4  8  16 32 64 128 256
+        {0, 0, 0},
+        {32, 16, 32},
+        {40, 24, 32},
+        {128, 128, 128},
+        {144, 128, 160},
+        {144, 132, 164},
+        {512, 512, 1024},
+        {512, 544, 1056},
+        {512, 545, 1056},
+        {513, 545, 1056}};
     const std::vector<se::scale_t> scales = {6, 5, 3, 6, 4, 2, 6, 4, 1, 1};
 
     for (se::idx_t i = 0; i < coords.size(); ++i) {
@@ -462,7 +467,7 @@ TEST(KeyOps, UniqueAtScale)
     std::vector<se::key_t> unique_keys;
     se::keyops::unique_at_scale(keys, scale_ought, unique_keys);
 
-    std::vector<Eigen::Vector3i> coords_ought = {
+    std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> coords_ought = {
         {32, 0, 32},
         {128, 128, 160},
         {512, 512, 1024},

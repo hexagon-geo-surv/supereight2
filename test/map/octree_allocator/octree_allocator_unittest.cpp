@@ -5,6 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <Eigen/StdVector>
 #include <gtest/gtest.h>
 
 #include "se/map/data.hpp"
@@ -51,7 +52,7 @@ TEST(SingleResAllocation, BlockKey)
     const NodeType* node_ptr = nullptr;
     se::OctantBase* octant_ptr = nullptr;
 
-    std::vector<Eigen::Vector3i> voxel_coords = {
+    std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> voxel_coords = {
         Eigen::Vector3i(253, 74, 135), Eigen::Vector3i(114, 244, 65), Eigen::Vector3i(38, 104, 85)};
 
     se::scale_t max_tree_scale = 8;
@@ -253,9 +254,10 @@ TEST(SingleResAllocation, BlockCoord)
     const NodeType* node_ptr = nullptr;
     se::OctantBase* octant_ptr = nullptr;
 
-    std::vector<Eigen::Vector3i> voxel_coords = {Eigen::Vector3i(233, 44, 255),
-                                                 Eigen::Vector3i(113, 144, 155),
-                                                 Eigen::Vector3i(33, 104, 55)};
+    std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> voxel_coords = {
+        Eigen::Vector3i(233, 44, 255),
+        Eigen::Vector3i(113, 144, 155),
+        Eigen::Vector3i(33, 104, 55)};
 
     for (const auto& voxel_coord : voxel_coords) {
         coord_ought = adapt_to_scale(voxel_coord, octree_ptr->max_block_scale);
@@ -293,14 +295,16 @@ TEST(SingleResAllocation, BlockKeys)
     OctreeType::Ptr octree_ptr = OctreeType::Ptr(new OctreeType(octree_size));
 
     // The coordinates of some voxels.
-    std::vector<Eigen::Vector3i> voxel_coords = {Eigen::Vector3i(33, 104, 55),
-                                                 Eigen::Vector3i(113, 144, 155),
-                                                 Eigen::Vector3i(233, 44, 255)};
+    std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> voxel_coords = {
+        Eigen::Vector3i(33, 104, 55),
+        Eigen::Vector3i(113, 144, 155),
+        Eigen::Vector3i(233, 44, 255)};
     // Sort the voxel coordinates to make later comparisons easier.
     std::sort(voxel_coords.begin(), voxel_coords.end(), vector3i_less);
 
     // Get the coordinates of the corresponding Blocks from the voxel coordinates.
-    std::vector<Eigen::Vector3i> desired_block_coords(voxel_coords.size());
+    std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> desired_block_coords(
+        voxel_coords.size());
     std::transform(
         voxel_coords.begin(),
         voxel_coords.end(),
@@ -354,7 +358,8 @@ TEST(SingleResAllocation, BlockKeys)
     block_ptrs = se::allocator::blocks(voxel_coords, *octree_ptr, octree_ptr->getRoot(), true);
 
     // Get the coordinates of the returned Blocks and sort them.
-    std::vector<Eigen::Vector3i> actual_block_coords(block_ptrs.size());
+    std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> actual_block_coords(
+        block_ptrs.size());
     std::transform(block_ptrs.begin(),
                    block_ptrs.end(),
                    actual_block_coords.begin(),
@@ -394,9 +399,10 @@ TEST(SingleResAllocation, BlockCoords)
     const NodeType* node_ptr = nullptr;
     se::OctantBase* octant_ptr = nullptr;
 
-    std::vector<Eigen::Vector3i> voxel_coords = {Eigen::Vector3i(233, 44, 255),
-                                                 Eigen::Vector3i(113, 144, 155),
-                                                 Eigen::Vector3i(33, 104, 55)};
+    std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> voxel_coords = {
+        Eigen::Vector3i(233, 44, 255),
+        Eigen::Vector3i(113, 144, 155),
+        Eigen::Vector3i(33, 104, 55)};
 
     std::vector<se::key_t> voxel_keys;
     for (const auto& voxel_coord : voxel_coords) {

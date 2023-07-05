@@ -6,6 +6,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <Eigen/StdVector>
 #include <gtest/gtest.h>
 #include <random>
 
@@ -22,7 +23,7 @@ TEST(MeshingTest, EqualScaleNeighbour)
     ;
     std::vector<se::key_t> allocation_list;
     allocation_list.reserve(blocks_per_side * blocks_per_side);
-    std::vector<Eigen::Vector3i> block_coords;
+    std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> block_coords;
     for (unsigned y = 0; y < octree_size; y += block_size) {
         for (unsigned z = 0; z < octree_size; z += block_size) {
             Eigen::Vector3i block_coord = Eigen::Vector3i(block_size, y, z);
@@ -81,7 +82,7 @@ TEST(MeshingTest, EqualScaleNeighbour2)
     ;
     std::vector<se::key_t> allocation_list;
     allocation_list.reserve(blocks_per_side * blocks_per_side);
-    std::vector<Eigen::Vector3i> block_coords;
+    std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> block_coords;
 
     for (unsigned y = 0; y < octree_size; y += block_size) {
         for (unsigned z = 0; z < octree_size; z += block_size) {
@@ -144,7 +145,7 @@ TEST(MeshingTest, EqualScaleNeighbour2)
 //  octree.init(32, 32);
 //  se::key_t allocation_list[27];
 //  int list_idx = 0;
-//  std::vector<Eigen::Vector3i> block_coords;
+//  std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> block_coords;
 //  for (unsigned x = 0; x <= 16; x += VoxelBlockType::size_li) {
 //    for (unsigned y = 0; y <= 16; y += VoxelBlockType::size_li) {
 //      for (unsigned z = 0; z <= 16; z += VoxelBlockType::size_li) {
@@ -194,7 +195,7 @@ TEST(MeshingTest, EqualScaleNeighbour2)
 //  octree.init(32, 32);
 //  se::key_t allocation_list[27];
 //  int list_idx = 0;
-//  std::vector<Eigen::Vector3i> block_coords;
+//  std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> block_coords;
 //  for (unsigned x = 0; x <= 16; x += VoxelBlockType::size_li) {
 //    for (unsigned y = 0; y <= 16; y += VoxelBlockType::size_li) {
 //      for (unsigned z = 0; z <= 16; z += VoxelBlockType::size_li) {
@@ -244,8 +245,8 @@ TEST(MeshingTest, EqualScaleNeighbour2)
 //  octree.init(32, 32);
 //  se::key_t allocation_list[32];
 //  int list_idx = 0;
-//  std::vector<Eigen::Vector3i> block_coords_1;
-//  std::vector<Eigen::Vector3i> block_coords_2;
+//  std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> block_coords_1;
+//  std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> block_coords_2;
 //  for (unsigned z = 0; z < 32; z += VoxelBlockType::size_li) {
 //    for (unsigned y = 0; y < 32; y += VoxelBlockType::size_li) {
 //      allocation_list[list_idx] = octree.hash(8, y, z);

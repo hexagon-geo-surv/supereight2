@@ -465,8 +465,8 @@ template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 template<se::Safe SafeB>
 inline typename std::enable_if_t<SafeB == se::Safe::On, bool>
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointsToVoxels(
-    const std::vector<Eigen::Vector3f>& points_W,
-    std::vector<Eigen::Vector3i>& voxel_coords) const
+    const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& points_W,
+    std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>>& voxel_coords) const
 {
     bool all_valid = true;
 
@@ -488,8 +488,8 @@ template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 template<se::Safe SafeB>
 inline typename std::enable_if_t<SafeB == se::Safe::Off, bool>
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointsToVoxels(
-    const std::vector<Eigen::Vector3f>& points_W,
-    std::vector<Eigen::Vector3i>& voxel_coords) const
+    const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& points_W,
+    std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>>& voxel_coords) const
 {
     for (auto point_W : points_W) {
         Eigen::Vector3i voxel_coord;
