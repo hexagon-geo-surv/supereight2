@@ -19,16 +19,15 @@ int save_point_cloud_vtk(se::Image<Eigen::Vector3f>& point_cloud,
         return 1;
     }
 
-    file << "# vtk DataFile Version 1.0" << std::endl;
-    file << "vtk mesh generated from KFusion" << std::endl;
-    file << "ASCII" << std::endl;
-    file << "DATASET POLYDATA" << std::endl;
-
-    file << "POINTS " << point_cloud.size() << " FLOAT" << std::endl;
+    file << "# vtk DataFile Version 1.0\n";
+    file << "vtk mesh generated from KFusion\n";
+    file << "ASCII\n";
+    file << "DATASET POLYDATA\n";
+    file << "POINTS " << point_cloud.size() << " FLOAT\n";
 
     // Write the point data.
     for (size_t i = 0; i < point_cloud.size(); ++i) {
-        const Eigen::Vector3f point_W = (T_WC * point_cloud[i].homogeneous()).head(3);
+        const Eigen::Vector3f point_W = (T_WC * point_cloud[i].homogeneous()).head<3>();
         file << point_W.x() << " " << point_W.y() << " " << point_W.z() << "\n";
     }
 
