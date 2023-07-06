@@ -303,7 +303,7 @@ inline void propagate_block_to_coarsest_scale(se::OctantBase* octant_ptr)
                                         max_weight = child_data.weight;
                                         max_occupancy = max_mean_occupancy * max_weight;
                                     }
-                                    else if (occupancy > min_occupancy) {
+                                    else if (occupancy < min_occupancy) {
                                         min_data.occupancy = child_data.occupancy;
                                         min_data.weight = child_data.weight;
                                         min_occupancy = occupancy;
