@@ -39,10 +39,6 @@ test-debug: debug
 install: release
 	cmake --install build/release
 
-.PHONY: uninstall
-uninstall:
-	cmake --build build/release --target uninstall
-
 .PHONY: installcheck
 installcheck:
 	mkdir -p test/installcheck/build

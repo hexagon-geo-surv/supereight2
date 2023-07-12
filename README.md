@@ -62,13 +62,11 @@ cmake --install build/release
 You can then use supereight 2 in your CMake project by adding
 `find_package(Supereight2 REQUIRED)` and linking against `SRL::Supereight2`.
 
-To uninstall the library:
+To uninstall the library delete the files listed in the `install_manifest.txt`
+located in the CMake build directory. In a POSIX system you can run:
 
 ``` sh
-# You might need to run the following commands as root/using sudo
-make uninstall
-# Or if you don't have/like Make you can use CMake directly
-cmake --build build/release --target uninstall
+xargs rm < install_manifest.txt
 ```
 
 
