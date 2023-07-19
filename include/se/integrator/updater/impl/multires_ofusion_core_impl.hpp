@@ -128,31 +128,62 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr, const 
     field_t max_occupancy = std::numeric_limits<field_t>::lowest();
     field_t max_mean_occupancy = 0;
     weight_t max_weight = 0;
+    int max_data_count = 0;
+
+    field_t min_mean_occupancy = 0;
+    weight_t min_weight = 0;
+    field_t min_occupancy = std::numeric_limits<field_t>::max();
+    int min_data_count = 0;
+
     int observed_count = 0;
-    int data_count = 0;
     for (int child_idx = 0; child_idx < 8; ++child_idx) {
         const OctantBase* child_ptr = node.getChild(child_idx);
         if (!child_ptr) {
             continue;
         }
-        const auto& child_data = child_ptr->isBlock()
+
+        const auto& child_min_data = (child_ptr->isBlock())
+            ? static_cast<const BlockT*>(child_ptr)->getMinData()
+            : static_cast<const NodeT*>(child_ptr)->getMinData();
+        // Only consider children with at least 1 integration.
+        if (child_min_data.weight > 0
+            && child_min_data.occupancy * child_min_data.weight < min_occupancy) {
+            min_mean_occupancy = child_min_data.occupancy;
+            min_weight = child_min_data.weight;
+            min_occupancy = min_mean_occupancy * min_weight;
+            min_data_count++;
+        }
+
+        const auto& child_max_data = child_ptr->isBlock()
             ? static_cast<const BlockT*>(child_ptr)->getMaxData()
             : static_cast<const NodeT*>(child_ptr)->getMaxData();
         // Only consider children with at least 1 integration.
-        if (child_data.weight > 0 && child_data.occupancy * child_data.weight > max_occupancy) {
-            max_mean_occupancy = child_data.occupancy;
-            max_weight = child_data.weight;
+        if (child_max_data.weight > 0
+            && child_max_data.occupancy * child_max_data.weight > max_occupancy) {
+            max_mean_occupancy = child_max_data.occupancy;
+            max_weight = child_max_data.weight;
             max_occupancy = max_mean_occupancy * max_weight;
-            data_count++;
+            max_data_count++;
         }
-        if (child_data.observed == true) {
+
+        assert(child_min_data.observed == child_max_data.observed);
+        if (child_max_data.observed == true) {
             observed_count++;
         }
     }
 
-    // Update the node data if necessary.
+    if (min_data_count > 0) {
+        typename NodeT::DataType node_min_data = node.getMinData();
+        node_min_data.occupancy = min_mean_occupancy; // TODO: Need to check update?
+        node_min_data.weight = min_weight;
+        if (observed_count == 8) {
+            node_min_data.observed = true;
+        }
+        node.setMinData(node_min_data);
+    }
+
     typename NodeT::DataType node_data = node.getData();
-    if (data_count > 0) {
+    if (max_data_count > 0) {
         node_data.occupancy = max_mean_occupancy; // TODO: Need to check update?
         node_data.weight = max_weight;
         if (observed_count == 8) {
@@ -200,14 +231,14 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
                     field_t min_mean_occupancy = 0;
                     weight_t min_weight = 0;
                     field_t min_occupancy = std::numeric_limits<float>::max();
-                    size_t min_data_count = 0;
+                    int min_data_count = 0;
 
                     field_t max_mean_occupancy = 0;
                     weight_t max_weight = 0;
                     field_t max_occupancy = -std::numeric_limits<float>::max();
-                    size_t max_data_count = 0;
+                    int max_data_count = 0;
 
-                    size_t observed_count = 0;
+                    int observed_count = 0;
 
                     for (int k = 0; k < 2; k++) {
                         for (int j = 0; j < 2; j++) {
