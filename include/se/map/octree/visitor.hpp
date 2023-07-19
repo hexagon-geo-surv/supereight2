@@ -105,6 +105,20 @@ getData(const OctreeT& octree,
         int& scale_returned);
 
 /**
+ * \brief Get the min occupancy data at a given scale.
+ *
+ * \tparam OctreeT      The type of octree used (has to be of field type occupancy and multi-res)
+ * \param octree        The reference to the octree
+ * \param voxel_coord   The voxel coordinates in [voxel] to be accessed
+ * \param scale_desired The scale to be accessed
+ * \return The min data at the requested scale.
+ */
+template<typename OctreeT>
+inline typename std::enable_if_t<OctreeT::DataType::fld_ == se::Field::Occupancy,
+                                 typename OctreeT::DataType>
+getMinData(const OctreeT& octree, const Eigen::Vector3i& voxel_coord, const int scale_desired);
+
+/**
  * \brief Get the max occupancy data at a given scale.
  *
  * \tparam OctreeT      The type of octree used (has to be of field type occupancy and multi-res)

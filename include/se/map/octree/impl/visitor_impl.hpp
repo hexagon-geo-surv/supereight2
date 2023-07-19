@@ -776,6 +776,27 @@ getData(const OctreeT& octree,
 
 template<typename OctreeT>
 typename std::enable_if_t<OctreeT::DataType::fld_ == Field::Occupancy, typename OctreeT::DataType>
+getMinData(const OctreeT& octree, const Eigen::Vector3i& voxel_coord, const int scale_desired)
+{
+    const OctantBase* octant_ptr =
+        fetcher::template finest_octant<OctreeT>(voxel_coord, scale_desired, octree.getRoot());
+    if (!octant_ptr) {
+        return typename OctreeT::DataType();
+    }
+    if (octant_ptr->isBlock()) {
+        int _;
+        return static_cast<const typename OctreeT::BlockType*>(octant_ptr)
+            ->getMinData(voxel_coord, scale_desired, _);
+    }
+    else {
+        return static_cast<const typename OctreeT::NodeType*>(octant_ptr)->getMinData();
+    }
+}
+
+
+
+template<typename OctreeT>
+typename std::enable_if_t<OctreeT::DataType::fld_ == Field::Occupancy, typename OctreeT::DataType>
 getMaxData(const OctreeT& octree, const Eigen::Vector3i& voxel_coord, const int scale_desired)
 {
     typename OctreeT::DataType data;
