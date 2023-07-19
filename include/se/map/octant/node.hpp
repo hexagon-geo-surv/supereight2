@@ -83,6 +83,7 @@ class NodeMultiRes<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
     NodeMultiRes(const DataType& init_data)
     {
         data_ = init_data;
+        min_data_ = init_data;
     }
 
     /**
@@ -92,6 +93,11 @@ class NodeMultiRes<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
     const DataType& getData() const
     {
         return (data_.observed && this->underlying().isLeaf()) ? data_ : default_data_;
+    }
+
+    const DataType& getMinData() const
+    {
+        return min_data_;
     }
 
     /**
@@ -116,11 +122,18 @@ class NodeMultiRes<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
         data_ = data;
     }
 
+    void setMinData(const DataType& data)
+    {
+        min_data_ = data;
+    }
+
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     protected:
     DataType data_; ///< Holds the max data of the node.
                     ///< At the leaf of the tree the nodes max data is equivalent to its data
+    // The minimum data among all the Node's children.
+    DataType min_data_;
 
     private:
     // Helper functions to access the derived variables.
