@@ -231,6 +231,48 @@ int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveFieldSlices(
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 template<se::Field FldTDummy>
 typename std::enable_if_t<FldTDummy == se::Field::Occupancy, int>
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMinFieldSlices(const std::string& filename_x,
+                                                                 const std::string& filename_y,
+                                                                 const std::string& filename_z,
+                                                                 const Eigen::Vector3f& point_W,
+                                                                 const int scale) const
+{
+    Eigen::Vector3i voxel_coord;
+    pointToVoxel(point_W, voxel_coord);
+
+    auto get_min_field_value = [&](const Eigen::Vector3i& coord) {
+        return get_field(se::visitor::getMinData(*octree_ptr_, coord, scale));
+    };
+
+    if (!filename_x.empty()) {
+        se::io::save_3d_slice_vtk(
+            filename_x,
+            Eigen::Vector3i(voxel_coord.x(), 0, 0),
+            Eigen::Vector3i(voxel_coord.x() + 1, octree_ptr_->getSize(), octree_ptr_->getSize()),
+            get_min_field_value);
+    }
+    if (!filename_y.empty()) {
+        se::io::save_3d_slice_vtk(
+            filename_y,
+            Eigen::Vector3i(0, voxel_coord.y(), 0),
+            Eigen::Vector3i(octree_ptr_->getSize(), voxel_coord.y() + 1, octree_ptr_->getSize()),
+            get_min_field_value);
+    }
+    if (!filename_z.empty()) {
+        se::io::save_3d_slice_vtk(
+            filename_z,
+            Eigen::Vector3i(0, 0, voxel_coord.z()),
+            Eigen::Vector3i(octree_ptr_->getSize(), octree_ptr_->getSize(), voxel_coord.z() + 1),
+            get_min_field_value);
+    }
+    return 0;
+}
+
+
+
+template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
+template<se::Field FldTDummy>
+typename std::enable_if_t<FldTDummy == se::Field::Occupancy, int>
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMaxFieldSlices(const std::string& filename_x,
                                                                  const std::string& filename_y,
                                                                  const std::string& filename_z,

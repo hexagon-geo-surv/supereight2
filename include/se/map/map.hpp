@@ -293,6 +293,30 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
                         const Eigen::Vector3f& point_W) const;
 
     /**
+     * \brief Save three slices of the minimum field value, each perpendicular to one of the axes
+     * (x, y and z) at the provided coordinates. Setting any of the filenames to the empty string
+     * will skip saving the respective slice.
+     *
+     * \note Only VTK (`.vtk`) files are currently supported.
+     *
+     * \param[in] filename_x The file where the slice perpendicular to the x axis will be written.
+     * \param[in] filename_y The file where the slice perpendicular to the y axis will be written.
+     * \param[in] filename_z The file where the slice perpendicular to the z axis will be written.
+     * \param[in] point_W    The point in the world frame in units of meters where the slices
+     *                       intersect. The x coordinate denotes the position along the x axis that
+     *                       the slice perpendicular to the x axis will be computed etc.
+     * \param[in] scale      The minimum scale the minimum field values will be extracted from.
+     * \return Zero on success and non-zero on error.
+     */
+    template<se::Field FldTDummy = FldT>
+    typename std::enable_if_t<FldTDummy == se::Field::Occupancy, int>
+    saveMinFieldSlices(const std::string& filename_x,
+                       const std::string& filename_y,
+                       const std::string& filename_z,
+                       const Eigen::Vector3f& point_W,
+                       const int scale) const;
+
+    /**
      * \brief Save three slices of the maximum field value, each perpendicular to one of the axes
      * (x, y and z) at the provided coordinates. Setting any of the filenames to the empty string
      * will skip saving the respective slice.
