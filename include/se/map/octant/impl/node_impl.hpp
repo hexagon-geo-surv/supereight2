@@ -17,9 +17,8 @@ int get_child_idx(const Eigen::Vector3i& child_coord, const NodeT* parent_ptr)
     const Eigen::Vector3i parent_coord = parent_ptr->getCoord();
     const int parent_size = parent_ptr->getSize();
 
-    assert(se::keyops::is_child(
-        se::keyops::encode_key(parent_coord, se::math::log2_const(parent_size)),
-        se::keyops::encode_key(child_coord, 0)));
+    assert(keyops::is_child(keyops::encode_key(parent_coord, math::log2_const(parent_size)),
+                            keyops::encode_key(child_coord, 0)));
 
     Eigen::Vector3i offset = child_coord - parent_coord;
     const unsigned int child_size = parent_size >> 1;
@@ -71,7 +70,7 @@ int Node<DataT, ResT>::getSize() const
 
 
 template<typename DataT, Res ResT>
-se::OctantBase* Node<DataT, ResT>::getChild(const int child_idx)
+OctantBase* Node<DataT, ResT>::getChild(const int child_idx)
 {
     return children_ptr_[child_idx];
 }
@@ -79,7 +78,7 @@ se::OctantBase* Node<DataT, ResT>::getChild(const int child_idx)
 
 
 template<typename DataT, Res ResT>
-const se::OctantBase* Node<DataT, ResT>::getChild(const int child_idx) const
+const OctantBase* Node<DataT, ResT>::getChild(const int child_idx) const
 {
     return children_ptr_[child_idx];
 }
@@ -87,7 +86,7 @@ const se::OctantBase* Node<DataT, ResT>::getChild(const int child_idx) const
 
 
 template<typename DataT, Res ResT>
-se::OctantBase* Node<DataT, ResT>::setChild(const int child_idx, se::OctantBase* child_ptr)
+OctantBase* Node<DataT, ResT>::setChild(const int child_idx, OctantBase* child_ptr)
 {
     children_mask_ |= 1 << child_idx;
     std::swap(child_ptr, children_ptr_[child_idx]);

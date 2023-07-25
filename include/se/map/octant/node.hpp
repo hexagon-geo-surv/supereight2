@@ -35,7 +35,7 @@ class NodeMultiRes {
 
 
 template<Field FldT, Colour ColB, Semantics SemB, typename DerivedT>
-class NodeMultiRes<se::Data<FldT, ColB, SemB>, DerivedT> {
+class NodeMultiRes<Data<FldT, ColB, SemB>, DerivedT> {
 };
 
 
@@ -45,10 +45,10 @@ class NodeMultiRes<se::Data<FldT, ColB, SemB>, DerivedT> {
  *        The node doesn't carry any data and returns the default data only.
  */
 template<Colour ColB, Semantics SemB, typename DerivedT>
-class NodeMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, DerivedT> {
+class NodeMultiRes<Data<Field::TSDF, ColB, SemB>, DerivedT> {
     public:
-    typedef se::Data<se::Field::TSDF, ColB, SemB> DataType;
-    typedef se::DeltaData<se::Field::TSDF, ColB, SemB> PropDataType;
+    typedef Data<Field::TSDF, ColB, SemB> DataType;
+    typedef DeltaData<Field::TSDF, ColB, SemB> PropDataType;
 
     NodeMultiRes(const DataType)
     {
@@ -70,9 +70,9 @@ class NodeMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, DerivedT> {
  * \brief Multi-resolution data of a Occupancy node.
  */
 template<Colour ColB, Semantics SemB, typename DerivedT>
-class NodeMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, DerivedT> {
+class NodeMultiRes<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
     public:
-    typedef se::Data<se::Field::Occupancy, ColB, SemB> DataType;
+    typedef Data<Field::Occupancy, ColB, SemB> DataType;
 
     /**
      * \brief Set the inital data of the node.
@@ -164,7 +164,7 @@ class NodeSingleRes {
  * \tparam DataT
  * \tparam ResT
  */
-template<typename DataT, se::Res ResT = se::Res::Single>
+template<typename DataT, Res ResT = Res::Single>
 class Node : public OctantBase,
              public std::conditional<ResT == Res::Single,
                                      NodeSingleRes<DataT>,
@@ -204,7 +204,7 @@ class Node : public OctantBase,
      *
      * \return The pointer to the child. nullptr if not allocated
      */
-    const se::OctantBase* getChild(const int child_idx) const;
+    const OctantBase* getChild(const int child_idx) const;
 
     /**
      * \brief Get the pointer to one of the children of the node.
@@ -213,7 +213,7 @@ class Node : public OctantBase,
      *
      * \return The pointer to the child. nullptr if not allocated
      */
-    se::OctantBase* getChild(const int child_idx);
+    OctantBase* getChild(const int child_idx);
 
     /**
      * \brief Set the pointer of one of the children of the node.
@@ -221,12 +221,12 @@ class Node : public OctantBase,
      * \param[in] child_idx   The child index of the child to be set
      * \param[in] child_ptr   The pointer to the child to be set
      */
-    se::OctantBase* setChild(const int child_idx, se::OctantBase* child_ptr);
+    OctantBase* setChild(const int child_idx, OctantBase* child_ptr);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     private:
-    std::array<se::OctantBase*, 8>
+    std::array<OctantBase*, 8>
         children_ptr_; ///< Pointers to the eight children (should be all nullptr at initialisation due to smart pointers)
     const int size_; ///< The size in [voxel] of the node in comparision to the finest voxel
 };
