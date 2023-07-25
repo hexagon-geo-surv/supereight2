@@ -11,8 +11,6 @@
 
 namespace se {
 
-
-
 // Forward declare Node to avoid depending on the order of includes.
 template<typename DataT, se::Res ResT>
 class Node;
@@ -29,25 +27,25 @@ class BlockSingleRes {
 
     BlockSingleRes(const DataType init_data = DataType());
 
-    inline const DataType& getData(const int voxel_idx) const;
+    const DataType& getData(const int voxel_idx) const;
 
-    inline DataType& getData(const int voxel_idx);
+    DataType& getData(const int voxel_idx);
 
-    inline const DataType& getData(const Eigen::Vector3i& voxel_coord) const;
+    const DataType& getData(const Eigen::Vector3i& voxel_coord) const;
 
-    inline DataType& getData(const Eigen::Vector3i& voxel_coord);
+    DataType& getData(const Eigen::Vector3i& voxel_coord);
 
-    inline void setData(const unsigned voxel_idx, const DataT& data);
+    void setData(const unsigned voxel_idx, const DataT& data);
 
-    inline void setData(const Eigen::Vector3i& voxel_coord, const DataT& data);
+    void setData(const Eigen::Vector3i& voxel_coord, const DataT& data);
 
 
-    static inline int getMinScale()
+    static int getMinScale()
     {
         return min_scale_;
     }
 
-    static inline int getCurrentScale()
+    static int getCurrentScale()
     {
         return curr_scale_;
     }
@@ -105,80 +103,79 @@ class BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, DerivedT> 
 
     /// Get voxel index
 
-    inline int getVoxelIdx(const Eigen::Vector3i& voxel_coord) const;
+    int getVoxelIdx(const Eigen::Vector3i& voxel_coord) const;
 
-    inline int getVoxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
+    int getVoxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
     /// Get coarsest block data
 
-    inline const DataType& getData() const;
+    const DataType& getData() const;
 
-    inline DataType& getData();
+    DataType& getData();
 
     /// Get data at current scale
 
-    inline const DataType& getData(const int voxel_idx) const;
+    const DataType& getData(const int voxel_idx) const;
 
-    inline DataType& getData(const int voxel_idx);
+    DataType& getData(const int voxel_idx);
 
-    inline const DataType& getData(const Eigen::Vector3i& voxel_coord) const;
+    const DataType& getData(const Eigen::Vector3i& voxel_coord) const;
 
-    inline DataType& getData(const Eigen::Vector3i& voxel_coord);
+    DataType& getData(const Eigen::Vector3i& voxel_coord);
 
     /// Get data at current scale or coarser
 
-    inline const DataType&
+    const DataType&
     getData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out) const;
 
-    inline DataType&
-    getData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out);
+    DataType& getData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out);
 
     /// Get data at scale
 
-    inline const DataType& getData(const Eigen::Vector3i& voxel_coord, const int scale) const;
+    const DataType& getData(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
-    inline DataType& getData(const Eigen::Vector3i& voxel_coord, const int scale);
+    DataType& getData(const Eigen::Vector3i& voxel_coord, const int scale);
 
     /// Get data
 
-    inline const DataUnion getDataUnion(const Eigen::Vector3i& voxel_coord, const int scale) const;
+    const DataUnion getDataUnion(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
-    inline DataUnion getDataUnion(const Eigen::Vector3i& voxel_coord, const int scale);
+    DataUnion getDataUnion(const Eigen::Vector3i& voxel_coord, const int scale);
 
     /// Set data at current scale
 
-    inline void setData(const int voxel_idx, const DataType& data);
+    void setData(const int voxel_idx, const DataType& data);
 
-    inline void setData(const Eigen::Vector3i& voxel_coord, const DataType& data);
+    void setData(const Eigen::Vector3i& voxel_coord, const DataType& data);
 
-    inline void setData(const Eigen::Vector3i& voxel_coord, const int scale, const DataType& data);
+    void setData(const Eigen::Vector3i& voxel_coord, const int scale, const DataType& data);
 
-    inline void setDataUnion(const DataUnion& data_union);
+    void setDataUnion(const DataUnion& data_union);
 
 
     /// Get scales
 
-    inline int getMinScale() const
+    int getMinScale() const
     {
         return min_scale_;
     }
 
-    inline void setMinScale(const int min_scale)
+    void setMinScale(const int min_scale)
     {
         min_scale_ = min_scale;
     }
 
-    static constexpr inline int getMaxScale()
+    static constexpr int getMaxScale()
     {
         return max_scale_;
     }
 
-    inline int getCurrentScale() const
+    int getCurrentScale() const
     {
         return curr_scale_;
     }
 
-    inline void setCurrentScale(const int curr_scale)
+    void setCurrentScale(const int curr_scale)
     {
         curr_scale_ = curr_scale;
     }
@@ -286,78 +283,75 @@ class BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, Deriv
 
     /// Get init block data
 
-    inline const DataType& getInitData() const
+    const DataType& getInitData() const
     {
         return init_data_;
     };
-    inline DataType& getInitData()
+    DataType& getInitData()
     {
         return init_data_;
     };
 
-    inline void setInitData(const DataType& init_data)
+    void setInitData(const DataType& init_data)
     {
         init_data_ = init_data;
     };
 
     /// Get voxel index
 
-    inline int getVoxelIdx(const Eigen::Vector3i& voxel_coord) const;
+    int getVoxelIdx(const Eigen::Vector3i& voxel_coord) const;
 
-    inline int getVoxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
+    int getVoxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
 
 
     /// Get data at current scale
 
-    inline const DataType& getData(const Eigen::Vector3i& voxel_coord) const;
+    const DataType& getData(const Eigen::Vector3i& voxel_coord) const;
 
-    inline DataType& getData(const Eigen::Vector3i& voxel_coord);
+    DataType& getData(const Eigen::Vector3i& voxel_coord);
 
     /// Get data at current scale or coarser
 
-    inline const DataType&
+    const DataType&
     getData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out) const;
 
-    inline DataType&
-    getData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out);
+    DataType& getData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out);
 
     /// Get data at scale
 
-    inline const DataType& getData(const Eigen::Vector3i& voxel_coord, const int scale) const;
+    const DataType& getData(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
-    inline DataType& getData(const Eigen::Vector3i& voxel_coord, const int scale);
+    DataType& getData(const Eigen::Vector3i& voxel_coord, const int scale);
 
-    inline const DataType& getMaxData(const Eigen::Vector3i& voxel_coord) const;
+    const DataType& getMaxData(const Eigen::Vector3i& voxel_coord) const;
 
-    inline DataType& getMaxData(const Eigen::Vector3i& voxel_coord);
+    DataType& getMaxData(const Eigen::Vector3i& voxel_coord);
 
-    inline const DataType&
+    const DataType&
     getMaxData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out) const;
 
-    inline DataType&
-    getMaxData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out);
+    DataType& getMaxData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out);
 
-    inline const DataType& getMaxData(const Eigen::Vector3i& voxel_coord, const int scale) const;
+    const DataType& getMaxData(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
-    inline DataType& getMaxData(const Eigen::Vector3i& voxel_coord, const int scale);
+    DataType& getMaxData(const Eigen::Vector3i& voxel_coord, const int scale);
 
-    inline const DataType& getMinData() const
+    const DataType& getMinData() const
     {
         return min_data_;
     };
 
 
     /// Set data at current scale
-    inline void setData(const Eigen::Vector3i& voxel_coord, const DataType& data);
+    void setData(const Eigen::Vector3i& voxel_coord, const DataType& data);
 
-    inline void setData(const Eigen::Vector3i& voxel_coord, const int scale, const DataType& data);
+    void setData(const Eigen::Vector3i& voxel_coord, const int scale, const DataType& data);
 
-    inline void setMaxData(const Eigen::Vector3i& voxel_coord, const DataType& data);
+    void setMaxData(const Eigen::Vector3i& voxel_coord, const DataType& data);
 
 
-    inline void
-    setMaxData(const Eigen::Vector3i& voxel_coord, const int scale, const DataType& data);
+    void setMaxData(const Eigen::Vector3i& voxel_coord, const int scale, const DataType& data);
 
     void setMinData(const DataType& min_data)
     {
@@ -372,7 +366,7 @@ class BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, Deriv
     /**
      * \brief Allocate the mip-mapped scales down to 'new_min_scale'.
      */
-    inline void allocateDownTo(const int new_min_scale);
+    void allocateDownTo(const int new_min_scale);
 
     /**
      * \brief Delete the mip-mapped scales up to 'new_min_scale'.
@@ -386,7 +380,7 @@ class BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, Deriv
      *
      * \return The block's data at the coarsest scale
      */
-    inline const DataType getData() const
+    const DataType getData() const
     {
         return block_data_[0][0];
     }
@@ -398,7 +392,7 @@ class BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, Deriv
      *
      * \return The block's max data at the coarsest scale
      */
-    inline const DataType getMaxData() const
+    const DataType getMaxData() const
     {
         return block_max_data_[0][0];
     }
@@ -427,22 +421,22 @@ class BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, Deriv
         return get_field(getMaxData());
     }
 
-    inline const std::vector<DataType*>& blockData() const
+    const std::vector<DataType*>& blockData() const
     {
         return block_data_;
     }
 
-    inline std::vector<DataType*>& blockData()
+    std::vector<DataType*>& blockData()
     {
         return block_data_;
     }
 
-    inline const std::vector<DataType*>& blockMaxData() const
+    const std::vector<DataType*>& blockMaxData() const
     {
         return block_max_data_;
     }
 
-    inline std::vector<DataType*>& blockMaxData()
+    std::vector<DataType*>& blockMaxData()
     {
         return block_max_data_;
     }
@@ -450,7 +444,7 @@ class BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, Deriv
     /**
      * \brief Get the number of integrations at the current scale.
      */
-    inline const size_t& currIntegrCount() const
+    const size_t& currIntegrCount() const
     {
         return curr_integr_count_;
     }
@@ -458,7 +452,7 @@ class BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, Deriv
     /**
      * \brief Get the number of observed voxels at the current scale.
      */
-    inline const size_t& currObservedCount() const
+    const size_t& currObservedCount() const
     {
         return curr_observed_count_;
     } ///<
@@ -643,27 +637,27 @@ class BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, Deriv
 
     /// Get scales
 
-    inline int getMinScale() const
+    int getMinScale() const
     {
         return min_scale_;
     }
 
-    inline void setMinScale(const int min_scale)
+    void setMinScale(const int min_scale)
     {
         min_scale_ = min_scale;
     }
 
-    static constexpr inline int getMaxScale()
+    static constexpr int getMaxScale()
     {
         return max_scale_;
     }
 
-    inline int getCurrentScale() const
+    int getCurrentScale() const
     {
         return curr_scale_;
     }
 
-    inline void setCurrentScale(const int curr_scale)
+    void setCurrentScale(const int curr_scale)
     {
         curr_scale_ = curr_scale;
     }
@@ -773,10 +767,6 @@ class Block
 
 } // namespace se
 
-
-
 #include "impl/block_impl.hpp"
-
-
 
 #endif // SE_BLOCK_HPP
