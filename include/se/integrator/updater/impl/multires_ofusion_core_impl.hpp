@@ -173,9 +173,9 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
 
     typedef typename BlockT::DataType DataType;
 
-    BlockT* block_ptr = static_cast<BlockT*>(octant_ptr);
+    BlockT& block = *static_cast<BlockT*>(octant_ptr);
 
-    int child_scale = block_ptr->getCurrentScale();
+    int child_scale = block.getCurrentScale();
     int size_at_child_scale_li = BlockT::size >> child_scale;
     int size_at_child_scale_sq = math::sq(size_at_child_scale_li);
 
@@ -186,9 +186,9 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
     DataType min_data;
     field_t min_occupancy;
 
-    if (block_ptr->buffer_scale() > block_ptr->getCurrentScale()) {
-        DataType* max_data_at_parent_scale = block_ptr->blockMaxDataAtScale(parent_scale);
-        DataType* max_data_at_child_scale = block_ptr->blockDataAtScale(child_scale);
+    if (block.buffer_scale() > block.getCurrentScale()) {
+        DataType* max_data_at_parent_scale = block.blockMaxDataAtScale(parent_scale);
+        DataType* max_data_at_child_scale = block.blockDataAtScale(child_scale);
 
         min_data = max_data_at_child_scale[0];
         min_occupancy = min_data.occupancy * min_data.weight;
@@ -254,9 +254,9 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
         }         // z
     }
     else {
-        DataType* max_data_at_parent_scale = block_ptr->blockMaxDataAtScale(parent_scale);
-        DataType* data_at_parent_scale = block_ptr->blockDataAtScale(parent_scale);
-        DataType* data_at_child_scale = block_ptr->blockDataAtScale(child_scale);
+        DataType* max_data_at_parent_scale = block.blockMaxDataAtScale(parent_scale);
+        DataType* data_at_parent_scale = block.blockDataAtScale(parent_scale);
+        DataType* data_at_child_scale = block.blockDataAtScale(child_scale);
 
         min_data = data_at_child_scale[0];
         min_occupancy = min_data.occupancy * min_data.weight;
@@ -344,10 +344,10 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
         size_at_child_scale_li = BlockT::size >> child_scale;
         size_at_child_scale_sq = math::sq(size_at_child_scale_li);
 
-        DataType* max_data_at_parent_scale = block_ptr->blockMaxDataAtScale(parent_scale);
-        DataType* data_at_parent_scale = block_ptr->blockDataAtScale(parent_scale);
-        DataType* max_data_at_child_scale = block_ptr->blockMaxDataAtScale(child_scale);
-        DataType* data_at_child_scale = block_ptr->blockDataAtScale(child_scale);
+        DataType* max_data_at_parent_scale = block.blockMaxDataAtScale(parent_scale);
+        DataType* data_at_parent_scale = block.blockDataAtScale(parent_scale);
+        DataType* max_data_at_child_scale = block.blockMaxDataAtScale(child_scale);
+        DataType* data_at_child_scale = block.blockDataAtScale(child_scale);
 
         for (int z = 0; z < size_at_parent_scale_li; z++) {
             for (int y = 0; y < size_at_parent_scale_li; y++) {
@@ -417,7 +417,7 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
         }         // z
     }
 
-    block_ptr->setMinData(min_data);
+    block.setMinData(min_data);
 }
 
 
