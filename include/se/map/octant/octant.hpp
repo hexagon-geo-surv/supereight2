@@ -38,14 +38,14 @@ class OctantBase {
     bool isBlock() const
     {
         return is_block_;
-    };
+    }
 
     /**
      * \brief Get the voxel coordinates of the octant.
      *
      * \return The voxel coordinates of the octant
      */
-    Eigen::Vector3i getCoord() const
+    const Eigen::Vector3i& getCoord() const
     {
         return coord_;
     }
