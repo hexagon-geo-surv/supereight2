@@ -118,6 +118,8 @@ bool free_voxel(DataT& voxel_data, const ConfigT config)
 template<typename NodeT, typename BlockT>
 typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr, const int frame)
 {
+    assert(octant_ptr);
+    assert(!octant_ptr->isBlock());
     NodeT* node_ptr = static_cast<NodeT*>(octant_ptr);
 
     node_ptr->setTimeStamp(frame);
