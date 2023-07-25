@@ -131,14 +131,14 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr, const 
     size_t data_count = 0;
 
     for (int child_idx = 0; child_idx < 8; ++child_idx) {
-        OctantBase* child_ptr = node.getChild(child_idx);
+        const OctantBase* child_ptr = node.getChild(child_idx);
         if (!child_ptr) {
             continue;
         }
 
-        const auto& child_data = (child_ptr->isBlock())
-            ? static_cast<BlockT*>(child_ptr)->getMaxData()
-            : static_cast<NodeT*>(child_ptr)->getMaxData();
+        const auto& child_data = child_ptr->isBlock()
+            ? static_cast<const BlockT*>(child_ptr)->getMaxData()
+            : static_cast<const NodeT*>(child_ptr)->getMaxData();
         if (child_data.weight > 0
             && child_data.occupancy * child_data.weight > max_occupancy) // At least 1 integration
         {
