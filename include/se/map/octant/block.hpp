@@ -12,7 +12,7 @@
 namespace se {
 
 // Forward declare Node to avoid depending on the order of includes.
-template<typename DataT, se::Res ResT>
+template<typename DataT, Res ResT>
 class Node;
 
 
@@ -76,16 +76,16 @@ class BlockMultiRes {
 
 
 template<Field FldT, Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
-class BlockMultiRes<se::Data<FldT, ColB, SemB>, BlockSize, DerivedT> {
+class BlockMultiRes<Data<FldT, ColB, SemB>, BlockSize, DerivedT> {
 };
 
 
 
 template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
-class BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, DerivedT> {
+class BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT> {
     public:
-    typedef se::Data<se::Field::TSDF, ColB, SemB> DataType;
-    typedef se::DeltaData<se::Field::TSDF, ColB, SemB> PropDataType;
+    typedef Data<Field::TSDF, ColB, SemB> DataType;
+    typedef DeltaData<Field::TSDF, ColB, SemB> PropDataType;
 
     BlockMultiRes(const DataType init_data = DataType());
 
@@ -197,9 +197,9 @@ class BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, DerivedT> 
         return voxel_count;
     }
 
-    static constexpr std::array<int, se::math::log2_const(BlockSize) + 1> compute_size_at_scales()
+    static constexpr std::array<int, math::log2_const(BlockSize) + 1> compute_size_at_scales()
     {
-        std::array<int, se::math::log2_const(BlockSize) + 1> size_at_scales{};
+        std::array<int, math::log2_const(BlockSize) + 1> size_at_scales{};
 
         int size_at_scale = BlockSize;
         int scale = 0;
@@ -211,9 +211,9 @@ class BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, DerivedT> 
         return size_at_scales;
     }
 
-    static constexpr std::array<int, se::math::log2_const(BlockSize) + 1> compute_scale_offsets()
+    static constexpr std::array<int, math::log2_const(BlockSize) + 1> compute_scale_offsets()
     {
-        std::array<int, se::math::log2_const(BlockSize) + 1> scale_offsets{};
+        std::array<int, math::log2_const(BlockSize) + 1> scale_offsets{};
 
         unsigned int size_at_scale = BlockSize;
         scale_offsets[0] = 0;
@@ -229,10 +229,10 @@ class BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, DerivedT> 
 
     static constexpr int num_voxels_ = compute_num_voxels();
 
-    static constexpr std::array<int, se::math::log2_const(BlockSize) + 1> size_at_scales_ =
+    static constexpr std::array<int, math::log2_const(BlockSize) + 1> size_at_scales_ =
         compute_size_at_scales();
 
-    static constexpr std::array<int, se::math::log2_const(BlockSize) + 1> scale_offsets_ =
+    static constexpr std::array<int, math::log2_const(BlockSize) + 1> scale_offsets_ =
         compute_scale_offsets();
 
 
@@ -256,7 +256,7 @@ class BlockMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, BlockSize, DerivedT> 
 
 // Forward decleration
 template<typename DataT,
-         Res ResT = se::Res::Single,
+         Res ResT = Res::Single,
          int BlockSize = 8,
          typename PolicyT = std::enable_if_t<math::is_power_of_two(
              BlockSize)> ///< Verify that the block size is sensible
@@ -266,18 +266,16 @@ class Block;
 
 
 template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
-class BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
+class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
     public:
-    typedef se::Data<se::Field::Occupancy, ColB, SemB> DataType;
-    typedef se::DeltaData<se::Field::Occupancy, ColB, SemB> PropDataType;
+    typedef Data<Field::Occupancy, ColB, SemB> DataType;
+    typedef DeltaData<Field::Occupancy, ColB, SemB> PropDataType;
 
     BlockMultiRes(const DataType init_data = DataType());
 
-    BlockMultiRes(
-        const Block<se::Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>& block);
+    BlockMultiRes(const Block<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>& block);
 
-    void operator=(
-        const Block<se::Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>& block);
+    void operator=(const Block<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>& block);
 
     ~BlockMultiRes();
 
@@ -404,7 +402,7 @@ class BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, Deriv
      *
      * \return The block's value at the coarsest scale
      */
-    se::field_t meanValue()
+    field_t meanValue()
     {
         return get_field(getData());
     }
@@ -416,7 +414,7 @@ class BlockMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, BlockSize, Deriv
      *
      * \return The block's max value at the coarsest scale
      */
-    se::field_t maxValue()
+    field_t maxValue()
     {
         return get_field(getMaxData());
     }
@@ -753,7 +751,7 @@ class Block
      * \param[in] child_idx      The child id {0,...,7} in relation to the parent
      * \param[in] init_data     The initial data of the block
      */
-    Block(se::Node<DataT, ResT>* parent_ptr, const int child_idx, const DataT init_data);
+    Block(Node<DataT, ResT>* parent_ptr, const int child_idx, const DataT init_data);
 
     static constexpr unsigned int getSize()
     {
