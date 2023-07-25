@@ -58,10 +58,6 @@ class NodeMultiRes<Data<Field::TSDF, ColB, SemB>, DerivedT> {
     {
         return DataType();
     }
-    DataType getData()
-    {
-        return DataType();
-    }
 };
 
 
@@ -148,10 +144,6 @@ class NodeSingleRes {
     }
 
     const DataT getData() const
-    {
-        return DataT();
-    }
-    DataT getData()
     {
         return DataT();
     }
