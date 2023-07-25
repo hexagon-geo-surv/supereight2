@@ -11,10 +11,8 @@
 
 namespace se {
 
-
-
 template<typename NodeT>
-inline int get_child_idx(const Eigen::Vector3i& child_coord, const NodeT* parent_ptr)
+int get_child_idx(const Eigen::Vector3i& child_coord, const NodeT* parent_ptr)
 {
     const Eigen::Vector3i parent_coord = parent_ptr->getCoord();
     const int parent_size = parent_ptr->getSize();
@@ -65,7 +63,7 @@ Node<DataT, ResT>::Node(Node* parent_ptr, const int child_idx, const DataT init_
 
 
 template<typename DataT, Res ResT>
-inline int Node<DataT, ResT>::getSize() const
+int Node<DataT, ResT>::getSize() const
 {
     return size_;
 }
@@ -73,7 +71,7 @@ inline int Node<DataT, ResT>::getSize() const
 
 
 template<typename DataT, Res ResT>
-inline se::OctantBase* Node<DataT, ResT>::getChild(const int child_idx)
+se::OctantBase* Node<DataT, ResT>::getChild(const int child_idx)
 {
     return children_ptr_[child_idx];
 }
@@ -81,7 +79,7 @@ inline se::OctantBase* Node<DataT, ResT>::getChild(const int child_idx)
 
 
 template<typename DataT, Res ResT>
-inline const se::OctantBase* Node<DataT, ResT>::getChild(const int child_idx) const
+const se::OctantBase* Node<DataT, ResT>::getChild(const int child_idx) const
 {
     return children_ptr_[child_idx];
 }
@@ -89,14 +87,12 @@ inline const se::OctantBase* Node<DataT, ResT>::getChild(const int child_idx) co
 
 
 template<typename DataT, Res ResT>
-inline se::OctantBase* Node<DataT, ResT>::setChild(const int child_idx, se::OctantBase* child_ptr)
+se::OctantBase* Node<DataT, ResT>::setChild(const int child_idx, se::OctantBase* child_ptr)
 {
     children_mask_ |= 1 << child_idx;
     std::swap(child_ptr, children_ptr_[child_idx]);
     return child_ptr;
 }
-
-
 
 } // namespace se
 

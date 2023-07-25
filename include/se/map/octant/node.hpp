@@ -11,8 +11,6 @@
 
 namespace se {
 
-
-
 /**
  * \brief Get the child idx for a given child coordinate and pointer to the parent node.
  *
@@ -25,7 +23,7 @@ namespace se {
  * \return The child index
  */
 template<typename NodeT>
-inline int get_child_idx(const Eigen::Vector3i& octant_coord, const NodeT* node_ptr);
+int get_child_idx(const Eigen::Vector3i& octant_coord, const NodeT* node_ptr);
 
 
 
@@ -56,11 +54,11 @@ class NodeMultiRes<se::Data<se::Field::TSDF, ColB, SemB>, DerivedT> {
     {
     }
 
-    inline const DataType getData() const
+    const DataType getData() const
     {
         return DataType();
     }
-    inline DataType getData()
+    DataType getData()
     {
         return DataType();
     }
@@ -93,7 +91,7 @@ class NodeMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, DerivedT> {
      *
      * \return The leaf data of the node. If the node is not an observed the default data is returned.
      */
-    inline const DataType getData() const
+    const DataType getData() const
     {
         return (data_.observed && this->underlying().children_mask_ == 0) ? data_ : DataType();
     }
@@ -105,7 +103,7 @@ class NodeMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, DerivedT> {
      *
      * \return The max data of the node.
      */
-    inline const DataType getMaxData() const
+    const DataType getMaxData() const
     {
         return data_;
     }
@@ -115,7 +113,7 @@ class NodeMultiRes<se::Data<se::Field::Occupancy, ColB, SemB>, DerivedT> {
      *
      * \param[in] data    The data to be set
      */
-    inline void setData(const DataType& data)
+    void setData(const DataType& data)
     {
         data_ = data;
     }
@@ -149,11 +147,11 @@ class NodeSingleRes {
     {
     }
 
-    inline const DataT getData() const
+    const DataT getData() const
     {
         return DataT();
     }
-    inline DataT getData()
+    DataT getData()
     {
         return DataT();
     }
@@ -197,7 +195,7 @@ class Node : public OctantBase,
      *
      * \return The size of the node
      */
-    inline int getSize() const;
+    int getSize() const;
 
     /**
      * \brief Get the pointer to one of the children of the node.
@@ -206,7 +204,7 @@ class Node : public OctantBase,
      *
      * \return The pointer to the child. nullptr if not allocated
      */
-    inline const se::OctantBase* getChild(const int child_idx) const;
+    const se::OctantBase* getChild(const int child_idx) const;
 
     /**
      * \brief Get the pointer to one of the children of the node.
@@ -215,7 +213,7 @@ class Node : public OctantBase,
      *
      * \return The pointer to the child. nullptr if not allocated
      */
-    inline se::OctantBase* getChild(const int child_idx);
+    se::OctantBase* getChild(const int child_idx);
 
     /**
      * \brief Set the pointer of one of the children of the node.
@@ -223,7 +221,7 @@ class Node : public OctantBase,
      * \param[in] child_idx   The child index of the child to be set
      * \param[in] child_ptr   The pointer to the child to be set
      */
-    inline se::OctantBase* setChild(const int child_idx, se::OctantBase* child_ptr);
+    se::OctantBase* setChild(const int child_idx, se::OctantBase* child_ptr);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -233,14 +231,8 @@ class Node : public OctantBase,
     const int size_; ///< The size in [voxel] of the node in comparision to the finest voxel
 };
 
-
-
 } // namespace se
 
-
-
 #include "impl/node_impl.hpp"
-
-
 
 #endif // SE_NODE_HPP
