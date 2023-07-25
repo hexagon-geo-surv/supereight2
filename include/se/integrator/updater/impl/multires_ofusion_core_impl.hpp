@@ -120,9 +120,9 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr, const 
 {
     assert(octant_ptr);
     assert(!octant_ptr->isBlock());
-    NodeT* node_ptr = static_cast<NodeT*>(octant_ptr);
 
-    node_ptr->setTimeStamp(frame);
+    NodeT& node = *static_cast<NodeT*>(octant_ptr);
+    node.setTimeStamp(frame);
 
     field_t max_mean_occupancy = 0;
     weight_t max_weight = 0;
@@ -131,8 +131,7 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr, const 
     size_t data_count = 0;
 
     for (int child_idx = 0; child_idx < 8; ++child_idx) {
-        OctantBase* child_ptr = node_ptr->getChild(child_idx);
-
+        OctantBase* child_ptr = node.getChild(child_idx);
         if (!child_ptr) {
             continue;
         }
@@ -153,7 +152,7 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr, const 
         }
     }
 
-    typename NodeT::DataType node_data = node_ptr->getData();
+    typename NodeT::DataType node_data = node.getData();
 
     if (data_count > 0) {
         node_data.occupancy = max_mean_occupancy; // TODO: Need to check update?
@@ -161,7 +160,7 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr, const 
         if (observed_count == 8) {
             node_data.observed = true;
         }
-        node_ptr->setData(node_data);
+        node.setData(node_data);
     }
     return node_data;
 }
