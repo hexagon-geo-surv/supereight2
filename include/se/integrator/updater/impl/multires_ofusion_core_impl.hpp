@@ -168,6 +168,9 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr, const 
 template<typename BlockT>
 void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
 {
+    assert(octant_ptr);
+    assert(octant_ptr->isBlock());
+
     typedef typename BlockT::DataType DataType;
 
     BlockT* block_ptr = static_cast<BlockT*>(octant_ptr);
