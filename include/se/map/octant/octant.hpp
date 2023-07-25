@@ -57,12 +57,12 @@ class OctantBase {
      *
      * \return The parent pointer of the octant
      */
-    const se::OctantBase* getParent() const
+    const OctantBase* getParent() const
     {
         return parent_ptr_;
     }
 
-    se::OctantBase* getParent()
+    OctantBase* getParent()
     {
         return parent_ptr_;
     }
