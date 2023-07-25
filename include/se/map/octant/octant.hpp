@@ -1,8 +1,8 @@
 /*
  * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
- * SPDX-FileCopyrightText: 2019-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2019-2023 Smart Robotics Lab, Imperial College London, Technical University of Munich
  * SPDX-FileCopyrightText: 2019-2021 Nils Funk
- * SPDX-FileCopyrightText: 2019-2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2019-2023 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -37,7 +37,7 @@ class OctantBase {
      *
      * \return True if the octant is a block, false otherwise
      */
-    inline bool isBlock() const
+    bool isBlock() const
     {
         return is_block_;
     };
@@ -47,7 +47,7 @@ class OctantBase {
      *
      * \return The voxel coordinates of the octant
      */
-    inline Eigen::Vector3i getCoord() const
+    Eigen::Vector3i getCoord() const
     {
         return coord_;
     }
@@ -57,12 +57,12 @@ class OctantBase {
      *
      * \return The parent pointer of the octant
      */
-    inline const se::OctantBase* getParent() const
+    const se::OctantBase* getParent() const
     {
         return parent_ptr_;
     }
 
-    inline se::OctantBase* getParent()
+    se::OctantBase* getParent()
     {
         return parent_ptr_;
     }
@@ -74,7 +74,7 @@ class OctantBase {
      *
      * \return The time stamp of the octant
      */
-    inline int getTimeStamp() const
+    int getTimeStamp() const
     {
         return time_stamp_;
     }
@@ -86,7 +86,7 @@ class OctantBase {
      *
      * \param[in] time_stamp  The time stamp of the octant
      */
-    inline void setTimeStamp(const int time_stamp)
+    void setTimeStamp(const int time_stamp)
     {
         time_stamp_ = time_stamp;
     }
@@ -96,7 +96,7 @@ class OctantBase {
      *
      * \return The active state of the octant
      */
-    inline bool getActive() const
+    bool getActive() const
     {
         return is_active_;
     }
@@ -106,12 +106,12 @@ class OctantBase {
      *
      * \param[in] is_active   The active state of the octant
      */
-    inline void setActive(bool is_active)
+    void setActive(bool is_active)
     {
         is_active_ = is_active;
     }
 
-    inline unsigned int getChildrenMask() const
+    unsigned int getChildrenMask() const
     {
         return children_mask_;
     }
@@ -121,7 +121,7 @@ class OctantBase {
      *
      * \warning Only use this function if all children pointer are 'nullptr's.
      */
-    inline void clearChildrenMask()
+    void clearChildrenMask()
     {
         children_mask_ = 0;
     }
@@ -146,10 +146,7 @@ class OctantBase {
     friend class NodeMultiRes;
 };
 
-
-
 } // namespace se
-
 
 #include "block.hpp"
 #include "node.hpp"
