@@ -54,10 +54,13 @@ class NodeMultiRes<Data<Field::TSDF, ColB, SemB>, DerivedT> {
     {
     }
 
-    const DataType getData() const
+    const DataType& getData() const
     {
-        return DataType();
+        return default_data_;
     }
+
+    private:
+    static constexpr DataType default_data_ = DataType();
 };
 
 
@@ -81,15 +84,12 @@ class NodeMultiRes<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
     }
 
     /**
-     * \brief Get the leaf data of the node.
-     *
-     * \warning The data is not returned by reference as it's the case for the blocks.
-     *
-     * \return The leaf data of the node. If the node is not an observed the default data is returned.
+     * \brief Get the node data. If the node is not observed and not a leaf the default data is
+     * returned.
      */
-    const DataType getData() const
+    const DataType& getData() const
     {
-        return (data_.observed && this->underlying().isLeaf()) ? data_ : DataType();
+        return (data_.observed && this->underlying().isLeaf()) ? data_ : default_data_;
     }
 
     /**
@@ -128,6 +128,9 @@ class NodeMultiRes<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
     {
         return static_cast<const DerivedT&>(*this);
     }
+
+    private:
+    static constexpr DataType default_data_ = DataType();
 };
 
 
@@ -143,10 +146,13 @@ class NodeSingleRes {
     {
     }
 
-    const DataT getData() const
+    const DataT& getData() const
     {
-        return DataT();
+        return default_data_;
     }
+
+    private:
+    static constexpr DataT default_data_ = DataT();
 };
 
 
