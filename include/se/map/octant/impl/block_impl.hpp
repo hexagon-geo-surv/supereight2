@@ -924,7 +924,7 @@ bool BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::swi
 
 
 template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
-typename BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::DataType&
+const typename BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::DataType&
 BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::bufferData(
     const Eigen::Vector3i& voxel_coord) const
 {

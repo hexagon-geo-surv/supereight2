@@ -378,7 +378,7 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
      *
      * \return The block's data at the coarsest scale
      */
-    const DataType getData() const
+    const DataType& getData() const
     {
         return block_data_[0][0];
     }
@@ -390,7 +390,7 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
      *
      * \return The block's max data at the coarsest scale
      */
-    const DataType getMaxData() const
+    const DataType& getMaxData() const
     {
         return block_max_data_[0][0];
     }
@@ -442,7 +442,7 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
     /**
      * \brief Get the number of integrations at the current scale.
      */
-    const size_t& currIntegrCount() const
+    size_t currIntegrCount() const
     {
         return curr_integr_count_;
     }
@@ -450,7 +450,7 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
     /**
      * \brief Get the number of observed voxels at the current scale.
      */
-    const size_t& currObservedCount() const
+    size_t currObservedCount() const
     {
         return curr_observed_count_;
     } ///<
@@ -485,15 +485,15 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
     /**
      * \return The integration scale of the buffer.
      */
-    const int& buffer_scale() const
+    int buffer_scale() const
     {
         return buffer_scale_;
     }
-    const size_t& bufferIntegrCount() const
+    size_t bufferIntegrCount() const
     {
         return buffer_integr_count_;
     }
-    const size_t& bufferObservedCount() const
+    size_t bufferObservedCount() const
     {
         return buffer_observed_count_;
     }
@@ -544,7 +544,7 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
      *
      * \return `const` reference to the voxel data in the buffer for the provided voxel coordinates.
      */
-    DataType& bufferData(const Eigen::Vector3i& voxel_coord) const;
+    const DataType& bufferData(const Eigen::Vector3i& voxel_coord) const;
 
     /**
      * \brief Get a reference to the voxel data in the buffer at the voxel coordinates.
@@ -566,7 +566,7 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
      *
      * \return `const` reference to the voxel data in the buffer for the provided voxel index.
      */
-    DataType& bufferData(const int voxel_idx) const
+    const DataType& bufferData(const int voxel_idx) const
     {
         return buffer_data_[voxel_idx];
     }
