@@ -21,7 +21,7 @@ OctantBase::OctantBase(const bool is_block, const Eigen::Vector3i& coord, Octant
         coord_(coord),
         time_stamp_(-1),
         is_active_(true),
-        children_mask_(0)
+        children_mask_(0u)
 {
 }
 

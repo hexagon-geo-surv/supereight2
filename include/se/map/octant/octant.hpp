@@ -121,7 +121,7 @@ class OctantBase {
      */
     void clearChildrenMask()
     {
-        children_mask_ = 0;
+        children_mask_ = 0u;
     }
 
     /**
@@ -140,7 +140,7 @@ class OctantBase {
     const Eigen::Vector3i coord_; ///< The coordinates of the block (left, front , bottom corner)
     int time_stamp_;              ///< The frame of the last update
     bool is_active_;              ///< The active state of the octant
-    unsigned int children_mask_;  ///< The allocated children
+    std::uint8_t children_mask_;  ///< The allocated children
 
     template<typename DerT, typename DatT, int BS>
     friend class BlockSingleRes;
