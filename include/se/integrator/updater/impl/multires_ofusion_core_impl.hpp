@@ -124,36 +124,34 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr, const 
     NodeT& node = *static_cast<NodeT*>(octant_ptr);
     node.setTimeStamp(frame);
 
+    // Compute the maximum data among all children.
+    field_t max_occupancy = std::numeric_limits<field_t>::lowest();
     field_t max_mean_occupancy = 0;
     weight_t max_weight = 0;
-    field_t max_occupancy = -std::numeric_limits<field_t>::max();
-    size_t observed_count = 0;
-    size_t data_count = 0;
-
+    int observed_count = 0;
+    int data_count = 0;
     for (int child_idx = 0; child_idx < 8; ++child_idx) {
         const OctantBase* child_ptr = node.getChild(child_idx);
         if (!child_ptr) {
             continue;
         }
-
         const auto& child_data = child_ptr->isBlock()
             ? static_cast<const BlockT*>(child_ptr)->getMaxData()
             : static_cast<const NodeT*>(child_ptr)->getMaxData();
-        if (child_data.weight > 0
-            && child_data.occupancy * child_data.weight > max_occupancy) // At least 1 integration
-        {
-            data_count++;
+        // Only consider children with at least 1 integration.
+        if (child_data.weight > 0 && child_data.occupancy * child_data.weight > max_occupancy) {
             max_mean_occupancy = child_data.occupancy;
             max_weight = child_data.weight;
             max_occupancy = max_mean_occupancy * max_weight;
+            data_count++;
         }
         if (child_data.observed == true) {
             observed_count++;
         }
     }
 
+    // Update the node data if necessary.
     typename NodeT::DataType node_data = node.getData();
-
     if (data_count > 0) {
         node_data.occupancy = max_mean_occupancy; // TODO: Need to check update?
         node_data.weight = max_weight;
