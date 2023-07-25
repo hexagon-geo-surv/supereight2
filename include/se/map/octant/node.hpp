@@ -50,7 +50,7 @@ class NodeMultiRes<Data<Field::TSDF, ColB, SemB>, DerivedT> {
     typedef Data<Field::TSDF, ColB, SemB> DataType;
     typedef DeltaData<Field::TSDF, ColB, SemB> PropDataType;
 
-    NodeMultiRes(const DataType)
+    NodeMultiRes(const DataType&)
     {
     }
 
@@ -79,7 +79,7 @@ class NodeMultiRes<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
      *
      * \param init_data   The initial data of the node.
      */
-    NodeMultiRes(const DataType init_data)
+    NodeMultiRes(const DataType& init_data)
     {
         data_ = init_data;
     }
@@ -143,7 +143,7 @@ class NodeMultiRes<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
 template<typename DataT>
 class NodeSingleRes {
     public:
-    NodeSingleRes(const DataT)
+    NodeSingleRes(const DataT&)
     {
     }
 
@@ -180,7 +180,7 @@ class Node : public OctantBase,
      * \param[in] coord   The coordinates in [voxel] of the node
      * \param[in] size    The size in [voxel] of the node
      */
-    Node(const Eigen::Vector3i& coord, const int size, const DataT init_data);
+    Node(const Eigen::Vector3i& coord, const int size, const DataT& init_data);
 
     /**
      * \brief Setup a node via its parent and child index.
@@ -188,7 +188,7 @@ class Node : public OctantBase,
      * \param[in] parent_ptr  The pointer to the parent node
      * \param[in] child_idx   The child index of the node
      */
-    Node(Node* parent_ptr, const int child_idx, const DataT init_data);
+    Node(Node* parent_ptr, const int child_idx, const DataT& init_data);
 
     /**
      * \brief Get the size in [voxel] of the node.

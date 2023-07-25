@@ -30,7 +30,7 @@ int get_child_idx(const Eigen::Vector3i& child_coord, const NodeT* parent_ptr)
 
 
 template<typename DataT, Res ResT>
-Node<DataT, ResT>::Node(const Eigen::Vector3i& coord, const int size, const DataT init_data) :
+Node<DataT, ResT>::Node(const Eigen::Vector3i& coord, const int size, const DataT& init_data) :
         OctantBase(false, coord, nullptr),
         std::conditional<ResT == Res::Single,
                          NodeSingleRes<DataT>,
@@ -43,7 +43,7 @@ Node<DataT, ResT>::Node(const Eigen::Vector3i& coord, const int size, const Data
 
 
 template<typename DataT, Res ResT>
-Node<DataT, ResT>::Node(Node* parent_ptr, const int child_idx, const DataT init_data) :
+Node<DataT, ResT>::Node(Node* parent_ptr, const int child_idx, const DataT& init_data) :
         OctantBase(false,
                    parent_ptr->coord_
                        + (parent_ptr->size_ >> 1)
