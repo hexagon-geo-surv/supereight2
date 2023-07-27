@@ -357,14 +357,9 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
     }
 
     /**
-     * \brief Allocate the mip-mapped scales down to scale 0.
-     */
-    void allocateDownTo();
-
-    /**
      * \brief Allocate the mip-mapped scales down to 'new_min_scale'.
      */
-    void allocateDownTo(const int new_min_scale);
+    void allocateDownTo(const int new_min_scale = 0);
 
     /**
      * \brief Delete the mip-mapped scales up to 'new_min_scale'.

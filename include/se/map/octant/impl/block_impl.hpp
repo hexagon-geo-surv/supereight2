@@ -645,51 +645,6 @@ void BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::set
 
 
 template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
-void BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::allocateDownTo()
-{
-    if (max_scale_ - (block_data_.size() - 1) != 0) {
-        block_max_data_.pop_back();
-        int size_at_scale = BlockSize >> (max_scale_ - (block_data_.size() - 1));
-        int num_voxels_at_scale = math::cu(size_at_scale);
-        DataType* max_data_at_scale = new DataType[num_voxels_at_scale];
-        DataType* data_at_scale = block_data_[block_data_.size() - 1];
-        std::copy(data_at_scale,
-                  data_at_scale + num_voxels_at_scale,
-                  max_data_at_scale); ///<< Copy init content.
-        block_max_data_.push_back(max_data_at_scale);
-
-        for (int scale = max_scale_ - block_data_.size(); scale >= 0; scale--) {
-            int size_at_scale = BlockSize >> scale;
-            int num_voxels_at_scale = math::cu(size_at_scale);
-
-            if (scale == 0) {
-                DataType* data_at_scale = new DataType[num_voxels_at_scale];
-                initialiseData(data_at_scale, num_voxels_at_scale);
-                block_data_.push_back(data_at_scale);
-                block_max_data_.push_back(
-                    data_at_scale); ///<< Mean and max data are the same at the min scale.
-            }
-            else {
-                DataType* data_at_scale = new DataType[num_voxels_at_scale];
-                DataType* max_data_at_scale = new DataType[num_voxels_at_scale];
-                initialiseData(data_at_scale, num_voxels_at_scale);
-                block_data_.push_back(data_at_scale);
-                std::copy(data_at_scale,
-                          data_at_scale + num_voxels_at_scale,
-                          max_data_at_scale); ///<< Copy init content.
-                block_max_data_.push_back(max_data_at_scale);
-            }
-        }
-
-        curr_scale_ = 0;
-        min_scale_ = 0;
-        curr_data_ = block_data_[max_scale_];
-    }
-}
-
-
-
-template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
 void BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::allocateDownTo(
     const int new_min_scale)
 {
