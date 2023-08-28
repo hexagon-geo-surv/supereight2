@@ -59,12 +59,8 @@ TEST(Map, Gradient)
         EXPECT_FLOAT_EQ(*occupancy, data_config.log_odd_min);
         // Check for zero gradients
         const std::optional<Eigen::Vector3f> gradient = map.getFieldGrad(point);
-        // TODO: The current gradient computation doesn't work for nodes so we can't test the
-        // gradient value in free space which is pruned. Comment in the tests below once this is
-        // fixed.
-        ASSERT_FALSE(gradient);
-        //ASSERT_TRUE(gradient);
-        //EXPECT_FLOAT_EQ(gradient->norm(), 0.0f);
+        ASSERT_TRUE(gradient);
+        EXPECT_FLOAT_EQ(gradient->norm(), 0.0f);
     }
 
     // Test the derivatives of points in the transition between free and occupied space. This is the

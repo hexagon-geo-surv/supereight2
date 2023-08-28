@@ -1261,13 +1261,34 @@ getFieldGrad(const OctreeT& octree,
              int& scale_returned)
 {
     typedef typename OctreeT::BlockType BlockType;
-
-    BlockType* block_ptr = static_cast<BlockType*>(
-        fetcher::template block<OctreeT>(voxel_coord_f.cast<int>(), octree.getRoot()));
-    if (!block_ptr) // If this block doesn't exist there's no way to compute a valid gradient
-    {
+    OctantBase* octant =
+        fetcher::template finest_octant<OctreeT>(voxel_coord_f.cast<int>(), 0, octree.getRoot());
+    if (!octant) {
+        // Nothing is allocated here, can't compute a gradient.
         return std::nullopt;
     }
+    if (!octant->isBlock()) {
+        // The octree is not allocated down to the Block level.
+        if constexpr (OctreeT::DataType::fld_ == Field::Occupancy) {
+            // Test the Node data.
+            if (static_cast<typename OctreeT::NodeType*>(octant)->getData().observed) {
+                // The Node has valid data which should be free space. This part of the map has
+                // uniform occupancy, meaning a gradient of 0. This isn't strictly true near the
+                // boundary of the node where there can be small non-zero gradients. It's a rather
+                // good and simple approximation though.
+                return field_vec_t::Zero();
+            }
+            else {
+                // The Node has no valid data (unkown space), can't compute a gradient.
+                return std::nullopt;
+            }
+        }
+        else {
+            // Node-level data is only available on occupancy maps, can't compute a gradient.
+            return std::nullopt;
+        }
+    }
+    BlockType* block_ptr = static_cast<BlockType*>(octant);
 
     int init_scale =
         std::max(scale_desired,
