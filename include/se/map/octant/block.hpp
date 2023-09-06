@@ -322,6 +322,19 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
 
     DataType& getData(const Eigen::Vector3i& voxel_coord, const int scale);
 
+    const DataType& getMinData(const Eigen::Vector3i& voxel_coord) const;
+
+    DataType& getMinData(const Eigen::Vector3i& voxel_coord);
+
+    const DataType&
+    getMinData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out) const;
+
+    DataType& getMinData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out);
+
+    const DataType& getMinData(const Eigen::Vector3i& voxel_coord, const int scale) const;
+
+    DataType& getMinData(const Eigen::Vector3i& voxel_coord, const int scale);
+
     const DataType& getMaxData(const Eigen::Vector3i& voxel_coord) const;
 
     DataType& getMaxData(const Eigen::Vector3i& voxel_coord);
@@ -335,26 +348,18 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
 
     DataType& getMaxData(const Eigen::Vector3i& voxel_coord, const int scale);
 
-    const DataType& getMinData() const
-    {
-        return min_data_;
-    };
-
-
     /// Set data at current scale
     void setData(const Eigen::Vector3i& voxel_coord, const DataType& data);
 
     void setData(const Eigen::Vector3i& voxel_coord, const int scale, const DataType& data);
 
+    void setMinData(const Eigen::Vector3i& voxel_coord, const DataType& data);
+
+    void setMinData(const Eigen::Vector3i& voxel_coord, const int scale, const DataType& data);
+
     void setMaxData(const Eigen::Vector3i& voxel_coord, const DataType& data);
 
-
     void setMaxData(const Eigen::Vector3i& voxel_coord, const int scale, const DataType& data);
-
-    void setMinData(const DataType& min_data)
-    {
-        min_data_ = min_data;
-    }
 
     /**
      * \brief Allocate the mip-mapped scales down to 'new_min_scale'.
@@ -376,6 +381,16 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
     const DataType& getData() const
     {
         return block_data_[0][0];
+    }
+
+    /**
+     * \brief Get the block's min data at the coarsest scale.
+     *
+     * \return The block's min data at the coarsest scale
+     */
+    const DataType& getMinData() const
+    {
+        return block_min_data_[0][0];
     }
 
     /**
@@ -422,6 +437,16 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
     std::vector<DataType*>& blockData()
     {
         return block_data_;
+    }
+
+    const std::vector<DataType*>& blockMinData() const
+    {
+        return block_min_data_;
+    }
+
+    std::vector<DataType*>& blockMinData()
+    {
+        return block_min_data_;
     }
 
     const std::vector<DataType*>& blockMaxData() const
@@ -619,6 +644,15 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
     DataType* blockDataAtScale(const int scale);
 
     /**
+     * \brief Get a pointer to the min block data array at a given scale.
+     *
+     * \param[in] scale The scale to return the min block data array from.
+     *
+     * \return The pointer to the min block data array at the provided scale.
+     *         Returns a nullptr if the scale smaller than the min allocated scale.
+     */
+    DataType* blockMinDataAtScale(const int scale);
+    /**
      * \brief Get a pointer to the max block data array at a given scale.
      *
      * \param[in] scale The scale to return the max block data array from.
@@ -667,6 +701,7 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
     }
 
     std::vector<DataType*> block_data_;
+    std::vector<DataType*> block_min_data_;
     std::vector<DataType*> block_max_data_;
 
     DataType* curr_data_ = nullptr; ///<< Pointer to the data at the current integration scale.
@@ -705,7 +740,6 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
         buffer_integr_count_; ///<< Number of integrations at the buffer scale. \note Is only incremented when 95% of the current observations are reached.
     size_t buffer_observed_count_; ///<< Number of observed voxels in the buffer.
 
-    DataType min_data_;
     DataType init_data_;
 
     DerivedT& underlying()
