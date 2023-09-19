@@ -78,7 +78,11 @@ class PinholeCamera : public SensorBase<PinholeCamera> {
 
     static constexpr int num_frustum_vertices_ = 8;
     static constexpr int num_frustum_normals_ = 6;
+
+    /** The vertices of the camera frustum expressed in the camera frame S. */
     Eigen::Matrix<float, 3, num_frustum_vertices_> frustum_vertices_S;
+
+    /** The inwards-pointing normals of the camera frustum faces expressed in the camera frame S. */
     Eigen::Matrix<float, 4, num_frustum_normals_> frustum_normals_S;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
