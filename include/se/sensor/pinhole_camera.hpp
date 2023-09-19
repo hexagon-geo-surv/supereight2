@@ -39,6 +39,36 @@ class PinholeCamera : public SensorBase<PinholeCamera> {
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
 
+    /** Linear indices to se::PinholeCamera::frustum_vertices_S and number of frustum vertices. */
+    struct FrustumVertex {
+        enum {
+            TopLeftNear,
+            TopRightNear,
+            BottomRightNear,
+            BottomLeftNear,
+            TopLeftFar,
+            TopRightFar,
+            BottomRightFar,
+            BottomLeftFar,
+            Num,
+        };
+    };
+
+    /** Linear indices to se::PinholeCamera::frustum_normals_S and number of frustum normals. */
+    struct FrustumNormal {
+        enum {
+            Left,
+            Right,
+            Bottom,
+            Top,
+            Near,
+            Far,
+            Num,
+        };
+    };
+
+
+
     PinholeCamera(const Config& config);
 
     PinholeCamera(const Config& config, const float downsampling_factor);
@@ -76,14 +106,11 @@ class PinholeCamera : public SensorBase<PinholeCamera> {
     /** \brief The vertical field of view in radians. */
     float vertical_fov;
 
-    static constexpr int num_frustum_vertices_ = 8;
-    static constexpr int num_frustum_normals_ = 6;
-
     /** The vertices of the camera frustum expressed in the camera frame S. */
-    Eigen::Matrix<float, 3, num_frustum_vertices_> frustum_vertices_S;
+    Eigen::Matrix<float, 3, FrustumVertex::Num> frustum_vertices_S;
 
     /** The inwards-pointing normals of the camera frustum faces expressed in the camera frame S. */
-    Eigen::Matrix<float, 4, num_frustum_normals_> frustum_normals_S;
+    Eigen::Matrix<float, 4, FrustumNormal::Num> frustum_normals_S;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
