@@ -76,15 +76,16 @@ class PinholeCamera : public SensorBase<PinholeCamera> {
     /** \brief The vertical field of view in radians. */
     float vertical_fov;
 
-    void computeFrustumVertices();
-    void computeFrustumNormals();
-
     static constexpr int num_frustum_vertices_ = 8;
     static constexpr int num_frustum_normals_ = 6;
     Eigen::Matrix<float, 3, num_frustum_vertices_> frustum_vertices_;
     Eigen::Matrix<float, 4, num_frustum_normals_> frustum_normals_;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+    private:
+    void computeFrustumVertices();
+    void computeFrustumNormals();
 };
 
 std::ostream& operator<<(std::ostream& os, const PinholeCamera::Config& c);
