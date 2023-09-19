@@ -171,7 +171,7 @@ bool se::PinholeCamera::pointInFrustumImpl(const Eigen::Vector3f& point_S) const
 {
     for (size_t i = 0; i < num_frustum_normals_; ++i) {
         // Compute the signed distance between the point and the plane
-        const float distance = point_S.homogeneous().dot(frustum_normals_.col(i));
+        const float distance = point_S.homogeneous().dot(frustum_normals_S.col(i));
         if (distance < 0.0f) {
             // A negative distance means that the point is located on the opposite
             // halfspace than the one the plane normal is pointing towards
@@ -188,7 +188,7 @@ bool se::PinholeCamera::pointInFrustumInfImpl(const Eigen::Vector3f& point_S) co
     // Skip the far plane normal
     for (size_t i = 0; i < num_frustum_normals_ - 1; ++i) {
         // Compute the signed distance between the point and the plane
-        const float distance = point_S.homogeneous().dot(frustum_normals_.col(i));
+        const float distance = point_S.homogeneous().dot(frustum_normals_S.col(i));
         if (distance < 0.0f) {
             // A negative distance means that the point is located on the opposite
             // halfspace than the one the plane normal is pointing towards
@@ -205,7 +205,7 @@ bool se::PinholeCamera::sphereInFrustumImpl(const Eigen::Vector3f& center_S,
 {
     for (size_t i = 0; i < num_frustum_normals_; ++i) {
         // Compute the signed distance between the point and the plane
-        const float distance = center_S.homogeneous().dot(frustum_normals_.col(i));
+        const float distance = center_S.homogeneous().dot(frustum_normals_S.col(i));
         if (distance < -radius) {
             // Instead of testing for negative distance as in
             // se::PinholeCamera::pointInFrustum, test for distance smaller than
@@ -225,7 +225,7 @@ bool se::PinholeCamera::sphereInFrustumInfImpl(const Eigen::Vector3f& center_S,
     // Skip the far plane normal
     for (size_t i = 0; i < num_frustum_normals_ - 1; ++i) {
         // Compute the signed distance between the point and the plane
-        const float distance = center_S.homogeneous().dot(frustum_normals_.col(i));
+        const float distance = center_S.homogeneous().dot(frustum_normals_S.col(i));
         if (distance < -radius) {
             // Instead of testing for negative distance as in
             // se::PinholeCamera::pointInFrustum, test for distance smaller than
@@ -245,25 +245,25 @@ void se::PinholeCamera::computeFrustumVertices()
     // Back-project the frame corners to get the frustum vertices
     // Top left
     model.backProject(Eigen::Vector2f(0.0f, 0.0f), &point_S);
-    frustum_vertices_.col(0) = point_S;
-    frustum_vertices_.col(4) = point_S;
+    frustum_vertices_S.col(0) = point_S;
+    frustum_vertices_S.col(4) = point_S;
     // Top right
     model.backProject(Eigen::Vector2f(model.imageWidth(), 0.0f), &point_S);
-    frustum_vertices_.col(1) = point_S;
-    frustum_vertices_.col(5) = point_S;
+    frustum_vertices_S.col(1) = point_S;
+    frustum_vertices_S.col(5) = point_S;
     // Bottom right
     model.backProject(Eigen::Vector2f(model.imageWidth(), model.imageHeight()), &point_S);
-    frustum_vertices_.col(2) = point_S;
-    frustum_vertices_.col(6) = point_S;
+    frustum_vertices_S.col(2) = point_S;
+    frustum_vertices_S.col(6) = point_S;
     // Bottom left
     model.backProject(Eigen::Vector2f(0.0f, model.imageHeight()), &point_S);
-    frustum_vertices_.col(3) = point_S;
-    frustum_vertices_.col(7) = point_S;
+    frustum_vertices_S.col(3) = point_S;
+    frustum_vertices_S.col(7) = point_S;
     // Scale the frustum vertices with the appropriate depth for near and far
     // plane vertices
     for (int i = 0; i < num_frustum_vertices_ / 2; ++i) {
-        frustum_vertices_.col(i) *= near_plane;
-        frustum_vertices_.col(num_frustum_vertices_ / 2 + i) *= far_plane;
+        frustum_vertices_S.col(i) *= near_plane;
+        frustum_vertices_S.col(num_frustum_vertices_ / 2 + i) *= far_plane;
     }
 }
 
@@ -274,31 +274,31 @@ void se::PinholeCamera::computeFrustumNormals()
     // The w vector component corresponds to the distance of the plane from the
     // origin. It should be 0 for all planes other than the near and far planes.
     // Left plane vector.
-    frustum_normals_.col(0).head<3>() = se::math::plane_normal(
-        frustum_vertices_.col(4), frustum_vertices_.col(0), frustum_vertices_.col(3));
-    frustum_normals_.col(0).w() = 0.0f;
+    frustum_normals_S.col(0).head<3>() = se::math::plane_normal(
+        frustum_vertices_S.col(4), frustum_vertices_S.col(0), frustum_vertices_S.col(3));
+    frustum_normals_S.col(0).w() = 0.0f;
     // Right plane vector.
-    frustum_normals_.col(1).head<3>() = se::math::plane_normal(
-        frustum_vertices_.col(1), frustum_vertices_.col(5), frustum_vertices_.col(6));
-    frustum_normals_.col(1).w() = 0.0f;
+    frustum_normals_S.col(1).head<3>() = se::math::plane_normal(
+        frustum_vertices_S.col(1), frustum_vertices_S.col(5), frustum_vertices_S.col(6));
+    frustum_normals_S.col(1).w() = 0.0f;
     // Bottom plane vector.
-    frustum_normals_.col(2).head<3>() = se::math::plane_normal(
-        frustum_vertices_.col(7), frustum_vertices_.col(3), frustum_vertices_.col(2));
-    frustum_normals_.col(2).w() = 0.0f;
+    frustum_normals_S.col(2).head<3>() = se::math::plane_normal(
+        frustum_vertices_S.col(7), frustum_vertices_S.col(3), frustum_vertices_S.col(2));
+    frustum_normals_S.col(2).w() = 0.0f;
     // Top plane vector.
-    frustum_normals_.col(3).head<3>() = se::math::plane_normal(
-        frustum_vertices_.col(5), frustum_vertices_.col(1), frustum_vertices_.col(0));
-    frustum_normals_.col(3).w() = 0.0f;
+    frustum_normals_S.col(3).head<3>() = se::math::plane_normal(
+        frustum_vertices_S.col(5), frustum_vertices_S.col(1), frustum_vertices_S.col(0));
+    frustum_normals_S.col(3).w() = 0.0f;
     // Near plane vector.
-    frustum_normals_.col(4) = Eigen::Vector4f(0.f, 0.f, 1.f, -near_plane);
+    frustum_normals_S.col(4) = Eigen::Vector4f(0.f, 0.f, 1.f, -near_plane);
     // Far plane vector.
-    frustum_normals_.col(5) = Eigen::Vector4f(0.f, 0.f, -1.f, far_plane);
+    frustum_normals_S.col(5) = Eigen::Vector4f(0.f, 0.f, -1.f, far_plane);
     // The directions of all normal vectors must be multiplied with sign(fx * fy) to account for
     // negative focal lengths. The near and far plane normals are already set with the correct
     // direction.
     float sign = model.focalLengthU() * model.focalLengthV();
     sign = sign / fabsf(sign);
     for (int i = 0; i < num_frustum_normals_ - 2; i++) {
-        frustum_normals_.col(i).head<3>() *= sign;
+        frustum_normals_S.col(i).head<3>() *= sign;
     }
 }
