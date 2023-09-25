@@ -60,7 +60,7 @@ se::OusterLidar::OusterLidar(const OusterLidarConfig& c) :
 {
     assert(c.width > 0);
     assert(c.height > 0);
-    assert(c.near_plane >= 0.f);
+    assert(c.near_plane > 0.0f);
     assert(c.far_plane > c.near_plane);
     assert(c.beam_azimuth_angles.size() == c.height);
     assert(c.beam_elevation_angles.size() == c.height);

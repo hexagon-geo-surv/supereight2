@@ -29,13 +29,14 @@ struct SensorBaseConfig {
      */
     int height = 0;
 
-    /** The sensor's near plane in metres.
+    /** The sensor's near plane in metres. Avoid setting to 0 since numerical issues may arise.
      */
-    float near_plane = 0.0f;
+    float near_plane = 0.01f;
 
-    /** The sensor's far plane in metres.
+    /** The sensor's far plane in metres. Avoid setting to infinity since performance may degrade
+     * significantly, for example with depth images containing really large erroneous measurements.
      */
-    float far_plane = std::numeric_limits<float>::infinity();
+    float far_plane = 10.0f;
 
     /** The transformation from the sensor frame S to the body frame B.
      */
