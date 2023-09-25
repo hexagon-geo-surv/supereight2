@@ -20,7 +20,6 @@ static constexpr field_t dflt_occupancy = 0.0f;
 static constexpr field_t dflt_delta_occupancy = 0.0f;
 static constexpr weight_t dflt_weight = 0.0f;
 static constexpr weight_t dflt_delta_weight = 0.0f;
-static constexpr time_stamp_t dflt_time_stamp = -1.0f;
 
 template<Field FieldT>
 struct FieldData {
@@ -31,7 +30,6 @@ struct FieldData<Field::Occupancy> {
     field_t occupancy = dflt_occupancy;
     weight_t weight = dflt_weight;
     bool observed = false;
-    time_stamp_t time_stamp = dflt_time_stamp;
     static constexpr bool invert_normals = false;
 };
 
