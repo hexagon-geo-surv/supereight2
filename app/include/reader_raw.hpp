@@ -10,7 +10,7 @@
 #ifndef __READER_RAW_HPP
 #define __READER_RAW_HPP
 
-#include <Eigen/Dense>
+#include <Eigen/Core>
 #include <cstdint>
 #include <fstream>
 #include <string>

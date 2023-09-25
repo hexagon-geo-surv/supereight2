@@ -8,7 +8,7 @@
 #ifndef SE_SETUP_UTIL_HPP
 #define SE_SETUP_UTIL_HPP
 
-#include <Eigen/Dense>
+#include <Eigen/Core>
 
 namespace se {
 

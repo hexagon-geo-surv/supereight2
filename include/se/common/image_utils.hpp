@@ -8,7 +8,7 @@
 #ifndef SE_IMAGE_UTILS_HPP
 #define SE_IMAGE_UTILS_HPP
 
-#include <Eigen/Dense>
+#include <Eigen/Core>
 #include <cstdint>
 #include <string>
 

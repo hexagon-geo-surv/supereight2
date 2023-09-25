@@ -23,7 +23,7 @@
 #endif
 
 
-#include <Eigen/Dense>
+#include <Eigen/Geometry>
 #include <algorithm>
 #include <fstream>
 #include <iomanip>

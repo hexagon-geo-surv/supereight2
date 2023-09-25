@@ -9,6 +9,7 @@
 
 #include "reader_base.hpp"
 
+#include <Eigen/Geometry>
 #include <algorithm>
 #include <cassert>
 #include <cmath>

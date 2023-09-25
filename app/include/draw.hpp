@@ -11,7 +11,7 @@
 #ifndef SE_DRAW_HPP
 #define SE_DRAW_HPP
 
-#include <Eigen/Dense>
+#include <Eigen/Core>
 
 #ifdef SE_GLUT
 #    include <algorithm>

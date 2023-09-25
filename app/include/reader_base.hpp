@@ -10,7 +10,7 @@
 #ifndef __READER_BASE_HPP
 #define __READER_BASE_HPP
 
-#include <Eigen/Dense>
+#include <Eigen/Core>
 #include <chrono>
 #include <cstdint>
 #include <fstream>

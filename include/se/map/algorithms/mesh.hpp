@@ -9,7 +9,7 @@
 #ifndef SE_MESH_FACE_HPP
 #define SE_MESH_FACE_HPP
 
-#include <Eigen/Dense>
+#include <Eigen/Core>
 #include <array>
 #include <cstdint>
 #include <vector>

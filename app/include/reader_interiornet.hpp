@@ -10,7 +10,7 @@
 
 
 
-#include <Eigen/Dense>
+#include <Eigen/Core>
 #include <cstdint>
 #include <fstream>
 #include <opencv2/core/core.hpp>

@@ -9,7 +9,7 @@
 #define __READER_TUM_HPP
 
 
-#include <Eigen/Dense>
+#include <Eigen/Core>
 #include <cstdint>
 #include <fstream>
 #include <string>

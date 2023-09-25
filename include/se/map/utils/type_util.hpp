@@ -8,7 +8,6 @@
 #ifndef SE_TYPE_UTIL_HPP
 #define SE_TYPE_UTIL_HPP
 
-#include <Eigen/Dense>
 #include <Eigen/StdVector>
 #include <cstdint>
 

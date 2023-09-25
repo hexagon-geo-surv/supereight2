@@ -10,7 +10,7 @@
 
 
 
-#include <Eigen/Dense>
+#include <Eigen/Core>
 #include <iostream>
 #include <opencv2/core.hpp>
 #include <string>

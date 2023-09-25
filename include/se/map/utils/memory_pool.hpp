@@ -9,7 +9,7 @@
 #ifndef SE_MEMORY_POOL_HPP
 #define SE_MEMORY_POOL_HPP
 
-#include <Eigen/Dense>
+#include <Eigen/Core>
 #include <boost/pool/pool.hpp>
 
 namespace se {

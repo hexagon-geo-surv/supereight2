@@ -8,7 +8,7 @@
 #ifndef SE_DENSE_POOLING_IMAGE
 #define SE_DENSE_POOLING_IMAGE
 
-#include <Eigen/Dense>
+#include <Eigen/Core>
 #include <iostream>
 
 #include "se/common/perfstats.hpp"

@@ -7,6 +7,7 @@
 
 #include "reader_interiornet.hpp"
 
+#include <Eigen/Geometry>
 #include <Eigen/StdVector>
 #include <algorithm>
 #include <cassert>
