@@ -106,6 +106,8 @@ class VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
      */
     VolumeCarverAllocation operator()();
 
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
 
 
     private:

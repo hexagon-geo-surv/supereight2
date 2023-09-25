@@ -525,6 +525,8 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
 
     static constexpr Res res_ = ResT;
 
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     protected:
     /**
      * \brief Setup octree fitting the map dimension and resolution.

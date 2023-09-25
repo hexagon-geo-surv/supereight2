@@ -26,6 +26,8 @@ struct MeshFace {
     {
         vertexes.fill(Eigen::Vector3f::Zero());
     }
+
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 /** \brief Meshes are represented as lists of faces.

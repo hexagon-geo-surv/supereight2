@@ -238,6 +238,8 @@ class FrustumIterator : public BaseIterator<FrustumIterator<MapT, SensorT>> {
         this->init();
     }
 
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     protected:
     bool isNext(se::OctantBase* octant_ptr)
     {

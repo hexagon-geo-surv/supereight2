@@ -59,6 +59,8 @@ class Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Se
 
     void operator()(VolumeCarverAllocation& allocation_list);
 
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     private:
     /**
    . * \brief Propage all newly integrated values from the voxel block depth up to the root of the octree.

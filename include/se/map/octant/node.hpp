@@ -59,6 +59,8 @@ class NodeMultiRes<Data<Field::TSDF, ColB, SemB>, DerivedT> {
         return default_data_;
     }
 
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     private:
     static constexpr DataType default_data_ = DataType();
 };
@@ -114,6 +116,8 @@ class NodeMultiRes<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
         data_ = data;
     }
 
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     protected:
     DataType data_; ///< Holds the max data of the node.
                     ///< At the leaf of the tree the nodes max data is equivalent to its data
@@ -150,6 +154,8 @@ class NodeSingleRes {
     {
         return default_data_;
     }
+
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     private:
     static constexpr DataT default_data_ = DataT();

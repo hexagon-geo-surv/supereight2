@@ -115,6 +115,8 @@ class Tracker {
 
     void renderTrackingResult(uint32_t* tracking_img_data);
 
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     private:
     void newReduce(const int block_idx,
                    float* output_data,

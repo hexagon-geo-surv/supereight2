@@ -73,6 +73,7 @@ class VoxelBlockRayIterator {
    */
     float tcmax() const;
 
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     private:
     struct StackEntry {

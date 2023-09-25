@@ -101,6 +101,8 @@ class MapIntegrator {
                         const Eigen::Matrix4f& T_WS,
                         const unsigned int frame);
 
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     private:
     MapT& map_;
 };
