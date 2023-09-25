@@ -36,13 +36,6 @@ void downsample_depth(se::Image<float>& input_depth_img, se::Image<float>& outpu
  */
 void downsample_rgba(se::Image<uint32_t>& input_RGBA_img, se::Image<uint32_t>& output_RGBA_img);
 
-void bilateral_filter(se::Image<float>& out,
-                      const se::Image<float>& in,
-                      const std::vector<float>& gaussian,
-                      const float e_d,
-                      const int radius);
-
-
 template<typename SensorT>
 void depth_to_point_cloud(se::Image<Eigen::Vector3f>& point_cloud_C,
                           const se::Image<float>& depth_image,

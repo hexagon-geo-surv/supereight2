@@ -109,55 +109,6 @@ void downsample_rgba(se::Image<uint32_t>& input_RGBA_img, se::Image<uint32_t>& o
     }
 }
 
-void bilateral_filter(se::Image<float>& output_image,
-                      const se::Image<float>& input_image,
-                      const std::vector<float>& gaussian,
-                      const float e_d,
-                      const int radius)
-{
-    if ((input_image.width() != output_image.width())
-        || input_image.height() != output_image.height()) {
-        output_image = se::Image<float>(input_image.width(), input_image.height());
-    }
-
-    const int width = input_image.width();
-    const int height = input_image.height();
-    const float e_d_squared_2 = e_d * e_d * 2.f;
-#pragma omp parallel for
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            const unsigned int pixel_idx = x + y * width;
-            if (input_image[pixel_idx] == 0) {
-                output_image[pixel_idx] = 0;
-                continue;
-            }
-
-            float factor_count = 0.0f;
-            float filter_value_sum = 0.0f;
-
-            const float centre_value = input_image[pixel_idx];
-
-            for (int i = -radius; i <= radius; ++i) {
-                for (int j = -radius; j <= radius; ++j) {
-                    const Eigen::Vector2i pixel_tmp =
-                        Eigen::Vector2i(se::math::clamp(x + i, 0, width - 1),
-                                        se::math::clamp(y + j, 0, height - 1));
-                    const float pixel_value_tmp =
-                        input_image[pixel_tmp.x() + pixel_tmp.y() * width];
-                    if (pixel_value_tmp > 0.f) {
-                        const float mod = se::math::sq(pixel_value_tmp - centre_value);
-                        const float factor = gaussian[i + radius] * gaussian[j + radius]
-                            * expf(-mod / e_d_squared_2);
-                        filter_value_sum += factor * pixel_value_tmp;
-                        factor_count += factor;
-                    }
-                }
-            }
-            output_image[pixel_idx] = filter_value_sum / factor_count;
-        }
-    }
-}
-
 
 
 void point_cloud_to_depth(se::Image<float>& depth_image,
