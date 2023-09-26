@@ -111,7 +111,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
 
                 if (node_data.observed
                     && node_data.occupancy * node_data.weight
-                        <= 0.95 * map_.getDataConfig().min_occupancy) {
+                        <= 0.95 * MapType::DataType::min_occupancy) {
                     octree_.deleteChildren(static_cast<NodeType*>(octant_ptr));
                 }
 

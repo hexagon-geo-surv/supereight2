@@ -20,15 +20,14 @@ FieldDataConfig<Field::Occupancy>::FieldDataConfig() :
         k_tau(0.026f),
         tau_min_factor(6.f),
         tau_max_factor(16.f),
-        min_occupancy(-100.f),
-        max_occupancy(100.f),
         log_odd_min(-5.015),
         log_odd_max(5.015),
         fs_integr_scale(1),
         uncertainty_model(UncertaintyModel::Linear),
         const_surface_thickness(false)
 {
-    max_weight = std::floor(std::fabs(min_occupancy / (0.97f * log_odd_min)));
+    max_weight =
+        std::floor(std::fabs(FieldData<Field::Occupancy>::min_occupancy / (0.97f * log_odd_min)));
 }
 
 
@@ -65,11 +64,6 @@ FieldDataConfig<Field::Occupancy>::FieldDataConfig(const std::string& yaml_file)
     se::yaml::subnode_as_float(node, "k_tau", k_tau);
     se::yaml::subnode_as_float(node, "tau_min_factor", tau_min_factor);
     se::yaml::subnode_as_float(node, "tau_max_factor", tau_max_factor);
-    se::yaml::subnode_as_float(node, "min_occupancy", min_occupancy);
-    se::yaml::subnode_as_float(
-        node,
-        "max_occupancy",
-        max_occupancy); // TODO: Compute based on min_occupancy and log_odd_min
     se::yaml::subnode_as_float(node, "log_odd_min", log_odd_min);
     se::yaml::subnode_as_float(node, "log_odd_max", log_odd_max);
     se::yaml::subnode_as_int(node, "fs_integr_scale", fs_integr_scale);
@@ -86,7 +80,8 @@ FieldDataConfig<Field::Occupancy>::FieldDataConfig(const std::string& yaml_file)
 
     se::yaml::subnode_as_bool(node, "const_surface_thickness", const_surface_thickness);
 
-    max_weight = std::floor(std::fabs(min_occupancy / (0.97f * log_odd_min)));
+    max_weight =
+        std::floor(std::fabs(FieldData<Field::Occupancy>::min_occupancy / (0.97f * log_odd_min)));
 }
 
 
@@ -99,8 +94,6 @@ std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::Occu
     os << str_utils::value_to_pretty_str(c.k_tau, "k_tau") << "\n";
     os << str_utils::value_to_pretty_str(c.tau_min_factor, "tau_min_factor") << "\n";
     os << str_utils::value_to_pretty_str(c.tau_max_factor, "tau_max_factor") << "\n";
-    os << str_utils::value_to_pretty_str(c.min_occupancy, "min_occupancy") << "\n";
-    os << str_utils::value_to_pretty_str(c.max_occupancy, "max_occupancy") << "\n";
     os << str_utils::value_to_pretty_str(c.log_odd_min, "log_odd_min") << "\n";
     os << str_utils::value_to_pretty_str(c.log_odd_max, "log_odd_max") << "\n";
     os << str_utils::value_to_pretty_str(c.max_weight, "max_weight") << "\n";

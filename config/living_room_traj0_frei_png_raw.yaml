@@ -12,8 +12,6 @@ data:
   max_weight:                 100
 
   # occupancy
-  min_occupancy:              -100
-  max_occupancy:               100
   log_odd_min:                -5.015
   log_odd_max:                 5.015
   fs_integr_scale:            1
