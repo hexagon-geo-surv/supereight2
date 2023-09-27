@@ -14,14 +14,7 @@
 
 
 namespace se {
-MapConfig::MapConfig() :
-        dim(10, 10, 3), res(0.1), T_MW(se::math::to_transformation(Eigen::Vector3f(dim / 2)))
-{
-}
-
-
-
-MapConfig::MapConfig(const std::string& yaml_file) : MapConfig::MapConfig()
+void MapConfig::readYaml(const std::string& yaml_file)
 {
     // Open the file for reading.
     cv::FileStorage fs;

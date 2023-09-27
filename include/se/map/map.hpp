@@ -30,25 +30,20 @@ namespace se {
 struct MapConfig {
     /** The dimensions of the map in metres.
      */
-    Eigen::Vector3f dim;
+    Eigen::Vector3f dim = Eigen::Vector3f::Constant(10.0f);
 
     /** The resolution of map voxels in metres.
      */
-    float res;
+    float res = 0.1f;
 
     /** The transformation from the world frame W to the map frame M.
      */
-    Eigen::Matrix4f T_MW;
+    Eigen::Matrix4f T_MW = math::to_transformation((dim / 2).eval());
 
-    /** Initializes the config to a 10m x 10m x 3m map with a 10cm resolution and the origin at the
-     * centre of the volume.
+    /** Reads the struct members from the "map" node of a YAML file. Members not present in the YAML
+     * file aren't modified.
      */
-    MapConfig();
-
-    /** Initializes the config from a YAML file. Data not present in the YAML file will be initialized
-     * as in MapConfig::MapConfig().
-     */
-    MapConfig(const std::string& yaml_file);
+    void readYaml(const std::string& yaml_file);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };

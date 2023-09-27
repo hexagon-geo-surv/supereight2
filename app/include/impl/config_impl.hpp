@@ -23,9 +23,9 @@ Config<DataConfigT, SensorConfigT>::Config()
 
 
 template<typename DataConfigT, typename SensorConfigT>
-Config<DataConfigT, SensorConfigT>::Config(const std::string& yaml_file) :
-        map(yaml_file), data(yaml_file)
+Config<DataConfigT, SensorConfigT>::Config(const std::string& yaml_file) : data(yaml_file)
 {
+    map.readYaml(yaml_file);
     sensor.readYaml(yaml_file);
     tracker.readYaml(yaml_file);
     reader.readYaml(yaml_file);
