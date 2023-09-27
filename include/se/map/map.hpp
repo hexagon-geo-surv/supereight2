@@ -537,7 +537,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
 
     std::shared_ptr<OctreeType> octree_ptr_ = nullptr;
 
-    DataConfigType data_config_; ///< The configuration of the data
+    const DataConfigType data_config_; ///< The configuration of the data
 
     /** The eight relative unit corner offsets */
     static const Eigen::Matrix<float, 3, 8> corner_rel_steps_;
