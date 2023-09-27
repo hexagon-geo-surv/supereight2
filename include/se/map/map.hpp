@@ -509,13 +509,10 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
     /**
      * \brief Update the octree pointer to a new one.
      *
-     * TODO: Requires to delete the old octree
-     *
      * \param[in] octree_ptr  The shared pointer to the new octree to be assigned
      */
     void setOctree(std::shared_ptr<OctreeType> octree_ptr)
     {
-        //    delete octree_ptr_; // TODO: Delete old octree when setting a new one.
         octree_ptr_ = octree_ptr;
     };
 
