@@ -24,7 +24,7 @@ const Eigen::Matrix<float, 3, 8> Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::c
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const Eigen::Vector3f& dim,
                                                   const float res,
-                                                  const DataConfig<FldT, ColB, SemB> data_config) :
+                                                  const DataConfig<FldT, ColB, SemB>& data_config) :
         Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(
             {dim, res /* T_MW uses default member initializer */},
             data_config)
@@ -34,9 +34,8 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const Eigen::Vector3f& dim,
 
 
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
-Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(
-    const MapConfig& map_config,
-    const se::DataConfig<FldT, ColB, SemB> data_config) :
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const MapConfig& map_config,
+                                                  const DataConfig<FldT, ColB, SemB>& data_config) :
         dimension_(map_config.dim),
         resolution_(map_config.res),
         T_MW_(map_config.T_MW),

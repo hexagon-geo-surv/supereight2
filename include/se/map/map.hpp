@@ -78,7 +78,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      */
     Map(const Eigen::Vector3f& dim,
         const float res,
-        const se::DataConfig<FldT, ColB, SemB> data_config = se::DataConfig<FldT, ColB, SemB>());
+        const DataConfig<FldT, ColB, SemB>& data_config = DataConfig<FldT, ColB, SemB>());
 
     /**
      * \brief The map constructor.
@@ -87,7 +87,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \param data_config         The configuration file for the data
      */
     Map(const MapConfig& map_config,
-        const se::DataConfig<FldT, ColB, SemB> data_config = se::DataConfig<FldT, ColB, SemB>());
+        const DataConfig<FldT, ColB, SemB>& data_config = DataConfig<FldT, ColB, SemB>());
 
     /**
      * \brief Verify if a point is inside the map.
