@@ -528,7 +528,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
     const Eigen::Vector3f lb_M_; ///< The lower map bound
     const Eigen::Vector3f ub_M_; ///< The upper map bound
 
-    std::shared_ptr<OctreeType> octree_ptr_ = nullptr;
+    std::shared_ptr<OctreeType> octree_ptr_;
 
     const DataConfigType data_config_; ///< The configuration of the data
 

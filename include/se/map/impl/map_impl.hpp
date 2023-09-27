@@ -42,12 +42,10 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const MapConfig& map_config,
         T_WM_(se::math::to_inverse_transformation(T_MW_)),
         lb_M_(Eigen::Vector3f::Zero()),
         ub_M_(dimension_),
+        octree_ptr_(new Octree<DataType, ResT, BlockSize>(
+            std::ceil(map_config.dim.maxCoeff() / map_config.res))),
         data_config_(data_config)
 {
-    const int desired_size = std::ceil(dimension_.maxCoeff() / resolution_);
-    octree_ptr_ = std::shared_ptr<se::Octree<DataType, ResT, BlockSize>>(
-        new se::Octree<DataType, ResT, BlockSize>(desired_size));
-
     const Eigen::Vector3f t_MW = se::math::to_translation(T_MW_);
     if (t_MW.x() < 0 || t_MW.x() >= dimension_.x() || t_MW.y() < 0 || t_MW.y() >= dimension_.y()
         || t_MW.z() < 0 || t_MW.z() >= dimension_.z()) {
