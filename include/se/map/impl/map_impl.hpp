@@ -11,6 +11,14 @@
 
 namespace se {
 
+// clang-format off
+template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
+const Eigen::Matrix<float, 3, 8> Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::corner_rel_steps_ =
+    (Eigen::Matrix<float, 3, 8>() << 0, 1, 0, 1, 0, 1, 0, 1,
+                                     0, 0, 1, 1, 0, 0, 1, 1,
+                                     0, 0, 0, 0, 1, 1, 1, 1).finished();
+// clang-format on
+
 
 
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
@@ -42,7 +50,6 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(
         || t_MW.z() < 0 || t_MW.z() >= dimension_.z()) {
         std::cout << "World origin is outside the map" << std::endl;
     }
-    corner_rel_steps_ << 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1;
     initialiseOctree();
 }
 

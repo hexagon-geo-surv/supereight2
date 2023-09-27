@@ -539,7 +539,8 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
 
     DataConfigType data_config_; ///< The configuration of the data
 
-    Eigen::Matrix<float, 3, 8> corner_rel_steps_; ///< The eight relative unit corner offsets
+    /** The eight relative unit corner offsets */
+    static const Eigen::Matrix<float, 3, 8> corner_rel_steps_;
 };
 
 //// Full alias template for alternative setup
