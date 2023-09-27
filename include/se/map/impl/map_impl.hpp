@@ -44,12 +44,15 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const MapConfig& map_config,
         ub_M_(dimension_),
         data_config_(data_config)
 {
+    const int desired_size = std::ceil(dimension_.maxCoeff() / resolution_);
+    octree_ptr_ = std::shared_ptr<se::Octree<DataType, ResT, BlockSize>>(
+        new se::Octree<DataType, ResT, BlockSize>(desired_size));
+
     const Eigen::Vector3f t_MW = se::math::to_translation(T_MW_);
     if (t_MW.x() < 0 || t_MW.x() >= dimension_.x() || t_MW.y() < 0 || t_MW.y() >= dimension_.y()
         || t_MW.z() < 0 || t_MW.z() >= dimension_.z()) {
         std::cout << "World origin is outside the map" << std::endl;
     }
-    initialiseOctree();
 }
 
 
@@ -492,24 +495,6 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointsToVoxels(
     }
     return true;
 }
-
-
-
-template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
-bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::initialiseOctree()
-{
-    if (octree_ptr_ != nullptr) {
-        std::cerr << "Octree has already been initialised\n";
-        return false;
-    }
-
-    const int desired_size = std::ceil(dimension_.maxCoeff() / resolution_);
-    octree_ptr_ = std::shared_ptr<se::Octree<DataType, ResT, BlockSize>>(
-        new se::Octree<DataType, ResT, BlockSize>(desired_size));
-    return true;
-}
-
-
 
 } // namespace se
 

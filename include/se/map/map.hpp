@@ -520,13 +520,6 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     protected:
-    /**
-     * \brief Setup octree fitting the map dimension and resolution.
-     *
-     * \return True if no octree has been allocated yet, false otherwise
-     */
-    bool initialiseOctree();
-
     const Eigen::Vector3f dimension_; ///< The dimensions of the map
     const float resolution_;          ///< The resolution of the map
     const Eigen::Matrix4f T_MW_;      ///< The transformation from world to map frame
