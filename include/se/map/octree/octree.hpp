@@ -199,9 +199,9 @@ class Octree {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     private:
-    int size_;               // The length of the octree edge in voxels.
+    const int size_;         // The length of the octree edge in voxels.
     MemoryPool memory_pool_; // Allocates and deallocates memory for nodes and blocks.
-    OctantBase* root_ptr_;   // The pointer lifetime is managed by memory_pool_.
+    OctantBase* const root_ptr_; // The pointer lifetime is managed by memory_pool_.
 
     static_assert(math::is_power_of_two(BlockSize));
 };
