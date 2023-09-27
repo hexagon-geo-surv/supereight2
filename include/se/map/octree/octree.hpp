@@ -43,9 +43,8 @@ class Octree {
 
     typedef se::BoostMemoryPool<NodeType, BlockType> MemoryPool;
 
-    // Compile-time constant expressions
-    // # of voxels per side in a voxel block
-    static constexpr unsigned int block_size = BlockSize;
+    /** The edge length of a voxel block in voxels. */
+    static constexpr int block_size = BlockSize;
     // The maximum scale of a block
     static constexpr se::scale_t max_block_scale = math::log2_const(BlockSize);
 
