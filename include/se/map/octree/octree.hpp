@@ -200,6 +200,8 @@ class Octree {
     se::OctantBase* root_ptr_ = nullptr; ///< The pointer to the root node of the octree
 
     MemoryPool memory_pool_; ///< The memory pool pre-allocating memory for nodes and blocks
+
+    static_assert(math::is_power_of_two(BlockSize));
 };
 
 
