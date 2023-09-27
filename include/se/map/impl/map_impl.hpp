@@ -14,23 +14,13 @@ namespace se {
 
 
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
-Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(
-    const Eigen::Vector3f& dim,
-    const float res,
-    const se::DataConfig<FldT, ColB, SemB> data_config) :
-        dimension_(dim),
-        resolution_(res),
-        T_MW_(se::math::to_transformation(Eigen::Vector3f(dim / 2))),
-        T_WM_(se::math::to_inverse_transformation(T_MW_)),
-        lb_M_(Eigen::Vector3f::Zero()),
-        ub_M_(dimension_),
-        data_config_(data_config)
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const Eigen::Vector3f& dim,
+                                                  const float res,
+                                                  const DataConfig<FldT, ColB, SemB> data_config) :
+        Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(
+            {dim, res /* T_MW uses default member initializer */},
+            data_config)
 {
-    if constexpr (FldT == se::Field::Occupancy) {
-        static_assert(ResT == se::Res::Multi, "Only se::Res::Multi occupancy maps are supported");
-    }
-    corner_rel_steps_ << 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1;
-    initialiseOctree();
 }
 
 
