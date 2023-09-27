@@ -56,7 +56,6 @@ class Octree {
    */
     Octree(const int size);
 
-    ~Octree(){};                               ///< TODO:
     Octree(const Octree&) = delete;            ///< Delete copy constructor
     Octree& operator=(const Octree&) = delete; ///< Delete copy assignment operator
 
