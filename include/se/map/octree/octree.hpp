@@ -49,11 +49,9 @@ class Octree {
     // The maximum scale of a block
     static constexpr se::scale_t max_block_scale = math::log2_const(BlockSize);
 
-    /**
-   * \brief The octree needs to be initialised during the allocation.
-   *
-   * \param[in] size    The size in [voxel] of the octree
-   */
+    /** \brief Initialize an octree with an edge length of at least \p size voxels. The actual edge
+     * length in voxels will be the smallest power of 2 that is greater or equal to \p size.
+     */
     Octree(const int size);
 
     Octree(const Octree&) = delete;            ///< Delete copy constructor

@@ -12,10 +12,9 @@
 namespace se {
 
 template<typename DataT, Res ResT, int BlockSize>
-Octree<DataT, ResT, BlockSize>::Octree(const int size) : size_(size)
+Octree<DataT, ResT, BlockSize>::Octree(const int size) : size_(math::power_two_up(size))
 {
-    assert(math::is_power_of_two(size)); // Verify that the octree size is a multiple of 2.
-    assert(BlockSize < size);            // Verify that the block size is smaller than the root.
+    assert(size_ > BlockSize);
     root_ptr_ =
         static_cast<se::OctantBase*>(memory_pool_.allocateNode(Eigen::Vector3i(0, 0, 0), size_));
 }

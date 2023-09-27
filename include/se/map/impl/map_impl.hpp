@@ -507,11 +507,9 @@ bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::initialiseOctree()
         return false;
     }
 
-    const float max_dim = dimension_.maxCoeff();
-    const int max_size = std::ceil(max_dim / resolution_);
-    const int oct_size = math::power_two_up(max_size);
+    const int desired_size = std::ceil(dimension_.maxCoeff() / resolution_);
     octree_ptr_ = std::shared_ptr<se::Octree<DataType, ResT, BlockSize>>(
-        new se::Octree<DataType, ResT, BlockSize>(oct_size));
+        new se::Octree<DataType, ResT, BlockSize>(desired_size));
     return true;
 }
 
