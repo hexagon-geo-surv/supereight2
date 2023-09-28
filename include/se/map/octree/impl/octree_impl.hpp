@@ -96,6 +96,7 @@ bool Octree<DataT, ResT, BlockSize>::allocate(NodeType* parent_ptr,
         {
             child_ptr = memory_pool_.allocateBlock(parent_ptr, child_idx, init_data);
         }
+        aabbExtend(child_ptr->getCoord(), parent_ptr->getSize() / 2);
     }
     else {
 #pragma omp critical
@@ -134,6 +135,11 @@ void Octree<DataT, ResT, BlockSize>::allocateChildren(NodeType* parent_ptr)
         }
         parent_ptr->setChild(child_idx, child_ptr);
     }
+    if (children_are_blocks) {
+        // Blocks are always leaves and all of them have been allocated, extend the AABB to contain
+        // their parent.
+        aabbExtend(parent_ptr->getCoord(), parent_ptr->getSize());
+    }
 }
 
 
@@ -156,6 +162,24 @@ void Octree<DataT, ResT, BlockSize>::deleteChildren(NodeType* parent_ptr)
         parent_ptr->setChild(child_idx, nullptr);
     }
     parent_ptr->clearChildrenMask();
+}
+
+
+
+template<typename DataT, Res ResT, int BlockSize>
+const Eigen::AlignedBox3i& Octree<DataT, ResT, BlockSize>::aabb() const
+{
+    return aabb_;
+}
+
+
+
+template<typename DataT, Res ResT, int BlockSize>
+void Octree<DataT, ResT, BlockSize>::aabbExtend(const Eigen::Vector3i& voxel_coord, const int size)
+{
+    const Eigen::AlignedBox3i octant_aabb(voxel_coord,
+                                          voxel_coord + Eigen::Vector3i::Constant(size));
+    aabb_.extend(octant_aabb);
 }
 
 } // namespace se
