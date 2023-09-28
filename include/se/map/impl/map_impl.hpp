@@ -36,14 +36,14 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const Eigen::Vector3f& dim,
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const MapConfig& map_config,
                                                   const DataConfig<FldT, ColB, SemB>& data_config) :
-        dimension_(map_config.dim),
+        octree_ptr_(new Octree<DataType, ResT, BlockSize>(
+            std::ceil(map_config.dim.maxCoeff() / map_config.res))),
         resolution_(map_config.res),
+        dimension_(Eigen::Vector3f::Constant(octree_ptr_->getSize() * resolution_)),
         T_MW_(map_config.T_MW),
         T_WM_(se::math::to_inverse_transformation(T_MW_)),
         lb_M_(Eigen::Vector3f::Zero()),
         ub_M_(dimension_),
-        octree_ptr_(new Octree<DataType, ResT, BlockSize>(
-            std::ceil(map_config.dim.maxCoeff() / map_config.res))),
         data_config_(data_config)
 {
     const Eigen::Vector3f t_MW = se::math::to_translation(T_MW_);

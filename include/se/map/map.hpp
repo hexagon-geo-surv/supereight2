@@ -520,15 +520,14 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     protected:
-    const Eigen::Vector3f dimension_; ///< The dimensions of the map
+    std::shared_ptr<OctreeType> octree_ptr_;
     const float resolution_;          ///< The resolution of the map
+    const Eigen::Vector3f dimension_; ///< The dimensions of the map
     const Eigen::Matrix4f T_MW_;      ///< The transformation from world to map frame
     const Eigen::Matrix4f T_WM_;      ///< The transformation from map to world frame
 
     const Eigen::Vector3f lb_M_; ///< The lower map bound
     const Eigen::Vector3f ub_M_; ///< The upper map bound
-
-    std::shared_ptr<OctreeType> octree_ptr_;
 
     const DataConfigType data_config_; ///< The configuration of the data
 
