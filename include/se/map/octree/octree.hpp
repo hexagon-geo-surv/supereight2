@@ -9,6 +9,7 @@
 #ifndef SE_OCTREE_HPP
 #define SE_OCTREE_HPP
 
+#include <Eigen/Geometry>
 #include <memory>
 
 #include "se/map/octant/octant.hpp"
@@ -126,6 +127,22 @@ class Octree {
      */
     void deleteChildren(NodeType* parent_ptr);
 
+    /** Return the axis-aligned bounding box of the octree's allocated leaves. The bounding box
+     * contains the whole allocated volume, not just the voxel origins thus the coordinates of its
+     * vertices can be in the interval [0, se::Octree::getSize()] inclusive.
+     */
+    const Eigen::AlignedBox3i& aabb() const;
+
+    /** Extend the octree allocated leaf AABB to contain the octant with coordinates in voxels \p
+     * voxel_coord and edge length in voxels \p size.
+     *
+     * \note This is typically only needed to update the AABB with leaf nodes as they can't
+     * efficiently be detected during allocation since all nodes are leaves when allocated. This
+     * function should be called only for newly allocated leaf nodes from an allocator that
+     * allocates free nodes (e.g. se::VolumeCarver).
+     */
+    void aabbExtend(const Eigen::Vector3i& voxel_coord, const int size);
+
     static constexpr Field fld_ = DataT::fld_;
     static constexpr Colour col_ = DataT::col_;
     static constexpr Semantics sem_ = DataT::sem_;
@@ -142,6 +159,7 @@ class Octree {
     // Allocates and deallocates memory for nodes and blocks.
     MemoryPool<NodeType, BlockType> memory_pool_;
     OctantBase* const root_ptr_; // The pointer lifetime is managed by memory_pool_.
+    Eigen::AlignedBox3i aabb_;
 
     static_assert(math::is_power_of_two(BlockSize));
 };
