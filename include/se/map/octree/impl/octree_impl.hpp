@@ -83,8 +83,8 @@ bool Octree<DataT, ResT, BlockSize>::allocate(NodeType* parent_ptr,
                                               const int child_idx,
                                               OctantBase*& child_ptr)
 {
-    assert(!parent_ptr->isBlock()); // Verify that the parent is not a block
-    assert(parent_ptr);             // Verify that the parent is not a nullptr
+    assert(parent_ptr);
+    assert(!parent_ptr->isBlock());
 
     child_ptr = parent_ptr->getChild(child_idx);
     if (child_ptr) {
@@ -115,8 +115,8 @@ bool Octree<DataT, ResT, BlockSize>::allocate(NodeType* parent_ptr,
 template<typename DataT, Res ResT, int BlockSize>
 OctantBase* Octree<DataT, ResT, BlockSize>::allocate(NodeType* parent_ptr, const int child_idx)
 {
-    assert(!parent_ptr->isBlock()); // Verify that the parent is not a block
-    assert(parent_ptr);             // Verify that the parent is not a nullptr
+    assert(parent_ptr);
+    assert(!parent_ptr->isBlock());
 
     se::OctantBase* child_ptr = parent_ptr->getChild(child_idx);
     if (child_ptr) {
@@ -172,8 +172,8 @@ bool Octree<DataT, ResT, BlockSize>::allocateAll(NodeType* parent_ptr,
                                                  const int child_idx,
                                                  OctantBase*& child_ptr)
 {
-    assert(!parent_ptr->isBlock()); // Verify that the parent is not a block
-    assert(parent_ptr);             // Verify that the parent is not a nullptr
+    assert(parent_ptr);
+    assert(!parent_ptr->isBlock());
 
     child_ptr = parent_ptr->getChild(child_idx);
     if (child_ptr) {
@@ -208,8 +208,8 @@ bool Octree<DataT, ResT, BlockSize>::allocateAll(NodeType* parent_ptr,
 template<typename DataT, Res ResT, int BlockSize>
 OctantBase* Octree<DataT, ResT, BlockSize>::allocateAll(NodeType* parent_ptr, const int child_idx)
 {
-    assert(!parent_ptr->isBlock()); // Verify that the parent is not a block
-    assert(parent_ptr);             // Verify that the parent is not a nullptr
+    assert(parent_ptr);
+    assert(!parent_ptr->isBlock());
 
     se::OctantBase* child_ptr = parent_ptr->getChild(child_idx);
     if (child_ptr) {
