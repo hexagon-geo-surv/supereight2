@@ -113,38 +113,6 @@ bool Octree<DataT, ResT, BlockSize>::allocate(NodeType* parent_ptr,
 
 
 template<typename DataT, Res ResT, int BlockSize>
-OctantBase* Octree<DataT, ResT, BlockSize>::allocate(NodeType* parent_ptr, const int child_idx)
-{
-    assert(parent_ptr);
-    assert(!parent_ptr->isBlock());
-
-    se::OctantBase* child_ptr = parent_ptr->getChild(child_idx);
-    if (child_ptr) {
-        return child_ptr;
-    }
-
-    const DataT init_data = parent_ptr->getData();
-    if (parent_ptr->getSize() == BlockSize << 1) // Allocate Block
-    {
-#pragma omp critical
-        {
-            child_ptr = memory_pool_.allocateBlock(parent_ptr, child_idx, init_data);
-        }
-    }
-    else // Allocate Node
-    {
-#pragma omp critical
-        {
-            child_ptr = memory_pool_.allocateNode(parent_ptr, child_idx, init_data);
-        }
-    }
-    parent_ptr->setChild(child_idx, child_ptr); // Update parent
-    return child_ptr;
-}
-
-
-
-template<typename DataT, Res ResT, int BlockSize>
 void Octree<DataT, ResT, BlockSize>::allocateChildren(NodeType* parent_ptr)
 {
     assert(parent_ptr);
@@ -193,80 +161,6 @@ void Octree<DataT, ResT, BlockSize>::deleteChildren(NodeType* parent_ptr)
     }
     parent_ptr->clearChildrenMask();
 }
-
-
-
-template<typename DataT, Res ResT, int BlockSize>
-bool Octree<DataT, ResT, BlockSize>::allocateAll(NodeType* parent_ptr,
-                                                 const int child_idx,
-                                                 OctantBase*& child_ptr)
-{
-    assert(parent_ptr);
-    assert(!parent_ptr->isBlock());
-
-    child_ptr = parent_ptr->getChild(child_idx);
-    if (child_ptr) {
-        return false; // Already allocated
-    }
-
-    const DataT init_data = parent_ptr->getData();
-    for (int idx = 0; idx < 8; idx++) {
-        if (parent_ptr->getSize() == BlockSize << 1) // Allocate Block
-        {
-#pragma omp critical
-            {
-                child_ptr = memory_pool_.allocateBlock(parent_ptr, idx, init_data);
-            }
-        }
-        else // Allocate Node
-        {
-#pragma omp critical
-            {
-                child_ptr = memory_pool_.allocateNode(parent_ptr, idx, init_data);
-            }
-        }
-        parent_ptr->setChild(idx, child_ptr); // Update parent
-    }
-
-    child_ptr = parent_ptr->getChild(child_idx);
-    return true;
-}
-
-
-
-template<typename DataT, Res ResT, int BlockSize>
-OctantBase* Octree<DataT, ResT, BlockSize>::allocateAll(NodeType* parent_ptr, const int child_idx)
-{
-    assert(parent_ptr);
-    assert(!parent_ptr->isBlock());
-
-    se::OctantBase* child_ptr = parent_ptr->getChild(child_idx);
-    if (child_ptr) {
-        return child_ptr;
-    }
-
-    const DataT init_data = parent_ptr->getData();
-    for (int idx = 0; idx < 8; idx++) {
-        if (parent_ptr->getSize() == BlockSize << 1) // Allocate Block
-        {
-#pragma omp critical
-            {
-                child_ptr = memory_pool_.allocateBlock(parent_ptr, idx, init_data);
-            }
-        }
-        else // Allocate Node
-        {
-#pragma omp critical
-            {
-                child_ptr = memory_pool_.allocateNode(parent_ptr, idx, init_data);
-            }
-        }
-        parent_ptr->setChild(idx, child_ptr); // Update parent
-    }
-    return parent_ptr->getChild(child_idx);
-}
-
-
 
 } // namespace se
 

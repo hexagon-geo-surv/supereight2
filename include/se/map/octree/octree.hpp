@@ -128,7 +128,7 @@ class Octree {
    * \warning The returned pointer is of type OctantBase as child might be a node or block.
    *
    * \warning This function might be dangerous when using Multires Occupancy.
-   *          Preferably use the allocateAll(...) function if unsure.
+   *          Preferably use the allocateChildren(...) function if unsure.
    *
    * \param[in] parent_ptr  The parent of the octant to be allocated
    * \param[in] child_idx   The child index of the octant to be allocated
@@ -139,49 +139,6 @@ class Octree {
     bool allocate(NodeType* parent_ptr,
                   const int child_idx,
                   se::OctantBase*& child_ptr); ///< Allocate child
-
-    /**
-   * \brief Allocate a octant for a given parent node.
-   *
-   * \warning The returned pointer is of type OctantBase as child might be a node or block.
-   *
-   * \warning This function might be dangerous when using Multires Occupancy.
-   *          Preferably use the allocateAll(...) function if unsure.
-   *
-   * \param[in] parent_ptr  The parent of the octant to be allocated
-   * \param[in] child_idx   The child index of the octant to be allocated
-   *
-   * \return The pointer ot the allocated / fetched octant
-   */
-    se::OctantBase* allocate(NodeType* parent_ptr, const int child_idx);
-
-    /**
-   * \brief Allocate all of the parent node's child octants.
-   *
-   * \warning The returned pointer is of type OctantBase as child might be a node or block.
-   *
-   * \param[in] parent_ptr  The parent of the octants to be allocated
-   * \param[in] child_idx   The child index of the octant to be returned
-   * \param[out] child_ptr  The pointer ot the allocated / fetched octant of the child_idx
-   *
-   * \return Ture if the node has been newly allocated, False if it has already been allocated
-   */
-    bool allocateAll(NodeType* parent_ptr,
-                     const int child_idx,
-                     se::OctantBase*& child_ptr); ///< Allocate child
-
-    /**
-   * \brief Allocate all of the parent node's child octants.
-   *
-   * \warning The returned pointer is of type OctantBase as child might be a node or block.
-   *
-   * \param[in] parent_ptr  The parent of the octants to be allocated
-   * \param[in] child_idx   The child index of the octant to be returned
-   * \param[out] child_ptr  The pointer ot the allocated octant
-   *
-   * \return The pointer ot the allocated / fetched octant of the child_idx
-   */
-    se::OctantBase* allocateAll(NodeType* parent_ptr, const int child_idx);
 
     /** \brief Allocate all the child nodes of \p parent_ptr.
      */
