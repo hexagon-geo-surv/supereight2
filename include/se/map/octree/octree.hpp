@@ -43,11 +43,6 @@ class Octree {
 
     typedef BoostMemoryPool<NodeType, BlockType> MemoryPool;
 
-    /** The edge length of a voxel block in voxels. */
-    static constexpr int block_size = BlockSize;
-    // The maximum scale of a block
-    static constexpr scale_t max_block_scale = math::log2_const(BlockSize);
-
     /** \brief Initialize an octree with an edge length of at least \p size voxels. The actual edge
      * length in voxels will be the smallest power of 2 that is greater or equal to \p size.
      */
@@ -148,8 +143,11 @@ class Octree {
     static constexpr Field fld_ = DataT::fld_;
     static constexpr Colour col_ = DataT::col_;
     static constexpr Semantics sem_ = DataT::sem_;
-
     static constexpr Res res_ = ResT;
+    /** The edge length of a voxel block in voxels. */
+    static constexpr int block_size = BlockSize;
+    /** The maximum scale of a voxel block. */
+    static constexpr scale_t max_block_scale = math::log2_const(BlockSize);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
