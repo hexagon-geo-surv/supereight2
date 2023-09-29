@@ -143,14 +143,13 @@ template<typename DataT, Res ResT, int BlockSize>
 void Octree<DataT, ResT, BlockSize>::deleteChildren(NodeType* parent_ptr)
 {
     for (int child_idx = 0; child_idx < 8; child_idx++) {
-        se::OctantBase* octant_ptr = parent_ptr->getChild(child_idx);
-        if (octant_ptr) {
-            if (octant_ptr->isBlock()) {
-                BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
-                memory_pool_.deleteBlock(block_ptr);
+        OctantBase* child_ptr = parent_ptr->getChild(child_idx);
+        if (child_ptr) {
+            if (child_ptr->isBlock()) {
+                memory_pool_.deleteBlock(static_cast<BlockType*>(child_ptr));
             }
             else {
-                NodeType* node_ptr = static_cast<NodeType*>(octant_ptr);
+                NodeType* node_ptr = static_cast<NodeType*>(child_ptr);
                 deleteChildren(node_ptr);
                 memory_pool_.deleteNode(node_ptr);
             }

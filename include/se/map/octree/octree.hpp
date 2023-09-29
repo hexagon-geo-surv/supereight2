@@ -141,11 +141,8 @@ class Octree {
      */
     void allocateChildren(NodeType* parent_ptr);
 
-    /**
-   * \brief Recursively delete all children of a given node pointer.
-   *
-   * \param[in] parent_ptr The node pointer to delete the children of
-   */
+    /** \brief Recursively delete all children of \p parent_ptr.
+     */
     void deleteChildren(NodeType* parent_ptr);
 
     static constexpr se::Field fld_ = DataT::fld_;
