@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 3.8...3.16)
 
 add_subdirectory(common/image_utils)
 add_subdirectory(common/str_utils)
+add_subdirectory(integrator)
 add_subdirectory(map/keyops)
 add_subdirectory(map/map)
 add_subdirectory(map/mesh_io)
