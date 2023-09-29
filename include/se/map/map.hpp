@@ -511,6 +511,10 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
         octree_ptr_ = octree_ptr;
     };
 
+    /** Return the axis-aligned bounding box in the world frame W of the map's allocated leaves.
+     */
+    Eigen::AlignedBox3f aabb() const;
+
     static constexpr Field fld_ = FldT;
     static constexpr Colour col_ = ColB;
     static constexpr Semantics sem_ = SemB;
