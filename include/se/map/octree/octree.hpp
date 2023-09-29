@@ -183,6 +183,10 @@ class Octree {
    */
     se::OctantBase* allocateAll(NodeType* parent_ptr, const int child_idx);
 
+    /** \brief Allocate all the child nodes of \p parent_ptr.
+     */
+    void allocateChildren(NodeType* parent_ptr);
+
     /**
    * \brief Recursively delete all children of a given node pointer.
    *

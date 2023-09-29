@@ -47,7 +47,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
     const int child_size = octree_.getSize() / 2;
     se::OctantBase* root_ptr = octree_.getRoot();
 
-    octree_.allocateAll(static_cast<NodeType*>(root_ptr), 0); ///< Allocates all 8 children
+    octree_.allocateChildren(static_cast<NodeType*>(root_ptr));
 #pragma omp parallel for
     for (int child_idx = 0; child_idx < 8; ++child_idx) {
         Eigen::Vector3i child_rel_step =
@@ -285,8 +285,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
         }
         else {
             // Split! Start recursive process
-            octree_.allocateAll(static_cast<NodeType*>(octant_ptr),
-                                0); ///< Allocates all 8 children
+            octree_.allocateChildren(static_cast<NodeType*>(octant_ptr));
 #pragma omp parallel for
             for (int child_idx = 0; child_idx < 8; ++child_idx) {
                 int child_size = octant_size / 2;
@@ -491,8 +490,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
         }
         else {
             // Split! Start recursive process
-            octree_.allocateAll(static_cast<NodeType*>(octant_ptr),
-                                0); ///< Allocates all 8 children
+            octree_.allocateChildren(static_cast<NodeType*>(octant_ptr));
 #pragma omp parallel for
             for (int child_idx = 0; child_idx < 8; ++child_idx) {
                 int child_size = octant_size / 2;

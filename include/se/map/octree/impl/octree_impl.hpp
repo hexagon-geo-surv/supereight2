@@ -145,6 +145,35 @@ OctantBase* Octree<DataT, ResT, BlockSize>::allocate(NodeType* parent_ptr, const
 
 
 template<typename DataT, Res ResT, int BlockSize>
+void Octree<DataT, ResT, BlockSize>::allocateChildren(NodeType* parent_ptr)
+{
+    assert(parent_ptr);
+    const DataT& init_data = parent_ptr->getData();
+    const bool children_are_blocks = parent_ptr->getSize() == 2 * BlockSize;
+    for (int child_idx = 0; child_idx < 8; child_idx++) {
+        OctantBase* child_ptr = parent_ptr->getChild(child_idx);
+        if (child_ptr) {
+            continue;
+        }
+        if (children_are_blocks) {
+#pragma omp critical
+            {
+                child_ptr = memory_pool_.allocateBlock(parent_ptr, child_idx, init_data);
+            }
+        }
+        else {
+#pragma omp critical
+            {
+                child_ptr = memory_pool_.allocateNode(parent_ptr, child_idx, init_data);
+            }
+        }
+        parent_ptr->setChild(child_idx, child_ptr);
+    }
+}
+
+
+
+template<typename DataT, Res ResT, int BlockSize>
 void Octree<DataT, ResT, BlockSize>::deleteChildren(NodeType* parent_ptr)
 {
     for (int child_idx = 0; child_idx < 8; child_idx++) {
