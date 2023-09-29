@@ -41,8 +41,6 @@ class Octree {
     typedef Node<DataT, ResT> NodeType;
     typedef Block<DataT, ResT, BlockSize> BlockType;
 
-    typedef BoostMemoryPool<NodeType, BlockType> MemoryPool;
-
     /** \brief Initialize an octree with an edge length of at least \p size voxels. The actual edge
      * length in voxels will be the smallest power of 2 that is greater or equal to \p size. and at
      * least 2 * \p BlockSize.
@@ -154,7 +152,8 @@ class Octree {
 
     private:
     const int size_;         // The length of the octree edge in voxels.
-    MemoryPool memory_pool_; // Allocates and deallocates memory for nodes and blocks.
+    // Allocates and deallocates memory for nodes and blocks.
+    BoostMemoryPool<NodeType, BlockType> memory_pool_;
     OctantBase* const root_ptr_; // The pointer lifetime is managed by memory_pool_.
 
     static_assert(math::is_power_of_two(BlockSize));
