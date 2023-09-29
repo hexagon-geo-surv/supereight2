@@ -542,10 +542,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
     else {
         for (int child_idx = 0; child_idx < 8; child_idx++) {
             OctantBase* child_ptr = node_ptr->getChild(child_idx);
-            if (!child_ptr) {
-                child_ptr = octree_.allocateAll(node_ptr, child_idx); // TODO: Can be optimised
-            }
-
+            assert(child_ptr);
             if (child_ptr->isBlock()) {
                 // Voxel block has a low variance. Update data at a minimum
                 // free space integration scale or finer/coarser (depending on later scale selection).
