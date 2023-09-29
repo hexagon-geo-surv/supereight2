@@ -88,25 +88,23 @@ bool Octree<DataT, ResT, BlockSize>::allocate(NodeType* parent_ptr,
 
     child_ptr = parent_ptr->getChild(child_idx);
     if (child_ptr) {
-        return false; // Already allocated
+        return false;
     }
 
-    const DataT init_data = parent_ptr->getData();
-    if (parent_ptr->getSize() == BlockSize << 1) // Allocate Block
-    {
+    const DataT& init_data = parent_ptr->getData();
+    if (parent_ptr->getSize() == 2 * BlockSize) {
 #pragma omp critical
         {
             child_ptr = memory_pool_.allocateBlock(parent_ptr, child_idx, init_data);
         }
     }
-    else // Allocate Node
-    {
+    else {
 #pragma omp critical
         {
             child_ptr = memory_pool_.allocateNode(parent_ptr, child_idx, init_data);
         }
     }
-    parent_ptr->setChild(child_idx, child_ptr); // Update parent
+    parent_ptr->setChild(child_idx, child_ptr);
     return true;
 }
 

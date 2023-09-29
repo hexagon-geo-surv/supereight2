@@ -122,23 +122,20 @@ class Octree {
         return se::math::log2_const(size_) - se::math::log2_const(BlockSize);
     }
 
-    /**
-   * \brief Allocate a node for a given parent node.
-   *
-   * \warning The returned pointer is of type OctantBase as child might be a node or block.
-   *
-   * \warning This function might be dangerous when using Multires Occupancy.
-   *          Preferably use the allocateChildren(...) function if unsure.
-   *
-   * \param[in] parent_ptr  The parent of the octant to be allocated
-   * \param[in] child_idx   The child index of the octant to be allocated
-   * \param[out] child_ptr  The pointer ot the allocated /fetched octant
-   *
-   * \return Ture if the node has been newly allocated, False if it has already been allocated
-   */
-    bool allocate(NodeType* parent_ptr,
-                  const int child_idx,
-                  se::OctantBase*& child_ptr); ///< Allocate child
+    /** \brief Allocate a child of a node.
+     *
+     * \note The returned pointer is of type se::OctantBase as the child might be a node or block.
+     *
+     * \warning This function might be dangerous when using Multires Occupancy. Use
+     * se::Octree::allocateChildren() if unsure.
+     *
+     * \param[in]  parent_ptr The parent of the octant to be allocated.
+     * \param[in]  child_idx  The child index of the octant to be allocated.
+     * \param[out] child_ptr  The pointer to the allocated or fetched octant.
+     *
+     * \return True if the child was allocated, false if it was already allocated.
+     */
+    bool allocate(NodeType* parent_ptr, const int child_idx, OctantBase*& child_ptr);
 
     /** \brief Allocate all the child nodes of \p parent_ptr.
      */
