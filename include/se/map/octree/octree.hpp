@@ -41,12 +41,12 @@ class Octree {
     typedef Node<DataT, ResT> NodeType;
     typedef Block<DataT, ResT, BlockSize> BlockType;
 
-    typedef se::BoostMemoryPool<NodeType, BlockType> MemoryPool;
+    typedef BoostMemoryPool<NodeType, BlockType> MemoryPool;
 
     /** The edge length of a voxel block in voxels. */
     static constexpr int block_size = BlockSize;
     // The maximum scale of a block
-    static constexpr se::scale_t max_block_scale = math::log2_const(BlockSize);
+    static constexpr scale_t max_block_scale = math::log2_const(BlockSize);
 
     /** \brief Initialize an octree with an edge length of at least \p size voxels. The actual edge
      * length in voxels will be the smallest power of 2 that is greater or equal to \p size.
@@ -77,7 +77,7 @@ class Octree {
    *
    * \return The pointer to the root of the octree
    */
-    se::OctantBase* getRoot()
+    OctantBase* getRoot()
     {
         return root_ptr_;
     };
@@ -87,7 +87,7 @@ class Octree {
    *
    * \return The pointer to the root of the octree
    */
-    se::OctantBase* getRoot() const
+    OctantBase* getRoot() const
     {
         return root_ptr_;
     };
@@ -109,7 +109,7 @@ class Octree {
    */
     int getMaxScale() const
     {
-        return se::math::log2_const(size_);
+        return math::log2_const(size_);
     }
 
     /**
@@ -119,7 +119,7 @@ class Octree {
    */
     int getBlockDepth() const
     {
-        return se::math::log2_const(size_) - se::math::log2_const(BlockSize);
+        return math::log2_const(size_) - math::log2_const(BlockSize);
     }
 
     /** \brief Allocate a child of a node.
@@ -145,11 +145,11 @@ class Octree {
      */
     void deleteChildren(NodeType* parent_ptr);
 
-    static constexpr se::Field fld_ = DataT::fld_;
-    static constexpr se::Colour col_ = DataT::col_;
-    static constexpr se::Semantics sem_ = DataT::sem_;
+    static constexpr Field fld_ = DataT::fld_;
+    static constexpr Colour col_ = DataT::col_;
+    static constexpr Semantics sem_ = DataT::sem_;
 
-    static constexpr se::Res res_ = ResT;
+    static constexpr Res res_ = ResT;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -164,7 +164,7 @@ class Octree {
 
 
 template<typename DataT, Res ResT, int BlockSize>
-constexpr se::scale_t Octree<DataT, ResT, BlockSize>::max_block_scale;
+constexpr scale_t Octree<DataT, ResT, BlockSize>::max_block_scale;
 
 } // namespace se
 
