@@ -13,10 +13,9 @@ namespace se {
 
 template<typename DataT, Res ResT, int BlockSize>
 Octree<DataT, ResT, BlockSize>::Octree(const int size) :
-        size_(math::power_two_up(size)),
+        size_(math::power_two_up(std::max(size, 2 * BlockSize))),
         root_ptr_(memory_pool_.allocateNode(Eigen::Vector3i::Zero(), size_))
 {
-    assert(size_ > BlockSize);
 }
 
 

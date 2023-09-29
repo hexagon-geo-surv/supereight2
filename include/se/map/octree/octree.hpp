@@ -44,7 +44,8 @@ class Octree {
     typedef BoostMemoryPool<NodeType, BlockType> MemoryPool;
 
     /** \brief Initialize an octree with an edge length of at least \p size voxels. The actual edge
-     * length in voxels will be the smallest power of 2 that is greater or equal to \p size.
+     * length in voxels will be the smallest power of 2 that is greater or equal to \p size. and at
+     * least 2 * \p BlockSize.
      */
     Octree(const int size);
 
