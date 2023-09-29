@@ -17,38 +17,42 @@
 #include "se/map/utils/memory_pool.hpp"
 #include "se/map/utils/setup_util.hpp"
 
-
-
 namespace se {
 
-/**
- * \brief The octree is the memory manager of the map.
- *        It is the only entity that is able to allocate and deallocate nodes and blocks.
- *        However it is not responsible to process the data in the nodes.
+/** The octree data structure containing the map data. It is the memory manager of the map since it
+ * is the only entity that is able to allocate and deallocate nodes and blocks. There are
+ * specialized functions and classes for accessing (se::visitor) and modifying (se::MapIntegrator)
+ * the map data as this isn't done through this class. At the maximum octree depth data is stored in
+ * blocks of \p BlockSize<sup>3</sup> voxels.
  *
- * \tparam DataT        The data struct stored in each voxel (or node for Res::Multi)
- * \tparam ResT         The resolution type (Res::Single, Res::Multi) defining if data can only stored at
- *                      a finest scale or any scale.
- * \tparam BlockSize    The size in voxels of a block. BlockSize in [1, (octree size) / 2]
- *                      Must be a power of two.
+ * https://en.wikipedia.org/wiki/Octree
+ *
+ * \tparam DataT     The data type stored in the octree.
+ * \tparam ResT      se::Res::Single if data is only stored in the octree leaves or se::Res::Multi
+ *                   if data is stored in all octree nodes.
+ * \tparam BlockSize The edge length of a voxel block in voxels. It must be a power of two.
  */
 template<typename DataT, Res ResT = Res::Single, int BlockSize = 8>
 class Octree {
     public:
     typedef std::shared_ptr<Octree<DataT, ResT, BlockSize>> Ptr;
-
     typedef DataT DataType;
     typedef Node<DataT, ResT> NodeType;
     typedef Block<DataT, ResT, BlockSize> BlockType;
 
-    /** \brief Initialize an octree with an edge length of at least \p size voxels. The actual edge
-     * length in voxels will be the smallest power of 2 that is greater or equal to \p size. and at
-     * least 2 * \p BlockSize.
+    /** Initialize an octree with an edge length of at least \p size voxels. The actual edge length
+     * in voxels will be the smallest power of 2 that is greater or equal to \p size. and at least
+     * 2 * \p BlockSize.
      */
     Octree(const int size);
 
-    Octree(const Octree&) = delete;            ///< Delete copy constructor
-    Octree& operator=(const Octree&) = delete; ///< Delete copy assignment operator
+    /** The copy constructor is explicitly deleted.
+     */
+    Octree(const Octree&) = delete;
+
+    /** The copy assignment operator is explicitly deleted.
+     */
+    Octree& operator=(const Octree&) = delete;
 
     OctreeIterator<Octree<DataT, ResT, BlockSize>> begin();
     OctreeIterator<const Octree<DataT, ResT, BlockSize>> begin() const;
@@ -57,66 +61,49 @@ class Octree {
     OctreeIterator<const Octree<DataT, ResT, BlockSize>> end() const;
     OctreeIterator<const Octree<DataT, ResT, BlockSize>> cend() const;
 
-    /**
-   * \brief Verify if the voxel coordinates are contained in the octree.
-   *
-   * \param[in] voxel_coord The voxel coordinates to be verified
-   *
-   * \return True if contained in the octree, False otherwise
-   */
+    /** Test if point \p voxel_coord with coordinates in voxels is contained in the octree.
+     */
     bool contains(const Eigen::Vector3i& voxel_coord) const;
 
-    /**
-   * \brief Get the node pointer to the root of the octree.
-   *
-   * \return The pointer to the root of the octree
-   */
+    /** Get the pointer octree's root octant.
+     */
     OctantBase* getRoot()
     {
         return root_ptr_;
     };
 
-    /**
-   * \brief Get the node pointer to the root of the octree.
-   *
-   * \return The pointer to the root of the octree
-   */
+    /** Get the pointer octree's root octant.
+     *
+     * \todo Return `const OctantBase*` once all relevant functions have been made const-correct.
+     */
     OctantBase* getRoot() const
     {
         return root_ptr_;
     };
 
-    /**
-   * \brief Get the size of the octree in [voxel] units.
-   *
-   * \return The size of the octree
-   */
+    /** Get the length of the octree edge in voxels.
+     */
     int getSize() const
     {
         return size_;
     }
 
     /**
-   * \brief Get the maximum scale of the octree. This is equivalent to the scale of the root.
-   *
-   * \return The max scale of the octree
-   */
+     * Get the maximum scale of the octree, i.e. the scale of the root node.
+     */
     int getMaxScale() const
     {
         return math::log2_const(size_);
     }
 
-    /**
-   * \brief Get the octree depth the blocks are allocated at.
-   *
-   * \return The octree depth the blocks are allocated at
-   */
+    /** Get the depth voxel blocks are allocated at.
+     */
     int getBlockDepth() const
     {
         return math::log2_const(size_) - math::log2_const(BlockSize);
     }
 
-    /** \brief Allocate a child of a node.
+    /** Allocate a child of a node.
      *
      * \note The returned pointer is of type se::OctantBase as the child might be a node or block.
      *
@@ -131,11 +118,11 @@ class Octree {
      */
     bool allocate(NodeType* parent_ptr, const int child_idx, OctantBase*& child_ptr);
 
-    /** \brief Allocate all the child nodes of \p parent_ptr.
+    /** Allocate all the child nodes of \p parent_ptr.
      */
     void allocateChildren(NodeType* parent_ptr);
 
-    /** \brief Recursively delete all children of \p parent_ptr.
+    /** Recursively delete all children of \p parent_ptr.
      */
     void deleteChildren(NodeType* parent_ptr);
 
@@ -151,7 +138,7 @@ class Octree {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     private:
-    const int size_;         // The length of the octree edge in voxels.
+    const int size_;
     // Allocates and deallocates memory for nodes and blocks.
     BoostMemoryPool<NodeType, BlockType> memory_pool_;
     OctantBase* const root_ptr_; // The pointer lifetime is managed by memory_pool_.
