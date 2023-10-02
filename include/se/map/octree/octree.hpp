@@ -140,7 +140,7 @@ class Octree {
     private:
     const int size_;
     // Allocates and deallocates memory for nodes and blocks.
-    BoostMemoryPool<NodeType, BlockType> memory_pool_;
+    MemoryPool<NodeType, BlockType> memory_pool_;
     OctantBase* const root_ptr_; // The pointer lifetime is managed by memory_pool_.
 
     static_assert(math::is_power_of_two(BlockSize));

@@ -17,11 +17,11 @@ namespace se {
 
 
 template<typename NodeT, typename BlockT>
-class BoostMemoryPool {
+class MemoryPool {
     public:
     typedef typename NodeT::DataType DataType;
 
-    BoostMemoryPool() : node_buffer_(sizeof(NodeT)), block_buffer_(sizeof(BlockT))
+    MemoryPool() : node_buffer_(sizeof(NodeT)), block_buffer_(sizeof(BlockT))
     {
     }
 
