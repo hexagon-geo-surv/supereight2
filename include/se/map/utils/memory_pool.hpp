@@ -14,6 +14,9 @@
 
 namespace se {
 
+/** Manages memory for octree nodes and blocks in an efficient manner. Never deallocate nodes/blocks
+ * created through se::MemoryPool using \p delete.
+ */
 template<typename NodeT, typename BlockT>
 class MemoryPool {
     public:
@@ -31,36 +34,33 @@ class MemoryPool {
         return new (node_buffer_.malloc()) NodeT(coord, size, DataType());
     }
 
-    /**
-     * \brief Allocate a node using its parent and child index.
+    /** Allocate a node.
      *
-     * \param[in] parent_ptr The pointer to the parent node
-     * \param[in] child_idx  The index of the child to be allocated
-     * \param[in] init_data  The data to initialise the child node with
+     * \param[in] parent_ptr The pointer to the parent of the node to be allocated.
+     * \param[in] child_idx  The child index of the node to be allocated.
+     * \param[in] init_data  The data to initialise the node with.
      *
-     * \return The pointer to the child node.
+     * \return The pointer to the allocated node.
      */
     NodeT* allocateNode(NodeT* parent_ptr, const int child_idx, const DataType& init_data)
     {
         return new (node_buffer_.malloc()) NodeT(parent_ptr, child_idx, init_data);
     }
 
-    /**
-     * \brief Allocate a block using its parent and child index.
+    /** Allocate a block.
      *
-     * \param[in] parent_ptr The pointer to the parent node
-     * \param[in] child_idx  The index of the child to be allocated
-     * \param[in] init_data  The data to initialise the child node with
+     * \param[in] parent_ptr The pointer to the parent of the block to be allocated.
+     * \param[in] child_idx  The child index of the block to be allocated.
+     * \param[in] init_data  The data to initialise the block with.
      *
-     * \return The pointer to the child block.
+     * \return The pointer to the allocated block.
      */
     BlockT* allocateBlock(NodeT* parent_ptr, const int child_idx, const DataType& init_data)
     {
         return new (block_buffer_.malloc()) BlockT(parent_ptr, child_idx, init_data);
     }
 
-    /**
-     * \brief Delete a given node.
+    /** Destruct and deallocate the node pointed to by \p node_ptr.
      */
     void deleteNode(NodeT* node_ptr)
     {
@@ -68,8 +68,7 @@ class MemoryPool {
         node_buffer_.free(node_ptr);
     }
 
-    /**
-     * \brief Delete a given block.
+    /** Destruct and deallocate the block pointed to by \p block_ptr.
      */
     void deleteBlock(BlockT* block_ptr)
     {
@@ -77,8 +76,8 @@ class MemoryPool {
         block_buffer_.free(block_ptr);
     }
 
-    boost::pool<> node_buffer_;  ///< The node buffer
-    boost::pool<> block_buffer_; ///< The block buffer
+    boost::pool<> node_buffer_;
+    boost::pool<> block_buffer_;
 };
 
 } // namespace se
