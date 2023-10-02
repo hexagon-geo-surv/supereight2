@@ -30,7 +30,7 @@ class MemoryPool {
      *
      * \warning Should only be used for the root.
      */
-    inline NodeT* allocateNode(const Eigen::Vector3i& node_coord, const unsigned int node_size)
+    NodeT* allocateNode(const Eigen::Vector3i& node_coord, const unsigned int node_size)
     {
         return new (node_buffer_.malloc()) NodeT(node_coord, node_size, DataType());
     }
@@ -44,7 +44,7 @@ class MemoryPool {
      *
      * \return The pointer to the child node.
      */
-    inline NodeT* allocateNode(NodeT* parent_ptr, const int child_idx, const DataType init_data)
+    NodeT* allocateNode(NodeT* parent_ptr, const int child_idx, const DataType init_data)
     {
         return new (node_buffer_.malloc()) NodeT(parent_ptr, child_idx, init_data);
     }
@@ -58,7 +58,7 @@ class MemoryPool {
      *
      * \return The pointer to the child block.
      */
-    inline BlockT* allocateBlock(NodeT* parent_ptr, const int child_idx, const DataType init_data)
+    BlockT* allocateBlock(NodeT* parent_ptr, const int child_idx, const DataType init_data)
     {
         return new (block_buffer_.malloc()) BlockT(parent_ptr, child_idx, init_data);
     }
@@ -66,7 +66,7 @@ class MemoryPool {
     /**
      * \brief Delete a given node.
      */
-    inline void deleteNode(NodeT* node_ptr)
+    void deleteNode(NodeT* node_ptr)
     {
         node_ptr->~NodeT();
         node_buffer_.free(node_ptr);
@@ -75,7 +75,7 @@ class MemoryPool {
     /**
      * \brief Delete a given block.
      */
-    inline void deleteBlock(BlockT* block_ptr)
+    void deleteBlock(BlockT* block_ptr)
     {
         block_ptr->~BlockT();
         block_buffer_.free(block_ptr);
