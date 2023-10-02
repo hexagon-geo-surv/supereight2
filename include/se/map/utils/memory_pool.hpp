@@ -14,8 +14,6 @@
 
 namespace se {
 
-
-
 template<typename NodeT, typename BlockT>
 class MemoryPool {
     public:
@@ -30,7 +28,7 @@ class MemoryPool {
      *
      * \warning Should only be used for the root.
      */
-    NodeT* allocateNode(const Eigen::Vector3i& node_coord, const unsigned int node_size)
+    NodeT* allocateNode(const Eigen::Vector3i& node_coord, const int node_size)
     {
         return new (node_buffer_.malloc()) NodeT(node_coord, node_size, DataType());
     }
@@ -44,7 +42,7 @@ class MemoryPool {
      *
      * \return The pointer to the child node.
      */
-    NodeT* allocateNode(NodeT* parent_ptr, const int child_idx, const DataType init_data)
+    NodeT* allocateNode(NodeT* parent_ptr, const int child_idx, const DataType& init_data)
     {
         return new (node_buffer_.malloc()) NodeT(parent_ptr, child_idx, init_data);
     }
@@ -58,7 +56,7 @@ class MemoryPool {
      *
      * \return The pointer to the child block.
      */
-    BlockT* allocateBlock(NodeT* parent_ptr, const int child_idx, const DataType init_data)
+    BlockT* allocateBlock(NodeT* parent_ptr, const int child_idx, const DataType& init_data)
     {
         return new (block_buffer_.malloc()) BlockT(parent_ptr, child_idx, init_data);
     }
