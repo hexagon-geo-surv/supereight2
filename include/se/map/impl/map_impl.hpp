@@ -87,6 +87,27 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getData(const Eigen::Vector3f& poi
 
 
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
+template<Safe SafeB, Res ResTDummy>
+std::enable_if_t<ResTDummy == Res::Multi,
+                 typename Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::DataType>
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getMinData(const Eigen::Vector3f& point_W,
+                                                         const int scale_desired) const
+{
+    Eigen::Vector3i voxel_coord;
+    if constexpr (SafeB == Safe::Off) {
+        pointToVoxel<Safe::Off>(point_W, voxel_coord);
+    }
+    else {
+        if (!pointToVoxel<Safe::On>(point_W, voxel_coord)) {
+            return DataType();
+        }
+    }
+    return se::visitor::getMinData(*octree_ptr_, voxel_coord, scale_desired);
+}
+
+
+
+template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 template<Safe SafeB>
 std::optional<se::field_t>
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getFieldInterp(const Eigen::Vector3f& point_W) const

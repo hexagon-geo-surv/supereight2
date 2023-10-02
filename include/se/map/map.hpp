@@ -198,6 +198,19 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
     DataType getData(const Eigen::Vector3f& point_W) const;
 
     /**
+     * \brief Get the stored min data at the provided coordinates in [meter] for a given scale.
+     *
+     * \tparam SafeB          The parameter turning "contains point" verification on and off (Off by default)
+     * \tparam ResTDummy      The dummy parameter disabling the function off for single res and TSDF maps // TODO: Clean up with C++20 using required
+     * \param point_W         The coordinates of the point in world frame [meter] to accessed
+     * \param scale_desired   The scale to be accessed
+     * \return The min data at the provided coordinates and scale
+     */
+    template<Safe SafeB = Safe::Off, Res ResTDummy = ResT>
+    typename std::enable_if_t<ResTDummy == Res::Multi, DataType>
+    getMinData(const Eigen::Vector3f& point_W, const int scale_desired) const;
+
+    /**
      * \brief Get the stored max data at the provided coordinates in [meter] for a given scale.
      *
      * \tparam SafeB          The parameter turning "contains point" verification on and off (Off by default)
