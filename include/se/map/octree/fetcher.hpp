@@ -74,6 +74,12 @@ const OctantBase* finest_octant(const Eigen::Vector3i& octant_coord,
 template<typename OctreeT>
 OctantBase* block(const Eigen::Vector3i& block_coord, OctantBase* const base_parent_ptr);
 
+/** Same as se::fetcher::block() but returning a pointer to const.
+ */
+template<typename OctreeT>
+const OctantBase* block(const Eigen::Vector3i& block_coord,
+                        const OctantBase* const base_parent_ptr);
+
 /**
  * \brief Fetch the leaf for given block coordinates.
  *

@@ -98,10 +98,19 @@ const OctantBase* finest_octant(const Eigen::Vector3i& octant_coord,
 template<typename OctreeT>
 OctantBase* block(const Eigen::Vector3i& block_coord, OctantBase* const base_parent_ptr)
 {
-    typename OctreeT::NodeType* parent_ptr =
-        static_cast<typename OctreeT::NodeType*>(base_parent_ptr);
+    return const_cast<OctantBase*>(
+        block<OctreeT>(block_coord, static_cast<const OctantBase*>(base_parent_ptr)));
+}
+
+
+
+template<typename OctreeT>
+const OctantBase* block(const Eigen::Vector3i& block_coord, const OctantBase* const base_parent_ptr)
+{
+    const typename OctreeT::NodeType* parent_ptr =
+        static_cast<const typename OctreeT::NodeType*>(base_parent_ptr);
     int child_size = parent_ptr->getSize() >> 1;
-    OctantBase* child_ptr = nullptr;
+    const OctantBase* child_ptr = nullptr;
 
     for (; child_size >= OctreeT::BlockType::getSize(); child_size = child_size >> 1) {
         idx_t child_idx = ((block_coord.x() & child_size) > 0)
@@ -110,7 +119,7 @@ OctantBase* block(const Eigen::Vector3i& block_coord, OctantBase* const base_par
         if (!child_ptr) {
             return nullptr;
         }
-        parent_ptr = static_cast<typename OctreeT::NodeType*>(child_ptr);
+        parent_ptr = static_cast<const typename OctreeT::NodeType*>(child_ptr);
     }
 
     return child_ptr;
