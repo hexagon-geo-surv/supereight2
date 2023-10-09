@@ -17,9 +17,9 @@ namespace fetcher {
 
 
 template<typename OctreeT>
-inline se::OctantBase* octant(const Eigen::Vector3i& octant_coord,
-                              const se::scale_t scale_desired,
-                              se::OctantBase* base_parent_ptr)
+se::OctantBase* octant(const Eigen::Vector3i& octant_coord,
+                       const se::scale_t scale_desired,
+                       se::OctantBase* base_parent_ptr)
 {
     typename OctreeT::NodeType* parent_ptr =
         static_cast<typename OctreeT::NodeType*>(base_parent_ptr);
@@ -44,9 +44,9 @@ inline se::OctantBase* octant(const Eigen::Vector3i& octant_coord,
 
 
 template<typename OctreeT>
-inline se::OctantBase* finest_octant(const Eigen::Vector3i& octant_coord,
-                                     const se::scale_t scale_desired,
-                                     se::OctantBase* base_parent_ptr)
+se::OctantBase* finest_octant(const Eigen::Vector3i& octant_coord,
+                              const se::scale_t scale_desired,
+                              se::OctantBase* base_parent_ptr)
 {
     typename OctreeT::NodeType* parent_ptr =
         static_cast<typename OctreeT::NodeType*>(base_parent_ptr);
@@ -74,7 +74,7 @@ inline se::OctantBase* finest_octant(const Eigen::Vector3i& octant_coord,
 
 
 template<typename OctreeT>
-inline se::OctantBase* block(const Eigen::Vector3i& block_coord, se::OctantBase* base_parent_ptr)
+se::OctantBase* block(const Eigen::Vector3i& block_coord, se::OctantBase* base_parent_ptr)
 {
     typename OctreeT::NodeType* parent_ptr =
         static_cast<typename OctreeT::NodeType*>(base_parent_ptr);
@@ -97,7 +97,7 @@ inline se::OctantBase* block(const Eigen::Vector3i& block_coord, se::OctantBase*
 
 
 template<typename OctreeT>
-inline se::OctantBase* leaf(const Eigen::Vector3i& leaf_coord, se::OctantBase* base_parent_ptr)
+se::OctantBase* leaf(const Eigen::Vector3i& leaf_coord, se::OctantBase* base_parent_ptr)
 {
     typename OctreeT::NodeType* parent_ptr =
         static_cast<typename OctreeT::NodeType*>(base_parent_ptr);
