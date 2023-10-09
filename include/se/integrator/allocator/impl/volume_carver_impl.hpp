@@ -43,18 +43,13 @@ VolumeCarverAllocation
 VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
              SensorT>::operator()()
 {
-    // Launch on the 8 voxels of the first depth
-    const int child_size = octree_.getSize() / 2;
-    se::OctantBase* root_ptr = octree_.getRoot();
-
-    octree_.allocateChildren(static_cast<NodeType*>(root_ptr));
+    NodeType* root_ptr = static_cast<NodeType*>(octree_.getRoot());
+    const int child_size = root_ptr->getSize() / 2;
+    octree_.allocateChildren(root_ptr);
+    // Launch on the root node's children.
 #pragma omp parallel for
     for (int child_idx = 0; child_idx < 8; ++child_idx) {
-        Eigen::Vector3i child_rel_step =
-            Eigen::Vector3i((child_idx & 1) > 0, (child_idx & 2) > 0, (child_idx & 4) > 0);
-        Eigen::Vector3i child_coord =
-            child_rel_step * child_size; // Because, + corner is (0, 0, 0) at root depth
-        (*this)(child_coord, child_size, 1, static_cast<NodeType*>(root_ptr)->getChild(child_idx));
+        (*this)(root_ptr->getChildCoord(child_idx), child_size, 1, root_ptr->getChild(child_idx));
     }
 
     // Extend the octree AABB to contain all leaf nodes. See se::Octree::aabbExtend() on why this
@@ -292,18 +287,16 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
             }
         }
         else {
+            NodeType* node_ptr = static_cast<NodeType*>(octant_ptr);
+            const int child_size = node_ptr->getSize() / 2;
             // Split! Start recursive process
-            octree_.allocateChildren(static_cast<NodeType*>(octant_ptr));
+            octree_.allocateChildren(node_ptr);
 #pragma omp parallel for
             for (int child_idx = 0; child_idx < 8; ++child_idx) {
-                int child_size = octant_size / 2;
-                const Eigen::Vector3i child_rel_step =
-                    Eigen::Vector3i((child_idx & 1) > 0, (child_idx & 2) > 0, (child_idx & 4) > 0);
-                const Eigen::Vector3i child_coord = octant_coord + child_rel_step * child_size;
-                (*this)(child_coord,
+                (*this)(node_ptr->getChildCoord(child_idx),
                         child_size,
                         octant_depth + 1,
-                        static_cast<NodeType*>(octant_ptr)->getChild(child_idx));
+                        node_ptr->getChild(child_idx));
             }
         }
     }
@@ -497,18 +490,16 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
             }
         }
         else {
+            NodeType* node_ptr = static_cast<NodeType*>(octant_ptr);
+            const int child_size = node_ptr->getSize() / 2;
             // Split! Start recursive process
-            octree_.allocateChildren(static_cast<NodeType*>(octant_ptr));
+            octree_.allocateChildren(node_ptr);
 #pragma omp parallel for
             for (int child_idx = 0; child_idx < 8; ++child_idx) {
-                int child_size = octant_size / 2;
-                const Eigen::Vector3i child_rel_step =
-                    Eigen::Vector3i((child_idx & 1) > 0, (child_idx & 2) > 0, (child_idx & 4) > 0);
-                const Eigen::Vector3i child_coord = octant_coord + child_rel_step * child_size;
-                (*this)(child_coord,
+                (*this)(node_ptr->getChildCoord(child_idx),
                         child_size,
                         octant_depth + 1,
-                        static_cast<NodeType*>(octant_ptr)->getChild(child_idx));
+                        node_ptr->getChild(child_idx));
             }
         }
     }
