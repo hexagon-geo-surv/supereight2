@@ -12,20 +12,17 @@
 #include "octree.hpp"
 #include "se/map/utils/type_util.hpp"
 
-
-
 namespace se {
 namespace fetcher {
 
-/**
- * \brief Fetch the octant for given coordinates and scale.
+/** Return the octant with coordinates in voxels \p octant_coord and scale \p scale_desired.
  *
- * \tparam OctreeT
- * \param octant_coord    The coordinates of the octant to be fetched
- * \param scale_desired   The scale of the node to be fetched
- * \param base_parent_ptr The parent pointer to start the fetching process from (e.g. the octrees root)
- *
- * \return The pointer to the octant if it is allocated, nullptr otherwise
+ * \tparam OctreeT        The type of the se::Octree \p base_parent_ptr is part of.
+ * \param octant_coord    The coordinates in voxels of the octant to be fetched.
+ * \param scale_desired   The scale of the octant to be fetched.
+ * \param base_parent_ptr The octant to start searching from (e.g. the octree root).
+ * \return The pointer to the fetched octant or nullptr if no octant is allocated at the supplied
+ * coordinates and scale.
  */
 template<typename OctreeT>
 OctantBase* octant(const Eigen::Vector3i& octant_coord,
@@ -39,16 +36,15 @@ const OctantBase* octant(const Eigen::Vector3i& octant_coord,
                          const scale_t scale_desired,
                          const OctantBase* const base_parent_ptr);
 
-/**
- * \brief Fetch the octant for given coordinates and scale.
- *        Returnes the finest allocated octant up to the desired scale
+/** Return the finest allocated octant with coordinates in voxels \p octant_coord and scale up to \p
+ * scale_desired.
  *
- * \tparam OctreeT
- * \param octant_coord    The coordinates of the octant to be fetched
- * \param scale_desired   The scale of the node to be fetched
- * \param base_parent_ptr The parent pointer to start the fetching process from (e.g. the octrees root)
- *
- * \return The pointer to the finest allocated octant up to the desired scale
+ * \tparam OctreeT        The type of the se::Octree \p base_parent_ptr is part of.
+ * \param octant_coord    The coordinates in voxels of the octant to be fetched.
+ * \param scale_desired   The maximum scale of the octant to be fetched.
+ * \param base_parent_ptr The octant to start searching from, e.g. the octree root.
+ * \return The pointer to the fetched octant or nullptr if no octant is allocated at the supplied
+ * coordinates.
  */
 template<typename OctreeT>
 OctantBase* finest_octant(const Eigen::Vector3i& octant_coord,
@@ -62,14 +58,13 @@ const OctantBase* finest_octant(const Eigen::Vector3i& octant_coord,
                                 const scale_t scale_desired,
                                 const OctantBase* const base_parent_ptr);
 
-/**
- * \brief Fetch the block for given block coordinates.
+/** Return the block with coordinates in voxels \p block_coord.
  *
- * \tparam OctreeT
- * \param block_coord     The coordinates of the block to be fetched
- * \param base_parent_ptr The parent pointer to start the fetching process from (e.g. the octrees root)
- *
- * \return The pointer to the block if allocated, nullptr otherwise
+ * \tparam OctreeT        The type of the se::Octree \p base_parent_ptr is part of.
+ * \param block_coord     The coordinates in voxels of the block to be fetched.
+ * \param base_parent_ptr The octant to start searching from, e.g. the octree root.
+ * \return The pointer to the fetched block or nullptr if no block is allocated at the supplied
+ * coordinates.
  */
 template<typename OctreeT>
 OctantBase* block(const Eigen::Vector3i& block_coord, OctantBase* const base_parent_ptr);
@@ -80,14 +75,13 @@ template<typename OctreeT>
 const OctantBase* block(const Eigen::Vector3i& block_coord,
                         const OctantBase* const base_parent_ptr);
 
-/**
- * \brief Fetch the leaf for given block coordinates.
+/** Return the finest allocated octant with coordinates in voxels \p block_coord.
  *
- * \tparam OctreeT
- * \param leaf_coord      The coordinates of the block to be fetched
- * \param base_parent_ptr The parent pointer to start the fetching process from (e.g. the octrees root)
- *
- * \return The pointer to the leaf
+ * \tparam OctreeT        The type of the se::Octree \p base_parent_ptr is part of.
+ * \param block_coord     The coordinates in voxels of the octant to be fetched.
+ * \param base_parent_ptr The octant to start searching from, e.g. the octree root.
+ * \return The pointer to the fetched octant or nullptr if no octant is allocated at the supplied
+ * coordinates.
  */
 template<typename OctreeT>
 OctantBase* leaf(const Eigen::Vector3i& leaf_coord, OctantBase* const base_parent_ptr);
@@ -96,8 +90,6 @@ OctantBase* leaf(const Eigen::Vector3i& leaf_coord, OctantBase* const base_paren
  */
 template<typename OctreeT>
 const OctantBase* leaf(const Eigen::Vector3i& leaf_coord, const OctantBase* const base_parent_ptr);
-
-
 
 } // namespace fetcher
 } // namespace se
