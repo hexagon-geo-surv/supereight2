@@ -19,7 +19,7 @@ namespace fetcher {
 template<typename OctreeT>
 OctantBase* octant(const Eigen::Vector3i& octant_coord,
                    const scale_t scale_desired,
-                   OctantBase* base_parent_ptr)
+                   OctantBase* const base_parent_ptr)
 {
     typename OctreeT::NodeType* parent_ptr =
         static_cast<typename OctreeT::NodeType*>(base_parent_ptr);
@@ -46,7 +46,7 @@ OctantBase* octant(const Eigen::Vector3i& octant_coord,
 template<typename OctreeT>
 OctantBase* finest_octant(const Eigen::Vector3i& octant_coord,
                           const scale_t scale_desired,
-                          OctantBase* base_parent_ptr)
+                          OctantBase* const base_parent_ptr)
 {
     typename OctreeT::NodeType* parent_ptr =
         static_cast<typename OctreeT::NodeType*>(base_parent_ptr);
@@ -74,7 +74,7 @@ OctantBase* finest_octant(const Eigen::Vector3i& octant_coord,
 
 
 template<typename OctreeT>
-OctantBase* block(const Eigen::Vector3i& block_coord, OctantBase* base_parent_ptr)
+OctantBase* block(const Eigen::Vector3i& block_coord, OctantBase* const base_parent_ptr)
 {
     typename OctreeT::NodeType* parent_ptr =
         static_cast<typename OctreeT::NodeType*>(base_parent_ptr);
@@ -97,7 +97,7 @@ OctantBase* block(const Eigen::Vector3i& block_coord, OctantBase* base_parent_pt
 
 
 template<typename OctreeT>
-OctantBase* leaf(const Eigen::Vector3i& leaf_coord, OctantBase* base_parent_ptr)
+OctantBase* leaf(const Eigen::Vector3i& leaf_coord, OctantBase* const base_parent_ptr)
 {
     typename OctreeT::NodeType* parent_ptr =
         static_cast<typename OctreeT::NodeType*>(base_parent_ptr);
