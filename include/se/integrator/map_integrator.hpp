@@ -101,6 +101,16 @@ class MapIntegrator {
                         const Eigen::Matrix4f& T_WS,
                         const unsigned int frame);
 
+    /** Same as se::MapIntegrator::integrateDepth() but also stores pointers to the octants updated
+     * during the integration in \p updated_octants.
+     */
+    template<typename SensorT>
+    void integrateDepth(const SensorT& sensor,
+                        const se::Image<float>& depth_img,
+                        const Eigen::Matrix4f& T_WS,
+                        const unsigned int frame,
+                        std::vector<const OctantBase*>& updated_octants);
+
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     private:

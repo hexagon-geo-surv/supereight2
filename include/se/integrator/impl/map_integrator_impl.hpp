@@ -36,7 +36,8 @@ struct IntegrateDepthImplD {
                           const SensorT& sensor,
                           const se::Image<float>& depth_img,
                           const Eigen::Matrix4f& T_WS,
-                          const unsigned int frame);
+                          const unsigned int frame,
+                          std::vector<const OctantBase*>* updated_octants);
 };
 
 
@@ -51,7 +52,8 @@ struct IntegrateDepthImplD<se::Field::TSDF, se::Res::Single> {
                           const SensorT& sensor,
                           const se::Image<float>& depth_img,
                           const Eigen::Matrix4f& T_WS,
-                          const unsigned int frame);
+                          const unsigned int frame,
+                          std::vector<const OctantBase*>* updated_octants);
 };
 
 
@@ -66,7 +68,8 @@ struct IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi> {
                           const SensorT& sensor,
                           const se::Image<float>& depth_img,
                           const Eigen::Matrix4f& T_WS,
-                          const unsigned int frame);
+                          const unsigned int frame,
+                          std::vector<const OctantBase*>* updated_octants);
 };
 
 
@@ -81,7 +84,8 @@ struct IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi> {
                           const SensorT& sensor,
                           const se::Image<float>& depth_img,
                           const Eigen::Matrix4f& T_WS,
-                          const unsigned int frame);
+                          const unsigned int frame,
+                          std::vector<const OctantBase*>* updated_octants);
 };
 
 
@@ -93,11 +97,13 @@ using IntegrateDepthImpl = IntegrateDepthImplD<MapT::fld_, MapT::res_>;
 
 template<se::Field FldT, se::Res ResT>
 template<typename SensorT, typename MapT>
-void IntegrateDepthImplD<FldT, ResT>::integrate(MapT& /* map */,
-                                                const SensorT& /* sensor */,
-                                                const se::Image<float>& /* depth_img */,
-                                                const Eigen::Matrix4f& /* T_WS */,
-                                                const unsigned int /* frame */)
+void IntegrateDepthImplD<FldT, ResT>::integrate(
+    MapT& /* map */,
+    const SensorT& /* sensor */,
+    const se::Image<float>& /* depth_img */,
+    const Eigen::Matrix4f& /* T_WS */,
+    const unsigned int /* frame */,
+    std::vector<const OctantBase*>* /* updated_octants */)
 {
 }
 
@@ -109,7 +115,8 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(
     const SensorT& sensor,
     const se::Image<float>& depth_img,
     const Eigen::Matrix4f& T_WS,
-    const unsigned int frame)
+    const unsigned int frame,
+    std::vector<const OctantBase*>* updated_octants)
 {
     // Allocation
     TICK("allocation")
@@ -122,6 +129,14 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(
     se::Updater updater(map, sensor, depth_img, T_WS, frame);
     updater(block_ptrs);
     TOCK("update")
+
+    if (updated_octants) {
+        // TODO: Currently returning allocated, not updated octants. Remove non-updated blocks from
+        // block_ptrs during the call to se::Updater::update() to return only updated octants.
+        updated_octants->clear();
+        updated_octants->reserve(block_ptrs.size());
+        updated_octants->insert(updated_octants->end(), block_ptrs.begin(), block_ptrs.end());
+    }
 }
 
 
@@ -132,7 +147,8 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi>::integrate(
     const SensorT& sensor,
     const se::Image<float>& depth_img,
     const Eigen::Matrix4f& T_WS,
-    const unsigned int frame)
+    const unsigned int frame,
+    std::vector<const OctantBase*>* updated_octants)
 {
     // Allocation
     TICK("allocation")
@@ -145,6 +161,14 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi>::integrate(
     se::Updater updater(map, sensor, depth_img, T_WS, frame);
     updater(block_ptrs);
     TOCK("update")
+
+    if (updated_octants) {
+        // TODO: Currently returning allocated, not updated octants. Remove non-updated blocks from
+        // block_ptrs during the call to se::Updater::update() to return only updated octants.
+        updated_octants->clear();
+        updated_octants->reserve(block_ptrs.size());
+        updated_octants->insert(updated_octants->end(), block_ptrs.begin(), block_ptrs.end());
+    }
 }
 
 
@@ -155,7 +179,8 @@ void IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
     const SensorT& sensor,
     const se::Image<float>& depth_img,
     const Eigen::Matrix4f& T_WS,
-    const unsigned int frame)
+    const unsigned int frame,
+    std::vector<const OctantBase*>* updated_octants)
 {
     // Allocation
     TICK("allocation")
@@ -169,6 +194,20 @@ void IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
     se::Updater updater(map, sensor, depth_img, T_WS, frame);
     updater(allocation_list);
     TOCK("update")
+
+    if (updated_octants) {
+        // TODO: Currently returning allocated, not updated octants. Remove non-updated octants from
+        // allocation_list during the call to se::Updater::update() to return only updated octants.
+        updated_octants->clear();
+        updated_octants->reserve(allocation_list.node_list.size()
+                                 + allocation_list.block_list.size());
+        updated_octants->insert(updated_octants->end(),
+                                allocation_list.node_list.begin(),
+                                allocation_list.node_list.end());
+        updated_octants->insert(updated_octants->end(),
+                                allocation_list.block_list.begin(),
+                                allocation_list.block_list.end());
+    }
 }
 
 
@@ -191,7 +230,21 @@ void MapIntegrator<MapT>::integrateDepth(const SensorT& sensor,
                                          const Eigen::Matrix4f& T_WS,
                                          const unsigned int frame)
 {
-    se::details::IntegrateDepthImpl<MapT>::integrate(map_, sensor, depth_img, T_WS, frame);
+    se::details::IntegrateDepthImpl<MapT>::integrate(map_, sensor, depth_img, T_WS, frame, nullptr);
+}
+
+
+
+template<typename MapT>
+template<typename SensorT>
+void MapIntegrator<MapT>::integrateDepth(const SensorT& sensor,
+                                         const se::Image<float>& depth_img,
+                                         const Eigen::Matrix4f& T_WS,
+                                         const unsigned int frame,
+                                         std::vector<const OctantBase*>& updated_octants)
+{
+    se::details::IntegrateDepthImpl<MapT>::integrate(
+        map_, sensor, depth_img, T_WS, frame, &updated_octants);
 }
 
 
