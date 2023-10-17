@@ -205,6 +205,9 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
     typedef typename BlockT::DataType DataType;
 
     BlockT& block = *static_cast<BlockT*>(octant_ptr);
+    if (block.getCurrentScale() == block.getMaxScale()) {
+        return;
+    }
 
     int child_scale = block.getCurrentScale();
     int size_at_child_scale_li = BlockT::size >> child_scale;
