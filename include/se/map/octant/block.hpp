@@ -101,10 +101,6 @@ class BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT> {
         int prop_data_idx;
     };
 
-    /// Get voxel index
-
-    int getVoxelIdx(const Eigen::Vector3i& voxel_coord) const;
-
     int getVoxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
     /// Get coarsest block data
@@ -294,10 +290,6 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
     {
         init_data_ = init_data;
     };
-
-    /// Get voxel index
-
-    int getVoxelIdx(const Eigen::Vector3i& voxel_coord) const;
 
     int getVoxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
