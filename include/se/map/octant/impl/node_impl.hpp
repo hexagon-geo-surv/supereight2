@@ -14,6 +14,7 @@ namespace se {
 template<typename NodeT>
 int get_child_idx(const Eigen::Vector3i& child_coord, const NodeT* parent_ptr)
 {
+    assert(parent_ptr);
     const Eigen::Vector3i parent_coord = parent_ptr->getCoord();
     const int parent_size = parent_ptr->getSize();
 
@@ -37,6 +38,7 @@ Node<DataT, ResT>::Node(const Eigen::Vector3i& coord, const int size, const Data
                          NodeMultiRes<DataT, Node<DataT, ResT>>>::type(init_data),
         size_(size)
 {
+    assert(math::is_power_of_two(size));
     children_ptr_.fill(nullptr);
 }
 
@@ -56,6 +58,8 @@ Node<DataT, ResT>::Node(Node* parent_ptr, const int child_idx, const DataT& init
                          NodeMultiRes<DataT, Node<DataT, ResT>>>::type(init_data),
         size_(parent_ptr->size_ >> 1)
 {
+    assert(child_idx >= 0);
+    assert(static_cast<size_t>(child_idx) < children_ptr_.size());
     children_ptr_.fill(nullptr);
 }
 
@@ -72,6 +76,8 @@ int Node<DataT, ResT>::getSize() const
 template<typename DataT, Res ResT>
 OctantBase* Node<DataT, ResT>::getChild(const int child_idx)
 {
+    assert(child_idx >= 0);
+    assert(static_cast<size_t>(child_idx) < children_ptr_.size());
     return children_ptr_[child_idx];
 }
 
@@ -80,6 +86,8 @@ OctantBase* Node<DataT, ResT>::getChild(const int child_idx)
 template<typename DataT, Res ResT>
 const OctantBase* Node<DataT, ResT>::getChild(const int child_idx) const
 {
+    assert(child_idx >= 0);
+    assert(static_cast<size_t>(child_idx) < children_ptr_.size());
     return children_ptr_[child_idx];
 }
 
@@ -88,6 +96,8 @@ const OctantBase* Node<DataT, ResT>::getChild(const int child_idx) const
 template<typename DataT, Res ResT>
 OctantBase* Node<DataT, ResT>::setChild(const int child_idx, OctantBase* child_ptr)
 {
+    assert(child_idx >= 0);
+    assert(static_cast<size_t>(child_idx) < children_ptr_.size());
     children_mask_ |= 1 << child_idx;
     std::swap(child_ptr, children_ptr_[child_idx]);
     return child_ptr;
@@ -98,6 +108,8 @@ OctantBase* Node<DataT, ResT>::setChild(const int child_idx, OctantBase* child_p
 template<typename DataT, Res ResT>
 Eigen::Vector3i Node<DataT, ResT>::getChildCoord(const int child_idx) const
 {
+    assert(child_idx >= 0);
+    assert(static_cast<size_t>(child_idx) < children_ptr_.size());
     const Eigen::Vector3i child_offset(
         (child_idx & 1) != 0, (child_idx & 2) != 0, (child_idx & 4) != 0);
     const int child_size = getSize() / 2;
