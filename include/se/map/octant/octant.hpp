@@ -135,11 +135,11 @@ class OctantBase {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     protected:
-    const Eigen::Vector3i coord_; ///< The coordinates of the block (left, front , bottom corner)
-    timestamp_t time_stamp_;      ///< The frame of the last update
-    OctantBase* parent_ptr_;      ///< Every node/block (other than root) needs a parent
-    std::uint8_t children_mask_;  ///< The allocated children
-    bool is_active_;              ///< The active state of the octant
+    const Eigen::Vector3i coord_;  ///< The coordinates of the block (left, front , bottom corner)
+    timestamp_t time_stamp_;       ///< The frame of the last update
+    OctantBase* const parent_ptr_; ///< Every node/block (other than root) needs a parent
+    std::uint8_t children_mask_;   ///< The allocated children
+    bool is_active_;               ///< The active state of the octant
     const bool is_block_;
 
     template<typename DerT, typename DatT, int BS>
