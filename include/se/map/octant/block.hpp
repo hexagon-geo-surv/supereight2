@@ -372,6 +372,8 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
      */
     const DataType& getData() const
     {
+        assert(!block_data_.empty());
+        assert(block_data_.front());
         return block_data_[0][0];
     }
 
@@ -382,6 +384,8 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
      */
     const DataType& getMinData() const
     {
+        assert(!block_min_data_.empty());
+        assert(block_min_data_.front());
         return block_min_data_[0][0];
     }
 
@@ -394,6 +398,8 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
      */
     const DataType& getMaxData() const
     {
+        assert(!block_max_data_.empty());
+        assert(block_max_data_.front());
         return block_max_data_[0][0];
     }
 
@@ -580,6 +586,9 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
      */
     const DataType& bufferData(const int voxel_idx) const
     {
+        assert(buffer_data_);
+        assert(voxel_idx >= 0);
+        assert(voxel_idx < math::cu(BlockSize >> buffer_scale_));
         return buffer_data_[voxel_idx];
     }
 
@@ -594,6 +603,9 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
      */
     DataType& bufferData(const int voxel_idx)
     {
+        assert(buffer_data_);
+        assert(voxel_idx >= 0);
+        assert(voxel_idx < math::cu(BlockSize >> buffer_scale_));
         return buffer_data_[voxel_idx];
     }
 
@@ -608,6 +620,9 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
      */
     const DataType& currData(const int voxel_idx) const
     {
+        assert(curr_data_);
+        assert(voxel_idx >= 0);
+        assert(voxel_idx < math::cu(BlockSize >> curr_scale_));
         return curr_data_[voxel_idx];
     }
 
@@ -622,6 +637,9 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
      */
     DataType& currData(const int voxel_idx)
     {
+        assert(curr_data_);
+        assert(voxel_idx >= 0);
+        assert(voxel_idx < math::cu(BlockSize >> curr_scale_));
         return curr_data_[voxel_idx];
     }
 
@@ -689,6 +707,8 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
     ///<< Initalise array of data with `init_data_`.
     void initialiseData(DataType* voxel_data, const int num_voxels)
     {
+        assert(voxel_data);
+        assert(num_voxels >= 0);
         std::fill(voxel_data, voxel_data + num_voxels, init_data_);
     }
 

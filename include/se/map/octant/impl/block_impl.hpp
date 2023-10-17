@@ -24,6 +24,8 @@ template<typename DerivedT, typename DataT, int BlockSize>
 const typename BlockSingleRes<DerivedT, DataT, BlockSize>::DataType&
 BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const int voxel_idx) const
 {
+    assert(voxel_idx >= 0);
+    assert(static_cast<size_t>(voxel_idx) < block_data_.size());
     return block_data_[voxel_idx];
 }
 
@@ -33,6 +35,8 @@ template<typename DerivedT, typename DataT, int BlockSize>
 typename BlockSingleRes<DerivedT, DataT, BlockSize>::DataType&
 BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const int voxel_idx)
 {
+    assert(voxel_idx >= 0);
+    assert(static_cast<size_t>(voxel_idx) < block_data_.size());
     return block_data_[voxel_idx];
 }
 
@@ -78,6 +82,8 @@ template<typename DerivedT, typename DataT, int BlockSize>
 void BlockSingleRes<DerivedT, DataT, BlockSize>::setData(const unsigned voxel_idx,
                                                          const DataType& data)
 {
+    assert(voxel_idx >= 0);
+    assert(static_cast<size_t>(voxel_idx) < block_data_.size());
     block_data_[voxel_idx] = data;
 }
 
@@ -100,6 +106,8 @@ int BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getVoxelI
     const Eigen::Vector3i& voxel_coord,
     const int scale) const
 {
+    assert(scale >= 0);
+    assert(scale <= max_scale_);
     const Eigen::Vector3i voxel_offset = (voxel_coord - this->underlying().coord_) / (1 << scale);
     const int size_at_scale = size_at_scales_[scale];
     return scale_offsets_[scale] + voxel_offset.x() + voxel_offset.y() * size_at_scale
@@ -113,6 +121,8 @@ const typename BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>
 BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getData(
     const int voxel_idx) const
 {
+    assert(voxel_idx >= 0);
+    assert(static_cast<size_t>(voxel_idx) < block_data_.size());
     return block_data_[voxel_idx];
 }
 
@@ -122,6 +132,8 @@ template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
 typename BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::DataType&
 BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getData(const int voxel_idx)
 {
+    assert(voxel_idx >= 0);
+    assert(static_cast<size_t>(voxel_idx) < block_data_.size());
     return block_data_[voxel_idx];
 }
 
@@ -202,6 +214,9 @@ BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getDataUnion(
     const int scale) const
 {
     const int voxel_idx = getVoxelIdx(voxel_coord, scale);
+    assert(voxel_idx >= 0);
+    assert(static_cast<size_t>(voxel_idx) < block_data_.size());
+    assert(static_cast<size_t>(voxel_idx) < block_prop_data_.size());
     DataUnion data_union;
     data_union.coord = voxel_coord;
     data_union.scale = scale;
@@ -221,6 +236,9 @@ BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getDataUnion(
     const int scale)
 {
     const int voxel_idx = getVoxelIdx(voxel_coord, scale);
+    assert(voxel_idx >= 0);
+    assert(static_cast<size_t>(voxel_idx) < block_data_.size());
+    assert(static_cast<size_t>(voxel_idx) < block_prop_data_.size());
     DataUnion data_union;
     data_union.coord = voxel_coord;
     data_union.scale = scale;
@@ -238,6 +256,8 @@ void BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::setData(
     const int voxel_idx,
     const DataType& data)
 {
+    assert(voxel_idx >= 0);
+    assert(static_cast<size_t>(voxel_idx) < block_data_.size());
     block_data_[voxel_idx] = data;
 }
 
@@ -268,6 +288,10 @@ template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
 void BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::setDataUnion(
     const DataUnion& data_union)
 {
+    assert(data_union.data_idx >= 0);
+    assert(static_cast<size_t>(data_union.data_idx) < block_data_.size());
+    assert(data_union.prop_data_idx >= 0);
+    assert(static_cast<size_t>(data_union.prop_data_idx) < block_prop_data_.size());
     block_data_[data_union.data_idx] = data_union.data;
     block_prop_data_[data_union.prop_data_idx] = data_union.prop_data;
 }
@@ -654,6 +678,8 @@ template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
 void BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::allocateDownTo(
     const int new_min_scale)
 {
+    assert(new_min_scale >= 0);
+    assert(new_min_scale <= max_scale_);
     if (max_scale_ - (block_data_.size() - 1) > static_cast<size_t>(new_min_scale)) {
         block_min_data_.pop_back();
         block_max_data_.pop_back();
@@ -713,6 +739,8 @@ template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
 void BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::deleteUpTo(
     const int new_min_scale)
 {
+    assert(new_min_scale >= 0);
+    assert(new_min_scale <= max_scale_);
     if (min_scale_ == -1 || min_scale_ >= new_min_scale)
         return;
 
@@ -841,6 +869,8 @@ template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
 void BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::initBuffer(
     const int buffer_scale)
 {
+    assert(buffer_scale >= 0);
+    assert(buffer_scale <= max_scale_);
     resetBuffer();
 
     buffer_scale_ = buffer_scale;
@@ -938,6 +968,8 @@ typename BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>:
 BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::blockDataAtScale(
     const int scale)
 {
+    assert(scale >= 0);
+    assert(scale <= max_scale_);
     if (scale < min_scale_) {
         return nullptr;
     }
@@ -953,6 +985,8 @@ typename BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>:
 BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::blockMinDataAtScale(
     const int scale)
 {
+    assert(scale >= 0);
+    assert(scale <= max_scale_);
     if (scale < min_scale_) {
         return nullptr;
     }
@@ -968,6 +1002,8 @@ typename BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>:
 BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::blockMaxDataAtScale(
     const int scale)
 {
+    assert(scale >= 0);
+    assert(scale <= max_scale_);
     if (scale < min_scale_) {
         return nullptr;
     }
