@@ -23,7 +23,8 @@ class OccupancyIntegrator : public ::testing::Test {
             {{w, h, 0.1f, 10.0f, T_BS}, 100.0f, 100.0f, w / 2 - 0.5f, h / 2 - 0.5f});
         // Create a z-up map with a wall integrated perpendicular to the the x axis at depth_value.
         constexpr float depth_value = 4.0f;
-        const se::Image<float> depth(w, h, depth_value);
+        const se::Image<float> depth(
+            sensor.model.imageWidth(), sensor.model.imageHeight(), depth_value);
         const Eigen::Matrix4f T_WB = Eigen::Matrix4f::Identity();
         se::MapIntegrator integrator(map_);
         integrator.integrateDepth(sensor, depth, T_WB * T_BS, 0);

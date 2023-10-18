@@ -44,7 +44,8 @@ TEST(Map, Gradient)
     se::OccupancyMap<se::Res::Multi> map(map_dim, map_res, data_config);
     // Create a pinhole camera and uniform depth image
     const se::PinholeCamera sensor(sensor_config, 2);
-    const se::Image<float> depth_img(sensor_config.width, sensor_config.height, surface_distance);
+    const se::Image<float> depth_img(
+        sensor.model.imageWidth(), sensor.model.imageHeight(), surface_distance);
     // Integrate depth image from an identity T_WS.
     se::MapIntegrator integrator(map);
     integrator.integrateDepth(sensor, depth_img, Eigen::Matrix4f::Identity(), 0);

@@ -20,7 +20,7 @@ int main(int argc, char** argv)
         sensor_config.cx = sensor_config.width / 2.0f - 0.5f;
         sensor_config.cy = sensor_config.height / 2.0f - 0.5f;
         const se::PinholeCamera sensor(sensor_config);
-        const se::Image<float> depth(sensor_config.width, sensor_config.height, 2.0f);
+        const se::Image<float> depth(sensor.model.imageWidth(), sensor.model.imageHeight(), 2.0f);
 
         se::MapIntegrator integrator(map);
         integrator.integrateDepth(sensor, depth, Eigen::Matrix4f::Identity(), 0);
