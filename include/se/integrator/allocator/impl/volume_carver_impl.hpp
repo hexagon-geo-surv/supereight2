@@ -85,6 +85,7 @@ bool VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, Bl
                                          const int node_size,
                                          const Eigen::Matrix4f& T_WS)
 {
+    assert(node_size > 0);
     Eigen::Vector3f voxel_coord_f;
     map_.pointToVoxel(se::math::to_translation(T_WS), voxel_coord_f);
     if (voxel_coord_f.x() >= node_coord.x() && voxel_coord_f.x() <= node_coord.x() + node_size
@@ -105,6 +106,8 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
                                        const float node_dist_min_m,
                                        const float node_dist_max_m)
 {
+    assert(depth_value_min <= depth_value_max);
+    assert(node_dist_min_m <= node_dist_max_m);
     // Assume worst case scenario -> no multiplication with proj_scale
     const float z_diff_max = (node_dist_max_m - depth_value_min); // * proj_scale;
     const float z_diff_min = (node_dist_min_m - depth_value_max); // * proj_scale;
@@ -136,6 +139,9 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
                                   const int octant_depth,
                                   se::OctantBase* octant_ptr)
 {
+    assert(octant_size > 0);
+    assert(octant_depth >= 0);
+    assert(octant_ptr);
     /// Approximate max and min depth to quickly check if the node is behind the camera or maximum depth.
     // Compute the node centre's depth in the camera frame
 
@@ -331,6 +337,9 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
                                   const int octant_depth,
                                   se::OctantBase* octant_ptr)
 {
+    assert(octant_size > 0);
+    assert(octant_depth >= 0);
+    assert(octant_ptr);
     /// Approximate max and min depth to quickly check if the node is behind the camera or maximum depth.
     // Compute the node centre's depth in the camera frame
 
