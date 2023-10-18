@@ -35,15 +35,15 @@ struct VolumeCarverAllocation {
 
 
 
+/** Unimplemented on purpose so that the template specialization is used. */
 template<typename MapT, typename SensorT>
 class VolumeCarver {
     public:
     VolumeCarver(MapT& /* map */,
                  const SensorT& /* sensor */,
                  const se::Image<float>& /* depth_img */,
-                 const se::DensePoolingImage<SensorT>& /* depth_pooling_img */,
-                 const Eigen::Matrix4f& /* T_SW */,
-                 const int /* frame */){};
+                 const Eigen::Matrix4f& /* T_WS */,
+                 const int /* frame */);
 };
 
 
