@@ -128,6 +128,9 @@ template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
 void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::freeBlock(
     OctantBase* octant_ptr)
 {
+    assert(octant_ptr);
+    assert(octant_ptr->isBlock());
+
     BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
 
     // Compute the point of the block centre in the sensor frame
@@ -281,6 +284,9 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
     bool low_variance,
     bool project_inside)
 {
+    assert(octant_ptr);
+    assert(octant_ptr->isBlock());
+
     // Compute the point of the block centre in the sensor frame
     BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
     const int block_size = BlockType::size;
@@ -528,6 +534,10 @@ template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
 void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
              SensorT>::freeNodeRecurse(OctantBase* octant_ptr, int depth)
 {
+    assert(octant_ptr);
+    assert(!octant_ptr->isBlock());
+    assert(depth >= 0);
+
     NodeType* node_ptr = static_cast<NodeType*>(octant_ptr);
 
     if (node_ptr->isLeaf()) {
