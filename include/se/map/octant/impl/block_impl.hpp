@@ -343,6 +343,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::BlockMul
     block_data_.push_back(data_at_scale);
     block_min_data_.push_back(data_at_scale);
     block_max_data_.push_back(data_at_scale);
+    curr_data_ = block_data_.back();
 }
 
 
