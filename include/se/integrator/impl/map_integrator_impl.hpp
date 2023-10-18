@@ -17,6 +17,7 @@ namespace se {
 static inline Eigen::Vector3f get_sample_coord(const Eigen::Vector3i& octant_coord,
                                                const int octant_size)
 {
+    assert(octant_size > 0);
     return octant_coord.cast<float>() + se::sample_offset_frac * octant_size;
 }
 
@@ -118,6 +119,8 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(
     const unsigned int frame,
     std::vector<const OctantBase*>* updated_octants)
 {
+    assert(sensor.model.imageWidth() == depth_img.width());
+    assert(sensor.model.imageHeight() == depth_img.height());
     // Allocation
     TICK("allocation")
     se::RaycastCarver raycast_carver(map, sensor, depth_img, T_WS, frame);
@@ -150,6 +153,8 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi>::integrate(
     const unsigned int frame,
     std::vector<const OctantBase*>* updated_octants)
 {
+    assert(sensor.model.imageWidth() == depth_img.width());
+    assert(sensor.model.imageHeight() == depth_img.height());
     // Allocation
     TICK("allocation")
     se::RaycastCarver raycast_carver(map, sensor, depth_img, T_WS, frame);
@@ -182,6 +187,8 @@ void IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
     const unsigned int frame,
     std::vector<const OctantBase*>* updated_octants)
 {
+    assert(sensor.model.imageWidth() == depth_img.width());
+    assert(sensor.model.imageHeight() == depth_img.height());
     // Allocation
     TICK("allocation")
     VolumeCarver<MapT, SensorT> volume_carver(
