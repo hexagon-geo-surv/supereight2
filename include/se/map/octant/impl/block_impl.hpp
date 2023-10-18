@@ -351,29 +351,30 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::BlockMul
 template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
 BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::~BlockMultiRes()
 {
-    for (auto& data_at_scale : block_data_) {
+    for (DataType* data_at_scale : block_data_) {
         delete[] data_at_scale;
     }
-    block_data_.clear();
 
-    block_min_data_
-        .pop_back(); ///<< Avoid double free as the min scale data points to the same data.
+    // Avoid double free as the last element of block_min_data_ is the same as the last element of
+    // block_data_.
     if (!block_min_data_.empty()) {
-        for (auto& min_data_at_scale : block_min_data_) {
-            delete[] min_data_at_scale;
-        }
+        block_min_data_.pop_back();
     }
-    block_min_data_.clear();
+    for (DataType* min_data_at_scale : block_min_data_) {
+        delete[] min_data_at_scale;
+    }
 
-    block_max_data_
-        .pop_back(); ///<< Avoid double free as the min scale data points to the same data.
+    // Avoid double free as the last element of block_max_data_ is the same as the last element of
+    // block_data_.
     if (!block_max_data_.empty()) {
-        for (auto& max_data_at_scale : block_max_data_) {
-            delete[] max_data_at_scale;
-        }
+        block_max_data_.pop_back();
     }
-    block_max_data_.clear();
+    for (DataType* max_data_at_scale : block_max_data_) {
+        delete[] max_data_at_scale;
+    }
 
+    // If buffer_scale_ >= min_scale_ then buffer_data_ will contain the same value as some element
+    // of block_data_ which has already been deallocated.
     if (buffer_data_ && buffer_scale_ < min_scale_) {
         delete[] buffer_data_;
     }
