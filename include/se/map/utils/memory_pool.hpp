@@ -10,7 +10,7 @@
 #define SE_MEMORY_POOL_HPP
 
 #include <Eigen/Core>
-#include <boost/pool/pool.hpp>
+#include <boost/pool/object_pool.hpp>
 
 namespace se {
 
@@ -21,10 +21,6 @@ template<typename NodeT, typename BlockT>
 class MemoryPool {
     public:
     typedef typename NodeT::DataType DataType;
-
-    MemoryPool() : node_buffer_(sizeof(NodeT)), block_buffer_(sizeof(BlockT))
-    {
-    }
 
     /** Allocate the root node with coordinates in voxels \p coord and edge length in voxels \p
      * size.
@@ -64,7 +60,6 @@ class MemoryPool {
      */
     void deleteNode(NodeT* node_ptr)
     {
-        node_ptr->~NodeT();
         node_buffer_.free(node_ptr);
     }
 
@@ -72,12 +67,11 @@ class MemoryPool {
      */
     void deleteBlock(BlockT* block_ptr)
     {
-        block_ptr->~BlockT();
         block_buffer_.free(block_ptr);
     }
 
-    boost::pool<> node_buffer_;
-    boost::pool<> block_buffer_;
+    boost::object_pool<NodeT> node_buffer_;
+    boost::object_pool<BlockT> block_buffer_;
 };
 
 } // namespace se
