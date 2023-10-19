@@ -56,13 +56,11 @@ class NodeMultiRes<Data<Field::TSDF, ColB, SemB>, DerivedT> {
 
     const DataType& getData() const
     {
-        return default_data_;
+        static const DataType default_data = DataType();
+        return default_data;
     }
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
-    private:
-    static constexpr DataType default_data_ = DataType();
 };
 
 
@@ -92,7 +90,8 @@ class NodeMultiRes<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
      */
     const DataType& getData() const
     {
-        return (data_.observed && this->underlying().isLeaf()) ? data_ : default_data_;
+        static const DataType default_data = DataType();
+        return (data_.observed && this->underlying().isLeaf()) ? data_ : default_data;
     }
 
     const DataType& getMinData() const
@@ -145,9 +144,6 @@ class NodeMultiRes<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
     {
         return static_cast<const DerivedT&>(*this);
     }
-
-    private:
-    static constexpr DataType default_data_ = DataType();
 };
 
 
@@ -165,13 +161,11 @@ class NodeSingleRes {
 
     const DataT& getData() const
     {
-        return default_data_;
+        static const DataT default_data = DataT();
+        return default_data;
     }
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
-    private:
-    static constexpr DataT default_data_ = DataT();
 };
 
 
