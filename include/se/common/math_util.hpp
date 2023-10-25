@@ -1,8 +1,8 @@
 /*
  * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
- * SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2021-2023 Smart Robotics Lab, Imperial College London, Technical University of Munich
  * SPDX-FileCopyrightText: 2021 Nils Funk
- * SPDX-FileCopyrightText: 2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2021-2023 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -81,7 +81,7 @@ clamp(Eigen::MatrixBase<R>& res, const Eigen::MatrixBase<A>& a, const Eigen::Mat
 /*! \brief Compute the normal vector of a plane defined by 3 points.
  * The direction of the normal depends on the order of the points.
  */
-static Eigen::Vector3f
+static inline Eigen::Vector3f
 plane_normal(const Eigen::Vector3f& p1, const Eigen::Vector3f& p2, const Eigen::Vector3f& p3);
 
 /*! \brief Compute the median of the data in the vector.
@@ -141,9 +141,9 @@ static T median(const std::vector<T>& data);
  *
  * \return Corresponding matrix representation of Lie algebra element.
  */
-static Eigen::Matrix3f hat(const Eigen::Vector3f& omega);
+static inline Eigen::Matrix3f hat(const Eigen::Vector3f& omega);
 
-static Eigen::Matrix3f exp_and_theta(const Eigen::Vector3f& omega, float& theta);
+static inline Eigen::Matrix3f exp_and_theta(const Eigen::Vector3f& omega, float& theta);
 
 /**
  * \brief Group exponential
@@ -158,7 +158,7 @@ static Eigen::Matrix3f exp_and_theta(const Eigen::Vector3f& omega, float& theta)
  * ``expmat(.)`` being the matrix exponential and ``hat(.)`` the hat-operator
  * of SE(3), see below.
  */
-static Eigen::Matrix4f exp(const Eigen::Matrix<float, 6, 1>& a);
+static inline Eigen::Matrix4f exp(const Eigen::Matrix<float, 6, 1>& a);
 
 
 

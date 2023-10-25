@@ -1,8 +1,8 @@
 /*
  * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
- * SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2021-2023 Smart Robotics Lab, Imperial College London, Technical University of Munich
  * SPDX-FileCopyrightText: 2021 Nils Funk
- * SPDX-FileCopyrightText: 2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2021-2023 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -198,7 +198,7 @@ clamp(Eigen::MatrixBase<R>& res, const Eigen::MatrixBase<A>& a, const Eigen::Mat
 
 
 
-static Eigen::Vector3f
+static inline Eigen::Vector3f
 plane_normal(const Eigen::Vector3f& p1, const Eigen::Vector3f& p2, const Eigen::Vector3f& p3)
 {
     // Plane tangent vectors
@@ -256,7 +256,7 @@ static T median(const std::vector<T>& data)
 
 
 
-static Eigen::Matrix3f hat(const Eigen::Vector3f& omega)
+static inline Eigen::Matrix3f hat(const Eigen::Vector3f& omega)
 {
     Eigen::Matrix3f Omega;
     // clang-format off
@@ -269,7 +269,7 @@ static Eigen::Matrix3f hat(const Eigen::Vector3f& omega)
 
 
 
-static Eigen::Matrix3f exp_and_theta(const Eigen::Vector3f& omega, float& theta)
+static inline Eigen::Matrix3f exp_and_theta(const Eigen::Vector3f& omega, float& theta)
 {
     using std::abs;
     using std::cos;
@@ -300,7 +300,7 @@ static Eigen::Matrix3f exp_and_theta(const Eigen::Vector3f& omega, float& theta)
 
 
 
-static Eigen::Matrix4f exp(const Eigen::Matrix<float, 6, 1>& a)
+static inline Eigen::Matrix4f exp(const Eigen::Matrix<float, 6, 1>& a)
 {
     using std::cos;
     using std::sin;

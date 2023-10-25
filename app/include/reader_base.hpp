@@ -1,9 +1,9 @@
 /*
  * SPDX-FileCopyrightText: 2014 University of Edinburgh, Imperial College London, University of Manchester
  * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
- * SPDX-FileCopyrightText: 2020-2022 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2020-2023 Smart Robotics Lab, Imperial College London, Technical University of Munich
  * SPDX-FileCopyrightText: 2020-2022 Nils Funk
- * SPDX-FileCopyrightText: 2020-2022 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2020-2023 Sotiris Papatheodorou
  * SPDX-License-Identifier: MIT
  */
 
@@ -343,7 +343,7 @@ class Reader {
  *
  * \return The configuration of the reader to the ostream.
  */
-static std::ostream& operator<<(std::ostream& out, se::Reader* reader)
+static inline std::ostream& operator<<(std::ostream& out, se::Reader* reader)
 {
     out << se::str_utils::header_to_pretty_str("READER") << "\n";
     out << se::str_utils::str_to_pretty_str(reader->name(), "Reader type") << "\n";

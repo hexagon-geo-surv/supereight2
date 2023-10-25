@@ -23,7 +23,6 @@ add_compile_options(
     -Wextra
     -Wpedantic
     -Wno-unknown-pragmas
-    -Wno-unused-function
 )
 
 # Enable interprocedural optimization (IPO/LTO) for Release if supported
