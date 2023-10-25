@@ -566,24 +566,8 @@ Eigen::AlignedBox3f Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::aabb() const
     if (aabb_v.isEmpty()) {
         return Eigen::AlignedBox3f();
     }
-    // Transform the octree AABB corners to the world frame W and compute their AABB. Since T_WM_
-    // may contain a rotation there's no other way to compute the AABB in the world frame W.
-    // clang-format off
-    const Eigen::Matrix<float, 3, 8> corners_M = resolution_ * (Eigen::Matrix<int, 3, 8>() <<
-        aabb_v.corner(Eigen::AlignedBox3i::CornerType::BottomLeftFloor),
-        aabb_v.corner(Eigen::AlignedBox3i::CornerType::BottomRightFloor),
-        aabb_v.corner(Eigen::AlignedBox3i::CornerType::TopLeftFloor),
-        aabb_v.corner(Eigen::AlignedBox3i::CornerType::TopRightFloor),
-        aabb_v.corner(Eigen::AlignedBox3i::CornerType::BottomLeftCeil),
-        aabb_v.corner(Eigen::AlignedBox3i::CornerType::BottomRightCeil),
-        aabb_v.corner(Eigen::AlignedBox3i::CornerType::TopLeftCeil),
-        aabb_v.corner(Eigen::AlignedBox3i::CornerType::TopRightCeil)).finished().cast<float>();
-    // clang-format on
-    const Eigen::Matrix<float, 3, 8> corners_W =
-        (T_WM_ * corners_M.colwise().homogeneous()).template topRows<3>();
-    const Eigen::Vector3f aabb_min = corners_W.rowwise().minCoeff();
-    const Eigen::Vector3f aabb_max = corners_W.rowwise().maxCoeff();
-    return Eigen::AlignedBox3f(aabb_min, aabb_max);
+    return eigen::transform(Eigen::Isometry3f(T_WM_) * Eigen::Scaling(resolution_),
+                            aabb_v.cast<float>());
 }
 
 } // namespace se

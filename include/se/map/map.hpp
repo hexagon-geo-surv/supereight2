@@ -12,6 +12,7 @@
 #include <Eigen/StdVector>
 #include <optional>
 
+#include "se/common/eigen_utils.hpp"
 #include "se/common/math_util.hpp"
 #include "se/common/str_utils.hpp"
 #include "se/map/algorithms/marching_cube.hpp"
