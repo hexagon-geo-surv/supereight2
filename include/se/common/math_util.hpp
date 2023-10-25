@@ -33,22 +33,22 @@ constexpr int log2_const(int n);
 static inline unsigned power_two_up(const float x);
 
 template<typename T>
-static inline T fracf(const T& v);
+T fracf(const T& v);
 
 template<typename T>
-static inline T floorf(const T& v);
+T floorf(const T& v);
 
 template<typename T>
-static inline T fabs(const T& v);
+T fabs(const T& v);
 
 template<typename Scalar>
-static constexpr inline Scalar sq(Scalar a);
+constexpr Scalar sq(Scalar a);
 
 template<typename Scalar>
-static constexpr inline Scalar cu(Scalar a);
+constexpr Scalar cu(Scalar a);
 
 template<typename Scalar>
-static inline bool in(const Scalar v, const Scalar a, const Scalar b);
+bool in(const Scalar v, const Scalar a, const Scalar b);
 
 static inline Eigen::Vector3f to_translation(const Eigen::Matrix4f& T);
 
@@ -67,7 +67,7 @@ static inline Eigen::Matrix3f to_inverse_rotation(const Eigen::Matrix4f& T);
 static inline Eigen::Matrix4f to_inverse_transformation(const Eigen::Matrix4f& T);
 
 template<typename T>
-static inline typename std::enable_if<std::is_arithmetic<T>::value, T>::type
+typename std::enable_if<std::is_arithmetic<T>::value, T>::type
 clamp(const T& f, const T& a, const T& b);
 
 static inline void clamp(Eigen::Ref<Eigen::VectorXf> res,
@@ -75,8 +75,7 @@ static inline void clamp(Eigen::Ref<Eigen::VectorXf> res,
                          const Eigen::Ref<Eigen::VectorXf> b);
 
 template<typename R, typename A, typename B>
-static inline void
-clamp(Eigen::MatrixBase<R>& res, const Eigen::MatrixBase<A>& a, const Eigen::MatrixBase<B>& b);
+void clamp(Eigen::MatrixBase<R>& res, const Eigen::MatrixBase<A>& a, const Eigen::MatrixBase<B>& b);
 
 /*! \brief Compute the normal vector of a plane defined by 3 points.
  * The direction of the normal depends on the order of the points.
@@ -96,7 +95,7 @@ plane_normal(const Eigen::Vector3f& p1, const Eigen::Vector3f& p2, const Eigen::
  * \note Weird things will happen if the vector contains NaNs.
  */
 template<typename T>
-static T median(std::vector<T>& data);
+T median(std::vector<T>& data);
 
 /*! \brief Compute the median of the data in the vector.
  * If the vector has an even number of elements, the second of the two
@@ -113,14 +112,14 @@ static T median(std::vector<T>& data);
  * \note Weird things will happen if the vector contains NaNs.
  */
 template<typename T>
-static T almost_median(std::vector<T>& data);
+T almost_median(std::vector<T>& data);
 
 /*! Same as se::math::median() but the order of the original vector is
  * retain. This has a performance impact proportional to the size of the
  * input vector.
  */
 template<typename T>
-static T median(const std::vector<T>& data);
+T median(const std::vector<T>& data);
 
 /**
  * \brief hat-operator

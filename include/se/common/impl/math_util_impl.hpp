@@ -56,7 +56,7 @@ static inline unsigned power_two_up(const float x)
 
 
 template<typename T>
-static inline T fracf(const T& v)
+T fracf(const T& v)
 {
     return v - v.array().floor().matrix();
 }
@@ -64,7 +64,7 @@ static inline T fracf(const T& v)
 
 
 template<typename T>
-static inline T floorf(const T& v)
+T floorf(const T& v)
 {
     return v.array().floor();
 }
@@ -72,7 +72,7 @@ static inline T floorf(const T& v)
 
 
 template<typename T>
-static inline T fabs(const T& v)
+T fabs(const T& v)
 {
     return v.cwiseAbs();
 }
@@ -80,7 +80,7 @@ static inline T fabs(const T& v)
 
 
 template<typename Scalar>
-static constexpr inline Scalar sq(Scalar a)
+constexpr Scalar sq(Scalar a)
 {
     return a * a;
 }
@@ -88,7 +88,7 @@ static constexpr inline Scalar sq(Scalar a)
 
 
 template<typename Scalar>
-static constexpr inline Scalar cu(Scalar a)
+constexpr Scalar cu(Scalar a)
 {
     return a * a * a;
 }
@@ -96,7 +96,7 @@ static constexpr inline Scalar cu(Scalar a)
 
 
 template<typename Scalar>
-static inline bool in(const Scalar v, const Scalar a, const Scalar b)
+bool in(const Scalar v, const Scalar a, const Scalar b)
 {
     return v >= a && v <= b;
 }
@@ -170,7 +170,7 @@ static inline Eigen::Matrix4f to_inverse_transformation(const Eigen::Matrix4f& T
 
 
 template<typename T>
-static inline typename std::enable_if<std::is_arithmetic<T>::value, T>::type
+typename std::enable_if<std::is_arithmetic<T>::value, T>::type
 clamp(const T& f, const T& a, const T& b)
 {
     return std::max(a, std::min(f, b));
@@ -189,8 +189,7 @@ static inline void clamp(Eigen::Ref<Eigen::VectorXf> res,
 
 
 template<typename R, typename A, typename B>
-static inline void
-clamp(Eigen::MatrixBase<R>& res, const Eigen::MatrixBase<A>& a, const Eigen::MatrixBase<B>& b)
+void clamp(Eigen::MatrixBase<R>& res, const Eigen::MatrixBase<A>& a, const Eigen::MatrixBase<B>& b)
 {
     res = res.array().max(a.array());
     res = res.array().min(b.array());
@@ -211,7 +210,7 @@ plane_normal(const Eigen::Vector3f& p1, const Eigen::Vector3f& p2, const Eigen::
 
 
 template<typename T>
-static T median(std::vector<T>& data)
+T median(std::vector<T>& data)
 {
     if (!data.empty()) {
         std::sort(data.begin(), data.end());
@@ -233,7 +232,7 @@ static T median(std::vector<T>& data)
 
 
 template<typename T>
-static T almost_median(std::vector<T>& data)
+T almost_median(std::vector<T>& data)
 {
     if (!data.empty()) {
         std::sort(data.begin(), data.end());
@@ -248,7 +247,7 @@ static T almost_median(std::vector<T>& data)
 
 
 template<typename T>
-static T median(const std::vector<T>& data)
+T median(const std::vector<T>& data)
 {
     std::vector<T> v(data);
     return median(v);
