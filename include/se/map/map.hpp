@@ -551,7 +551,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
 
     /** Return the axis-aligned bounding box in the world frame W of the map's allocated leaves.
      */
-    Eigen::AlignedBox3f aabb() const;
+    const Eigen::AlignedBox3f& aabb() const;
 
     static constexpr Field fld_ = FldT;
     static constexpr Colour col_ = ColB;
@@ -572,6 +572,9 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
     const Eigen::Vector3f ub_M_; ///< The upper map bound
 
     const DataConfigType data_config_; ///< The configuration of the data
+
+    mutable Eigen::AlignedBox3f cached_aabb_;
+    mutable Eigen::AlignedBox3i cached_octree_aabb_;
 
     /** The eight relative unit corner offsets */
     static const Eigen::Matrix<float, 3, 8> corner_rel_steps_;

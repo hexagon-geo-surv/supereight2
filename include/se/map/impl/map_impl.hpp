@@ -560,14 +560,24 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointsToVoxels(
 
 
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
-Eigen::AlignedBox3f Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::aabb() const
+const Eigen::AlignedBox3f& Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::aabb() const
 {
-    const Eigen::AlignedBox3i& aabb_v = octree_ptr_->aabb();
-    if (aabb_v.isEmpty()) {
-        return Eigen::AlignedBox3f();
+    const Eigen::AlignedBox3i& octree_aabb = octree_ptr_->aabb();
+    // Ensure the AABBs are compared only if both aren't empty to avoid undefined behavior.
+    const bool octree_aabbs_not_empty = !cached_octree_aabb_.isEmpty() && !octree_aabb.isEmpty();
+    const bool octree_aabb_changed = (cached_octree_aabb_.isEmpty() != octree_aabb.isEmpty())
+        || (octree_aabbs_not_empty && !cached_octree_aabb_.isApprox(octree_aabb));
+    if (octree_aabb_changed) {
+        cached_octree_aabb_ = octree_aabb;
+        if (cached_octree_aabb_.isEmpty()) {
+            cached_aabb_.setEmpty();
+        }
+        else {
+            cached_aabb_ = eigen::transform(Eigen::Isometry3f(T_WM_) * Eigen::Scaling(resolution_),
+                                            cached_octree_aabb_.cast<float>());
+        }
     }
-    return eigen::transform(Eigen::Isometry3f(T_WM_) * Eigen::Scaling(resolution_),
-                            aabb_v.cast<float>());
+    return cached_aabb_;
 }
 
 } // namespace se
