@@ -562,9 +562,12 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointsToVoxels(
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 Eigen::AlignedBox3f Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::aabb() const
 {
+    const Eigen::AlignedBox3i& aabb_v = octree_ptr_->aabb();
+    if (aabb_v.isEmpty()) {
+        return Eigen::AlignedBox3f();
+    }
     // Transform the octree AABB corners to the world frame W and compute their AABB. Since T_WM_
     // may contain a rotation there's no other way to compute the AABB in the world frame W.
-    const Eigen::AlignedBox3i& aabb_v = octree_ptr_->aabb();
     // clang-format off
     const Eigen::Matrix<float, 3, 8> corners_M = resolution_ * (Eigen::Matrix<int, 3, 8>() <<
         aabb_v.corner(Eigen::AlignedBox3i::CornerType::BottomLeftFloor),
