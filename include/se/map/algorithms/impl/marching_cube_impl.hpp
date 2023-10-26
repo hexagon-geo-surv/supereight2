@@ -894,6 +894,7 @@ marching_cube_kernel(const OctreeT& octree,
         }         // x
 
     } // block_ptr_itr
+    mesh.shrink_to_fit();
     return mesh;
 }
 
@@ -985,6 +986,7 @@ dual_marching_cube_kernel(const OctreeT& octree,
         }         // x
 
     } // block_ptr_itr
+    mesh.shrink_to_fit();
     return mesh;
 }
 
