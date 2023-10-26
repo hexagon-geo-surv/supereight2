@@ -1292,7 +1292,7 @@ getFieldGrad(const OctreeT& octree,
         // The octree is not allocated down to the Block level.
         if constexpr (OctreeT::DataType::fld_ == Field::Occupancy) {
             // Test the Node data.
-            if (static_cast<const typename OctreeT::NodeType*>(octant)->getData().observed) {
+            if (is_valid(static_cast<const typename OctreeT::NodeType*>(octant)->getData())) {
                 // The Node has valid data which should be free space. This part of the map has
                 // uniform occupancy, meaning a gradient of 0. This isn't strictly true near the
                 // boundary of the node where there can be small non-zero gradients. It's a rather
