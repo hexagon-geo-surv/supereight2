@@ -10,7 +10,7 @@ add_compile_options(-w)
 option(SRL_PROJECTION_BUILD_TESTS "Enable testing" OFF)
 add_subdirectory(srl_projection)
 
-if(SE_TEST)
+if(SE_TEST AND NOT TARGET gtest AND NOT TARGET gtest_main)
     set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
     option(BUILD_GMOCK OFF)
     option(INSTALL_GTEST OFF)
