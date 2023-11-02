@@ -25,6 +25,7 @@ add_library(${LIB_NAME} STATIC
   "src/reader_raw.cpp"
   "src/reader_tum.cpp"
 )
+target_compile_options(${LIB_NAME} PRIVATE ${SE_PRIVATE_CXX_FLAGS})
 target_include_directories(${LIB_NAME} PUBLIC include)
 target_link_libraries(${LIB_NAME} PUBLIC SRL::Supereight2)
 if(OPENMP_FOUND)
@@ -83,6 +84,7 @@ foreach(APP_CONFIG ${SE_APP_CONFIG})
   # Compile the app using the generated file.
   set(EXE_NAME "supereight_${FIELD_LC}_${RES_LC}_${SENSOR_LC}")
   add_executable(${EXE_NAME} ${GENERATED_MAIN} "src/montage.cpp")
+  target_compile_options(${EXE_NAME} PRIVATE ${SE_PRIVATE_CXX_FLAGS})
   target_include_directories(${EXE_NAME} BEFORE PRIVATE include)
   target_link_libraries(${EXE_NAME} PRIVATE SRL::Supereight2 ${LIB_NAME})
   if(OPENMP_FOUND)

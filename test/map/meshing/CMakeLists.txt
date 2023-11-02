@@ -4,5 +4,6 @@
 cmake_minimum_required(VERSION 3.10...3.16)
 
 add_executable(meshing-unittest meshing_unittest.cpp)
+target_compile_options(meshing-unittest PRIVATE ${SE_PRIVATE_CXX_FLAGS})
 target_link_libraries(meshing-unittest PRIVATE SRL::Supereight2 gtest_main)
 add_test(NAME meshing-unittest COMMAND meshing-unittest)

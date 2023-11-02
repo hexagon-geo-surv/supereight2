@@ -18,12 +18,7 @@ if(TBB_tbb_FOUND)
 endif()
 
 # Compiler options
-add_compile_options(
-    -Wall
-    -Wextra
-    -Wpedantic
-    -Wno-unknown-pragmas
-)
+set(SE_PRIVATE_CXX_FLAGS -Wall -Wextra -Wpedantic -Wno-unknown-pragmas)
 
 # Enable interprocedural optimization (IPO/LTO) for Release if supported
 include(CheckIPOSupported)
@@ -58,6 +53,7 @@ add_library(${LIB_NAME} STATIC
 configure_file("include/se/supereight_config.hpp.in" "include/se/supereight_config.hpp" @ONLY)
 # Set the C++ standard required by the library.
 target_compile_features(${LIB_NAME} PUBLIC cxx_std_17)
+target_compile_options(${LIB_NAME} PRIVATE ${SE_PRIVATE_CXX_FLAGS})
 target_include_directories(${LIB_NAME}
     PUBLIC
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
