@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 3.10...3.16)
 project(Supereight2 VERSION 0.13.0 LANGUAGES C CXX)
 
 option(SE_OPENMP "Compile supereight with OpenMP" ON)
+option(SE_IPO "Compile supereight with interprocedural optimization in Release" ON)
 option(SE_TEST "Compile the supereight tests" ON)
 option(SE_APP "Compile the supereight application" ON)
 
@@ -21,10 +22,14 @@ endif()
 set(SE_PRIVATE_CXX_FLAGS -Wall -Wextra -Wpedantic -Wno-unknown-pragmas)
 
 # Enable interprocedural optimization (IPO/LTO) for Release if supported
-include(CheckIPOSupported)
-check_ipo_supported(RESULT IPO_SUPPORTED)
-if(IPO_SUPPORTED)
-    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
+if(SE_IPO)
+    include(CheckIPOSupported)
+    check_ipo_supported(RESULT IPO_SUPPORTED)
+    if(IPO_SUPPORTED)
+        set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
+    endif()
+else()
+    set(IPO_SUPPORTED FALSE)
 endif()
 
 # Compile the dependencies
