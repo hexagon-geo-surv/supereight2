@@ -27,7 +27,7 @@ void point_cloud_to_normal(se::Image<Eigen::Vector3f>& normals,
         for (int x = 0; x < width; x++) {
             const Eigen::Vector3f point = point_cloud[x + width * y];
             if (point.z() == 0.f) {
-                normals[x + y * width].x() = INVALID;
+                normals[x + y * width] = math::g_invalid_normal;
                 continue;
             }
 
@@ -51,7 +51,7 @@ void point_cloud_to_normal(se::Image<Eigen::Vector3f>& normals,
             const Eigen::Vector3f down = point_cloud[p_down.x() + width * p_down.y()];
 
             if (left.z() == 0 || right.z() == 0 || up.z() == 0 || down.z() == 0) {
-                normals[x + y * width].x() = INVALID;
+                normals[x + y * width] = math::g_invalid_normal;
                 continue;
             }
             const Eigen::Vector3f dv_x = right - left;
@@ -83,7 +83,7 @@ void render_volume_kernel(uint32_t* volume_RGBA_image_data,
             const Eigen::Vector3f surface_point_M = surface_point_cloud_M[pixel_idx];
             const Eigen::Vector3f surface_normal_M = surface_normals_M[pixel_idx];
 
-            if (surface_normal_M.x() != INVALID && surface_normal_M.norm() > 0.f) {
+            if (surface_normal_M != math::g_invalid_normal && surface_normal_M.norm() > 0.f) {
                 const Eigen::Vector3f diff = (surface_point_M - light_M).normalized();
                 const Eigen::Vector3f dir = Eigen::Vector3f::Constant(
                     std::max(surface_normal_M.normalized().dot(diff), 0.f));

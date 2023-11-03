@@ -10,6 +10,7 @@
 #ifndef SE_TRACKER_HPP
 #define SE_TRACKER_HPP
 
+#include "se/common/math_util.hpp"
 #include "se/map/preprocessor.hpp"
 #include "se/map/raycaster.hpp"
 #include "se/sensor/sensor.hpp"

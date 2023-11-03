@@ -576,7 +576,7 @@ void raycast_volume(const MapT& map,
                     map.template getFieldGrad((*surface_intersection_W).head<3>());
                 if (!surface_normal_W) {
                     surface_normals_W[pixel.x() + pixel.y() * surface_normals_W.width()] =
-                        Eigen::Vector3f(INVALID, 0.f, 0.f);
+                        math::g_invalid_normal;
                 }
                 else {
                     // Invert surface normals for TSDF representations.
@@ -589,7 +589,7 @@ void raycast_volume(const MapT& map,
                 surface_point_cloud_W[pixel.x() + pixel.y() * surface_point_cloud_W.width()] =
                     Eigen::Vector3f::Zero();
                 surface_normals_W[pixel.x() + pixel.y() * surface_normals_W.width()] =
-                    Eigen::Vector3f(INVALID, 0.f, 0.f);
+                    math::g_invalid_normal;
             }
         } // x
     }     // y

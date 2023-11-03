@@ -13,8 +13,6 @@
 
 #include "se/common/math_util.hpp"
 
-#define INVALID -2
-
 namespace se {
 namespace preprocessor {
 
@@ -143,7 +141,7 @@ void point_cloud_to_normal(se::Image<Eigen::Vector3f>& normals,
         for (int x = 0; x < width; x++) {
             const Eigen::Vector3f point = point_cloud[x + width * y];
             if (point.z() == 0.f) {
-                normals[x + y * width].x() = INVALID;
+                normals[x + y * width] = math::g_invalid_normal;
                 continue;
             }
 
@@ -167,7 +165,7 @@ void point_cloud_to_normal(se::Image<Eigen::Vector3f>& normals,
             const Eigen::Vector3f down = point_cloud[p_down.x() + width * p_down.y()];
 
             if (left.z() == 0 || right.z() == 0 || up.z() == 0 || down.z() == 0) {
-                normals[x + y * width].x() = INVALID;
+                normals[x + y * width] = math::g_invalid_normal;
                 continue;
             }
             const Eigen::Vector3f dv_x = right - left;

@@ -346,7 +346,7 @@ void Tracker<MapT, SensorT>::trackKernel(
 
             TrackData& row = output_data[pixel.x() + pixel.y() * ref_res.x()];
 
-            if (input_normals_S[pixel.x() + pixel.y() * w].x() == INVALID) {
+            if (input_normals_S[pixel.x() + pixel.y() * w] == math::g_invalid_normal) {
                 row.result = -1;
                 continue;
             }
@@ -371,7 +371,7 @@ void Tracker<MapT, SensorT>::trackKernel(
             const Eigen::Vector3f ref_normal_W =
                 surface_normals_W_ref[ref_pixel.x() + ref_pixel.y() * ref_res.x()];
 
-            if (ref_normal_W.x() == INVALID) {
+            if (ref_normal_W == math::g_invalid_normal) {
                 row.result = -3;
                 continue;
             }
