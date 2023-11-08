@@ -22,7 +22,8 @@ frustum(MapT& map, const SensorT& sensor, const Eigen::Matrix4f& T_WS)
     // Loop over all allocated Blocks.
     std::vector<se::OctantBase*> fetched_block_ptrs;
 
-    for (auto block_ptr_itr = se::FrustumIterator<MapT, SensorT>(map, sensor, T_SM);
+    for (auto block_ptr_itr =
+             se::FrustumIterator<MapT, SensorT>(map, sensor, Eigen::Isometry3f(T_SM));
          block_ptr_itr != se::FrustumIterator<MapT, SensorT>();
          ++block_ptr_itr) {
         fetched_block_ptrs.push_back(*block_ptr_itr);
