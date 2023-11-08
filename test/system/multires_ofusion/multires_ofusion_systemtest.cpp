@@ -404,7 +404,7 @@ TEST(MultiResOFusionSystemTest, Raycasting)
     se::Image<Eigen::Vector3f> surface_normals_W(processed_img_res.x(), processed_img_res.y());
     se::Image<int8_t> surface_scale(processed_img_res.x(), processed_img_res.y());
 
-    Eigen::Matrix4f T_WS;
+    Eigen::Isometry3f T_WS;
     reader->nextData(input_depth_img, input_rgba_img, T_WS);
 
     // Preprocess depth
@@ -412,17 +412,17 @@ TEST(MultiResOFusionSystemTest, Raycasting)
     se::preprocessor::downsample_rgba(input_rgba_img, processed_rgba_img);
 
     se::MapIntegrator integrator(map);
-    integrator.integrateDepth(sensor, processed_depth_img, T_WS, frame);
+    integrator.integrateDepth(sensor, processed_depth_img, T_WS.matrix(), frame);
 
     se::raycaster::raycast_volume(
-        map, surface_point_cloud_W, surface_normals_W, surface_scale, T_WS, sensor);
+        map, surface_point_cloud_W, surface_normals_W, surface_scale, T_WS.matrix(), sensor);
 
     const Eigen::Vector3f ambient{0.1, 0.1, 0.1};
     convert_to_output_rgba_img(processed_rgba_img, output_rgba_img_data.get());
     convert_to_output_depth_img(processed_depth_img, output_depth_img_data.get());
     se::raycaster::render_volume_kernel(output_volume_img_data.get(),
                                         processed_img_res,
-                                        se::math::to_translation(T_WS),
+                                        T_WS.translation(),
                                         ambient,
                                         surface_point_cloud_W,
                                         surface_normals_W,
@@ -438,7 +438,7 @@ TEST(MultiResOFusionSystemTest, Raycasting)
         config.app.slice_path + "/test-raycasting-slice-field-" + std::to_string(frame) + "-x.vtk",
         config.app.slice_path + "/test-raycasting-slice-field-" + std::to_string(frame) + "-y.vtk",
         config.app.slice_path + "/test-raycasting-slice-field-" + std::to_string(frame) + "-z.vtk",
-        se::math::to_translation(T_WS));
+        T_WS.translation());
     map.saveMesh(config.app.mesh_path + "/test-raycasting-mesh_" + std::to_string(frame) + ".ply");
     map.saveMesh(config.app.mesh_path + "/test-raycasting-mesh_" + std::to_string(frame) + ".vtk");
     map.saveMesh(config.app.mesh_path + "/test-raycasting-mesh_" + std::to_string(frame) + ".obj");

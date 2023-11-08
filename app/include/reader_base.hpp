@@ -11,7 +11,7 @@
 #ifndef __READER_BASE_HPP
 #define __READER_BASE_HPP
 
-#include <Eigen/Core>
+#include <Eigen/Geometry>
 #include <chrono>
 #include <cstdint>
 #include <fstream>
@@ -133,7 +133,7 @@ class Reader {
         /** Provide Transformation Sensor (LiDAR) to Body (Drone) also to reader. T_BS.
          *  \note Only for se::ReaderType::LEICA ("rangeImage" or "ray")
          */
-        Eigen::Matrix4f T_BL = Eigen::Matrix4f::Identity();
+        Eigen::Isometry3f T_BL = Eigen::Isometry3f::Identity();
 
         /** The time for the interval of LiDAR Measurements that are grouped together as one scan and
          *  converted to one range image
@@ -187,7 +187,7 @@ class Reader {
     * \param[out] T_WB        The next ground truth pose.
     * \return An appropriate status code.
     */
-    ReaderStatus nextData(Eigen::Vector3f& ray_measurement, Eigen::Matrix4f& T_WB);
+    ReaderStatus nextData(Eigen::Vector3f& ray_measurement, Eigen::Isometry3f& T_WB);
 
     /** Read the next batch of rays and ground truth poses.
     *
@@ -213,7 +213,7 @@ class Reader {
      * \return An appropriate status code.
      */
     ReaderStatus
-    nextData(Image<float>& depth_image, Image<uint32_t>& rgba_image, Eigen::Matrix4f& T_WB);
+    nextData(Image<float>& depth_image, Image<uint32_t>& rgba_image, Eigen::Isometry3f& T_WB);
 
     /** Read the ground truth pose at the provided frame number.
      * Each line in the ground truth file should correspond to a single
@@ -225,7 +225,7 @@ class Reader {
      * \param[out] T_WB  The ground truth pose.
      * \return An appropriate status code.
      */
-    ReaderStatus getPose(Eigen::Matrix4f& T_WB, const size_t frame);
+    ReaderStatus getPose(Eigen::Isometry3f& T_WB, const size_t frame);
 
     /** Restart reading from the beginning.
      *
@@ -328,7 +328,7 @@ class Reader {
      * \param[in]  delimiter The character delimiting columns in the file. Defaults to space.
      * \return An appropriate status code.
      */
-    ReaderStatus readPose(Eigen::Matrix4f& T_WB, const size_t frame, const char delimiter = ' ');
+    ReaderStatus readPose(Eigen::Isometry3f& T_WB, const size_t frame, const char delimiter = ' ');
 
 
     /** Read the next ground truth pose.
@@ -342,7 +342,7 @@ class Reader {
      * \param[out] T_WB The next ground truth pose.
      * \return An appropriate status code.
      */
-    ReaderStatus nextPose(Eigen::Matrix4f& T_WB);
+    ReaderStatus nextPose(Eigen::Isometry3f& T_WB);
 
     private:
     size_t ground_truth_frame_;

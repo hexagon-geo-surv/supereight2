@@ -138,7 +138,7 @@ void se::Reader::Config::readYaml(const std::string& filename)
     se::yaml::subnode_as_string(node, "ground_truth_file", ground_truth_file);
     // Leica specific config params (initialised to default if not existing)
     se::yaml::subnode_as_float(node, "scan_time_interval", scan_time_interval);
-    se::yaml::subnode_as_eigen_matrix4f(fs["sensor"], "T_BS", T_BL);
+    se::yaml::subnode_as_eigen_matrix4f(fs["sensor"], "T_BS", T_BL.matrix());
 
     // Expand ~ in the paths.
     sequence_path = se::str_utils::expand_user(sequence_path);
@@ -171,7 +171,7 @@ std::ostream& se::operator<<(std::ostream& os, const se::Reader::Config& c)
 
     if (c.reader_type == se::ReaderType::LEICA) {
         os << str_utils::value_to_pretty_str(c.scan_time_interval, "scan_time_interval") << "\n";
-        os << str_utils::eigen_matrix_to_pretty_str(c.T_BL, "T_BS") << "\n";
+        os << str_utils::eigen_matrix_to_pretty_str(c.T_BL.matrix(), "T_BS") << "\n";
     }
     return os;
 }
@@ -274,7 +274,7 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
 
 se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
                                       se::Image<uint32_t>& rgba_image,
-                                      Eigen::Matrix4f& T_WB)
+                                      Eigen::Isometry3f& T_WB)
 {
     if (!good()) {
         if (verbose_ >= 1) {
@@ -306,7 +306,7 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
     return status_;
 }
 
-se::ReaderStatus se::Reader::nextData(Eigen::Vector3f& ray_measurement, Eigen::Matrix4f& T_WB)
+se::ReaderStatus se::Reader::nextData(Eigen::Vector3f& ray_measurement, Eigen::Isometry3f& T_WB)
 {
     if (!good()) {
         if (verbose_ >= 1) {
@@ -420,12 +420,12 @@ se::ReaderStatus se::Reader::mergeStatus(se::ReaderStatus status_1, se::ReaderSt
 
 
 
-se::ReaderStatus se::Reader::nextPose(Eigen::Matrix4f& T_WB)
+se::ReaderStatus se::Reader::nextPose(Eigen::Isometry3f& T_WB)
 {
     return readPose(T_WB, frame_, ground_truth_delimiter_);
 }
 
-se::ReaderStatus se::Reader::getPose(Eigen::Matrix4f& T_WB, const size_t frame)
+se::ReaderStatus se::Reader::getPose(Eigen::Isometry3f& T_WB, const size_t frame)
 {
     // Store and reset current ground truth frame
     size_t ground_truth_frame_curr = ground_truth_frame_;
@@ -448,7 +448,7 @@ se::ReaderStatus se::Reader::getPose(Eigen::Matrix4f& T_WB, const size_t frame)
 
 
 se::ReaderStatus
-se::Reader::readPose(Eigen::Matrix4f& T_WB, const size_t frame, const char delimiter)
+se::Reader::readPose(Eigen::Isometry3f& T_WB, const size_t frame, const char delimiter)
 {
     std::string line;
     while (true) {
@@ -509,9 +509,9 @@ se::Reader::readPose(Eigen::Matrix4f& T_WB, const size_t frame, const char delim
             return se::ReaderStatus::skip;
         }
         // Combine into the pose
-        T_WB = Eigen::Matrix4f::Identity();
-        T_WB.block<3, 1>(0, 3) = position;
-        T_WB.block<3, 3>(0, 0) = orientation.toRotationMatrix();
+        T_WB = Eigen::Isometry3f::Identity();
+        T_WB.translation() = position;
+        T_WB.linear() = orientation.toRotationMatrix();
 
         return se::ReaderStatus::ok;
     }

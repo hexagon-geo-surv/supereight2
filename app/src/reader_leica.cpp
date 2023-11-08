@@ -280,7 +280,7 @@ se::ReaderStatus se::LeicaReader::nextRay(Eigen::Vector3f& ray_measurement)
     return se::ReaderStatus::ok;
 }
 
-se::ReaderStatus se::LeicaReader::nextPose(Eigen::Matrix4f& T_WB)
+se::ReaderStatus se::LeicaReader::nextPose(Eigen::Isometry3f& T_WB)
 {
     std::string line;
     LeicaPoseEntry pose;
@@ -303,10 +303,8 @@ se::ReaderStatus se::LeicaReader::nextPose(Eigen::Matrix4f& T_WB)
     // interpolate between poses
     double r =
         (static_cast<double>(ray_timestamp_ - ts_prev_)) / static_cast<double>(ts_curr_ - ts_prev_);
-    Eigen::Vector3f posInterp = r * pos_curr_ + (1. - r) * pos_prev_;
-    Eigen::Quaternionf oriInterp = ori_prev_.slerp(r, ori_curr_);
-    T_WB.topLeftCorner<3, 3>() = oriInterp.toRotationMatrix();
-    T_WB.topRightCorner<3, 1>() = posInterp;
+    T_WB.translation() = r * pos_curr_ + (1. - r) * pos_prev_;
+    T_WB.linear() = ori_prev_.slerp(r, ori_curr_).toRotationMatrix();
 
     return se::ReaderStatus::ok;
 }

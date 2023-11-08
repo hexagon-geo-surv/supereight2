@@ -67,9 +67,9 @@ int main(int argc, char** argv)
         }
 
         // Setup input, processed and output imgs
-        Eigen::Matrix4f T_WB = Eigen::Matrix4f::Identity(); //< Body to world transformation
-        Eigen::Matrix4f T_BS = sensor.T_BS.matrix();        //< Sensor to body transformation
-        Eigen::Matrix4f T_WS = T_WB * T_BS;                 //< Sensor to world transformation
+        Eigen::Isometry3f T_WB = Eigen::Isometry3f::Identity(); //< Body to world transformation
+        Eigen::Isometry3f T_BS = sensor.T_BS;                   //< Sensor to body transformation
+        Eigen::Isometry3f T_WS = T_WB * T_BS;                   //< Sensor to world transformation
 
         // ========= Tracker & Pose INITIALIZATION  =========
         se::Tracker tracker(map, sensor, config.tracker);
@@ -93,7 +93,7 @@ int main(int argc, char** argv)
                 break;
             }
             for (size_t i = 0; i < ray_pose_batch.size(); i++) {
-                ray_pose_batch[i].first = ray_pose_batch[i].first * T_BS;
+                ray_pose_batch[i].first = ray_pose_batch[i].first * T_BS.matrix();
             }
             TOCK("read")
 
@@ -118,7 +118,7 @@ int main(int argc, char** argv)
                         config.app.slice_path + "/slice_x_" + std::to_string(frame) + ".vtk",
                         config.app.slice_path + "/slice_y_" + std::to_string(frame) + ".vtk",
                         config.app.slice_path + "/slice_z_" + std::to_string(frame) + ".vtk",
-                        se::math::to_translation(T_WS));
+                        T_WS.translation());
                 }
                 if (!config.app.structure_path.empty()) {
                     map.saveStructure(config.app.structure_path + "/struct_" + std::to_string(frame)

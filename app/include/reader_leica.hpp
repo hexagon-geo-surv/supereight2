@@ -62,7 +62,7 @@ class LeicaReader : public Reader {
 
     ReaderStatus nextRay(Eigen::Vector3f& ray_measurement);
 
-    ReaderStatus nextPose(Eigen::Matrix4f& T_WB);
+    ReaderStatus nextPose(Eigen::Isometry3f& T_WB);
 
     ReaderStatus
     nextRayBatch(const float batch_interval,
