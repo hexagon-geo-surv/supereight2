@@ -56,7 +56,7 @@ class Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Se
     Updater(MapType& map,
             const SensorT& sensor,
             const Image<float>& depth_img,
-            const Eigen::Matrix4f& T_WS,
+            const Eigen::Isometry3f& T_WS,
             const int frame);
 
     void operator()(VolumeCarverAllocation& allocation_list,
@@ -94,7 +94,7 @@ class Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Se
     OctreeType& octree_;
     const SensorT& sensor_;
     const Image<float>& depth_img_;
-    const Eigen::Matrix4f T_SW_;
+    const Eigen::Isometry3f T_SW_;
     const int frame_;
     const float map_res_;
     const UpdaterConfig config_;

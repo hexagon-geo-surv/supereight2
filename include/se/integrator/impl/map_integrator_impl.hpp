@@ -199,7 +199,7 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(
 
     // Update
     TICK("update")
-    se::Updater updater(map, sensor, depth_img, T_WS.matrix(), frame);
+    se::Updater updater(map, sensor, depth_img, T_WS, frame);
     updater(block_ptrs);
     TOCK("update")
 
@@ -233,7 +233,7 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi>::integrate(
 
     // Update
     TICK("update")
-    se::Updater updater(map, sensor, depth_img, T_WS.matrix(), frame);
+    se::Updater updater(map, sensor, depth_img, T_WS, frame);
     updater(block_ptrs);
     TOCK("update")
 
@@ -272,7 +272,7 @@ void IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
 
     // Update
     TICK("update")
-    se::Updater updater(map, sensor, depth_img, T_WS.matrix(), frame);
+    se::Updater updater(map, sensor, depth_img, T_WS, frame);
     updater(allocation_list, updated_octants);
     TOCK("update")
 }

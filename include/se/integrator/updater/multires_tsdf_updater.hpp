@@ -50,7 +50,7 @@ class Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT
     Updater(MapType& map,
             const SensorT& sensor,
             const Image<float>& depth_img,
-            const Eigen::Matrix4f& T_WS,
+            const Eigen::Isometry3f& T_WS,
             const int frame);
 
 
@@ -64,7 +64,7 @@ class Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT
     MapType& map_;
     const SensorT& sensor_;
     const Image<float>& depth_img_;
-    const Eigen::Matrix4f& T_WS_;
+    const Eigen::Isometry3f& T_WS_;
     const int frame_;
     const UpdaterConfig config_;
 };
