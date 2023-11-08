@@ -134,8 +134,7 @@ int main(int argc, char** argv)
             TICK("tracking")
             if (!config.app.enable_ground_truth && frame > 1
                 && (frame % config.app.tracking_rate == 0)) {
-                tracker.track(
-                    processed_depth_img, T_WS.matrix(), surface_point_cloud_W, surface_normals_W);
+                tracker.track(processed_depth_img, T_WS, surface_point_cloud_W, surface_normals_W);
             }
             se::perfstats.sampleT_WB(T_WB);
             TOCK("tracking")
