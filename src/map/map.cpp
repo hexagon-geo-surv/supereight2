@@ -43,22 +43,22 @@ void MapConfig::readYaml(const std::string& yaml_file)
     se::yaml::subnode_as_float(node, "res", res);
 
     // Don't show a warning if origin is not available, set it to dim / 2.
-    T_MW = se::math::to_transformation(Eigen::Vector3f(dim / 2));
+    T_MW = Eigen::Isometry3f(Eigen::Translation3f(dim / 2));
 
     if (!node["T_MW"].isNone()) {
-        se::yaml::subnode_as_eigen_matrix4f(node, "T_MW", T_MW);
+        se::yaml::subnode_as_eigen_matrix4f(node, "T_MW", T_MW.matrix());
     }
 
     if (!node["t_MW"].isNone()) {
         Eigen::Vector3f t_MW;
         se::yaml::subnode_as_eigen_vector3f(node, "t_MW", t_MW);
-        T_MW.topRightCorner<3, 1>() = t_MW;
+        T_MW.translation() = t_MW;
     }
 
     if (!node["R_MW"].isNone()) {
         Eigen::Matrix3f R_MW;
         se::yaml::subnode_as_eigen_matrix3f(node, "R_MW", R_MW);
-        T_MW.topLeftCorner<3, 3>() = R_MW;
+        T_MW.linear() = R_MW;
     }
 }
 
@@ -68,7 +68,7 @@ std::ostream& operator<<(std::ostream& os, const MapConfig& c)
 {
     os << str_utils::volume_to_pretty_str(c.dim, "dim") << " m\n";
     os << str_utils::value_to_pretty_str(c.res, "res") << " m/voxel\n";
-    os << str_utils::eigen_matrix_to_pretty_str(c.T_MW, "T_MW") << "\n";
+    os << str_utils::eigen_matrix_to_pretty_str(c.T_MW.matrix(), "T_MW") << "\n";
     return os;
 }
 } // namespace se

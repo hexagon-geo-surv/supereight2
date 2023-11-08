@@ -98,10 +98,8 @@ inline float compute_map_intersection(const MapT& map,
   from "Graphics Gems", Academic Press, 1990
   */
     // Translate position and direction from world to map frame
-    const Eigen::Matrix4f T_MW = map.getTMW();
-    const Eigen::Matrix3f R_MW = se::math::to_rotation(T_MW);
-    const Eigen::Vector3f ray_pos_M = (T_MW * ray_pos_W.homogeneous()).head<3>();
-    const Eigen::Vector3f ray_dir_M = R_MW * ray_dir_W;
+    const Eigen::Vector3f ray_pos_M = map.getTMW() * ray_pos_W;
+    const Eigen::Vector3f ray_dir_M = map.getTMW().linear() * ray_dir_W;
 
     const Eigen::Vector3f map_min = Eigen::Vector3f::Zero();
     const Eigen::Vector3f map_max = map.getDim();

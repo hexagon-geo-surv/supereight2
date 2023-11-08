@@ -39,7 +39,7 @@ struct MapConfig {
 
     /** The transformation from the world frame W to the map frame M.
      */
-    Eigen::Matrix4f T_MW = math::to_transformation((dim / 2).eval());
+    Eigen::Isometry3f T_MW = Eigen::Isometry3f(Eigen::Translation3f(dim / 2));
 
     /** Reads the struct members from the "map" node of a YAML file. Members not present in the YAML
      * file aren't modified.
@@ -111,7 +111,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      *
      * \return T_MW
      */
-    const Eigen::Matrix4f& getTMW() const
+    const Eigen::Isometry3f& getTMW() const
     {
         return T_MW_;
     };
@@ -121,50 +121,10 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      *
      * \return T_WM
      */
-    const Eigen::Matrix4f& getTWM() const
+    const Eigen::Isometry3f& getTWM() const
     {
         return T_WM_;
     };
-
-    /**
-     * \brief Get the translation from world to map frame
-     *
-     * \return t_MW
-     */
-    Eigen::Vector3f gettMW() const
-    {
-        return se::math::to_translation(T_MW_);
-    }
-
-    /**
-     * \brief Get the translation from map to world frame
-     *
-     * \return t_WM
-     */
-    Eigen::Vector3f gettWM() const
-    {
-        return se::math::to_translation(T_WM_);
-    }
-
-    /**
-     * \brief Get the rotation from world to map frame
-     *
-     * \return R_MW
-     */
-    Eigen::Matrix3f getRMW() const
-    {
-        return se::math::to_rotation(T_MW_);
-    }
-
-    /**
-     * \brief Get the rotation from map to world frame
-     *
-     * \return R_WM
-     */
-    Eigen::Matrix3f getRWM() const
-    {
-        return se::math::to_rotation(T_WM_);
-    }
 
     /**
      * \brief Get the dimensions of the map in [meter] (length x width x height)
@@ -382,7 +342,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \return Zero on success and non-zero on error.
      */
     int saveStructure(const std::string& filename,
-                      const Eigen::Matrix4f& T_WM = Eigen::Matrix4f::Identity()) const;
+                      const Eigen::Isometry3f& T_WM = Eigen::Isometry3f::Identity()) const;
 
     /**
      * \brief Create a mesh in the world frame in units of metres and save it to a file.
@@ -394,7 +354,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \return Zero on success and non-zero on error.
      */
     int saveMesh(const std::string& filename,
-                 const Eigen::Matrix4f& T_OW = Eigen::Matrix4f::Identity()) const;
+                 const Eigen::Isometry3f& T_OW = Eigen::Isometry3f::Identity()) const;
 
     /**
      * \brief Create a mesh in the map frame in units of voxel and save it to a file.
@@ -557,8 +517,8 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
     OctreeType octree_;
     const float resolution_;          ///< The resolution of the map
     const Eigen::Vector3f dimension_; ///< The dimensions of the map
-    const Eigen::Matrix4f T_MW_;      ///< The transformation from world to map frame
-    const Eigen::Matrix4f T_WM_;      ///< The transformation from map to world frame
+    const Eigen::Isometry3f T_MW_;    ///< The transformation from world to map frame
+    const Eigen::Isometry3f T_WM_;    ///< The transformation from map to world frame
 
     const Eigen::Vector3f lb_M_; ///< The lower map bound
     const Eigen::Vector3f ub_M_; ///< The upper map bound
