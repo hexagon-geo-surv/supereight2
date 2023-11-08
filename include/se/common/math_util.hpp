@@ -48,22 +48,6 @@ constexpr Scalar cu(Scalar a);
 template<typename Scalar>
 bool in(const Scalar v, const Scalar a, const Scalar b);
 
-static inline Eigen::Vector3f to_translation(const Eigen::Matrix4f& T);
-
-static inline Eigen::Matrix3f to_rotation(const Eigen::Matrix4f& T);
-
-static inline Eigen::Matrix4f to_transformation(const Eigen::Vector3f& t);
-
-static inline Eigen::Matrix4f to_transformation(const Eigen::Matrix3f& R);
-
-static inline Eigen::Matrix4f to_transformation(const Eigen::Matrix3f& R, const Eigen::Vector3f& t);
-
-static inline Eigen::Vector3f to_inverse_translation(const Eigen::Matrix4f& T);
-
-static inline Eigen::Matrix3f to_inverse_rotation(const Eigen::Matrix4f& T);
-
-static inline Eigen::Matrix4f to_inverse_transformation(const Eigen::Matrix4f& T);
-
 /*! \brief Compute the normal vector of a plane defined by 3 points.
  * The direction of the normal depends on the order of the points.
  */
