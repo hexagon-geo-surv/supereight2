@@ -42,7 +42,7 @@ class VolumeCarver {
     VolumeCarver(MapT& /* map */,
                  const SensorT& /* sensor */,
                  const se::Image<float>& /* depth_img */,
-                 const Eigen::Matrix4f& /* T_WS */,
+                 const Eigen::Isometry3f& /* T_WS */,
                  const int /* frame */);
 };
 
@@ -98,7 +98,7 @@ class VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
     VolumeCarver(MapType& map,
                  const SensorT& sensor,
                  const se::Image<float>& depth_img,
-                 const Eigen::Matrix4f& T_WS,
+                 const Eigen::Isometry3f& T_WS,
                  const int frame);
 
     /**
@@ -131,7 +131,7 @@ class VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
      */
     bool cameraInNode(const Eigen::Vector3i& node_coord,
                       const int node_size,
-                      const Eigen::Matrix4f& T_WS);
+                      const Eigen::Isometry3f& T_WS);
 
     /**
      * \brief Return a conservative meassure of the expected variance of a sensor model inside a voxel
@@ -189,7 +189,7 @@ class VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
     OctreeType& octree_;
     const SensorT& sensor_;
     const se::DensePoolingImage<SensorT> depth_pooling_img_;
-    const Eigen::Matrix4f T_SW_;
+    const Eigen::Isometry3f T_SW_;
     const int frame_;
     const float map_res_;
     VolumeCarverConfig config_;

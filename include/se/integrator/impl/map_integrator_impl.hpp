@@ -265,7 +265,7 @@ void IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
         map,
         sensor,
         depth_img,
-        T_WS.matrix(),
+        T_WS,
         frame); //< process based on variance state and project inside
     se::VolumeCarverAllocation allocation_list = volume_carver();
     TOCK("allocation")
