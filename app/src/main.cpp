@@ -142,7 +142,7 @@ int main(int argc, char** argv)
             // Integrate depth for a given sensor, depth image, pose and frame number
             TICK("integration")
             if (frame % config.app.integration_rate == 0) {
-                integrator.integrateDepth(sensor, processed_depth_img, T_WS.matrix(), frame);
+                integrator.integrateDepth(sensor, processed_depth_img, T_WS, frame);
             }
             TOCK("integration")
 

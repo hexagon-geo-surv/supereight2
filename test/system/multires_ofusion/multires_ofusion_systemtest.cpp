@@ -65,7 +65,7 @@ TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
     se::Image<float> processed_depth_img(processed_img_res.x(), processed_img_res.y());
 
     // Set pose to identity
-    Eigen::Matrix4f T_WS = Eigen::Matrix4f::Identity();
+    const Eigen::Isometry3f T_WS = Eigen::Isometry3f::Identity();
 
     // Set depth image
     for (int y = 0; y < input_img_res.y(); y++) {
@@ -86,7 +86,7 @@ TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
     map.saveFieldSlices(config.app.slice_path + "/test-field-interp-slice-x.vtk",
                         config.app.slice_path + "/test-field-interp-slice-y.vtk",
                         config.app.slice_path + "/test-field-interp-slice-z.vtk",
-                        se::math::to_translation(T_WS));
+                        T_WS.translation());
     map.saveStructure(config.app.structure_path + "/test-field-interp-structure_"
                       + std::to_string(max_frame) + ".ply");
 
@@ -138,7 +138,7 @@ TEST(MultiResOFusionSystemTest, GetField)
     se::Image<float> processed_depth_img(processed_img_res.x(), processed_img_res.y());
 
     // Set pose to identity
-    Eigen::Matrix4f T_WS = Eigen::Matrix4f::Identity();
+    const Eigen::Isometry3f T_WS = Eigen::Isometry3f::Identity();
 
     // Set depth image
     for (int y = 0; y < input_img_res.y(); y++) {
@@ -167,7 +167,7 @@ TEST(MultiResOFusionSystemTest, GetField)
     map.saveFieldSlices(config.app.slice_path + "/test-field-slice-x.vtk",
                         config.app.slice_path + "/test-field-slice-y.vtk",
                         config.app.slice_path + "/test-field-slice-z.vtk",
-                        se::math::to_translation(T_WS));
+                        T_WS.translation());
 
     map.saveStructure(config.app.structure_path + "/test-field-structure_"
                       + std::to_string(max_frame) + ".ply");
@@ -215,7 +215,7 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
     se::Image<float> processed_depth_img(processed_img_res.x(), processed_img_res.y());
 
     // Set pose to identity
-    Eigen::Matrix4f T_WS = Eigen::Matrix4f::Identity();
+    const Eigen::Isometry3f T_WS = Eigen::Isometry3f::Identity();
 
     // Set depth image
     for (int y = 0; y < input_img_res.y(); y++) {
@@ -245,12 +245,12 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
     map.saveFieldSlices(config.app.slice_path + "/test-max-field-slice-field-x.vtk",
                         config.app.slice_path + "/test-max-field-slice-field-y.vtk",
                         config.app.slice_path + "/test-max-field-slice-field-z.vtk",
-                        se::math::to_translation(T_WS));
+                        T_WS.translation());
 
     map.saveScaleSlices(config.app.slice_path + "/test-max-field-slice-scale-x.vtk",
                         config.app.slice_path + "/test-max-field-slice-scale-y.vtk",
                         config.app.slice_path + "/test-max-field-slice-scale-z.vtk",
-                        se::math::to_translation(T_WS));
+                        T_WS.translation());
 
 
 
@@ -262,7 +262,7 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
                                    + std::to_string(scale) + "-y.vtk",
                                config.app.slice_path + "/test-max-field-slice-max-field-scale-"
                                    + std::to_string(scale) + "-z.vtk",
-                               se::math::to_translation(T_WS),
+                               T_WS.translation(),
                                scale);
     }
 
@@ -297,7 +297,7 @@ TEST(MultiResOFusionSystemTest, DeleteChildren)
     se::Image<float> processed_depth_img(processed_img_res.x(), processed_img_res.y());
 
     // Set pose to identity
-    Eigen::Matrix4f T_WS = Eigen::Matrix4f::Identity();
+    const Eigen::Isometry3f T_WS = Eigen::Isometry3f::Identity();
 
     // Set depth image
     for (int y = 0; y < input_img_res.y(); y++) {
@@ -334,7 +334,7 @@ TEST(MultiResOFusionSystemTest, DeleteChildren)
             config.app.slice_path + "/test-delete-child-slice-" + std::to_string(frame) + "-x.vtk",
             config.app.slice_path + "/test-delete-child-slice-" + std::to_string(frame) + "-y.vtk",
             config.app.slice_path + "/test-delete-child-slice-" + std::to_string(frame) + "-z.vtk",
-            se::math::to_translation(T_WS));
+            T_WS.translation());
 
         map.saveStructure(config.app.structure_path + "/test-delete-child-structure_"
                           + std::to_string(frame) + ".ply");
@@ -412,7 +412,7 @@ TEST(MultiResOFusionSystemTest, Raycasting)
     se::preprocessor::downsample_rgba(input_rgba_img, processed_rgba_img);
 
     se::MapIntegrator integrator(map);
-    integrator.integrateDepth(sensor, processed_depth_img, T_WS.matrix(), frame);
+    integrator.integrateDepth(sensor, processed_depth_img, T_WS, frame);
 
     se::raycaster::raycast_volume(
         map, surface_point_cloud_W, surface_normals_W, surface_scale, T_WS, sensor);

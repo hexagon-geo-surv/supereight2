@@ -25,9 +25,9 @@ class OccupancyIntegrator : public ::testing::Test {
         constexpr float depth_value = 4.0f;
         const se::Image<float> depth(
             sensor.model.imageWidth(), sensor.model.imageHeight(), depth_value);
-        const Eigen::Matrix4f T_WB = Eigen::Matrix4f::Identity();
+        const Eigen::Isometry3f T_WB = Eigen::Isometry3f::Identity();
         se::MapIntegrator integrator(map_);
-        integrator.integrateDepth(sensor, depth, T_WB * T_BS.matrix(), 0);
+        integrator.integrateDepth(sensor, depth, T_WB * T_BS, 0);
     }
 
     public:

@@ -26,9 +26,9 @@ void integrate_wall(MapT& map, const se::PinholeCamera& sensor, float depth_valu
 {
     const se::Image<float> depth(
         sensor.model.imageWidth(), sensor.model.imageHeight(), depth_value);
-    const Eigen::Matrix4f T_WB = Eigen::Matrix4f::Identity();
+    const Eigen::Isometry3f T_WB = Eigen::Isometry3f::Identity();
     se::MapIntegrator integrator_stsdf(map);
-    integrator_stsdf.integrateDepth(sensor, depth, T_WB * sensor.T_BS.matrix(), 0);
+    integrator_stsdf.integrateDepth(sensor, depth, T_WB * sensor.T_BS, 0);
 }
 
 int dim_to_blocks(float dim, float block_dim)
@@ -148,7 +148,7 @@ TEST(Map, aabb_ray)
     const se::LeicaLidar sensor(sensorConfig);
 
     // Setup input, processed and output imgs
-    Eigen::Matrix4f T_WS = Eigen::Matrix4f::Identity();
+    Eigen::Isometry3f T_WS = Eigen::Isometry3f::Identity();
 
     // ========= Integrator INITIALIZATION  =========
     se::MapIntegrator integrator(map);
