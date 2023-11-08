@@ -143,8 +143,6 @@ TEST(Map, Interpolation)
     typedef typename se::TSDFMap<se::Res::Single>::OctreeType OctreeType;
     typedef typename se::TSDFMap<se::Res::Single>::OctreeType::BlockType BlockType;
 
-    unsigned int octree_size = 32;
-
     int block_size = BlockType::size;
 
     std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> block_coords = {
@@ -157,8 +155,7 @@ TEST(Map, Interpolation)
         Eigen::Vector3i(0, block_size, block_size),
         Eigen::Vector3i(block_size, block_size, block_size)};
 
-    std::shared_ptr<OctreeType> octree_ptr =
-        std::shared_ptr<OctreeType>(new OctreeType(octree_size));
+    std::shared_ptr<OctreeType> octree_ptr = map_tsdf.getOctree();
 
     BlockType* block_ptr = nullptr;
 
@@ -178,8 +175,6 @@ TEST(Map, Interpolation)
             block_ptr->setData(voxel_idx, data);
         }
     }
-
-    map_tsdf.setOctree(octree_ptr);
 
     auto interp_field_value = map_tsdf.getFieldInterp(Eigen::Vector3f(-12, -12, -12));
     EXPECT_TRUE(interp_field_value);

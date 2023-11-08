@@ -539,16 +539,6 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
         return octree_ptr_;
     };
 
-    /**
-     * \brief Update the octree pointer to a new one.
-     *
-     * \param[in] octree_ptr  The shared pointer to the new octree to be assigned
-     */
-    void setOctree(std::shared_ptr<OctreeType> octree_ptr)
-    {
-        octree_ptr_ = octree_ptr;
-    };
-
     /** Return the axis-aligned bounding box in the world frame W of the map's allocated leaves.
      */
     const Eigen::AlignedBox3f& aabb() const;
