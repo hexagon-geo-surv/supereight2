@@ -11,7 +11,6 @@ data:
   log_odd_min:                -5.015
   log_odd_max:                 5.015
   fs_integr_scale:            1
-  const_surface_thickness:    false
   uncertainty_model:          linear
   tau_min_factor:             3
   tau_max_factor:             12

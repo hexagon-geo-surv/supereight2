@@ -23,8 +23,7 @@ FieldDataConfig<Field::Occupancy>::FieldDataConfig() :
         log_odd_min(-5.015),
         log_odd_max(5.015),
         fs_integr_scale(1),
-        uncertainty_model(UncertaintyModel::Linear),
-        const_surface_thickness(false)
+        uncertainty_model(UncertaintyModel::Linear)
 {
     max_weight =
         std::floor(std::fabs(FieldData<Field::Occupancy>::min_occupancy / (0.97f * log_odd_min)));
@@ -78,8 +77,6 @@ FieldDataConfig<Field::Occupancy>::FieldDataConfig(const std::string& yaml_file)
         uncertainty_model = UncertaintyModel::Quadratic;
     }
 
-    se::yaml::subnode_as_bool(node, "const_surface_thickness", const_surface_thickness);
-
     max_weight =
         std::floor(std::fabs(FieldData<Field::Occupancy>::min_occupancy / (0.97f * log_odd_min)));
 }
@@ -101,8 +98,6 @@ std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::Occu
     os << str_utils::str_to_pretty_str(
         ((c.uncertainty_model == UncertaintyModel::Linear) ? "linear" : "quadratic"),
         "uncertainty_model")
-       << "\n";
-    os << str_utils::bool_to_pretty_str(c.const_surface_thickness, "const_surface_thickness")
        << "\n";
     return os;
 }

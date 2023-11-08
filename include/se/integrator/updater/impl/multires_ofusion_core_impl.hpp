@@ -40,12 +40,7 @@ float compute_tau(const field_t depth_value,
                   const float tau_max,
                   const ConfigT config)
 {
-    if (config.const_surface_thickness) {
-        return tau_max; ///<< e.g. used in ICL-NUIM livingroom dataset.
-    }
-    else {
-        return std::clamp(config.k_tau * depth_value, tau_min, tau_max);
-    }
+    return std::clamp(config.k_tau * depth_value, tau_min, tau_max);
 }
 
 

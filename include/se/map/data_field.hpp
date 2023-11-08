@@ -83,8 +83,6 @@ struct FieldDataConfig<Field::Occupancy> {
 
     UncertaintyModel uncertainty_model;
 
-    bool const_surface_thickness;
-
     /** Initializes the config to some sensible defaults.
      */
     FieldDataConfig();
