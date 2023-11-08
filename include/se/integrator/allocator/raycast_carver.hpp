@@ -22,7 +22,7 @@ namespace fetcher {
 
 template<typename MapT, typename SensorT>
 inline std::vector<se::OctantBase*>
-frustum(MapT& map, const SensorT& sensor, const Eigen::Matrix4f& T_WS);
+frustum(MapT& map, const SensorT& sensor, const Eigen::Isometry3f& T_WS);
 
 
 
@@ -49,7 +49,7 @@ class RaycastCarver {
     RaycastCarver(MapT& map,
                   const SensorT& sensor,
                   const se::Image<float>& depth_img,
-                  const Eigen::Matrix4f& T_WS,
+                  const Eigen::Isometry3f& T_WS,
                   const int frame);
 
     /** Performs the necessary allocations and returns the allocated blocks. */
@@ -62,7 +62,7 @@ class RaycastCarver {
     typename MapT::OctreeType& octree_;
     const SensorT& sensor_;
     const se::Image<float>& depth_img_;
-    const Eigen::Matrix4f& T_WS_;
+    const Eigen::Isometry3f& T_WS_;
     const float band_;
 };
 

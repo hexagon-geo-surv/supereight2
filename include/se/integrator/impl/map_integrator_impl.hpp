@@ -193,7 +193,7 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(
     assert(sensor.model.imageHeight() == depth_img.height());
     // Allocation
     TICK("allocation")
-    se::RaycastCarver raycast_carver(map, sensor, depth_img, T_WS.matrix(), frame);
+    se::RaycastCarver raycast_carver(map, sensor, depth_img, T_WS, frame);
     std::vector<OctantBase*> block_ptrs = raycast_carver();
     TOCK("allocation")
 
@@ -227,7 +227,7 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi>::integrate(
     assert(sensor.model.imageHeight() == depth_img.height());
     // Allocation
     TICK("allocation")
-    se::RaycastCarver raycast_carver(map, sensor, depth_img, T_WS.matrix(), frame);
+    se::RaycastCarver raycast_carver(map, sensor, depth_img, T_WS, frame);
     std::vector<OctantBase*> block_ptrs = raycast_carver();
     TOCK("allocation")
 
