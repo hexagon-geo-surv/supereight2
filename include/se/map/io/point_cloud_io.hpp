@@ -8,6 +8,7 @@
 #ifndef SE_POINT_CLOUD_IO_HPP
 #define SE_POINT_CLOUD_IO_HPP
 
+#include <Eigen/Geometry>
 #include <fstream>
 #include <string>
 
@@ -27,7 +28,7 @@
  */
 int save_point_cloud_vtk(se::Image<Eigen::Vector3f>& point_cloud,
                          const std::string& filename,
-                         const Eigen::Matrix4f& T_WC);
+                         const Eigen::Isometry3f& T_WC);
 
 
 
