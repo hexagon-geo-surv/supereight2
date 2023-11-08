@@ -136,7 +136,7 @@ int main(int argc, char** argv)
                 && (frame % config.app.tracking_rate == 0)) {
                 tracker.track(processed_depth_img, T_WS, surface_point_cloud_W, surface_normals_W);
             }
-            se::perfstats.sampleT_WB(T_WB);
+            se::perfstats.sampleT_WB(Eigen::Isometry3f(T_WB));
             TOCK("tracking")
 
             // Integrate depth for a given sensor, depth image, pose and frame number
