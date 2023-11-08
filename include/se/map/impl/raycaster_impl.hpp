@@ -545,7 +545,7 @@ void raycast_volume(const MapT& map,
                     const Eigen::Matrix4f& T_WS,
                     const SensorT& sensor)
 {
-    const typename MapT::OctreeType& octree = *(map.getOctree());
+    const typename MapT::OctreeType& octree = map.getOctree();
 #pragma omp parallel for
     for (int y = 0; y < surface_point_cloud_W.height(); y++) {
 #pragma omp simd

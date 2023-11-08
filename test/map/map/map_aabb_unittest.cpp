@@ -43,7 +43,7 @@ TEST(Map, aabbTSDF)
     integrate_wall(map, sensor, depth_value);
 
     const float truncation_boundary = map.getRes() * map.getDataConfig().truncation_boundary_factor;
-    const float block_dim = map.getRes() * map.getOctree()->block_size;
+    const float block_dim = map.getRes() * map.getOctree().block_size;
     const float half_wall_dim = depth_value * std::tan(sensor.horizontal_fov / 2);
     const int half_wall_blocks = dim_to_blocks(half_wall_dim, block_dim);
     const auto aabb = map.aabb();
@@ -67,7 +67,7 @@ TEST(Map, aabbOccupancy)
     constexpr float depth_value = 4.0f;
     integrate_wall(map, sensor, depth_value);
 
-    const float block_dim = map.getRes() * map.getOctree()->block_size;
+    const float block_dim = map.getRes() * map.getOctree().block_size;
     const float half_wall_dim = depth_value * std::tan(sensor.horizontal_fov / 2);
     const int half_wall_blocks = dim_to_blocks(half_wall_dim, block_dim);
     const auto aabb = map.aabb();

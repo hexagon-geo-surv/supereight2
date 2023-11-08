@@ -22,7 +22,7 @@ VoxelBlockRayIterator<MapT>::VoxelBlockRayIterator(const MapT& map,
                                                    const Eigen::Vector3f& ray_dir_M,
                                                    const float near_plane,
                                                    const float far_plane) :
-        map_(map), octree_(*(map_.getOctree())), scaling_((octree_.getSize() * map_.getRes()))
+        map_(map), octree_(map_.getOctree()), scaling_((octree_.getSize() * map_.getRes()))
 {
     pos_ = Eigen::Vector3f::Ones();
     idx_ = 0;

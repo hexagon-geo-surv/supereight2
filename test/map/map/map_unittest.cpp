@@ -155,17 +155,17 @@ TEST(Map, Interpolation)
         Eigen::Vector3i(0, block_size, block_size),
         Eigen::Vector3i(block_size, block_size, block_size)};
 
-    std::shared_ptr<OctreeType> octree_ptr = map_tsdf.getOctree();
+    OctreeType& octree = map_tsdf.getOctree();
 
     BlockType* block_ptr = nullptr;
 
     for (size_t i = 0; i < block_coords.size(); i++) {
         const Eigen::Vector3i block_coord = block_coords[i];
-        coord_ought = adapt_to_scale(block_coord, octree_ptr->max_block_scale);
+        coord_ought = adapt_to_scale(block_coord, octree.max_block_scale);
         se::key_t voxel_key;
         se::keyops::encode_key(block_coord, 0, voxel_key);
-        block_ptr = static_cast<BlockType*>(
-            se::allocator::block(voxel_key, *octree_ptr, octree_ptr->getRoot()));
+        block_ptr =
+            static_cast<BlockType*>(se::allocator::block(voxel_key, octree, octree.getRoot()));
         coord_is = block_ptr->getCoord();
         EXPECT_EQ(coord_ought, coord_is);
         for (size_t voxel_idx = 0; voxel_idx < block_ptr->size_cu; voxel_idx++) {
@@ -236,6 +236,6 @@ TEST(Map, initialization)
         se::TSDFMap<se::Res::Single> map(Eigen::Vector3f::Constant(d.dim), d.res);
         EXPECT_GE(map.getDim().x(), d.dim);
         EXPECT_FLOAT_EQ(map.getRes(), d.res);
-        EXPECT_EQ(map.getOctree()->getSize(), d.size);
+        EXPECT_EQ(map.getOctree().getSize(), d.size);
     }
 }

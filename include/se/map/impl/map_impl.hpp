@@ -36,10 +36,9 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const Eigen::Vector3f& dim,
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const MapConfig& map_config,
                                                   const DataConfig<FldT, ColB, SemB>& data_config) :
-        octree_ptr_(new Octree<DataType, ResT, BlockSize>(
-            std::ceil(map_config.dim.maxCoeff() / map_config.res))),
+        octree_(std::ceil(map_config.dim.maxCoeff() / map_config.res)),
         resolution_(map_config.res),
-        dimension_(Eigen::Vector3f::Constant(octree_ptr_->getSize() * resolution_)),
+        dimension_(Eigen::Vector3f::Constant(octree_.getSize() * resolution_)),
         T_MW_(map_config.T_MW),
         T_WM_(se::math::to_inverse_transformation(T_MW_)),
         lb_M_(Eigen::Vector3f::Zero()),
@@ -81,7 +80,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getData(const Eigen::Vector3f& poi
         }
     }
 
-    return se::visitor::getData(*octree_ptr_, voxel_coord);
+    return se::visitor::getData(octree_, voxel_coord);
 }
 
 
@@ -102,7 +101,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getMinData(const Eigen::Vector3f& 
             return DataType();
         }
     }
-    return se::visitor::getMinData(*octree_ptr_, voxel_coord, scale_desired);
+    return se::visitor::getMinData(octree_, voxel_coord, scale_desired);
 }
 
 
@@ -124,7 +123,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getFieldInterp(const Eigen::Vector
         }
     }
 
-    return se::visitor::getFieldInterp(*octree_ptr_, voxel_coord_f);
+    return se::visitor::getFieldInterp(octree_, voxel_coord_f);
 }
 
 
@@ -147,7 +146,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getFieldInterp(const Eigen::Vector
         }
     }
 
-    return se::visitor::getFieldInterp(*octree_ptr_, voxel_coord_f, returned_scale);
+    return se::visitor::getFieldInterp(octree_, voxel_coord_f, returned_scale);
 }
 
 
@@ -171,14 +170,14 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getFieldGrad(const Eigen::Vector3f
 
     if constexpr (ResT == Res::Multi) {
         int scale_returned;
-        auto field_grad = se::visitor::getFieldGrad(*octree_ptr_, voxel_coord_f, scale_returned);
+        auto field_grad = se::visitor::getFieldGrad(octree_, voxel_coord_f, scale_returned);
         if (field_grad) {
             *field_grad /= resolution_ * (1 << scale_returned);
         }
         return field_grad;
     }
     else {
-        auto field_grad = se::visitor::getFieldGrad(*octree_ptr_, voxel_coord_f);
+        auto field_grad = se::visitor::getFieldGrad(octree_, voxel_coord_f);
         if (field_grad) {
             *field_grad /= resolution_;
         }
@@ -199,28 +198,28 @@ int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveFieldSlices(
     pointToVoxel(point_W, voxel_coord);
 
     auto get_field_value = [&](const Eigen::Vector3i& coord) {
-        return se::get_field(se::visitor::getData(*octree_ptr_, coord));
+        return se::get_field(se::visitor::getData(octree_, coord));
     };
 
     if (!filename_x.empty()) {
         se::io::save_3d_slice_vtk(
             filename_x,
             Eigen::Vector3i(voxel_coord.x(), 0, 0),
-            Eigen::Vector3i(voxel_coord.x() + 1, octree_ptr_->getSize(), octree_ptr_->getSize()),
+            Eigen::Vector3i(voxel_coord.x() + 1, octree_.getSize(), octree_.getSize()),
             get_field_value);
     }
     if (!filename_y.empty()) {
         se::io::save_3d_slice_vtk(
             filename_y,
             Eigen::Vector3i(0, voxel_coord.y(), 0),
-            Eigen::Vector3i(octree_ptr_->getSize(), voxel_coord.y() + 1, octree_ptr_->getSize()),
+            Eigen::Vector3i(octree_.getSize(), voxel_coord.y() + 1, octree_.getSize()),
             get_field_value);
     }
     if (!filename_z.empty()) {
         se::io::save_3d_slice_vtk(
             filename_z,
             Eigen::Vector3i(0, 0, voxel_coord.z()),
-            Eigen::Vector3i(octree_ptr_->getSize(), octree_ptr_->getSize(), voxel_coord.z() + 1),
+            Eigen::Vector3i(octree_.getSize(), octree_.getSize(), voxel_coord.z() + 1),
             get_field_value);
     }
     return 0;
@@ -241,28 +240,28 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMinFieldSlices(const std::stri
     pointToVoxel(point_W, voxel_coord);
 
     auto get_min_field_value = [&](const Eigen::Vector3i& coord) {
-        return get_field(se::visitor::getMinData(*octree_ptr_, coord, scale));
+        return get_field(se::visitor::getMinData(octree_, coord, scale));
     };
 
     if (!filename_x.empty()) {
         se::io::save_3d_slice_vtk(
             filename_x,
             Eigen::Vector3i(voxel_coord.x(), 0, 0),
-            Eigen::Vector3i(voxel_coord.x() + 1, octree_ptr_->getSize(), octree_ptr_->getSize()),
+            Eigen::Vector3i(voxel_coord.x() + 1, octree_.getSize(), octree_.getSize()),
             get_min_field_value);
     }
     if (!filename_y.empty()) {
         se::io::save_3d_slice_vtk(
             filename_y,
             Eigen::Vector3i(0, voxel_coord.y(), 0),
-            Eigen::Vector3i(octree_ptr_->getSize(), voxel_coord.y() + 1, octree_ptr_->getSize()),
+            Eigen::Vector3i(octree_.getSize(), voxel_coord.y() + 1, octree_.getSize()),
             get_min_field_value);
     }
     if (!filename_z.empty()) {
         se::io::save_3d_slice_vtk(
             filename_z,
             Eigen::Vector3i(0, 0, voxel_coord.z()),
-            Eigen::Vector3i(octree_ptr_->getSize(), octree_ptr_->getSize(), voxel_coord.z() + 1),
+            Eigen::Vector3i(octree_.getSize(), octree_.getSize(), voxel_coord.z() + 1),
             get_min_field_value);
     }
     return 0;
@@ -283,28 +282,28 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMaxFieldSlices(const std::stri
     pointToVoxel(point_W, voxel_coord);
 
     auto get_max_field_value = [&](const Eigen::Vector3i& coord) {
-        return get_field(se::visitor::getMaxData(*octree_ptr_, coord, scale));
+        return get_field(se::visitor::getMaxData(octree_, coord, scale));
     };
 
     if (!filename_x.empty()) {
         se::io::save_3d_slice_vtk(
             filename_x,
             Eigen::Vector3i(voxel_coord.x(), 0, 0),
-            Eigen::Vector3i(voxel_coord.x() + 1, octree_ptr_->getSize(), octree_ptr_->getSize()),
+            Eigen::Vector3i(voxel_coord.x() + 1, octree_.getSize(), octree_.getSize()),
             get_max_field_value);
     }
     if (!filename_y.empty()) {
         se::io::save_3d_slice_vtk(
             filename_y,
             Eigen::Vector3i(0, voxel_coord.y(), 0),
-            Eigen::Vector3i(octree_ptr_->getSize(), voxel_coord.y() + 1, octree_ptr_->getSize()),
+            Eigen::Vector3i(octree_.getSize(), voxel_coord.y() + 1, octree_.getSize()),
             get_max_field_value);
     }
     if (!filename_z.empty()) {
         se::io::save_3d_slice_vtk(
             filename_z,
             Eigen::Vector3i(0, 0, voxel_coord.z()),
-            Eigen::Vector3i(octree_ptr_->getSize(), octree_ptr_->getSize(), voxel_coord.z() + 1),
+            Eigen::Vector3i(octree_.getSize(), octree_.getSize(), voxel_coord.z() + 1),
             get_max_field_value);
     }
     return 0;
@@ -323,8 +322,8 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveScaleSlices(const std::string&
     Eigen::Vector3i voxel_coord;
     pointToVoxel(point_W, voxel_coord);
 
-    se::OctantBase* root_ptr = octree_ptr_->getRoot();
-    const int max_scale = octree_ptr_->getMaxScale();
+    se::OctantBase* root_ptr = octree_.getRoot();
+    const int max_scale = octree_.getMaxScale();
 
     auto get_scale = [&](const Eigen::Vector3i& coord) {
         const se::OctantBase* leaf_ptr = se::fetcher::template leaf<OctreeType>(coord, root_ptr);
@@ -348,21 +347,21 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveScaleSlices(const std::string&
         se::io::save_3d_slice_vtk(
             filename_x,
             Eigen::Vector3i(voxel_coord.x(), 0, 0),
-            Eigen::Vector3i(voxel_coord.x() + 1, octree_ptr_->getSize(), octree_ptr_->getSize()),
+            Eigen::Vector3i(voxel_coord.x() + 1, octree_.getSize(), octree_.getSize()),
             get_scale);
     }
     if (!filename_y.empty()) {
         se::io::save_3d_slice_vtk(
             filename_y,
             Eigen::Vector3i(0, voxel_coord.y(), 0),
-            Eigen::Vector3i(octree_ptr_->getSize(), voxel_coord.y() + 1, octree_ptr_->getSize()),
+            Eigen::Vector3i(octree_.getSize(), voxel_coord.y() + 1, octree_.getSize()),
             get_scale);
     }
     if (!filename_z.empty()) {
         se::io::save_3d_slice_vtk(
             filename_z,
             Eigen::Vector3i(0, 0, voxel_coord.z()),
-            Eigen::Vector3i(octree_ptr_->getSize(), octree_ptr_->getSize(), voxel_coord.z() + 1),
+            Eigen::Vector3i(octree_.getSize(), octree_.getSize(), voxel_coord.z() + 1),
             get_scale);
     }
     return 0;
@@ -372,7 +371,7 @@ template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveStructure(const std::string& filename,
                                                                 const Eigen::Matrix4f& T_WM) const
 {
-    const QuadMesh mesh = octree_structure_mesh(*octree_ptr_);
+    const QuadMesh mesh = octree_structure_mesh(octree_);
     return io::save_mesh(mesh, filename, T_WM);
 }
 
@@ -384,10 +383,10 @@ int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMesh(const std::string& fi
 {
     se::TriangleMesh mesh;
     if constexpr (ResT == se::Res::Single) {
-        se::algorithms::marching_cube(*octree_ptr_, mesh);
+        se::algorithms::marching_cube(octree_, mesh);
     }
     else {
-        se::algorithms::dual_marching_cube(*octree_ptr_, mesh);
+        se::algorithms::dual_marching_cube(octree_, mesh);
     }
     Eigen::Matrix4f T_WM_scale = T_WM_;
     T_WM_scale.topLeftCorner<3, 3>() *= resolution_;
@@ -402,10 +401,10 @@ int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMeshVoxel(const std::strin
 {
     se::TriangleMesh mesh;
     if constexpr (ResT == se::Res::Single) {
-        se::algorithms::marching_cube(*octree_ptr_, mesh);
+        se::algorithms::marching_cube(octree_, mesh);
     }
     else {
-        se::algorithms::dual_marching_cube(*octree_ptr_, mesh);
+        se::algorithms::dual_marching_cube(octree_, mesh);
     }
     return io::save_mesh(mesh, filename);
 }
@@ -562,7 +561,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointsToVoxels(
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 const Eigen::AlignedBox3f& Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::aabb() const
 {
-    const Eigen::AlignedBox3i& octree_aabb = octree_ptr_->aabb();
+    const Eigen::AlignedBox3i& octree_aabb = octree_.aabb();
     // Ensure the AABBs are compared only if both aren't empty to avoid undefined behavior.
     const bool octree_aabbs_not_empty = !cached_octree_aabb_.isEmpty() && !octree_aabb.isEmpty();
     const bool octree_aabb_changed = (cached_octree_aabb_.isEmpty() != octree_aabb.isEmpty())

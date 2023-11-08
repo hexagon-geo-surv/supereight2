@@ -236,7 +236,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
             }
         }
 
-        return se::visitor::getMaxData(*octree_ptr_, voxel_coord, scale_desired);
+        return se::visitor::getMaxData(octree_, voxel_coord, scale_desired);
     }
 
 
@@ -519,24 +519,16 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
         std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>>& voxel_coords)
         const;
 
-    /**
-     * \brief Get the shared pointer to the octree.
-     *
-     * \return The shared pointer to the octree
-     */
-    std::shared_ptr<OctreeType> getOctree()
+    /** Return a reference to the internal se::Octree. */
+    OctreeType& getOctree()
     {
-        return octree_ptr_;
+        return octree_;
     };
 
-    /**
-     * \brief Get the const shared pointer to the octree.
-     *
-     * \return The const shared pointer to the octree
-     */
-    std::shared_ptr<OctreeType> getOctree() const
+    /** Return a constant reference to the internal se::Octree. */
+    const OctreeType& getOctree() const
     {
-        return octree_ptr_;
+        return octree_;
     };
 
     /** Return the axis-aligned bounding box in the world frame W of the map's allocated leaves. It
@@ -554,7 +546,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     protected:
-    std::shared_ptr<OctreeType> octree_ptr_;
+    OctreeType octree_;
     const float resolution_;          ///< The resolution of the map
     const Eigen::Vector3f dimension_; ///< The dimensions of the map
     const Eigen::Matrix4f T_MW_;      ///< The transformation from world to map frame

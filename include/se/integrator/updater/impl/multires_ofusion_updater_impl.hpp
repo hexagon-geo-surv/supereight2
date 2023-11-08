@@ -23,7 +23,7 @@ Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
     const Eigen::Matrix4f& T_WS,
     const int frame) :
         map_(map),
-        octree_(*(map.getOctree())),
+        octree_(map.getOctree()),
         sensor_(sensor),
         depth_img_(depth_img),
         T_SW_(math::to_inverse_transformation(T_WS)),

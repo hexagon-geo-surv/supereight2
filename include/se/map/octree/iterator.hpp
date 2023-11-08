@@ -230,7 +230,7 @@ class FrustumIterator : public BaseIterator<FrustumIterator<MapT, SensorT>> {
     FrustumIterator() : BaseIterator<FrustumIterator<MapT, SensorT>>(){};
 
     FrustumIterator(MapT& map, const SensorT& sensor, const Eigen::Matrix4f& T_SM) :
-            BaseIterator<FrustumIterator<MapT, SensorT>>(map.getOctree().get()),
+            BaseIterator<FrustumIterator<MapT, SensorT>>(&map.getOctree()),
             map_ptr_(&map),
             sensor_ptr_(&sensor),
             T_SM_(T_SM)

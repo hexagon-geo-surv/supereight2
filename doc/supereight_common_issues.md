@@ -46,14 +46,14 @@ stored it is still created and destroyed.
 
 ``` cpp
 // Correct, create a single copy of the shared pointer
-int size = map.getOctree()->getSize();
+int size = map.getOctree().getSize();
 for (...) {
     // Do stuff
 }
 
 // Wrong, create one copy of the shared pointer per iteration
 for (...) {
-    int size = map.getOctree()->getSize();
+    int size = map.getOctree().getSize();
     // Do stuff
 }
 ```

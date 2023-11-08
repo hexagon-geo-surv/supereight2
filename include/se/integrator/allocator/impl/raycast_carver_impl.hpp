@@ -42,7 +42,7 @@ RaycastCarver<MapT, SensorT>::RaycastCarver(MapT& map,
                                             const Eigen::Matrix4f& T_WS,
                                             const int frame) :
         map_(map),
-        octree_(*(map_.getOctree())),
+        octree_(map_.getOctree()),
         sensor_(sensor),
         depth_img_(depth_img),
         T_WS_(T_WS),

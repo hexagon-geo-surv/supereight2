@@ -34,7 +34,7 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
 {
     unsigned int block_size = BlockType::getSize();
     const Eigen::Matrix4f T_SW = math::to_inverse_transformation(T_WS_);
-    const Octree<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>& octree = *map_.getOctree();
+    const Octree<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>& octree = map_.getOctree();
 
     auto valid_predicate = [&](float depth_value) { return depth_value >= sensor_.near_plane; };
 

@@ -254,7 +254,7 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
 
 
 
-    const int max_scale = map.getOctree()->getMaxScale();
+    const int max_scale = map.getOctree().getMaxScale();
     for (int scale = 0; scale < max_scale; scale++) {
         map.saveMaxFieldSlices(config.app.slice_path + "/test-max-field-slice-max-field-scale-"
                                    + std::to_string(scale) + "-x.vtk",

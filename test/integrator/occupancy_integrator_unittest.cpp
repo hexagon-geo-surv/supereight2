@@ -93,7 +93,7 @@ TEST_F(OccupancyIntegrator, propagation)
 {
     std::queue<const NodeType*> nodes;
     std::queue<const BlockType*> blocks;
-    const NodeType* const root = static_cast<const NodeType*>(map_.getOctree()->getRoot());
+    const NodeType* const root = static_cast<const NodeType*>(map_.getOctree().getRoot());
     ASSERT_TRUE(root);
     nodes.push(root);
 
