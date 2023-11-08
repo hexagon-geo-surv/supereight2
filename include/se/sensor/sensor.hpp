@@ -45,7 +45,7 @@ class SensorBase {
 
         /** The transformation from the sensor frame S to the body frame B.
          */
-        Eigen::Matrix4f T_BS = Eigen::Matrix4f::Identity();
+        Eigen::Isometry3f T_BS = Eigen::Isometry3f::Identity();
 
         /** The pixel-size to voxel-size ratio in physical coordinates for computing the integration scale.
          *  See SensorBase::computeIntegrationScale()
@@ -207,7 +207,7 @@ class SensorBase {
     bool left_hand_frame;
     float near_plane;
     float far_plane;
-    Eigen::Matrix4f T_BS;
+    Eigen::Isometry3f T_BS;
     std::vector<float> pixel_voxel_ratio_per_scale;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW

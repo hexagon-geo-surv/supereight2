@@ -84,7 +84,7 @@ int main(int argc, char** argv)
 
         // Setup input, processed and output imgs
         Eigen::Matrix4f T_WB = Eigen::Matrix4f::Identity(); //< Body to world transformation
-        Eigen::Matrix4f T_BS = sensor.T_BS;                 //< Sensor to body transformation
+        Eigen::Matrix4f T_BS = sensor.T_BS.matrix();        //< Sensor to body transformation
         Eigen::Matrix4f T_WS = T_WB * T_BS;                 //< Sensor to world transformation
 
         // ========= Tracker & Pose INITIALIZATION  =========

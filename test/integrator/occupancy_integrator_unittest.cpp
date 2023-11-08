@@ -17,8 +17,8 @@ class OccupancyIntegrator : public ::testing::Test {
         // Create a sensor.
         constexpr int w = 100;
         constexpr int h = w;
-        const Eigen::Matrix4f T_BS =
-            (Eigen::Matrix4f() << 0, 0, 1, 0, -1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1).finished();
+        const Eigen::Isometry3f T_BS(Eigen::AngleAxisf(M_PI / 2, Eigen::Vector3f::UnitY())
+                                     * Eigen::AngleAxisf(-M_PI / 2, Eigen::Vector3f::UnitZ()));
         const se::PinholeCamera sensor(
             {{w, h, 0.1f, 10.0f, T_BS}, 100.0f, 100.0f, w / 2 - 0.5f, h / 2 - 0.5f});
         // Create a z-up map with a wall integrated perpendicular to the the x axis at depth_value.
@@ -27,7 +27,7 @@ class OccupancyIntegrator : public ::testing::Test {
             sensor.model.imageWidth(), sensor.model.imageHeight(), depth_value);
         const Eigen::Matrix4f T_WB = Eigen::Matrix4f::Identity();
         se::MapIntegrator integrator(map_);
-        integrator.integrateDepth(sensor, depth, T_WB * T_BS, 0);
+        integrator.integrateDepth(sensor, depth, T_WB * T_BS.matrix(), 0);
     }
 
     public:

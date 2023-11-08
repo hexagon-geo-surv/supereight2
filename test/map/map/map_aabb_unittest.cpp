@@ -15,8 +15,8 @@ se::PinholeCamera generate_sensor()
 {
     constexpr int width = 100;
     constexpr int height = width;
-    const Eigen::Matrix4f T_BS =
-        (Eigen::Matrix4f() << 0, 0, 1, 0, -1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1).finished();
+    const Eigen::Isometry3f T_BS(Eigen::AngleAxisf(M_PI / 2, Eigen::Vector3f::UnitY())
+                                 * Eigen::AngleAxisf(-M_PI / 2, Eigen::Vector3f::UnitZ()));
     return se::PinholeCamera(
         {{width, height, 0.1f, 10.0f, T_BS}, 100.0f, 100.0f, width / 2 - 0.5f, height / 2 - 0.5f});
 }
@@ -28,7 +28,7 @@ void integrate_wall(MapT& map, const se::PinholeCamera& sensor, float depth_valu
         sensor.model.imageWidth(), sensor.model.imageHeight(), depth_value);
     const Eigen::Matrix4f T_WB = Eigen::Matrix4f::Identity();
     se::MapIntegrator integrator_stsdf(map);
-    integrator_stsdf.integrateDepth(sensor, depth, T_WB * sensor.T_BS, 0);
+    integrator_stsdf.integrateDepth(sensor, depth, T_WB * sensor.T_BS.matrix(), 0);
 }
 
 int dim_to_blocks(float dim, float block_dim)
@@ -141,7 +141,7 @@ TEST(Map, aabb_ray)
     sensorConfig.height = 1; // To satisfy assert
     sensorConfig.near_plane = 0.6f;
     sensorConfig.far_plane = 30.0f;
-    sensorConfig.T_BS = Eigen::Matrix4f::Identity();
+    sensorConfig.T_BS = Eigen::Isometry3f::Identity();
     sensorConfig.elevation_resolution_angle_ = static_cast<float>(elevation_res);
     sensorConfig.azimuth_resolution_angle_ = static_cast<float>(azimuth_res);
 
@@ -238,7 +238,7 @@ TEST(Map, aabb_ray_batch)
     sensorConfig.height = 1; // To satisfy assert
     sensorConfig.near_plane = 0.6f;
     sensorConfig.far_plane = 30.0f;
-    sensorConfig.T_BS = Eigen::Matrix4f::Identity();
+    sensorConfig.T_BS = Eigen::Isometry3f::Identity();
     sensorConfig.elevation_resolution_angle_ = static_cast<float>(elevation_res);
     sensorConfig.azimuth_resolution_angle_ = static_cast<float>(azimuth_res);
 

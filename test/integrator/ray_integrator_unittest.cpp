@@ -93,7 +93,7 @@ TEST(RayIntegrator, SingleRay)
     sensorConfig.height = 180;
     sensorConfig.near_plane = 0.2f;
     sensorConfig.far_plane = 30.0f;
-    sensorConfig.T_BS = Eigen::Matrix4f::Identity();
+    sensorConfig.T_BS = Eigen::Isometry3f::Identity();
     sensorConfig.elevation_resolution_angle_ = 1.0f;
     sensorConfig.azimuth_resolution_angle_ = 1.0f;
     const se::LeicaLidar sensor(sensorConfig);
@@ -214,7 +214,7 @@ TEST(RayIntegrator, Propagation)
     sensorConfig.height = 180;
     sensorConfig.near_plane = 0.6f;
     sensorConfig.far_plane = 30.0f;
-    sensorConfig.T_BS = Eigen::Matrix4f::Identity();
+    sensorConfig.T_BS = Eigen::Isometry3f::Identity();
     sensorConfig.elevation_resolution_angle_ = static_cast<float>(elevation_res);
     sensorConfig.azimuth_resolution_angle_ = static_cast<float>(azimuth_res);
 

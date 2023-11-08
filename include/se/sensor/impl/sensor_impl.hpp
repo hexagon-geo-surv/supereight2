@@ -174,7 +174,7 @@ std::ostream& operator<<(std::ostream& os, const typename se::SensorBase<Derived
     os << str_utils::value_to_pretty_str(c.height, "height") << " px\n";
     os << str_utils::value_to_pretty_str(c.near_plane, "near_plane") << " m\n";
     os << str_utils::value_to_pretty_str(c.far_plane, "far_plane") << " m\n";
-    os << str_utils::eigen_matrix_to_pretty_str(c.T_BS, "T_BS") << "\n";
+    os << str_utils::eigen_matrix_to_pretty_str(c.T_BS.matrix(), "T_BS") << "\n";
     return os;
 }
 
@@ -211,22 +211,22 @@ void se::SensorBase<DerivedT>::Config::readYaml(const std::string& filename)
     se::yaml::subnode_as_float(node, "near_plane", near_plane);
     se::yaml::subnode_as_float(node, "far_plane", far_plane);
 
-    T_BS = Eigen::Matrix4f::Identity();
+    T_BS = Eigen::Isometry3f::Identity();
 
     if (!node["T_BS"].isNone()) {
-        se::yaml::subnode_as_eigen_matrix4f(node, "T_BS", T_BS);
+        se::yaml::subnode_as_eigen_matrix4f(node, "T_BS", T_BS.matrix());
     }
 
     if (!node["t_BS"].isNone()) {
         Eigen::Vector3f t_BS;
         se::yaml::subnode_as_eigen_vector3f(node, "t_BS", t_BS);
-        T_BS.topRightCorner<3, 1>() = t_BS;
+        T_BS.translation() = t_BS;
     }
 
     if (!node["R_BS"].isNone()) {
         Eigen::Matrix3f R_BS;
         se::yaml::subnode_as_eigen_matrix3f(node, "R_BS", R_BS);
-        T_BS.topLeftCorner<3, 3>() = R_BS;
+        T_BS.linear() = R_BS;
     }
 }
 
