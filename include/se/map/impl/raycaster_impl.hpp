@@ -540,7 +540,7 @@ void raycast_volume(const MapT& map,
                     se::Image<Eigen::Vector3f>& surface_point_cloud_W,
                     se::Image<Eigen::Vector3f>& surface_normals_W,
                     se::Image<int8_t>& surface_scale,
-                    const Eigen::Matrix4f& T_WS,
+                    const Eigen::Isometry3f& T_WS,
                     const SensorT& sensor)
 {
     const typename MapT::OctreeType& octree = map.getOctree();
@@ -552,13 +552,11 @@ void raycast_volume(const MapT& map,
             const Eigen::Vector2f pixel_f = pixel.cast<float>();
             Eigen::Vector3f ray_dir_S; //< Ray direction in sensor frame
             sensor.model.backProject(pixel_f, &ray_dir_S);
-            const Eigen::Vector3f ray_dir_W =
-                (se::math::to_rotation(T_WS) * ray_dir_S.normalized()).head(3);
-            const Eigen::Vector3f t_WS = se::math::to_translation(T_WS);
+            const Eigen::Vector3f ray_dir_W = T_WS.linear() * ray_dir_S.normalized();
             std::optional<Eigen::Vector4f> surface_intersection_W =
                 raycast(map,
                         octree,
-                        t_WS,
+                        T_WS.translation(),
                         ray_dir_W,
                         sensor.nearDist(ray_dir_S),
                         sensor.farDist(ray_dir_S));

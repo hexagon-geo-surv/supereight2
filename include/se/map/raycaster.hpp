@@ -55,7 +55,7 @@ void raycast_volume(const MapT& map,
                     se::Image<Eigen::Vector3f>& surface_point_cloud_W,
                     se::Image<Eigen::Vector3f>& surface_normals_W,
                     se::Image<int8_t>& surface_scale,
-                    const Eigen::Matrix4f& T_WS,
+                    const Eigen::Isometry3f& T_WS,
                     const SensorT& sensor);
 
 void render_volume_kernel(uint32_t* volume_RGBA_image_data,
