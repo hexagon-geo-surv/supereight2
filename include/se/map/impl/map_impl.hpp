@@ -372,7 +372,7 @@ int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveStructure(const std::strin
                                                                 const Eigen::Matrix4f& T_WM) const
 {
     const QuadMesh mesh = octree_structure_mesh(octree_);
-    return io::save_mesh(mesh, filename, T_WM);
+    return io::save_mesh(mesh, filename, Eigen::Affine3f(T_WM));
 }
 
 
@@ -391,7 +391,7 @@ int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMesh(const std::string& fi
     Eigen::Matrix4f T_WM_scale = T_WM_;
     T_WM_scale.topLeftCorner<3, 3>() *= resolution_;
     const Eigen::Matrix4f T_OM = T_OW * T_WM_scale;
-    return io::save_mesh(mesh, filename, T_OM);
+    return io::save_mesh(mesh, filename, Eigen::Affine3f(T_OM));
 }
 
 
