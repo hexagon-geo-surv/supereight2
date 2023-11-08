@@ -10,6 +10,8 @@
 #ifndef SE_PREPROCESSOR_HPP
 #define SE_PREPROCESSOR_HPP
 
+#include <Eigen/Geometry>
+
 #include "se/image/image.hpp"
 
 namespace se {
@@ -43,7 +45,7 @@ void depth_to_point_cloud(se::Image<Eigen::Vector3f>& point_cloud_C,
 
 void point_cloud_to_depth(se::Image<float>& depth_image,
                           const se::Image<Eigen::Vector3f>& point_cloud_X,
-                          const Eigen::Matrix4f& T_CX);
+                          const Eigen::Isometry3f& T_CX);
 
 /**
  * NegY should only be true when reading an ICL-NUIM dataset which has a

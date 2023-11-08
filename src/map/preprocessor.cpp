@@ -112,12 +112,12 @@ void downsample_rgba(se::Image<uint32_t>& input_RGBA_img, se::Image<uint32_t>& o
 
 void point_cloud_to_depth(se::Image<float>& depth_image,
                           const se::Image<Eigen::Vector3f>& point_cloud_X,
-                          const Eigen::Matrix4f& T_CX)
+                          const Eigen::Isometry3f& T_CX)
 {
 #pragma omp parallel for
     for (int y = 0; y < depth_image.height(); y++) {
         for (int x = 0; x < depth_image.width(); x++) {
-            depth_image(x, y) = (T_CX * point_cloud_X(x, y).homogeneous()).z();
+            depth_image(x, y) = (T_CX * point_cloud_X(x, y)).z();
         }
     }
 }
