@@ -580,7 +580,7 @@ Eigen::AlignedBox3f Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::aabb() const
         aabb_v.corner(Eigen::AlignedBox3i::CornerType::TopRightCeil)).finished().cast<float>();
     // clang-format on
     const Eigen::Matrix<float, 3, 8> corners_W =
-        (T_WM_ * corners_M.colwise().homogeneous()).topRows<3>();
+        (T_WM_ * corners_M.colwise().homogeneous()).template topRows<3>();
     const Eigen::Vector3f aabb_min = corners_W.rowwise().minCoeff();
     const Eigen::Vector3f aabb_max = corners_W.rowwise().maxCoeff();
     return Eigen::AlignedBox3f(aabb_min, aabb_max);
