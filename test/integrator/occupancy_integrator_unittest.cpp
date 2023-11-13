@@ -21,13 +21,16 @@ class OccupancyIntegrator : public ::testing::Test {
                                      * Eigen::AngleAxisf(-M_PI / 2, Eigen::Vector3f::UnitZ()));
         const se::PinholeCamera sensor(
             {{w, h, 0.1f, 10.0f, T_BS}, 100.0f, 100.0f, w / 2 - 0.5f, h / 2 - 0.5f});
-        // Create a z-up map with a wall integrated perpendicular to the the x axis at depth_value.
-        constexpr float depth_value = 4.0f;
-        const se::Image<float> depth(
-            sensor.model.imageWidth(), sensor.model.imageHeight(), depth_value);
-        const Eigen::Isometry3f T_WB = Eigen::Isometry3f::Identity();
+        // Create a z-up map with a wall integrated perpendicular to the the x axis at 4 meters.
+        const se::Image<float> depth(sensor.model.imageWidth(), sensor.model.imageHeight(), 4.0f);
+        Eigen::Isometry3f T_WB = Eigen::Isometry3f::Identity();
+        int frame = 0;
         se::MapIntegrator integrator(map_);
-        integrator.integrateDepth(sensor, depth, T_WB * T_BS, 0);
+        integrator.integrateDepth(sensor, depth, T_WB * T_BS, frame++);
+        // Integrate the wall from a second, partially-overlapping pose so as to get some data with
+        // weight greater than 1.
+        T_WB.translation().y() += 1;
+        integrator.integrateDepth(sensor, depth, T_WB * T_BS, frame++);
     }
 
     public:
@@ -36,6 +39,8 @@ class OccupancyIntegrator : public ::testing::Test {
     typedef se::OccupancyMap<>::OctreeType::DataType DataType;
 
     se::OccupancyMap<> map_;
+
+
 
     static void expect_valid_node_data(const NodeType& node, const se::OctantBase* const child)
     {
@@ -50,10 +55,12 @@ class OccupancyIntegrator : public ::testing::Test {
         failure_message << "for node (" << node.getCoord().transpose() << ") with size "
                         << node.getSize();
         if (min_data.observed) {
-            EXPECT_LE(node.getMinData().occupancy, min_data.occupancy) << failure_message.str();
+            EXPECT_LE(se::get_field(node.getMinData()), se::get_field(min_data))
+                << failure_message.str();
         }
         if (max_data.observed) {
-            EXPECT_GE(node.getMaxData().occupancy, max_data.occupancy) << failure_message.str();
+            EXPECT_GE(se::get_field(node.getMaxData()), se::get_field(max_data))
+                << failure_message.str();
         }
     }
 
@@ -74,11 +81,11 @@ class OccupancyIntegrator : public ::testing::Test {
                     failure_message << "for block (" << parent_coord.transpose() << ") at scale "
                                     << scale;
                     if (child_min_data.observed) {
-                        EXPECT_LE(parent_min_data.occupancy, child_min_data.occupancy)
+                        EXPECT_LE(se::get_field(parent_min_data), se::get_field(child_min_data))
                             << failure_message.str();
                     }
                     if (child_max_data.observed) {
-                        EXPECT_GE(parent_max_data.occupancy, child_max_data.occupancy)
+                        EXPECT_GE(se::get_field(parent_max_data), se::get_field(child_max_data))
                             << failure_message.str();
                     }
                 }
