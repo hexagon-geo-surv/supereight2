@@ -122,7 +122,7 @@ inline field_t get_field(const Data<Field::TSDF, ColB, SemB>& data)
 template<Colour ColB, Semantics SemB>
 inline field_t get_field(const Data<Field::Occupancy, ColB, SemB>& data)
 {
-    return data.occupancy;
+    return data.occupancy * data.weight;
 }
 
 
