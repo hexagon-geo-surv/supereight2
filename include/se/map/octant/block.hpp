@@ -403,30 +403,6 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
         return block_max_data_[0][0];
     }
 
-    /**
-     * \brief Get the block's value at the coarsest scale.
-     *
-     * \warning The function does not return a reference to the value.
-     *
-     * \return The block's value at the coarsest scale
-     */
-    field_t meanValue()
-    {
-        return get_field(getData());
-    }
-
-    /**
-     * \brief Get the block's max value at the coarsest scale.
-     *
-     * \warning The function does not return a reference to the value.
-     *
-     * \return The block's max value at the coarsest scale
-     */
-    field_t maxValue()
-    {
-        return get_field(getMaxData());
-    }
-
     const std::vector<DataType*>& blockData() const
     {
         return block_data_;
