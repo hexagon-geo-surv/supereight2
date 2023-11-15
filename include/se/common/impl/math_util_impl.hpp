@@ -169,11 +169,12 @@ static inline Eigen::Matrix4f to_inverse_transformation(const Eigen::Matrix4f& T
 
 
 
-template<typename R, typename A, typename B>
-void clamp(Eigen::MatrixBase<R>& res, const Eigen::MatrixBase<A>& a, const Eigen::MatrixBase<B>& b)
+template<typename T, typename U, typename V>
+void clamp(Eigen::MatrixBase<T>& v,
+           const Eigen::MatrixBase<U>& low,
+           const Eigen::MatrixBase<V>& high)
 {
-    res = res.array().max(a.array());
-    res = res.array().min(b.array());
+    v = v.array().max(low.array()).min(high.array()).matrix();
 }
 
 
