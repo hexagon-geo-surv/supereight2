@@ -169,16 +169,6 @@ static inline Eigen::Matrix4f to_inverse_transformation(const Eigen::Matrix4f& T
 
 
 
-static inline void clamp(Eigen::Ref<Eigen::VectorXf> res,
-                         const Eigen::Ref<const Eigen::VectorXf> a,
-                         const Eigen::Ref<Eigen::VectorXf> b)
-{
-    res = (res.array() < a.array()).select(a, res);
-    res = (res.array() >= b.array()).select(b, res);
-}
-
-
-
 template<typename R, typename A, typename B>
 void clamp(Eigen::MatrixBase<R>& res, const Eigen::MatrixBase<A>& a, const Eigen::MatrixBase<B>& b)
 {
