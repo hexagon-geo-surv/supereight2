@@ -681,8 +681,6 @@ bool get_neighbours(const OctreeT& octree,
 template<typename OctreeT>
 typename OctreeT::DataType getData(const OctreeT& octree, const Eigen::Vector3i& voxel_coord)
 {
-    typename OctreeT::DataType data;
-
     const OctantBase* octant_ptr = fetcher::template leaf<OctreeT>(voxel_coord, octree.getRoot());
 
     if (!octant_ptr) // not allocated
@@ -727,8 +725,6 @@ getData(const OctreeT& octree,
         const int scale_desired,
         int& scale_returned)
 {
-    typename OctreeT::DataType data;
-
     const OctantBase* octant_ptr = fetcher::template leaf<OctreeT>(voxel_coord, octree.getRoot());
 
     if (!octant_ptr) // not allocated
@@ -799,8 +795,6 @@ template<typename OctreeT>
 typename std::enable_if_t<OctreeT::DataType::fld_ == Field::Occupancy, typename OctreeT::DataType>
 getMaxData(const OctreeT& octree, const Eigen::Vector3i& voxel_coord, const int scale_desired)
 {
-    typename OctreeT::DataType data;
-
     const OctantBase* octant_ptr =
         fetcher::template finest_octant<OctreeT>(voxel_coord, scale_desired, octree.getRoot());
 
@@ -894,7 +888,6 @@ template<typename OctreeT>
 typename std::enable_if_t<OctreeT::res_ == Res::Single, std::optional<field_t>>
 getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 {
-    typename OctreeT::DataType init_data;
     typename OctreeT::DataType neighbour_data[8] = {};
 
     const unsigned int octree_size = octree.getSize();
