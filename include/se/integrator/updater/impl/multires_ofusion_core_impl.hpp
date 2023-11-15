@@ -146,24 +146,28 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr, const 
             ? static_cast<const BlockT*>(child_ptr)->getMinData()
             : static_cast<const NodeT*>(child_ptr)->getMinData();
         // Only consider children with at least 1 integration.
-        if (child_min_data.weight > 0
-            && child_min_data.occupancy * child_min_data.weight < min_occupancy) {
-            min_mean_occupancy = child_min_data.occupancy;
-            min_weight = child_min_data.weight;
-            min_occupancy = min_mean_occupancy * min_weight;
-            min_data_count++;
+        if (child_min_data.weight > 0) {
+            const field_t occupancy = get_field(child_min_data);
+            if (occupancy < min_occupancy) {
+                min_mean_occupancy = child_min_data.occupancy;
+                min_weight = child_min_data.weight;
+                min_occupancy = occupancy;
+                min_data_count++;
+            }
         }
 
         const auto& child_max_data = child_ptr->isBlock()
             ? static_cast<const BlockT*>(child_ptr)->getMaxData()
             : static_cast<const NodeT*>(child_ptr)->getMaxData();
         // Only consider children with at least 1 integration.
-        if (child_max_data.weight > 0
-            && child_max_data.occupancy * child_max_data.weight > max_occupancy) {
-            max_mean_occupancy = child_max_data.occupancy;
-            max_weight = child_max_data.weight;
-            max_occupancy = max_mean_occupancy * max_weight;
-            max_data_count++;
+        if (child_max_data.weight > 0) {
+            const field_t occupancy = get_field(child_max_data);
+            if (occupancy > max_occupancy) {
+                max_mean_occupancy = child_max_data.occupancy;
+                max_weight = child_max_data.weight;
+                max_occupancy = occupancy;
+                max_data_count++;
+            }
         }
 
         assert(child_min_data.observed == child_max_data.observed);
@@ -255,8 +259,7 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
                                     max_data_at_child_scale[child_data_idx];
 
                                 if (child_max_data.weight > 0) {
-                                    const field_t occupancy =
-                                        child_max_data.occupancy * child_max_data.weight;
+                                    const field_t occupancy = get_field(child_max_data);
                                     if (occupancy > max_occupancy) {
                                         max_data_count++;
                                         // Update max
@@ -266,8 +269,7 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
                                     }
                                 }
                                 if (child_min_data.weight > 0) {
-                                    const field_t occupancy =
-                                        child_min_data.occupancy * child_min_data.weight;
+                                    const field_t occupancy = get_field(child_min_data);
                                     if (occupancy < min_occupancy) {
                                         min_data_count++;
                                         min_mean_occupancy = child_min_data.occupancy;
@@ -349,18 +351,17 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
                                     mean_occupancy += child_data.occupancy;
                                     mean_weight += child_data.weight;
 
-                                    field_t occupancy = (child_data.occupancy * child_data.weight);
-
+                                    const field_t occupancy = get_field(child_data);
                                     if (occupancy > max_occupancy) {
                                         // Update max
                                         max_mean_occupancy = child_data.occupancy;
                                         max_weight = child_data.weight;
-                                        max_occupancy = max_mean_occupancy * max_weight;
+                                        max_occupancy = occupancy;
                                     }
                                     if (occupancy < min_occupancy) {
                                         min_mean_occupancy = child_data.occupancy;
                                         min_weight = child_data.weight;
-                                        min_occupancy = min_mean_occupancy * min_weight;
+                                        min_occupancy = occupancy;
                                     }
                                 }
 
@@ -449,20 +450,20 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
                                     mean_occupancy += child_data.occupancy;
                                     mean_weight += child_data.weight;
 
-                                    if ((child_max_data.occupancy * child_max_data.weight)
-                                        > max_occupancy) {
+                                    const field_t child_max_occupancy = get_field(child_max_data);
+                                    if (child_max_occupancy > max_occupancy) {
                                         // Update max
                                         max_mean_occupancy = child_max_data.occupancy;
                                         max_weight = child_max_data.weight;
-                                        max_occupancy = max_mean_occupancy * max_weight;
+                                        max_occupancy = child_max_occupancy;
                                     }
 
-                                    if ((child_min_data.occupancy * child_min_data.weight)
-                                        < min_occupancy) {
+                                    const field_t child_min_occupancy = get_field(child_min_data);
+                                    if (child_min_occupancy < min_occupancy) {
                                         // Update min
                                         min_mean_occupancy = child_min_data.occupancy;
                                         min_weight = child_min_data.weight;
-                                        min_occupancy = min_mean_occupancy * min_weight;
+                                        min_occupancy = child_min_occupancy;
                                     }
                                 }
 

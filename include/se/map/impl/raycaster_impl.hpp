@@ -254,7 +254,7 @@ inline void advance_ray(const MapT& map,
     typename MapT::OctreeType::DataType data =
         se::visitor::getMaxData(octree, ray_origin_coord_f.cast<int>(), scale);
 
-    while (data.occupancy * data.weight > -0.2f && scale > 2) { // TODO Verify
+    while (get_field(data) > -0.2f && scale > 2) { // TODO Verify
         scale -= 1;
         data = se::visitor::getMaxData(octree, ray_origin_coord_f.cast<int>(), scale);
     }
@@ -313,8 +313,8 @@ inline void advance_ray(const MapT& map,
 
         data = se::visitor::getMaxData(octree, ray_coord_f.cast<int>(), scale);
 
-        if (data.occupancy * data.weight > -0.2f) {
-            while (data.occupancy * data.weight > -0.2f && scale > 2) {
+        if (get_field(data) > -0.2f) {
+            while (get_field(data) > -0.2f && scale > 2) {
                 scale -= 1;
                 data = se::visitor::getMaxData(octree, ray_coord_f.cast<int>(), scale);
             }
@@ -323,7 +323,7 @@ inline void advance_ray(const MapT& map,
             for (int s = scale + 1; s <= max_scale; s++) {
                 data = se::visitor::getMaxData(octree, ray_coord_f.cast<int>(), s);
 
-                if (data.occupancy * data.weight > -0.2f) {
+                if (get_field(data) > -0.2f) {
                     break;
                 }
                 scale += 1;

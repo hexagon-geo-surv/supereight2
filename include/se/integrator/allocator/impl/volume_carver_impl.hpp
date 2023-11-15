@@ -255,8 +255,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
 
                 if (child_data
                         .observed // Check if the child is fully observed (i.e. all children are observed) // TODO: incooperate MAX occupancy
-                    && child_data.occupancy * child_data.weight
-                        <= 0.95 * MapType::DataType::min_occupancy) {
+                    && get_field(child_data) <= 0.95 * MapType::DataType::min_occupancy) {
                     return;
                 }
             }
@@ -456,8 +455,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
 
                 if (child_data
                         .observed // Check if the child is fully observed (i.e. all children are observed) // TODO: incooperate MAX occupancy
-                    && child_data.occupancy * child_data.weight
-                        <= 0.95 * MapType::DataType::min_occupancy) {
+                    && get_field(child_data) <= 0.95 * MapType::DataType::min_occupancy) {
                     return;
                 }
             }
