@@ -22,13 +22,13 @@ float compute_three_sigma(const field_t depth_value,
 {
     if (config.uncertainty_model == UncertaintyModel::Linear) {
         return 3
-            * math::clamp(config.k_sigma * depth_value, sigma_min, sigma_max); // Livingroom dataset
+            * std::clamp(config.k_sigma * depth_value, sigma_min, sigma_max); // Livingroom dataset
     }
     else {
         return 3
-            * math::clamp(config.k_sigma * math::sq(depth_value),
-                          sigma_min,
-                          sigma_max); // Cow and lady
+            * std::clamp(config.k_sigma * math::sq(depth_value),
+                         sigma_min,
+                         sigma_max); // Cow and lady
     }
 }
 
@@ -44,7 +44,7 @@ float compute_tau(const field_t depth_value,
         return tau_max; ///<< e.g. used in ICL-NUIM livingroom dataset.
     }
     else {
-        return math::clamp(config.k_tau * depth_value, tau_min, tau_max);
+        return std::clamp(config.k_tau * depth_value, tau_min, tau_max);
     }
 }
 

@@ -95,7 +95,7 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
         const float tsdf_value = std::min(1.f, sdf_value / config_.truncation_boundary);
 
         data.tsdf = (data.tsdf * data.weight + tsdf_value) / (data.weight + 1.f);
-        data.tsdf = math::clamp(data.tsdf, -1.f, 1.f);
+        data.tsdf = std::clamp(data.tsdf, field_t(-1), field_t(1));
         data.weight = std::min(data.weight + 1, map_.getDataConfig().max_weight);
     }
 }

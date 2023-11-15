@@ -169,15 +169,6 @@ static inline Eigen::Matrix4f to_inverse_transformation(const Eigen::Matrix4f& T
 
 
 
-template<typename T>
-typename std::enable_if<std::is_arithmetic<T>::value, T>::type
-clamp(const T& f, const T& a, const T& b)
-{
-    return std::max(a, std::min(f, b));
-}
-
-
-
 static inline void clamp(Eigen::Ref<Eigen::VectorXf> res,
                          const Eigen::Ref<const Eigen::VectorXf> a,
                          const Eigen::Ref<Eigen::VectorXf> b)

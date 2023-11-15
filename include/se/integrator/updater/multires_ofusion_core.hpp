@@ -8,6 +8,7 @@
 #ifndef SE_MULTIRES_OFUSION_CORE_HPP
 #define SE_MULTIRES_OFUSION_CORE_HPP
 
+#include <algorithm>
 #include <limits>
 
 #include "se/common/str_utils.hpp"
