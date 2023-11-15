@@ -49,6 +49,16 @@ Eigen::AlignedBox<ScalarT, 3> transform(const Eigen::Transform<ScalarT, 3, Mode,
                                          corners_B.rowwise().maxCoeff());
 }
 
+
+
+template<typename T, typename U, typename V>
+void clamp(Eigen::MatrixBase<T>& x,
+           const Eigen::MatrixBase<U>& low,
+           const Eigen::MatrixBase<V>& high)
+{
+    x = x.array().max(low.array()).min(high.array()).matrix();
+}
+
 } // namespace eigen
 } // namespace se
 

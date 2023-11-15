@@ -169,16 +169,6 @@ static inline Eigen::Matrix4f to_inverse_transformation(const Eigen::Matrix4f& T
 
 
 
-template<typename T, typename U, typename V>
-void clamp(Eigen::MatrixBase<T>& v,
-           const Eigen::MatrixBase<U>& low,
-           const Eigen::MatrixBase<V>& high)
-{
-    v = v.array().max(low.array()).min(high.array()).matrix();
-}
-
-
-
 static inline Eigen::Vector3f
 plane_normal(const Eigen::Vector3f& p1, const Eigen::Vector3f& p2, const Eigen::Vector3f& p3)
 {

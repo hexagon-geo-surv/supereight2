@@ -31,6 +31,12 @@ template<typename ScalarT, int Mode, int Options>
 Eigen::AlignedBox<ScalarT, 3> transform(const Eigen::Transform<ScalarT, 3, Mode, Options>& T_BA,
                                         const Eigen::AlignedBox<ScalarT, 3>& box_A);
 
+/** Clamp the coefficients of \p v between those of \p low and \p high. */
+template<typename T, typename U, typename V>
+void clamp(Eigen::MatrixBase<T>& x,
+           const Eigen::MatrixBase<U>& low,
+           const Eigen::MatrixBase<V>& high);
+
 } // namespace eigen
 } // namespace se
 

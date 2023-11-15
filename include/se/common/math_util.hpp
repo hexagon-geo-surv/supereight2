@@ -67,12 +67,6 @@ static inline Eigen::Matrix3f to_inverse_rotation(const Eigen::Matrix4f& T);
 
 static inline Eigen::Matrix4f to_inverse_transformation(const Eigen::Matrix4f& T);
 
-/** Clamp the coefficients of \p v between those of \p low and \p high. */
-template<typename T, typename U, typename V>
-void clamp(Eigen::MatrixBase<T>& v,
-           const Eigen::MatrixBase<U>& low,
-           const Eigen::MatrixBase<V>& high);
-
 /*! \brief Compute the normal vector of a plane defined by 3 points.
  * The direction of the normal depends on the order of the points.
  */

@@ -8,7 +8,7 @@
 
 #include "se/map/raycaster.hpp"
 
-
+#include <se/common/eigen_utils.hpp>
 
 namespace se {
 namespace raycaster {
@@ -88,7 +88,7 @@ void render_volume_kernel(uint32_t* volume_RGBA_image_data,
                 const Eigen::Vector3f dir = Eigen::Vector3f::Constant(
                     std::max(surface_normal_M.normalized().dot(diff), 0.f));
                 Eigen::Vector3f col = dir + ambient_M;
-                se::math::clamp(col, Eigen::Vector3f::Zero(), Eigen::Vector3f::Ones());
+                se::eigen::clamp(col, Eigen::Vector3f::Zero(), Eigen::Vector3f::Ones());
 
                 col = col.cwiseProduct(se::colours::scale[surface_scale(x, y)]);
                 volume_RGBA_image_data[pixel_idx] = se::pack_rgba(col.x(), col.y(), col.z(), 0xFF);

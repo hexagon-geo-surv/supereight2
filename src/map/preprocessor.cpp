@@ -10,6 +10,7 @@
 #include "se/map/preprocessor.hpp"
 
 #include <iostream>
+#include <se/common/eigen_utils.hpp>
 
 #include "se/common/math_util.hpp"
 
@@ -200,10 +201,10 @@ void half_sample_robust_image(se::Image<float>& output_image,
             for (int i = -radius + 1; i <= radius; ++i) {
                 for (int j = -radius + 1; j <= radius; ++j) {
                     Eigen::Vector2i in_pixel_tmp = in_pixel + Eigen::Vector2i(j, i);
-                    se::math::clamp(in_pixel_tmp,
-                                    Eigen::Vector2i::Zero(),
-                                    Eigen::Vector2i(2 * output_image.width() - 1,
-                                                    2 * output_image.height() - 1));
+                    se::eigen::clamp(in_pixel_tmp,
+                                     Eigen::Vector2i::Zero(),
+                                     Eigen::Vector2i(2 * output_image.width() - 1,
+                                                     2 * output_image.height() - 1));
                     const float in_pixel_value_tmp =
                         input_image[in_pixel_tmp.x() + in_pixel_tmp.y() * input_image.width()];
                     if (fabsf(in_pixel_value_tmp - in_pixel_value) < e_d) {
