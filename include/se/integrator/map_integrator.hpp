@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
  * SPDX-FileCopyrightText: 2021 Nils Funk
  * SPDX-FileCopyrightText: 2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2022-2024 Simon Boche
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -14,6 +15,7 @@
 #include "se/common/math_util.hpp"
 #include "se/integrator/allocator/raycast_carver.hpp"
 #include "se/integrator/allocator/volume_carver.hpp"
+#include "se/integrator/ray_integrator.hpp"
 #include "se/map/octree/fetcher.hpp"
 #include "se/map/octree/integrator.hpp"
 #include "se/map/utils/setup_util.hpp"
@@ -110,6 +112,36 @@ class MapIntegrator {
                         const Eigen::Matrix4f& T_WS,
                         const unsigned int frame,
                         std::vector<const OctantBase*>& updated_octants);
+
+    /**
+     * \brief Integrate single ray measurement into the maps field representation.
+     *
+     * \tparam SensorT
+     * \param[in] ray_S       The measured ray in sensor frame
+     * \param[in] sensor      The sensor use for the projection
+     * \param[in] T_WS        The transformation from sensor to world frame
+     * \param[in] frame       The frame number to be integrated (number of so-far integrated rays)
+     */
+    template<typename SensorT>
+    void integrateRay(const SensorT& sensor,
+                      const Eigen::Vector3f& ray_S,
+                      const Eigen::Matrix4f& T_WS,
+                      const unsigned int frame);
+
+    /**
+     * \brief Integrate a batch of ray images into the maps field representation.
+     *
+     * \tparam SensorT
+     * \param[in] sensor      The sensor use for the projection
+     * \param[in] rayBatch    The batch of ray measurements (in sensor frame)
+     * \param[in] poseBatch   The batch of corresponding sensor poses in the world frame
+     * \param[in] frame       The frame number to be integrated (will be number of batch)
+     */
+    template<typename SensorT>
+    void integrateRayBatch(const SensorT& sensor,
+                           const std::vector<std::pair<Eigen::Matrix4f,Eigen::Vector3f>,
+                               Eigen::aligned_allocator<std::pair<Eigen::Matrix4f,Eigen::Vector3f>>>& rayPoseBatch,
+                           const unsigned int frame);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 

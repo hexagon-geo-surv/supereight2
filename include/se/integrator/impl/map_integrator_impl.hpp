@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
  * SPDX-FileCopyrightText: 2021 Nils Funk
  * SPDX-FileCopyrightText: 2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2022-2024 Simon Boche
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -39,6 +40,36 @@ struct IntegrateDepthImplD {
                           const Eigen::Matrix4f& T_WS,
                           const unsigned int frame,
                           std::vector<const OctantBase*>* updated_octants);
+};
+
+
+
+/**
+ * Integration helper struct for partial function specialisation
+ */
+template<se::Field FldT, se::Res ResT>
+struct IntegrateRayImplD {
+    template<typename SensorT, typename MapT>
+    static void integrate(MapT& map,
+                          const SensorT& sensor,
+                          const Eigen::Vector3f& ray_S,
+                          const Eigen::Matrix4f& T_WS,
+                          const unsigned int frame);
+};
+
+
+
+/**
+ * Integration helper struct for partial function specialisation
+ */
+template<se::Field FldT, se::Res ResT>
+struct IntegrateRayBatchImplD {
+    template<typename SensorT, typename MapT>
+    static void integrate(MapT& map,
+                          const SensorT& sensor,
+                          const std::vector<std::pair<Eigen::Matrix4f,Eigen::Vector3f>,
+                              Eigen::aligned_allocator<std::pair<Eigen::Matrix4f,Eigen::Vector3f>>>& rayPoseBatch,
+                          const unsigned int frame);
 };
 
 
@@ -91,9 +122,41 @@ struct IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi> {
 
 
 
+/**
+ * Multi-res OFusion integration helper struct for partial function specialisation
+ */
+template<>
+struct IntegrateRayImplD<se::Field::Occupancy, se::Res::Multi> {
+    template<typename SensorT, typename MapT>
+    static void integrate(MapT& map,
+                          const SensorT& sensor,
+                          const Eigen::Vector3f& depth_img,
+                          const Eigen::Matrix4f& T_WS,
+                          const unsigned int frame);
+};
+
+/**
+ * Multi-res OFusion integration helper struct for partial function specialisation
+ */
+template<>
+struct IntegrateRayBatchImplD<se::Field::Occupancy, se::Res::Multi> {
+    template<typename SensorT, typename MapT>
+    static void integrate(MapT& map,
+                          const SensorT& sensor,
+                          const std::vector<std::pair<Eigen::Matrix4f,Eigen::Vector3f>,
+                              Eigen::aligned_allocator<std::pair<Eigen::Matrix4f,Eigen::Vector3f>>>& rayPoseBatch,
+                          const unsigned int frame);
+};
+
+
 template<typename MapT>
 using IntegrateDepthImpl = IntegrateDepthImplD<MapT::fld_, MapT::res_>;
 
+template<typename MapT>
+using IntegrateRayImpl = IntegrateRayImplD<MapT::fld_, MapT::res_>;
+
+template<typename MapT>
+using IntegrateRayBatchImpl = IntegrateRayBatchImplD<MapT::fld_, MapT::res_>;
 
 
 template<se::Field FldT, se::Res ResT>
@@ -219,6 +282,65 @@ void IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
 
 
 
+template<typename SensorT, typename MapT>
+void IntegrateRayImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
+    MapT& map,
+    const SensorT& sensor,
+    const Eigen::Vector3f& ray_S,
+    const Eigen::Matrix4f& T_WS,
+    const unsigned int frame)
+{
+
+    omp_set_num_threads(3);
+    TICK("Ray Integration")
+    TICK("allocation-integration")
+    se::RayIntegrator rayIntegrator(map,sensor,ray_S,T_WS,frame);
+    rayIntegrator();
+    TOCK("allocation-integration")
+    TICK("propagateBlocksToCoarsestScale")
+    rayIntegrator.propagateBlocksToCoarsestScale();
+    TOCK("propagateBlocksToCoarsestScale")
+    TICK("propagateToRoot")
+    rayIntegrator.propagateToRoot();
+    TOCK("propagateToRoot")
+    TOCK("Ray Integration")
+}
+
+template<typename SensorT, typename MapT>
+void IntegrateRayBatchImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
+    MapT& map,
+    const SensorT& sensor,
+    const std::vector<std::pair<Eigen::Matrix4f,Eigen::Vector3f>, Eigen::aligned_allocator<std::pair<Eigen::Matrix4f,Eigen::Vector3f>>>& rayPoseBatch,
+    const unsigned int frame)
+{
+    se::RayIntegrator<MapT,SensorT> rayIntegrator(map, sensor, rayPoseBatch.at(0).second, rayPoseBatch.at(0).first, frame);
+
+    omp_set_num_threads(3); // ToDo: check if this holds for later functions?
+    // do downsampling
+    int skip_count = 0;
+
+    for(size_t i = 0; i < rayPoseBatch.size(); i++){
+        TICK("Ray Integration")
+        TICK("allocation-integration")
+        if(rayIntegrator.resetIntegrator(rayPoseBatch.at(i).second, rayPoseBatch.at(i).first, frame)){
+            rayIntegrator();
+        }else{
+            skip_count++;
+        }
+        TOCK("allocation-integration")
+        TOCK("Ray Integration")
+    }
+    // Do Propagations
+    TICK("propagateBlocksToCoarsestScale")
+    rayIntegrator.propagateBlocksToCoarsestScale();
+    TOCK("propagateBlocksToCoarsestScale")
+    TICK("propagateToRoot")
+    rayIntegrator.propagateToRoot();
+    TOCK("propagateToRoot")
+}
+
+
+
 } // namespace details
 
 
@@ -252,6 +374,30 @@ void MapIntegrator<MapT>::integrateDepth(const SensorT& sensor,
 {
     se::details::IntegrateDepthImpl<MapT>::integrate(
         map_, sensor, depth_img, T_WS, frame, &updated_octants);
+}
+
+
+
+template<typename MapT>
+template<typename SensorT>
+void MapIntegrator<MapT>::integrateRay(const SensorT& sensor,
+                                       const Eigen::Vector3f& ray_S,
+                                       const Eigen::Matrix4f& T_WS,
+                                       const unsigned int frame)
+{
+    se::details::IntegrateRayImpl<MapT>::integrate(map_, sensor, ray_S, T_WS, frame);
+}
+
+template<typename MapT>
+template<typename SensorT>
+void MapIntegrator<MapT>::integrateRayBatch(const SensorT& sensor,
+                                            const std::vector<std::pair<Eigen::Matrix4f,Eigen::Vector3f>, Eigen::aligned_allocator<std::pair<Eigen::Matrix4f,Eigen::Vector3f>>>& rayPoseBatch,
+                                            /*const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& rayBatch,
+                                            const std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f>>& poseBatch,*/
+                                            const unsigned int frame)
+{
+    //se::details::IntegrateRayBatchImpl<MapT>::integrate(map_, sensor, rayBatch, poseBatch, frame);
+    se::details::IntegrateRayBatchImpl<MapT>::integrate(map_, sensor, rayPoseBatch, frame);
 }
 
 

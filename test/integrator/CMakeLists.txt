@@ -7,3 +7,8 @@ add_executable(occupancy-integrator-unittest occupancy_integrator_unittest.cpp)
 target_compile_options(occupancy-integrator-unittest PRIVATE ${SE_PRIVATE_CXX_FLAGS})
 target_link_libraries(occupancy-integrator-unittest PRIVATE SRL::Supereight2 gtest_main)
 add_test(NAME occupancy-integrator-unittest COMMAND occupancy-integrator-unittest)
+
+add_executable(ray-integrator-unittest ray_integrator_unittest.cpp)
+target_compile_options(ray-integrator-unittest PRIVATE ${SE_PRIVATE_CXX_FLAGS})
+target_link_libraries(ray-integrator-unittest PRIVATE SRL::Supereight2 gtest_main)
+add_test(NAME ray-integrator-unittest COMMAND ray-integrator-unittest)
