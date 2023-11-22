@@ -1,7 +1,8 @@
 /*
- * SPDX-FileCopyrightText: 2020-2022 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2020-2024 Smart Robotics Lab, Imperial College London, Technical University of Munich
  * SPDX-FileCopyrightText: 2020-2022 Nils Funk
  * SPDX-FileCopyrightText: 2020-2022 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2022-2024 Simon Boche
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -216,6 +217,7 @@ class SensorBase {
 } // namespace se
 
 #include "impl/sensor_impl.hpp"
+#include "leica_lidar.hpp"
 #include "ouster_lidar.hpp"
 #include "pinhole_camera.hpp"
 

@@ -38,6 +38,7 @@ add_library(${LIB_NAME} STATIC
     "src/map/octant.cpp"
     "src/map/preprocessor.cpp"
     "src/map/raycaster.cpp"
+    "src/sensor/leica_lidar.cpp"
     "src/sensor/ouster_lidar.cpp"
     "src/sensor/pinhole_camera.cpp"
     "src/sensor/sensor.cpp"
