@@ -4,12 +4,14 @@
  * SPDX-FileCopyrightText: 2020-2022 Smart Robotics Lab, Imperial College London, Technical University of Munich
  * SPDX-FileCopyrightText: 2020-2021 Nils Funk
  * SPDX-FileCopyrightText: 2020-2022 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2022-2024 Simon Boche
  * SPDX-License-Identifier: MIT
  */
 
 #include "reader.hpp"
 
 #include "reader_interiornet.hpp"
+#include "reader_leica.hpp"
 #include "reader_newercollege.hpp"
 #include "reader_openni.hpp"
 #include "reader_raw.hpp"
@@ -37,6 +39,9 @@ se::Reader* se::create_reader(const se::ReaderConfig& config)
         break;
     case se::ReaderType::INTERIORNET:
         reader = new se::InteriorNetReader(config);
+        break;
+    case se::ReaderType::LEICA:
+        reader = new se::LeicaReader(config);
         break;
     default:
         std::cerr << "Error: Unrecognised file format, file not loaded\n";

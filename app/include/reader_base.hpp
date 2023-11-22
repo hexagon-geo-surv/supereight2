@@ -4,6 +4,7 @@
  * SPDX-FileCopyrightText: 2020-2023 Smart Robotics Lab, Imperial College London, Technical University of Munich
  * SPDX-FileCopyrightText: 2020-2022 Nils Funk
  * SPDX-FileCopyrightText: 2020-2023 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2022-2024 Simon Boche
  * SPDX-License-Identifier: MIT
  */
 
@@ -34,6 +35,8 @@ enum class ReaderType {
     INTERIORNET,
     /** Use the se::NewerCollegeReader. */
     NEWERCOLLEGE,
+    /** Use the se::LeicaReader. */
+    LEICA,
     UNKNOWN
 };
 
@@ -89,6 +92,39 @@ struct ReaderConfig {
      * printed.
      */
     int verbose = 0;
+
+    /** Type of Leica Reader ("rangeImage" or "ray")
+     *  \note Only for se::ReaderType::LEICA ("rangeImage" or "ray")
+     */
+    std::string leica_reader_type = "ray";
+
+    /** Provide Transformation Sensor (LiDAR) to Body (Drone) also to reader. T_BS.
+     *  \note Only for se::ReaderType::LEICA ("rangeImage" or "ray")
+     */
+    Eigen::Matrix4f T_BL = Eigen::Matrix4f::Identity();
+
+    /** The time for the interval of LiDAR Measurements that are grouped together as one scan and
+     *  converted to one range image
+     *  \note Only for se::ReaderType::LEICA ("rangeImage" or "ray")
+     */
+    float scan_time_interval = 1.0;
+
+    /** Flag whether motion compensation for single LiDAR measurements is applied.
+     * \note Only for se::ReaderType::LEICA ("rangeImage" or "ray")
+     */
+    bool use_motion_comp = false;
+
+    /** Width of range image to project points onto.
+     *  (Width default 360 results in 1 degree resolution for "rangeImage" type reader.)
+     *  \note Only for se::ReaderType::LEICA ("rangeImage" or "ray")
+     */
+    int width = 360;
+
+    /** Height of range image to project points onto.
+     *  (Height default 180 results in 1 degree resolution for "rangeImage" type reader.)
+     *  \note Only for se::ReaderType::LEICA ("rangeImage" or "ray")
+     */
+    int height = 180;
 
     /** Reads the struct members from the "reader" node of a YAML file. Members not present in the
      * YAML file aren't modified.
@@ -167,6 +203,29 @@ class Reader {
      * \return An appropriate status code.
      */
     ReaderStatus nextData(Image<float>& depth_image, Image<uint32_t>& rgba_image);
+
+
+    /** Read the next ray and ground truth pose.
+    *
+    * \note The frame number is incremented when calling this function.
+    *
+    * \param[out] ray_measurement The next ray (LiDAR) measurement.
+    * \param[out] T_WB        The next ground truth pose.
+    * \return An appropriate status code.
+    */
+    ReaderStatus nextData(Eigen::Vector3f& ray_measurement, Eigen::Matrix4f& T_WB);
+
+    /** Read the next batch of rays and ground truth poses.
+    *
+    * \note The frame number is incremented when calling this function.
+    *
+    * \param[in]  batch_interval Time interval over which measurements are aggregated
+    * \param[out] rayPoseBatch   The next batch of ray (LiDAR) measurements and corresponding poses.
+    * \return An appropriate status code.
+    */
+    ReaderStatus nextData(const float batch_interval,
+                          std::vector<std::pair<Eigen::Matrix4f,Eigen::Vector3f>,
+                              Eigen::aligned_allocator<std::pair<Eigen::Matrix4f,Eigen::Vector3f>>>& rayPoseBatch);
 
     /** Read the next depth and RGBA images and ground truth pose.
      *
@@ -322,6 +381,22 @@ class Reader {
      */
     void nextFrame();
 
+    /** Read next ray measurement.
+     *
+     * \param[out] ray_measurement The next (lidar) ray measurement.
+     * \return An appropriate status code.
+     */
+    virtual ReaderStatus nextRay(Eigen::Vector3f& ray_measurement);
+
+    /** Read next batch of ray measurements.
+     *
+     * \param[in]  batch_interval (Time) Interval over which measurements are aggregated
+     * \param[out] rayPoseBatch   The batch of (lidar) ray measurements.
+     * \return An appropriate status code.
+     */
+    virtual ReaderStatus nextRayBatch(const float batch_interval,
+                                      std::vector<std::pair<Eigen::Matrix4f,Eigen::Vector3f>,
+                                          Eigen::aligned_allocator<std::pair<Eigen::Matrix4f,Eigen::Vector3f>>>& rayPoseBatch);
     /** Read the next depth image.
      *
      * \param[out] depth_image The next depth image.

@@ -42,6 +42,9 @@ se::ReaderType se::string_to_reader_type(const std::string& s)
     else if (s_lowered == "interiornet") {
         return se::ReaderType::INTERIORNET;
     }
+    else if (s_lowered == "leica"){
+        return se::ReaderType::LEICA;
+    }
     else {
         return se::ReaderType::UNKNOWN;
     }
@@ -65,6 +68,9 @@ std::string se::reader_type_to_string(se::ReaderType t)
     }
     else if (t == se::ReaderType::INTERIORNET) {
         return "InteriorNet";
+    }
+    else if (t == se::ReaderType::LEICA){
+        return "leica";
     }
     else {
         return "unknown";
@@ -107,6 +113,13 @@ void se::ReaderConfig::readYaml(const std::string& filename)
     se::yaml::subnode_as_int(node, "verbose", verbose);
     se::yaml::subnode_as_string(node, "sequence_path", sequence_path);
     se::yaml::subnode_as_string(node, "ground_truth_file", ground_truth_file);
+    // Leica specific config params (initialised to default if not existing)
+    se::yaml::subnode_as_string(node, "leica_reader_type", leica_reader_type);
+    se::yaml::subnode_as_float(node, "scan_time_interval", scan_time_interval);
+    se::yaml::subnode_as_bool(node, "use_motion_comp", use_motion_comp);
+    se::yaml::subnode_as_int(node, "width", width);
+    se::yaml::subnode_as_int(node, "height", height);
+    se::yaml::subnode_as_eigen_matrix4f(fs["sensor"], "T_BS", T_BL);
 
     // Expand ~ in the paths.
     sequence_path = se::str_utils::expand_user(sequence_path);
@@ -136,6 +149,17 @@ std::ostream& se::operator<<(std::ostream& os, const se::ReaderConfig& c)
     os << str_utils::value_to_pretty_str(c.fps, "fps") << "\n";
     os << str_utils::bool_to_pretty_str(c.drop_frames, "drop_frames") << "\n";
     os << str_utils::value_to_pretty_str(c.verbose, "verbose") << "\n";
+
+    if(c.reader_type == se::ReaderType::LEICA){
+        os << str_utils::value_to_pretty_str(c.leica_reader_type, "leica_reader_type") << "\n";
+        os << str_utils::value_to_pretty_str(c.scan_time_interval, "scan_time_interval") << "\n";
+        if(c.leica_reader_type == "rangeImage"){
+            os << str_utils::value_to_pretty_str(c.use_motion_comp, "use_motion_comp") << "\n";
+            os << str_utils::value_to_pretty_str(c.width, "width") << "\n";
+            os << str_utils::value_to_pretty_str(c.height, "height") << "\n";
+        }
+        os << str_utils::eigen_matrix_to_pretty_str(c.T_BL, "T_BS") << "\n";
+    }
     return os;
 }
 
@@ -288,6 +312,53 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
         if (verbose_ >= 1) {
             std::clog << "Stopping reading due to nextPose() status: " << status_ << "\n";
         }
+    }
+    return status_;
+}
+
+se::ReaderStatus se::Reader::nextData(Eigen::Vector3f& ray_measurement,
+                                      Eigen::Matrix4f& T_WB)
+{
+    if (!good()) {
+        if (verbose_ >= 1) {
+            std::clog << "Stopping reading due to reader status: " << status_ << "\n";
+        }
+        return status_;
+    }
+    nextFrame();
+    status_ = nextRay(ray_measurement);
+    if (!good()) {
+        if (verbose_ >= 1) {
+            std::clog << "Stopping reading due to nextRay() status: " << status_ << "\n";
+        }
+        return status_;
+    }
+    status_ = mergeStatus(nextPose(T_WB), status_);
+    if (!good()) {
+        if (verbose_ >= 1) {
+            std::clog << "Stopping reading due to nextPose() status: " << status_ << "\n";
+        }
+    }
+    return status_;
+}
+
+se::ReaderStatus se::Reader::nextData(const float batch_interval,
+                                      std::vector<std::pair<Eigen::Matrix4f,Eigen::Vector3f>,
+                                          Eigen::aligned_allocator<std::pair<Eigen::Matrix4f,Eigen::Vector3f>>>& rayPoseBatch)
+{
+    if (!good()) {
+        if (verbose_ >= 1) {
+            std::clog << "Stopping reading due to reader status: " << status_ << "\n";
+        }
+        return status_;
+    }
+    nextFrame();
+    status_ = nextRayBatch(batch_interval, rayPoseBatch);
+    if (!good()) {
+        if (verbose_ >= 1) {
+            std::clog << "Stopping reading due to nextRayBatch() status: " << status_ << "\n";
+        }
+        return status_;
     }
     return status_;
 }
@@ -496,4 +567,15 @@ void se::Reader::nextFrame()
     // std::this_thread::sleep_for it might be drastically different than
     // curr_frame_timestamp.
     prev_frame_timestamp_ = chr::steady_clock::now();
+}
+
+se::ReaderStatus se::Reader::nextRay(Eigen::Vector3f& /*ray_measurement*/)
+{
+    return se::ReaderStatus::error;
+}
+
+se::ReaderStatus se::Reader::nextRayBatch(const float /*batch_interval*/, std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
+    Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>& /*rayPoseBatch*/)
+{
+    return se::ReaderStatus::error;
 }
