@@ -1,0 +1,75 @@
+%YAML:1.2
+# SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+# SPDX-License-Identifier: CC0-1.0
+
+map:
+  dim:                        [30.72, 30.72, 30.72]
+  res:                        0.03
+
+data:
+  # tsdf
+  truncation_boundary_factor: 8
+  max_weight:                 100
+
+  # occupancy
+  log_odd_min:                -5.015
+  log_odd_max:                 5.015
+  fs_integr_scale:            1
+  uncertainty_model:          linear
+  tau_min_factor:             3
+  tau_max_factor:             12
+  k_tau:                      0.05
+  sigma_min_factor:           1         # minimum/maximum uncertainty := 3 x sigma_min_factor/sigma_max_factor * voxel_dim
+  sigma_max_factor:           3         # minimum/maximum uncertainty := 3 x sigma_min_factor/sigma_max_factor * voxel_dim
+  k_sigma:                    0.05
+
+sensor:
+  width:                      360
+  height:                     180
+  elevation_angles:           []
+  azimuth_angles:             []
+  near_plane:                 0.2
+  far_plane:                  30.0
+  T_BS:                       [0.004088675978291, 0.003617778170131, 0.999985097093880, 0.154175877654483,
+                              -0.788916081238428, -0.614476792035727, 0.005448744156649, -0.000462884781525,
+                               0.614487346893446, -0.788926602245478, 0.000341726877956, -0.028905072502590,
+                               0.0000, 0.0000, 0.0000, 1.0000] # Flight 02: Body - to - sensor (LiDAR) for only mapping
+  # T_BS:                       [-0.0058, 0.0020, 1.0000, 0.1524, 0.3955, -0.9184, 0.0042, 0.0004, 0.9184, 0.3955, 0.0045, -0.0250, 0., 0., 0., 1.0000] # outdoor Flight 03
+  elevation_resolution_angle: 0.0674 # only used for ray-based integration [degree]
+  azimuth_resolution_angle:   0.1731 #1.0 # only used for ray-based integration [degree]
+
+tracker:
+  iterations:                 [10, 5, 4]
+  dist_threshold:             0.1
+  normal_threshold:           0.8
+  track_threshold:            0.15
+  icp_threshold:              0.00001
+
+reader:
+  reader_type:                "leica"
+  sequence_path:              ""
+  ground_truth_file:          "trajectory.csv"
+  fps:                        0.0
+  drop_frames:                false
+  verbose:                    0
+  # following parameters are only used for Leica BLK LiDAR sensor
+  leica_reader_type:          "ray" # "ray" | "rangeImage"
+  scan_time_interval:         1.0 # size of interval that lidar measurements are clustered together
+  use_motion_comp:            true
+  width:                      360 # only for "rangeImage; should match sensor.width
+  height:                     180 # only for "rangeImage; should match sensor.height
+
+app:
+  enable_ground_truth:        true
+  enable_rendering:           true
+  enable_gui:                 true
+  mesh_path:                  "./meshes"
+  slice_path:                 "./meshes"
+  structure_path:             "./meshes"
+  sensor_downsampling_factor: 1
+  tracking_rate:              1
+  integration_rate:           1
+  rendering_rate:             1
+  meshing_rate:               30
+  max_frames:                 -1
+  log_file:                   "./log.tsv"
