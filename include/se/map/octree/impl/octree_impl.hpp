@@ -178,7 +178,7 @@ template<typename DataT, Res ResT, int BlockSize>
 void Octree<DataT, ResT, BlockSize>::aabbExtend(const Eigen::Vector3i& voxel_coord, const int size)
 {
     const Eigen::AlignedBox3i octant_aabb(voxel_coord,
-                                          voxel_coord + Eigen::Vector3i::Constant(size));
+                                          voxel_coord + Eigen::Vector3i::Constant(size - 1));
     aabb_.extend(octant_aabb);
 }
 

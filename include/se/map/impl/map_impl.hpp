@@ -573,8 +573,18 @@ const Eigen::AlignedBox3f& Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::aabb() 
             cached_aabb_.setEmpty();
         }
         else {
-            cached_aabb_ = eigen::transform(Eigen::Isometry3f(T_WM_) * Eigen::Scaling(resolution_),
-                                            cached_octree_aabb_.cast<float>());
+            // Extend the the octree AABB so that it contains the whole volume and not just the
+            // voxel coordinates. Then get the immediately smaller floats for the upper limit so
+            // that no equality tests are performed with the vertices/edges/faces of the AABB that
+            // are away from the origin. This is done because valid voxel coordinates must be
+            // strictly smaller than the octree size.
+            Eigen::AlignedBox3f a(cached_octree_aabb_.min().cast<float>(),
+                                  (cached_octree_aabb_.max().array() + 1).cast<float>());
+            for (int i = 0; i < a.dim(); i++) {
+                a.max()[i] = std::nextafter(a.max()[i], a.min()[i]);
+            }
+            cached_aabb_ =
+                eigen::transform(Eigen::Isometry3f(T_WM_) * Eigen::Scaling(resolution_), a);
         }
     }
     return cached_aabb_;

@@ -127,9 +127,11 @@ class Octree {
      */
     void deleteChildren(NodeType* parent_ptr);
 
-    /** Return the axis-aligned bounding box of the octree's allocated leaves. The bounding box
-     * contains the whole allocated volume, not just the voxel origins thus the coordinates of its
-     * vertices can be in the interval [0, se::Octree::getSize()] inclusive.
+    /** Return the axis-aligned bounding box of the octree's allocated leaves. The bounding box is
+     * computed using the coordinates of allocated voxels, not using the whole allocated volume.
+     * Thus the coordinates of its vertices are in the interval [0, se::Octree::getSize()) and it
+     * can be used to safely test if some voxel is contained in it using
+     * Eigen::AlignedBox3i::contains().
      */
     const Eigen::AlignedBox3i& aabb() const;
 

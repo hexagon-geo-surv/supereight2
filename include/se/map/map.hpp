@@ -539,7 +539,9 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
         return octree_ptr_;
     };
 
-    /** Return the axis-aligned bounding box in the world frame W of the map's allocated leaves.
+    /** Return the axis-aligned bounding box in the world frame W of the map's allocated leaves. It
+     * can be used to test if some point expressed in the world frame W is contained in it using
+     * Eigen::AlignedBox3f::contains().
      */
     const Eigen::AlignedBox3f& aabb() const;
 
