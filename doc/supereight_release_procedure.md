@@ -24,7 +24,7 @@ git remote add public git@bitbucket.org:smartroboticslab/supereight2.git
    running
 
    ``` sh
-   ./run_tests.sh -u 18.04 devel; ./run_tests.sh -d ~/Documents/Datasets/ -u 20.04 devel
+   ./run_tests.sh -u 18.04,22.04 devel; ./run_tests.sh -d ~/Documents/Datasets/ -u 20.04 devel
    ```
 
 1. Pull the latest commits in the `devel` and `master` branches from the private
@@ -44,7 +44,7 @@ git remote add public git@bitbucket.org:smartroboticslab/supereight2.git
     # Set the project version in CMakeLists.txt to X.Y.Z and then:
     se2_version='vX.Y.Z'
     git add CMakeLists.txt
-    git commit -m "Bump version to $se2_version"
+    git commit -m "Increment version to $se2_version"
     git push origin devel
     ```
 
@@ -76,4 +76,3 @@ git remote add public git@bitbucket.org:smartroboticslab/supereight2.git
     git push origin "$se2_version"
     git push public "$se2_version"
     ```
-
