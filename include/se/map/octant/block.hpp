@@ -234,9 +234,9 @@ class BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT> {
     int min_scale_;
     int curr_scale_;
 
-    const DerivedT& underlying() const
+    const DerivedT* underlying() const
     {
-        return static_cast<const DerivedT&>(*this);
+        return static_cast<const DerivedT*>(this);
     }
 };
 

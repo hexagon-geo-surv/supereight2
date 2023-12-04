@@ -108,7 +108,7 @@ int BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getVoxelI
 {
     assert(scale >= 0);
     assert(scale <= max_scale_);
-    const Eigen::Vector3i voxel_offset = (voxel_coord - this->underlying().coord_) / (1 << scale);
+    const Eigen::Vector3i voxel_offset = (voxel_coord - underlying()->coord_) / (1 << scale);
     const int size_at_scale = size_at_scales_[scale];
     return scale_offsets_[scale] + voxel_offset.x() + voxel_offset.y() * size_at_scale
         + voxel_offset.z() * math::sq(size_at_scale);
