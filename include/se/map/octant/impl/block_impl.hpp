@@ -356,7 +356,7 @@ int BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getV
 {
     assert(scale >= 0);
     assert(scale <= max_scale_);
-    const Eigen::Vector3i voxel_offset = (voxel_coord - this->underlying().coord_) / (1 << scale);
+    const Eigen::Vector3i voxel_offset = (voxel_coord - underlying()->coord_) / (1 << scale);
     const int size_at_scale = BlockSize >> scale;
     return voxel_offset.x() + voxel_offset.y() * size_at_scale
         + voxel_offset.z() * math::sq(size_at_scale);
@@ -426,7 +426,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getData(
         return init_data_;
     }
     else {
-        Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
+        Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord_;
         voxel_offset = voxel_offset / (1 << scale);
         const int size_at_scale = BlockSize >> scale;
         return block_data_[max_scale_ - scale][voxel_offset.x() + voxel_offset.y() * size_at_scale
@@ -446,7 +446,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getData(
         return init_data_;
     }
     else {
-        Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
+        Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord_;
         voxel_offset = voxel_offset / (1 << scale);
         const int size_at_scale = BlockSize >> scale;
         return block_data_[max_scale_ - scale][voxel_offset.x() + voxel_offset.y() * size_at_scale
@@ -512,7 +512,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getMinDa
         return init_data_;
     }
     else {
-        Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
+        Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord_;
         voxel_offset = voxel_offset / (1 << scale);
         const int size_at_scale = BlockSize >> scale;
         return block_min_data_[max_scale_ - scale][voxel_offset.x()
@@ -533,7 +533,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getMinDa
         return init_data_;
     }
     else {
-        Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
+        Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord_;
         voxel_offset = voxel_offset / (1 << scale);
         const int size_at_scale = BlockSize >> scale;
         return block_min_data_[max_scale_ - scale][voxel_offset.x()
@@ -600,7 +600,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getMaxDa
         return init_data_;
     }
     else {
-        Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
+        Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord_;
         voxel_offset = voxel_offset / (1 << scale);
         const int size_at_scale = BlockSize >> scale;
         return block_max_data_[max_scale_ - scale][voxel_offset.x()
@@ -621,7 +621,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getMaxDa
         return init_data_;
     }
     else {
-        Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
+        Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord_;
         voxel_offset = voxel_offset / (1 << scale);
         const int size_at_scale = BlockSize >> scale;
         return block_max_data_[max_scale_ - scale][voxel_offset.x()
