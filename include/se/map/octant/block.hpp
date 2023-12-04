@@ -722,10 +722,6 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
 
     DataType init_data_;
 
-    DerivedT& underlying()
-    {
-        return static_cast<DerivedT&>(*this);
-    }
     const DerivedT& underlying() const
     {
         return static_cast<const DerivedT&>(*this);
