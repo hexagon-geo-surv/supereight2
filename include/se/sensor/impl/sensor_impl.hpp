@@ -156,14 +156,6 @@ std::string SensorBase<DerivedT>::type()
 
 
 template<typename DerivedT>
-DerivedT& SensorBase<DerivedT>::underlying()
-{
-    return static_cast<DerivedT&>(*this);
-}
-
-
-
-template<typename DerivedT>
 const DerivedT& SensorBase<DerivedT>::underlying() const
 {
     return static_cast<const DerivedT&>(*this);

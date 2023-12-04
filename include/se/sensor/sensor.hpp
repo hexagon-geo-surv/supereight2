@@ -208,7 +208,6 @@ class SensorBase {
     friend DerivedT;
 
     // Simplify access to derived member functions
-    DerivedT& underlying();
     const DerivedT& underlying() const;
 };
 
