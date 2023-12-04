@@ -91,7 +91,7 @@ class NodeMultiRes<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
     const DataType& getData() const
     {
         static const DataType default_data = DataType();
-        return (data_.observed && this->underlying().isLeaf()) ? data_ : default_data;
+        return (data_.observed && underlying()->isLeaf()) ? data_ : default_data;
     }
 
     const DataType& getMinData() const
@@ -135,9 +135,9 @@ class NodeMultiRes<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
     DataType min_data_;
 
     private:
-    const DerivedT& underlying() const
+    const DerivedT* underlying() const
     {
-        return static_cast<const DerivedT&>(*this);
+        return static_cast<const DerivedT*>(this);
     }
 };
 
