@@ -135,11 +135,6 @@ class NodeMultiRes<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
     DataType min_data_;
 
     private:
-    // Helper functions to access the derived variables.
-    DerivedT& underlying()
-    {
-        return static_cast<DerivedT&>(*this);
-    }
     const DerivedT& underlying() const
     {
         return static_cast<const DerivedT&>(*this);
