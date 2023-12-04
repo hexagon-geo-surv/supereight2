@@ -106,13 +106,13 @@ void BaseIterator<DerivedT>::init()
 
             // Check if root is part of iterator
             if constexpr (DerivedT::has_ignore_condition == true) {
-                if (this->underlying().doIgnore(root)) {
+                if (underlying()->doIgnore(root)) {
                     nextData();
                     return;
                 }
             }
 
-            if (this->underlying().isNext(root)) {
+            if (underlying()->isNext(root)) {
                 octant_ = root;
                 return;
             }
@@ -139,7 +139,7 @@ void BaseIterator<DerivedT>::nextData()
         octant_stack_.pop();
 
         if constexpr (DerivedT::has_ignore_condition == true) {
-            if (this->underlying().doIgnore(octant)) {
+            if (underlying()->doIgnore(octant)) {
                 continue;
             }
         }
@@ -155,7 +155,7 @@ void BaseIterator<DerivedT>::nextData()
             // Then continue until a leaf is found
         }
 
-        if (this->underlying().isNext(octant)) {
+        if (underlying()->isNext(octant)) {
             octant_ = octant;
             return;
         }
