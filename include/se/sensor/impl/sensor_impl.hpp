@@ -40,7 +40,7 @@ bool SensorBase<DerivedT>::projectToPixelValue(const Eigen::Vector3f& point_S,
                                                ValidPredicate valid_predicate) const
 {
     Eigen::Vector2f pixel_f;
-    if (this->underlying().model.project(point_S, &pixel_f)
+    if (underlying()->model.project(point_S, &pixel_f)
         != srl::projection::ProjectionStatus::Successful) {
         return false;
     }
@@ -62,7 +62,7 @@ bool SensorBase<DerivedT>::getPixelValue(const Eigen::Vector2f& pixel_f,
                                          float& img_value,
                                          ValidPredicate valid_predicate) const
 {
-    if (!this->underlying().model.isInImage(pixel_f)) {
+    if (!underlying()->model.isInImage(pixel_f)) {
         return false;
     }
     Eigen::Vector2i pixel = se::round_pixel(pixel_f);
@@ -83,7 +83,7 @@ int SensorBase<DerivedT>::computeIntegrationScale(const Eigen::Vector3f& block_c
                                                   const int min_scale,
                                                   const int max_block_scale) const
 {
-    return this->underlying().computeIntegrationScaleImpl(
+    return underlying()->computeIntegrationScaleImpl(
         block_centre_S, map_res, last_scale, min_scale, max_block_scale);
 }
 
@@ -92,7 +92,7 @@ int SensorBase<DerivedT>::computeIntegrationScale(const Eigen::Vector3f& block_c
 template<typename DerivedT>
 float SensorBase<DerivedT>::nearDist(const Eigen::Vector3f& ray_S) const
 {
-    return this->underlying().nearDistImpl(ray_S);
+    return underlying()->nearDistImpl(ray_S);
 }
 
 
@@ -100,7 +100,7 @@ float SensorBase<DerivedT>::nearDist(const Eigen::Vector3f& ray_S) const
 template<typename DerivedT>
 float SensorBase<DerivedT>::farDist(const Eigen::Vector3f& ray_S) const
 {
-    return this->underlying().farDistImpl(ray_S);
+    return underlying()->farDistImpl(ray_S);
 }
 
 
@@ -108,7 +108,7 @@ float SensorBase<DerivedT>::farDist(const Eigen::Vector3f& ray_S) const
 template<typename DerivedT>
 float SensorBase<DerivedT>::measurementFromPoint(const Eigen::Vector3f& point_S) const
 {
-    return this->underlying().measurementFromPointImpl(point_S);
+    return underlying()->measurementFromPointImpl(point_S);
 }
 
 
@@ -116,7 +116,7 @@ float SensorBase<DerivedT>::measurementFromPoint(const Eigen::Vector3f& point_S)
 template<typename DerivedT>
 bool SensorBase<DerivedT>::pointInFrustum(const Eigen::Vector3f& point_S) const
 {
-    return this->underlying().pointInFrustumImpl(point_S);
+    return underlying()->pointInFrustumImpl(point_S);
 }
 
 
@@ -124,7 +124,7 @@ bool SensorBase<DerivedT>::pointInFrustum(const Eigen::Vector3f& point_S) const
 template<typename DerivedT>
 bool SensorBase<DerivedT>::pointInFrustumInf(const Eigen::Vector3f& point_S) const
 {
-    return this->underlying().pointInFrustumInfImpl(point_S);
+    return underlying()->pointInFrustumInfImpl(point_S);
 }
 
 
@@ -133,7 +133,7 @@ template<typename DerivedT>
 bool SensorBase<DerivedT>::sphereInFrustum(const Eigen::Vector3f& centre_S,
                                            const float radius) const
 {
-    return this->underlying().sphereInFrustumImpl(centre_S, radius);
+    return underlying()->sphereInFrustumImpl(centre_S, radius);
 }
 
 
@@ -142,7 +142,7 @@ template<typename DerivedT>
 bool SensorBase<DerivedT>::sphereInFrustumInf(const Eigen::Vector3f& centre_S,
                                               const float radius) const
 {
-    return this->underlying().sphereInFrustumInfImpl(centre_S, radius);
+    return underlying()->sphereInFrustumInfImpl(centre_S, radius);
 }
 
 
@@ -156,9 +156,9 @@ std::string SensorBase<DerivedT>::type()
 
 
 template<typename DerivedT>
-const DerivedT& SensorBase<DerivedT>::underlying() const
+const DerivedT* SensorBase<DerivedT>::underlying() const
 {
-    return static_cast<const DerivedT&>(*this);
+    return static_cast<const DerivedT*>(this);
 }
 
 
