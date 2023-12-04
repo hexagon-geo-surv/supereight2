@@ -57,9 +57,9 @@ class BlockSingleRes {
     static constexpr int min_scale_ = 0;
     static constexpr int curr_scale_ = 0;
 
-    const DerivedT& underlying() const
+    const DerivedT* underlying() const
     {
-        return static_cast<const DerivedT&>(*this);
+        return static_cast<const DerivedT*>(this);
     }
 };
 

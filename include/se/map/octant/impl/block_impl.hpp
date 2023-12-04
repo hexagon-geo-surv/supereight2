@@ -46,9 +46,9 @@ template<typename DerivedT, typename DataT, int BlockSize>
 const typename BlockSingleRes<DerivedT, DataT, BlockSize>::DataType&
 BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const Eigen::Vector3i& voxel_coord) const
 {
-    const Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
-    const int voxel_idx = voxel_offset.x() + voxel_offset.y() * this->underlying().size
-        + voxel_offset.z() * this->underlying().size_sq;
+    const Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord_;
+    const int voxel_idx = voxel_offset.x() + voxel_offset.y() * underlying()->size
+        + voxel_offset.z() * underlying()->size_sq;
     return getData(voxel_idx);
 }
 
@@ -58,9 +58,9 @@ template<typename DerivedT, typename DataT, int BlockSize>
 typename BlockSingleRes<DerivedT, DataT, BlockSize>::DataType&
 BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const Eigen::Vector3i& voxel_coord)
 {
-    const Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
-    const int voxel_idx = voxel_offset.x() + voxel_offset.y() * this->underlying().size
-        + voxel_offset.z() * this->underlying().size_sq;
+    const Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord_;
+    const int voxel_idx = voxel_offset.x() + voxel_offset.y() * underlying()->size
+        + voxel_offset.z() * underlying()->size_sq;
     return getData(voxel_idx);
 }
 
@@ -70,9 +70,9 @@ template<typename DerivedT, typename DataT, int BlockSize>
 void BlockSingleRes<DerivedT, DataT, BlockSize>::setData(const Eigen::Vector3i& voxel_coord,
                                                          const DataType& data)
 {
-    const Eigen::Vector3i voxel_offset = voxel_coord - this->underlying().coord_;
-    const int voxel_idx = voxel_offset.x() + voxel_offset.y() * this->underlying().size
-        + voxel_offset.z() * this->underlying().size_sq;
+    const Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord_;
+    const int voxel_idx = voxel_offset.x() + voxel_offset.y() * underlying()->size
+        + voxel_offset.z() * underlying()->size_sq;
     setData(voxel_idx, data);
 }
 
