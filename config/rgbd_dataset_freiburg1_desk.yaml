@@ -26,10 +26,10 @@ data:
 sensor:
   width:                      640
   height:                     480
-  fx:                         525
-  fy:                         525
-  cx:                         319.5
-  cy:                         239.5
+  fx:                         517.3
+  fy:                         516.5
+  cx:                         318.6
+  cy:                         255.3
   near_plane:                 0.4
   far_plane:                  6.0
 
@@ -62,4 +62,3 @@ app:
   meshing_rate:               0
   max_frames:                 -1
   log_file:                   "log.tsv"
-
