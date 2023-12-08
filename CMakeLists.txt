@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: CC0-1.0
 
 cmake_minimum_required(VERSION 3.10...3.16)
-project(Supereight2 VERSION 0.15.0 LANGUAGES C CXX)
+project(Supereight2 VERSION 0.16.0 LANGUAGES C CXX)
 
 option(SE_OPENMP "Compile supereight with OpenMP" ON)
 option(SE_IPO "Compile supereight with interprocedural optimization in Release" ON)
