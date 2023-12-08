@@ -35,7 +35,7 @@ class BlockSingleRes {
 
     DataType& getData(const Eigen::Vector3i& voxel_coord);
 
-    void setData(const unsigned voxel_idx, const DataT& data);
+    void setData(const int voxel_idx, const DataT& data);
 
     void setData(const Eigen::Vector3i& voxel_coord, const DataT& data);
 

@@ -79,8 +79,7 @@ void BlockSingleRes<DerivedT, DataT, BlockSize>::setData(const Eigen::Vector3i& 
 
 
 template<typename DerivedT, typename DataT, int BlockSize>
-void BlockSingleRes<DerivedT, DataT, BlockSize>::setData(const unsigned voxel_idx,
-                                                         const DataType& data)
+void BlockSingleRes<DerivedT, DataT, BlockSize>::setData(const int voxel_idx, const DataType& data)
 {
     assert(voxel_idx >= 0);
     assert(static_cast<size_t>(voxel_idx) < block_data_.size());
