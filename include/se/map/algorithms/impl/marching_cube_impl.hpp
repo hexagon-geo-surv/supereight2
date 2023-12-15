@@ -88,7 +88,9 @@ Eigen::Vector3f compute_intersection(const OctreeT& octree,
     const field_t value_1 = get_field(visitor::getData(octree, coord_1));
     const Eigen::Vector3f point_0_M = coord_0.cast<float>() + se::sample_offset_frac;
     const Eigen::Vector3f point_1_M = coord_1.cast<float>() + se::sample_offset_frac;
-    return point_0_M + (0 - value_0) / (value_1 - value_0) * (point_1_M - point_0_M);
+    return point_0_M
+        + (OctreeT::DataType::surface_boundary - value_0) / (value_1 - value_0)
+        * (point_1_M - point_0_M);
 }
 
 template<typename OctreeT>
@@ -207,9 +209,9 @@ Eigen::Vector3f compute_dual_intersection(const DataT& data_0,
 {
     const field_t value_0 = get_field(data_0);
     const field_t value_1 = get_field(data_1);
-    float iso_value = 0.f;
     return dual_point_0_M
-        + (iso_value - value_0) / (value_1 - value_0) * (dual_point_1_M - dual_point_0_M);
+        + (DataT::surface_boundary - value_0) / (value_1 - value_0)
+        * (dual_point_1_M - dual_point_0_M);
 }
 
 

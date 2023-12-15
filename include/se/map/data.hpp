@@ -133,13 +133,13 @@ inline bool is_inside(const Data<FldT, ColB, SemB>& data);
 template<Colour ColB, Semantics SemB>
 inline bool is_inside(const Data<Field::TSDF, ColB, SemB>& data)
 {
-    return get_field(data) < 0;
+    return get_field(data) < Data<Field::TSDF, ColB, SemB>::surface_boundary;
 }
 
 template<Colour ColB, Semantics SemB>
 inline bool is_inside(const Data<Field::Occupancy, ColB, SemB>& data)
 {
-    return get_field(data) > 0;
+    return get_field(data) > Data<Field::Occupancy, ColB, SemB>::surface_boundary;
 }
 
 
