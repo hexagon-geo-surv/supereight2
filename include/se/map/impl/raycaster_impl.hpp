@@ -418,7 +418,7 @@ raycast(MapT& map,
                 }
                 continue;
             }
-            value_tt = std::optional<se::field_t>(data.occupancy);
+            value_tt = std::optional<field_t>(get_field(data));
             point_W_tt = ray_pos_W;
             if (*value_tt > -0.2f) {
                 value_tt = map.getFieldInterp(ray_pos_W, scale_tt);
