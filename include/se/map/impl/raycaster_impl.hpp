@@ -489,7 +489,7 @@ raycast(MapT& map,
         float stepsize = largestep;
         Eigen::Vector3f point_W = ray_origin_W + ray_dir_W * t;
         typename MapT::DataType data = map.template getData<se::Safe::On>(point_W);
-        float f_t = data.tsdf;
+        float f_t = get_field(data);
         float f_tt = 0;
         int scale_tt = 0;
         if (f_t >= 0) { // ups, if we were already in it, then don't render anything here
@@ -501,7 +501,7 @@ raycast(MapT& map,
                     continue;
                 }
 
-                f_tt = data.tsdf;
+                f_tt = get_field(data);
                 if (f_tt <= 0.1 && f_tt >= -0.5f) {
                     std::optional<se::field_t> field_value = [&]() -> std::optional<se::field_t> {
                         if constexpr (MapT::res_ == se::Res::Single) {
