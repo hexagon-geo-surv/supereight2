@@ -139,7 +139,7 @@ inline bool is_inside(const Data<Field::TSDF, ColB, SemB>& data)
 template<Colour ColB, Semantics SemB>
 inline bool is_inside(const Data<Field::Occupancy, ColB, SemB>& data)
 {
-    return data.occupancy > 0;
+    return get_field(data) > 0;
 }
 
 
