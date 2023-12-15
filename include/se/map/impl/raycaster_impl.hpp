@@ -399,8 +399,7 @@ raycast(MapT& map,
     t += step_size;
 
     // if we are not already in it
-    if (*value_t <= 0) // MultiresOFusion::surface_boundary
-    {
+    if (*value_t <= MapT::DataType::surface_boundary) {
         for (; t < t_far; t += step_size) {
             ray_pos_W = ray_origin_W + ray_dir_W * t;
             DataType data = map.getData(ray_pos_W);
@@ -412,8 +411,7 @@ raycast(MapT& map,
                     return Eigen::Vector4f::Zero();
                 }
 
-                if (*value_t > 0) // MultiresOFusion::surface_boundary
-                {
+                if (*value_t > MapT::DataType::surface_boundary) {
                     break;
                 }
                 continue;
@@ -429,26 +427,24 @@ raycast(MapT& map,
                     if (!value_t) {
                         return std::nullopt;
                     }
-                    if (*value_t > 0) // MultiresOFusion::surface_boundary
-                    {
+                    if (*value_t > MapT::DataType::surface_boundary) {
                         break;
                     }
                     continue;
                 }
             }
-            if (*value_tt > 0.f) // MultiresOFusion::surface_boundary
-            {                    // got it, jump out of inner loop
+            if (*value_tt > MapT::DataType::surface_boundary) { // got it, jump out of inner loop
                 break;
             }
             value_t = value_tt;
             point_W_t = point_W_tt;
         }
-        if (*value_tt > 0.f && *value_t < 0.f) // MultiresOFusion::surface_boundary
-        {
+        if (*value_tt > MapT::DataType::surface_boundary
+            && *value_t < MapT::DataType::surface_boundary) {
             // We overshot. Need to move backwards for zero crossing.
             t = t
-                - (point_W_tt - point_W_t).norm() * (*value_tt - 0.f)
-                    / (*value_tt - *value_t); // MultiresOFusion::surface_boundary
+                - (point_W_tt - point_W_t).norm() * (*value_tt - MapT::DataType::surface_boundary)
+                    / (*value_tt - *value_t);
             Eigen::Vector4f surface_point_W = (ray_origin_W + ray_dir_W * t).homogeneous();
             surface_point_W.w() = scale_tt;
             return surface_point_W;
@@ -492,7 +488,8 @@ raycast(MapT& map,
         float f_t = get_field(data);
         float f_tt = 0;
         int scale_tt = 0;
-        if (f_t >= 0) { // ups, if we were already in it, then don't render anything here
+        // if we are not already in it
+        if (f_t >= MapT::DataType::surface_boundary) {
             for (; t < t_far; t += stepsize) {
                 data = map.template getData<se::Safe::On>(point_W);
                 if (!se::is_valid(data)) {
@@ -516,7 +513,7 @@ raycast(MapT& map,
                     }
                 }
 
-                if (f_tt < 0) {
+                if (f_tt < MapT::DataType::surface_boundary) {
                     break;
                 } // got it, jump out of inner loop
 
@@ -524,8 +521,9 @@ raycast(MapT& map,
                 point_W += stepsize * ray_dir_W;
                 f_t = f_tt;
             }
-            if (f_tt < 0) { // got it, calculate accurate intersection
-                t = t + stepsize * f_tt / (f_t - f_tt);
+            // got it, calculate accurate intersection
+            if (f_tt < MapT::DataType::surface_boundary) {
+                t = t - stepsize * (f_tt - MapT::DataType::surface_boundary) / (f_tt - f_t);
                 Eigen::Vector4f intersection_W = (ray_origin_W + ray_dir_W * t).homogeneous();
                 intersection_W.w() = scale_tt;
                 return intersection_W;
