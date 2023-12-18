@@ -31,11 +31,8 @@ Eigen::Vector3f compute_intersection(const OctreeT& octree,
                                      const Eigen::Vector3i& dest_coord);
 
 template<typename OctreeT>
-Eigen::Vector3f interp_vertexes(const OctreeT& octree,
-                                const unsigned x,
-                                const unsigned y,
-                                const unsigned z,
-                                const int edge);
+Eigen::Vector3f
+interp_vertexes(const OctreeT& octree, const int x, const int y, const int z, const int edge);
 
 template<typename BlockT>
 void gather_data(const BlockT* block,
@@ -54,9 +51,9 @@ void gather_data(const OctreeT& octree,
 template<typename OctreeT>
 uint8_t compute_index(const OctreeT& octree,
                       const typename OctreeT::BlockType* block_ptr,
-                      const unsigned x,
-                      const unsigned y,
-                      const unsigned z);
+                      const int x,
+                      const int y,
+                      const int z);
 
 
 
