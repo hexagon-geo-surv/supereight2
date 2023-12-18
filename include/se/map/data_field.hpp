@@ -33,6 +33,7 @@ struct FieldData<Field::TSDF> {
     field_t tsdf = 1;
     weight_t weight = 0;
     static constexpr bool invert_normals = true;
+    static constexpr field_t surface_boundary = 0;
 };
 
 ///////////////////
