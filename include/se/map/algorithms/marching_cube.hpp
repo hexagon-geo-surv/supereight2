@@ -26,30 +26,30 @@ namespace meshing {
 /// Single-res marching cube implementation
 
 template<typename OctreeT>
-inline Eigen::Vector3f compute_intersection(const OctreeT& octree,
-                                            const Eigen::Vector3i& source_coord,
-                                            const Eigen::Vector3i& dest_coord);
+Eigen::Vector3f compute_intersection(const OctreeT& octree,
+                                     const Eigen::Vector3i& source_coord,
+                                     const Eigen::Vector3i& dest_coord);
 
 template<typename OctreeT>
-inline Eigen::Vector3f interp_vertexes(const OctreeT& octree,
-                                       const unsigned x,
-                                       const unsigned y,
-                                       const unsigned z,
-                                       const int edge);
+Eigen::Vector3f interp_vertexes(const OctreeT& octree,
+                                const unsigned x,
+                                const unsigned y,
+                                const unsigned z,
+                                const int edge);
 
 template<typename BlockT>
-inline void gather_data(const BlockT* block,
-                        typename BlockT::DataType data[8],
-                        const int x,
-                        const int y,
-                        const int z);
+void gather_data(const BlockT* block,
+                 typename BlockT::DataType data[8],
+                 const int x,
+                 const int y,
+                 const int z);
 
 template<typename OctreeT>
-inline void gather_data(const OctreeT& octree,
-                        typename OctreeT::DataType data[8],
-                        const int x,
-                        const int y,
-                        const int z);
+void gather_data(const OctreeT& octree,
+                 typename OctreeT::DataType data[8],
+                 const int x,
+                 const int y,
+                 const int z);
 
 template<typename OctreeT>
 uint8_t compute_index(const OctreeT& octree,
@@ -70,7 +70,7 @@ inline Eigen::Vector3f compute_dual_intersection(const float value_0,
                                                  const int /* edge_case */);
 
 template<typename DataT, typename ValueSelector>
-inline Eigen::Vector3f
+Eigen::Vector3f
 interp_dual_vertexes(const int edge,
                      const DataT data[8],
                      const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>&
@@ -91,7 +91,7 @@ static const Eigen::Vector3f norm_dual_offset_f[8] = {{-1, -1, -1},
                                                       {-1, +1, +1}};
 
 template<typename BlockT, typename DataT>
-inline void gather_dual_data(
+void gather_dual_data(
     const BlockT* block,
     const int scale,
     const Eigen::Vector3f& primal_corner_coord_f,
@@ -141,7 +141,7 @@ static const Eigen::Vector3i logical_dual_offset[8] = {{-1, -1, -1},
                                                        {-1, +0, +0}};
 
 template<typename OctreeT, typename DataT>
-inline void gather_dual_data(
+void gather_dual_data(
     const OctreeT& octree,
     const typename OctreeT::BlockType* block,
     const int scale,

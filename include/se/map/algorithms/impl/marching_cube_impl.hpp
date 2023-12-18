@@ -80,9 +80,9 @@ static constexpr auto frontier = [](const auto data[8]) -> std::uint8_t {
 /// Single-res marching cube implementation
 
 template<typename OctreeT>
-inline Eigen::Vector3f compute_intersection(const OctreeT& octree,
-                                            const Eigen::Vector3i& source_coord,
-                                            const Eigen::Vector3i& dest_coord)
+Eigen::Vector3f compute_intersection(const OctreeT& octree,
+                                     const Eigen::Vector3i& source_coord,
+                                     const Eigen::Vector3i& dest_coord)
 {
     typename OctreeT::DataType data_0 = se::visitor::getData(octree, source_coord);
     const float value_0 = get_field(data_0);
@@ -97,11 +97,11 @@ inline Eigen::Vector3f compute_intersection(const OctreeT& octree,
 }
 
 template<typename OctreeT>
-inline Eigen::Vector3f interp_vertexes(const OctreeT& octree,
-                                       const unsigned x,
-                                       const unsigned y,
-                                       const unsigned z,
-                                       const int edge)
+Eigen::Vector3f interp_vertexes(const OctreeT& octree,
+                                const unsigned x,
+                                const unsigned y,
+                                const unsigned z,
+                                const int edge)
 {
     switch (edge) {
     case 0:
@@ -139,15 +139,15 @@ inline Eigen::Vector3f interp_vertexes(const OctreeT& octree,
         return compute_intersection(
             octree, Eigen::Vector3i(x, y, z + 1), Eigen::Vector3i(x, y + 1, z + 1));
     }
-    return Eigen::Vector3f::Constant(0);
+    return Eigen::Vector3f::Zero();
 }
 
 template<typename BlockT>
-inline void gather_data(const BlockT* block_ptr,
-                        typename BlockT::DataType data_arr[8],
-                        const int x,
-                        const int y,
-                        const int z)
+void gather_data(const BlockT* block_ptr,
+                 typename BlockT::DataType data_arr[8],
+                 const int x,
+                 const int y,
+                 const int z)
 {
     data_arr[0] = block_ptr->getData(Eigen::Vector3i(x, y, z));
     data_arr[1] = block_ptr->getData(Eigen::Vector3i(x + 1, y, z));
@@ -162,11 +162,11 @@ inline void gather_data(const BlockT* block_ptr,
 
 
 template<typename OctreeT>
-inline void gather_data(const OctreeT& octree,
-                        typename OctreeT::DataType data[8],
-                        const int x,
-                        const int y,
-                        const int z)
+void gather_data(const OctreeT& octree,
+                 typename OctreeT::DataType data[8],
+                 const int x,
+                 const int y,
+                 const int z)
 {
     data[0] = se::visitor::getData(octree, Eigen::Vector3i(x, y, z));
     data[1] = se::visitor::getData(octree, Eigen::Vector3i(x + 1, y, z));
@@ -223,7 +223,7 @@ inline Eigen::Vector3f compute_dual_intersection(const float value_0,
 
 
 template<typename DataT>
-inline Eigen::Vector3f
+Eigen::Vector3f
 interp_dual_vertexes(const int edge,
                      const DataT data[8],
                      const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>&
@@ -309,7 +309,7 @@ interp_dual_vertexes(const int edge,
 
 
 template<typename BlockT, typename DataT>
-inline void gather_dual_data(
+void gather_dual_data(
     const BlockT* block_ptr,
     const int scale,
     const Eigen::Vector3f& primal_corner_coord_f,
@@ -722,7 +722,7 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i& primal_corner_coord_rel
 
 
 template<typename OctreeT, typename DataT>
-inline void gather_dual_data(
+void gather_dual_data(
     const OctreeT& octree,
     const typename OctreeT::BlockType* block_ptr,
     const int scale,
