@@ -59,12 +59,11 @@ uint8_t compute_index(const OctreeT& octree,
 
 /// Multires-res marching cube implementation
 
-inline Eigen::Vector3f compute_dual_intersection(const float value_0,
-                                                 const float value_1,
-                                                 const Eigen::Vector3f& dual_corner_coord_0,
-                                                 const Eigen::Vector3f& dual_corner_coord_1,
-                                                 const float voxel_dim,
-                                                 const int /* edge_case */);
+template<typename DataT>
+Eigen::Vector3f compute_dual_intersection(const DataT& data_0,
+                                          const DataT& data_1,
+                                          const Eigen::Vector3f& dual_point_0_M,
+                                          const Eigen::Vector3f& dual_point_1_M);
 
 template<typename DataT, typename ValueSelector>
 Eigen::Vector3f

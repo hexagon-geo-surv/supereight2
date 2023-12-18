@@ -199,17 +199,17 @@ uint8_t compute_index(const OctreeT& octree,
 
 /// Multi-res marching cube implementation
 
-inline Eigen::Vector3f compute_dual_intersection(const float value_0,
-                                                 const float value_1,
-                                                 const Eigen::Vector3f& dual_corner_coord_0,
-                                                 const Eigen::Vector3f& dual_corner_coord_1,
-                                                 const int /* edge_case */)
+template<typename DataT>
+Eigen::Vector3f compute_dual_intersection(const DataT& data_0,
+                                          const DataT& data_1,
+                                          const Eigen::Vector3f& dual_point_0_M,
+                                          const Eigen::Vector3f& dual_point_1_M)
 {
-    Eigen::Vector3f dual_point_0_M = dual_corner_coord_0;
-    Eigen::Vector3f dual_point_1_M = dual_corner_coord_1;
+    const field_t value_0 = get_field(data_0);
+    const field_t value_1 = get_field(data_1);
     float iso_value = 0.f;
     return dual_point_0_M
-        + (iso_value - value_0) * (dual_point_1_M - dual_point_0_M) / (value_1 - value_0);
+        + (iso_value - value_0) / (value_1 - value_0) * (dual_point_1_M - dual_point_0_M);
 }
 
 
@@ -223,77 +223,41 @@ interp_dual_vertexes(const int edge,
 {
     switch (edge) {
     case 0:
-        return compute_dual_intersection(get_field(data[0]),
-                                         get_field(data[1]),
-                                         dual_corner_coords_f[0],
-                                         dual_corner_coords_f[1],
-                                         0);
+        return compute_dual_intersection(
+            data[0], data[1], dual_corner_coords_f[0], dual_corner_coords_f[1]);
     case 1:
-        return compute_dual_intersection(get_field(data[1]),
-                                         get_field(data[2]),
-                                         dual_corner_coords_f[1],
-                                         dual_corner_coords_f[2],
-                                         1);
+        return compute_dual_intersection(
+            data[1], data[2], dual_corner_coords_f[1], dual_corner_coords_f[2]);
     case 2:
-        return compute_dual_intersection(get_field(data[2]),
-                                         get_field(data[3]),
-                                         dual_corner_coords_f[2],
-                                         dual_corner_coords_f[3],
-                                         2);
+        return compute_dual_intersection(
+            data[2], data[3], dual_corner_coords_f[2], dual_corner_coords_f[3]);
     case 3:
-        return compute_dual_intersection(get_field(data[0]),
-                                         get_field(data[3]),
-                                         dual_corner_coords_f[0],
-                                         dual_corner_coords_f[3],
-                                         3);
+        return compute_dual_intersection(
+            data[0], data[3], dual_corner_coords_f[0], dual_corner_coords_f[3]);
     case 4:
-        return compute_dual_intersection(get_field(data[4]),
-                                         get_field(data[5]),
-                                         dual_corner_coords_f[4],
-                                         dual_corner_coords_f[5],
-                                         4);
+        return compute_dual_intersection(
+            data[4], data[5], dual_corner_coords_f[4], dual_corner_coords_f[5]);
     case 5:
-        return compute_dual_intersection(get_field(data[5]),
-                                         get_field(data[6]),
-                                         dual_corner_coords_f[5],
-                                         dual_corner_coords_f[6],
-                                         5);
+        return compute_dual_intersection(
+            data[5], data[6], dual_corner_coords_f[5], dual_corner_coords_f[6]);
     case 6:
-        return compute_dual_intersection(get_field(data[6]),
-                                         get_field(data[7]),
-                                         dual_corner_coords_f[6],
-                                         dual_corner_coords_f[7],
-                                         6);
+        return compute_dual_intersection(
+            data[6], data[7], dual_corner_coords_f[6], dual_corner_coords_f[7]);
     case 7:
-        return compute_dual_intersection(get_field(data[4]),
-                                         get_field(data[7]),
-                                         dual_corner_coords_f[4],
-                                         dual_corner_coords_f[7],
-                                         7);
+        return compute_dual_intersection(
+            data[4], data[7], dual_corner_coords_f[4], dual_corner_coords_f[7]);
     case 8:
-        return compute_dual_intersection(get_field(data[0]),
-                                         get_field(data[4]),
-                                         dual_corner_coords_f[0],
-                                         dual_corner_coords_f[4],
-                                         8);
+        return compute_dual_intersection(
+            data[0], data[4], dual_corner_coords_f[0], dual_corner_coords_f[4]);
     case 9:
-        return compute_dual_intersection(get_field(data[1]),
-                                         get_field(data[5]),
-                                         dual_corner_coords_f[1],
-                                         dual_corner_coords_f[5],
-                                         9);
+        return compute_dual_intersection(
+            data[1], data[5], dual_corner_coords_f[1], dual_corner_coords_f[5]);
     case 10:
-        return compute_dual_intersection(get_field(data[2]),
-                                         get_field(data[6]),
-                                         dual_corner_coords_f[2],
-                                         dual_corner_coords_f[6],
-                                         10);
+        return compute_dual_intersection(
+            data[2], data[6], dual_corner_coords_f[2], dual_corner_coords_f[6]);
     case 11:
-        return compute_dual_intersection(get_field(data[3]),
-                                         get_field(data[7]),
-                                         dual_corner_coords_f[3],
-                                         dual_corner_coords_f[7],
-                                         11);
+        return compute_dual_intersection(
+            data[3], data[7], dual_corner_coords_f[3], dual_corner_coords_f[7]);
     }
     return Eigen::Vector3f::Constant(0);
 }
