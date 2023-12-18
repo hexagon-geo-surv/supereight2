@@ -27,8 +27,8 @@ namespace meshing {
 
 template<typename OctreeT>
 Eigen::Vector3f compute_intersection(const OctreeT& octree,
-                                     const Eigen::Vector3i& source_coord,
-                                     const Eigen::Vector3i& dest_coord);
+                                     const Eigen::Vector3i& coord_0,
+                                     const Eigen::Vector3i& coord_1);
 
 template<typename OctreeT>
 Eigen::Vector3f

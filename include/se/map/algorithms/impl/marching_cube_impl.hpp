@@ -81,19 +81,14 @@ static constexpr auto frontier = [](const auto data[8]) -> std::uint8_t {
 
 template<typename OctreeT>
 Eigen::Vector3f compute_intersection(const OctreeT& octree,
-                                     const Eigen::Vector3i& source_coord,
-                                     const Eigen::Vector3i& dest_coord)
+                                     const Eigen::Vector3i& coord_0,
+                                     const Eigen::Vector3i& coord_1)
 {
-    typename OctreeT::DataType data_0 = se::visitor::getData(octree, source_coord);
-    const float value_0 = get_field(data_0);
-
-    typename OctreeT::DataType data_1 = se::visitor::getData(octree, dest_coord);
-    const float value_1 = get_field(data_1);
-
-    Eigen::Vector3f source_point_M = (source_coord.cast<float>() + se::sample_offset_frac);
-    Eigen::Vector3f dest_point_M = (dest_coord.cast<float>() + se::sample_offset_frac);
-
-    return source_point_M + (0.0 - value_0) * (dest_point_M - source_point_M) / (value_1 - value_0);
+    const field_t value_0 = get_field(visitor::getData(octree, coord_0));
+    const field_t value_1 = get_field(visitor::getData(octree, coord_1));
+    const Eigen::Vector3f point_0_M = coord_0.cast<float>() + se::sample_offset_frac;
+    const Eigen::Vector3f point_1_M = coord_1.cast<float>() + se::sample_offset_frac;
+    return point_0_M + (0 - value_0) / (value_1 - value_0) * (point_1_M - point_0_M);
 }
 
 template<typename OctreeT>
