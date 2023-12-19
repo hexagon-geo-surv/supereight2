@@ -217,11 +217,9 @@ Eigen::Vector3f compute_dual_intersection(const DataT& data_0,
 
 
 template<typename DataT>
-Eigen::Vector3f
-interp_dual_vertexes(const int edge,
-                     const DataT data[8],
-                     const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>&
-                         dual_corner_coords_f)
+Eigen::Vector3f interp_dual_vertexes(const int edge,
+                                     const DataT data[8],
+                                     const std::array<Eigen::Vector3f, 8>& dual_corner_coords_f)
 {
     switch (edge) {
     case 0:
@@ -267,12 +265,11 @@ interp_dual_vertexes(const int edge,
 
 
 template<typename BlockT, typename DataT>
-void gather_dual_data(
-    const BlockT* block_ptr,
-    const int scale,
-    const Eigen::Vector3f& primal_corner_coord_f,
-    DataT data_arr[8],
-    std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& dual_corner_coords_f)
+void gather_dual_data(const BlockT* block_ptr,
+                      const int scale,
+                      const Eigen::Vector3f& primal_corner_coord_f,
+                      DataT data_arr[8],
+                      std::array<Eigen::Vector3f, 8>& dual_corner_coords_f)
 {
     // In the local case:        actual_dual_offset = actual_dual_scaling * norm_dual_offset_f and
     // dual_corner_coords_f = primal_corner_coord_f + actual_dual_scaling * norm_dual_offset_f
@@ -680,13 +677,12 @@ inline void norm_dual_corner_idxs(const Eigen::Vector3i& primal_corner_coord_rel
 
 
 template<typename OctreeT, typename DataT>
-void gather_dual_data(
-    const OctreeT& octree,
-    const typename OctreeT::BlockType* block_ptr,
-    const int scale,
-    const Eigen::Vector3i& primal_corner_coord,
-    DataT data_arr[8],
-    std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& dual_corner_coords_f)
+void gather_dual_data(const OctreeT& octree,
+                      const typename OctreeT::BlockType* block_ptr,
+                      const int scale,
+                      const Eigen::Vector3i& primal_corner_coord,
+                      DataT data_arr[8],
+                      std::array<Eigen::Vector3f, 8>& dual_corner_coords_f)
 {
     const Eigen::Vector3i primal_corner_coord_rel = primal_corner_coord - block_ptr->getCoord();
 
@@ -763,15 +759,14 @@ void gather_dual_data(
 
 
 template<typename OctreeT, typename DataT, typename DataToIndexF>
-void compute_dual_index(
-    const OctreeT& octree,
-    const typename OctreeT::BlockType* block_ptr,
-    const int scale,
-    const Eigen::Vector3i& primal_corner_coord,
-    uint8_t& edge_pattern_idx,
-    DataT data[8],
-    std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& dual_corner_coords_f,
-    DataToIndexF data_to_index)
+void compute_dual_index(const OctreeT& octree,
+                        const typename OctreeT::BlockType* block_ptr,
+                        const int scale,
+                        const Eigen::Vector3i& primal_corner_coord,
+                        uint8_t& edge_pattern_idx,
+                        DataT data[8],
+                        std::array<Eigen::Vector3f, 8>& dual_corner_coords_f,
+                        DataToIndexF data_to_index)
 {
     const unsigned int block_size = block_ptr->getSize();
     // The local case is independent of the scale.
@@ -907,8 +902,8 @@ void dual_marching_cube_kernel(OctreeT& octree,
 
                     uint8_t edge_pattern_idx;
                     typename OctreeT::DataType data[8];
-                    std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>
-                        dual_corner_coords_f(8, Eigen::Vector3f::Constant(0));
+                    std::array<Eigen::Vector3f, 8> dual_corner_coords_f;
+                    dual_corner_coords_f.fill(Eigen::Vector3f::Zero());
                     meshing::compute_dual_index(octree,
                                                 block_ptr,
                                                 voxel_scale,

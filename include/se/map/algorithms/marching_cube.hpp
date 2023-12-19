@@ -66,13 +66,9 @@ Eigen::Vector3f compute_dual_intersection(const DataT& data_0,
                                           const Eigen::Vector3f& dual_point_1_M);
 
 template<typename DataT, typename ValueSelector>
-Eigen::Vector3f
-interp_dual_vertexes(const int edge,
-                     const DataT data[8],
-                     const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>&
-                         dual_corner_coords_f,
-                     const float voxel_dim,
-                     ValueSelector select_value);
+Eigen::Vector3f interp_dual_vertexes(const int edge,
+                                     const DataT data[8],
+                                     const std::array<Eigen::Vector3f, 8>& dual_corner_coords_f);
 
 /*
  * Normalised offsets of the dual corners from the primal corner
@@ -87,12 +83,11 @@ static const Eigen::Vector3f norm_dual_offset_f[8] = {{-1, -1, -1},
                                                       {-1, +1, +1}};
 
 template<typename BlockT, typename DataT>
-void gather_dual_data(
-    const BlockT* block,
-    const int scale,
-    const Eigen::Vector3f& primal_corner_coord_f,
-    DataT data[8],
-    std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& dual_corner_coords_f);
+void gather_dual_data(const BlockT* block,
+                      const int scale,
+                      const Eigen::Vector3f& primal_corner_coord_f,
+                      DataT data[8],
+                      std::array<Eigen::Vector3f, 8>& dual_corner_coords_f);
 
 /*! \brief The following strategy is derived from I. Wald, A Simple, General,
  *  and GPU Friendly Method for Computing Dual Mesh and Iso-Surfaces of Adaptive Mesh Refinement (AMR) Data, 2020
@@ -137,23 +132,21 @@ static const Eigen::Vector3i logical_dual_offset[8] = {{-1, -1, -1},
                                                        {-1, +0, +0}};
 
 template<typename OctreeT, typename DataT>
-void gather_dual_data(
-    const OctreeT& octree,
-    const typename OctreeT::BlockType* block,
-    const int scale,
-    const Eigen::Vector3i& primal_corner_coord,
-    DataT data[8],
-    std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& dual_corner_coords_f);
+void gather_dual_data(const OctreeT& octree,
+                      const typename OctreeT::BlockType* block,
+                      const int scale,
+                      const Eigen::Vector3i& primal_corner_coord,
+                      DataT data[8],
+                      std::array<Eigen::Vector3f, 8>& dual_corner_coords_f);
 
 template<typename OctreeT, typename DataT>
-void compute_dual_index(
-    const OctreeT& octree,
-    const typename OctreeT::BlockType* block_ptr,
-    const int scale,
-    const Eigen::Vector3i& primal_corner_coord,
-    uint8_t& edge_pattern_idx,
-    DataT data[8],
-    std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& dual_corner_coords_f);
+void compute_dual_index(const OctreeT& octree,
+                        const typename OctreeT::BlockType* block_ptr,
+                        const int scale,
+                        const Eigen::Vector3i& primal_corner_coord,
+                        uint8_t& edge_pattern_idx,
+                        DataT data[8],
+                        std::array<Eigen::Vector3f, 8>& dual_corner_coords_f);
 
 inline bool checkVertex(const Eigen::Vector3f& vertex_M, const float dim);
 
