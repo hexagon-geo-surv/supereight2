@@ -24,10 +24,7 @@ namespace math {
 inline const Eigen::Vector3f g_invalid_normal = Eigen::Vector3f::Zero();
 
 template<typename T>
-constexpr bool is_power_of_two(T);
-
-template<>
-constexpr bool is_power_of_two<unsigned>(const unsigned x);
+constexpr bool is_power_of_two(const T x);
 
 constexpr int log2_const(int n);
 

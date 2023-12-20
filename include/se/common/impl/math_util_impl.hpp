@@ -17,25 +17,11 @@ namespace math {
 
 
 template<typename T>
-constexpr bool is_power_of_two(T)
+constexpr bool is_power_of_two(const T x)
 {
-    return false;
-}
-
-
-
-template<>
-constexpr bool is_power_of_two<unsigned int>(const unsigned int x)
-{
-    return (x != 0) && ((x & (x - 1)) == 0);
-}
-
-
-
-template<>
-constexpr bool is_power_of_two<int>(const int x)
-{
-    return (x != 0) && ((x & (x - 1)) == 0);
+    static_assert(std::is_integral_v<T>);
+    // https://stackoverflow.com/questions/108318/how-can-i-test-whether-a-number-is-a-power-of-2
+    return x > 0 && (x & (x - 1)) == 0;
 }
 
 
