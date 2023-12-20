@@ -12,6 +12,7 @@
 
 
 #include "edge_tables.hpp"
+#include "se/common/bounded_vector.hpp"
 #include "se/common/timings.hpp"
 #include "se/map/algorithms/mesh.hpp"
 #include "se/map/octree/fetcher.hpp"
@@ -112,9 +113,9 @@ void gather_dual_data(const BlockT* block,
  */
 inline void norm_dual_corner_idxs(const Eigen::Vector3i& primal_corner_coord_rel,
                                   const int block_size,
-                                  std::vector<int>& lower_priority_neighbours,
-                                  std::vector<int>& higher_priority_neighbours,
-                                  std::vector<std::vector<int>>& neighbours);
+                                  BoundedVector<int, 8>& lower_priority_neighbours,
+                                  BoundedVector<int, 8>& higher_priority_neighbours,
+                                  BoundedVector<BoundedVector<int, 8>, 8>& neighbours);
 
 /*
  * Normalised offsets of the primal corners from the primal corner

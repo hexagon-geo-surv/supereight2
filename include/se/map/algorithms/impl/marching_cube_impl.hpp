@@ -306,9 +306,9 @@ void gather_dual_data(const BlockT* block_ptr,
  */
 inline void norm_dual_corner_idxs(const Eigen::Vector3i& primal_corner_coord_rel,
                                   const int block_size,
-                                  std::vector<int>& lower_priority_neighbours,
-                                  std::vector<int>& higher_priority_neighbours,
-                                  std::vector<std::vector<int>>& neighbours)
+                                  BoundedVector<int, 8>& lower_priority_neighbours,
+                                  BoundedVector<int, 8>& higher_priority_neighbours,
+                                  BoundedVector<BoundedVector<int, 8>, 8>& neighbours)
 {
     // 26 binary cases (6 faces, 8 corners, 12 edges)
     // 100 000 upper x crossing
@@ -686,8 +686,8 @@ void gather_dual_data(const OctreeT& octree,
 {
     const Eigen::Vector3i primal_corner_coord_rel = primal_corner_coord - block_ptr->getCoord();
 
-    std::vector<int> lower_priority_neighbours, higher_priority_neighbours;
-    std::vector<std::vector<int>> neighbours;
+    BoundedVector<int, 8> lower_priority_neighbours, higher_priority_neighbours;
+    BoundedVector<BoundedVector<int, 8>, 8> neighbours;
     norm_dual_corner_idxs(primal_corner_coord_rel,
                           block_ptr->getSize(),
                           lower_priority_neighbours,
