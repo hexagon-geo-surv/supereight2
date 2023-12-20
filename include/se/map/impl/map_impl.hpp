@@ -577,8 +577,8 @@ const Eigen::AlignedBox3f& Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::aabb() 
             // that no equality tests are performed with the vertices/edges/faces of the AABB that
             // are away from the origin. This is done because valid voxel coordinates must be
             // strictly smaller than the octree size.
-            Eigen::AlignedBox3f a(cached_octree_aabb_.min().cast<float>(),
-                                  (cached_octree_aabb_.max().array() + 1).cast<float>());
+            Eigen::AlignedBox3f a(cached_octree_aabb_.min().template cast<float>(),
+                                  (cached_octree_aabb_.max().array() + 1).template cast<float>());
             for (int i = 0; i < a.dim(); i++) {
                 a.max()[i] = std::nextafter(a.max()[i], a.min()[i]);
             }
