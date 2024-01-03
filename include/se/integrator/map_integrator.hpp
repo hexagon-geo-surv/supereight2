@@ -138,10 +138,12 @@ class MapIntegrator {
      * \param[in] frame       The frame number to be integrated (will be number of batch)
      */
     template<typename SensorT>
-    void integrateRayBatch(const SensorT& sensor,
-                           const std::vector<std::pair<Eigen::Matrix4f,Eigen::Vector3f>,
-                               Eigen::aligned_allocator<std::pair<Eigen::Matrix4f,Eigen::Vector3f>>>& rayPoseBatch,
-                           const unsigned int frame);
+    void integrateRayBatch(
+        const SensorT& sensor,
+        const std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
+                          Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>&
+            rayPoseBatch,
+        const unsigned int frame);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 

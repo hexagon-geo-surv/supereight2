@@ -443,4 +443,4 @@ inline void unique_at_scale(std::vector<se::key_t>& keys,
 
 #undef SE_PARALLEL_SORT
 
-#    endif // SE_KEY_UTIL_IMPL_HPP
+#endif // SE_KEY_UTIL_IMPL_HPP

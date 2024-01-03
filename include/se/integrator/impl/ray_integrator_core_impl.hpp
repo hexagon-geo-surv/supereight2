@@ -8,12 +8,14 @@
 #define SE_RAY_INTEGRATOR_CORE_IMPL_HPP
 
 
-namespace se{
+namespace se {
 
-namespace ray_integrator{
+namespace ray_integrator {
 
 template<typename DataT>
-bool weighted_mean_update(DataT& data, const se::field_t sample_value, const se::weight_t max_weight)
+bool weighted_mean_update(DataT& data,
+                          const se::field_t sample_value,
+                          const se::weight_t max_weight)
 {
     data.occupancy = (data.occupancy * data.weight + sample_value) / (data.weight + 1);
     data.weight = std::min((data.weight + 1), max_weight);
@@ -24,10 +26,10 @@ bool weighted_mean_update(DataT& data, const se::field_t sample_value, const se:
 
 template<typename DataT, typename ConfigT>
 bool update_voxel(DataT& data,
-                         const float range_diff,
-                         const float tau,
-                         const float three_sigma,
-                         const ConfigT config)
+                  const float range_diff,
+                  const float tau,
+                  const float three_sigma,
+                  const ConfigT config)
 {
     float sample_value;
 
@@ -36,7 +38,7 @@ bool update_voxel(DataT& data,
     }
     else if (range_diff < tau / 2) {
         sample_value = std::min(config.log_odd_min
-                                - config.log_odd_min / three_sigma * (range_diff + three_sigma),
+                                    - config.log_odd_min / three_sigma * (range_diff + three_sigma),
                                 config.log_odd_max);
     }
     else if (range_diff < tau) {
@@ -156,7 +158,7 @@ void propagate_block_to_coarsest_scale(se::OctantBase* octant_ptr)
     assert(octant_ptr->isBlock());
     BlockT& block = *static_cast<BlockT*>(octant_ptr);
     if (block.getCurrentScale() == block.getMaxScale()) {
-      return;
+        return;
     }
     return propagate_block_to_scale<BlockT>(octant_ptr, BlockT::getMaxScale());
 }
@@ -187,7 +189,7 @@ void propagate_block_to_scale(se::OctantBase* octant_ptr, int desired_scale)
     DataType* data_at_child_scale = block.blockDataAtScale(child_scale);
 
     // Iter over all parent scale data
-//#pragma omp parallel for //collapse(3) ToDo: Is this actually possible
+    //#pragma omp parallel for //collapse(3) ToDo: Is this actually possible
     for (int z = 0; z < size_at_parent_scale_li; z++) {
         for (int y = 0; y < size_at_parent_scale_li; y++) {
             for (int x = 0; x < size_at_parent_scale_li; x++) {
@@ -216,8 +218,8 @@ void propagate_block_to_scale(se::OctantBase* octant_ptr, int desired_scale)
                     for (int j = 0; j < 2; j++) {
                         for (int i = 0; i < 2; i++) {
                             const int child_data_idx = (2 * x + i)
-                                                       + (2 * y + j) * size_at_child_scale_li
-                                                       + (2 * z + k) * size_at_child_scale_sq;
+                                + (2 * y + j) * size_at_child_scale_li
+                                + (2 * z + k) * size_at_child_scale_sq;
                             const auto& child_data = data_at_child_scale[child_data_idx];
 
                             if (child_data.weight > 0) {
@@ -240,7 +242,7 @@ void propagate_block_to_scale(se::OctantBase* octant_ptr, int desired_scale)
                                     min_occupancy = occupancy;
                                 }
                             }
-                            if(child_data.observed){
+                            if (child_data.observed) {
                                 observed_count++;
                             }
 
@@ -258,7 +260,7 @@ void propagate_block_to_scale(se::OctantBase* octant_ptr, int desired_scale)
                     parent_min_data.weight = min_weight;
                     parent_max_data.occupancy = max_mean_occupancy;
                     parent_max_data.weight = max_weight;
-                    if(observed_count==8){
+                    if (observed_count == 8) {
                         parent_max_data.observed = true;
                         parent_min_data.observed = true;
                         //parent_data.observed = true;
@@ -288,7 +290,7 @@ void propagate_block_to_scale(se::OctantBase* octant_ptr, int desired_scale)
         DataType* max_data_at_child_scale = block.blockMaxDataAtScale(child_scale);
         DataType* data_at_child_scale = block.blockDataAtScale(child_scale);
 
-//#pragma omp parallel for // collapse(3)
+        //#pragma omp parallel for // collapse(3)
         for (int z = 0; z < size_at_parent_scale_li; z++) {
             for (int y = 0; y < size_at_parent_scale_li; y++) {
                 for (int x = 0; x < size_at_parent_scale_li; x++) {
@@ -316,11 +318,13 @@ void propagate_block_to_scale(se::OctantBase* octant_ptr, int desired_scale)
                         for (int j = 0; j < 2; j++) {
                             for (int i = 0; i < 2; i++) {
                                 const int child_data_idx = (2 * x + i)
-                                                           + (2 * y + j) * size_at_child_scale_li
-                                                           + (2 * z + k) * size_at_child_scale_sq;
+                                    + (2 * y + j) * size_at_child_scale_li
+                                    + (2 * z + k) * size_at_child_scale_sq;
                                 const auto& child_data = data_at_child_scale[child_data_idx];
-                                const auto& child_min_data = min_data_at_child_scale[child_data_idx];
-                                const auto& child_max_data = max_data_at_child_scale[child_data_idx];
+                                const auto& child_min_data =
+                                    min_data_at_child_scale[child_data_idx];
+                                const auto& child_max_data =
+                                    max_data_at_child_scale[child_data_idx];
 
                                 if (child_max_data.weight > 0) {
                                     // Update mean
@@ -336,14 +340,14 @@ void propagate_block_to_scale(se::OctantBase* octant_ptr, int desired_scale)
                                         max_occupancy = child_max_occupancy;
                                     }
                                     const field_t child_min_occupancy = get_field(child_min_data);
-                                    if(child_min_occupancy < min_occupancy){
+                                    if (child_min_occupancy < min_occupancy) {
                                         // Update min
                                         min_mean_occupancy = child_min_data.occupancy;
                                         min_weight = child_min_data.weight;
                                         min_occupancy = child_min_occupancy;
                                     }
                                 }
-                                if(child_max_data.observed) {
+                                if (child_max_data.observed) {
                                     observed_count++;
                                 }
 
@@ -365,7 +369,7 @@ void propagate_block_to_scale(se::OctantBase* octant_ptr, int desired_scale)
                             parent_max_data.observed = true;
                             parent_min_data.observed = true;
                             //parent_data.observed = true;
-                          // ToDo: why original SE sets only max data to observed=true?
+                            // ToDo: why original SE sets only max data to observed=true?
                         }
                     }
 
@@ -376,7 +380,8 @@ void propagate_block_to_scale(se::OctantBase* octant_ptr, int desired_scale)
 }
 
 template<typename BlockT>
-void propagate_block_down_to_scale(se::OctantBase* octant_ptr, int desired_scale){
+void propagate_block_down_to_scale(se::OctantBase* octant_ptr, int desired_scale)
+{
     assert(octant_ptr);
     assert(octant_ptr->isBlock());
 
@@ -387,13 +392,13 @@ void propagate_block_down_to_scale(se::OctantBase* octant_ptr, int desired_scale
     const int last_scale = block.getCurrentScale();
 
     int current_scale = last_scale;
-    while(current_scale > desired_scale){
+    while (current_scale > desired_scale) {
         // down propagation
-        block.allocateDownTo(current_scale-1);
-        block.setCurrentScale(current_scale-1);
-        assert(block.getCurrentScale() == current_scale-1);
+        block.allocateDownTo(current_scale - 1);
+        block.setCurrentScale(current_scale - 1);
+        assert(block.getCurrentScale() == current_scale - 1);
         // Now do the down propagation
-        int child_scale = current_scale-1;
+        int child_scale = current_scale - 1;
         int size_at_child_scale_li = BlockT::size >> child_scale;
         int size_at_child_scale_sq = se::math::sq(size_at_child_scale_li);
 
@@ -430,11 +435,10 @@ void propagate_block_down_to_scale(se::OctantBase* octant_ptr, int desired_scale
                             } // i
                         }     // j
                     }         // k
-                } // x
-            }     // y
-        }         // z
+                }             // x
+            }                 // y
+        }                     // z
         current_scale--;
-
     }
 }
 

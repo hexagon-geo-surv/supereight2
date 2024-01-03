@@ -12,14 +12,12 @@
 #include <cstring>
 #include <iomanip>
 #include <iostream>
+#include <opencv2/opencv.hpp>
 #include <regex>
 
 #include "se/common/filesystem.hpp"
 #include "se/common/image_utils.hpp"
 #include "se/common/yaml.hpp"
-
-
-#include <opencv2/opencv.hpp>
 
 /** A timestamped ground truth pose (VIO estimate) .
  */
@@ -32,10 +30,8 @@ struct LeicaPoseEntry {
      */
     LeicaPoseEntry() = default;
 
-    LeicaPoseEntry(const double t,
-                 const Eigen::Vector3f& p,
-                 const Eigen::Quaternionf& o) :
-        timestamp(t), position(p), orientation(o)
+    LeicaPoseEntry(const double t, const Eigen::Vector3f& p, const Eigen::Quaternionf& o) :
+            timestamp(t), position(p), orientation(o)
     {
     }
 
@@ -46,7 +42,8 @@ struct LeicaPoseEntry {
     {
         const std::vector<std::string> columns = se::str_utils::split_str(s, ',', true);
         timestamp = std::stol(columns[1].c_str());
-        position = Eigen::Vector3f(std::stof(columns[2]), std::stof(columns[3]), std::stof(columns[4]));
+        position =
+            Eigen::Vector3f(std::stof(columns[2]), std::stof(columns[3]), std::stof(columns[4]));
         orientation = Eigen::Quaternionf(std::stof(columns[5]),
                                          std::stof(columns[6]),
                                          std::stof(columns[7]),
@@ -59,10 +56,10 @@ struct LeicaPoseEntry {
      */
     std::string string() const
     {
-        const std::string s = std::to_string(timestamp) + "," + std::to_string(position.x()) + "," + std::to_string(position.y()) + ","
-                              + std::to_string(position.z()) + "," + std::to_string(orientation.x()) + ","
-                              + std::to_string(orientation.y()) + "," + std::to_string(orientation.z()) + ","
-                              + std::to_string(orientation.w());
+        const std::string s = std::to_string(timestamp) + "," + std::to_string(position.x()) + ","
+            + std::to_string(position.y()) + "," + std::to_string(position.z()) + ","
+            + std::to_string(orientation.x()) + "," + std::to_string(orientation.y()) + ","
+            + std::to_string(orientation.z()) + "," + std::to_string(orientation.w());
         return s;
     }
 
@@ -80,9 +77,8 @@ struct LeicaLiDAREntry {
      */
     LeicaLiDAREntry() = default;
 
-    LeicaLiDAREntry(const double t,
-                   const Eigen::Vector3f& p, const int intensity ) :
-        timestamp(t), position(p), intensity(intensity)
+    LeicaLiDAREntry(const double t, const Eigen::Vector3f& p, const int intensity) :
+            timestamp(t), position(p), intensity(intensity)
     {
     }
 
@@ -93,7 +89,8 @@ struct LeicaLiDAREntry {
     {
         const std::vector<std::string> columns = se::str_utils::split_str(s, ',', true);
         timestamp = std::stol(columns[0].c_str());
-        position = Eigen::Vector3f(std::stof(columns[1]), std::stof(columns[2]), std::stof(columns[3]));
+        position =
+            Eigen::Vector3f(std::stof(columns[1]), std::stof(columns[2]), std::stof(columns[3]));
         intensity = std::stoi(columns[4]);
     }
 
@@ -103,16 +100,21 @@ struct LeicaLiDAREntry {
      */
     std::string string() const
     {
-        const std::string s = std::to_string(timestamp) + "," + std::to_string(position.x()) + "," + std::to_string(position.y()) + ","
-                              + std::to_string(position.z()) + "," + std::to_string(intensity);
+        const std::string s = std::to_string(timestamp) + "," + std::to_string(position.x()) + ","
+            + std::to_string(position.y()) + "," + std::to_string(position.z()) + ","
+            + std::to_string(intensity);
         return s;
     }
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
-bool readLidarAndPoses(const std::string& path, float scan_time_interval, std::vector<std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>>& clouds, std::vector<LeicaPoseEntry>& interpolatedPoses){
-
+bool readLidarAndPoses(
+    const std::string& path,
+    float scan_time_interval,
+    std::vector<std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>>& clouds,
+    std::vector<LeicaPoseEntry>& interpolatedPoses)
+{
     // Ensure a valid directory was provided
     if (!stdfs::is_directory(path)) {
         return false;
@@ -122,7 +124,7 @@ bool readLidarAndPoses(const std::string& path, float scan_time_interval, std::v
 
     // Setup stream of pose data
     std::ifstream poseStream;
-    poseStream.open(path+"/trajectory.csv");
+    poseStream.open(path + "/trajectory.csv");
     std::string poseLine;
     // set reading position to 2nd line
     std::getline(poseStream, poseLine);
@@ -132,20 +134,20 @@ bool readLidarAndPoses(const std::string& path, float scan_time_interval, std::v
 
     // Setup stream of lidar data
     std::ifstream lidarStream;
-    lidarStream.open(path+"/lidar.csv");
-    if(!lidarStream.good()){
-        std::cerr << "Error: " << path+"/lidar.csv could not be found \n";
+    lidarStream.open(path + "/lidar.csv");
+    if (!lidarStream.good()) {
+        std::cerr << "Error: " << path + "/lidar.csv could not be found \n";
         return false;
     }
     std::string line;
     int numberOfLines = 0;
-    while(std::getline(lidarStream, line))
+    while (std::getline(lidarStream, line))
         numberOfLines++;
-    if(numberOfLines-1 <= 0){
-        std::cerr << "Error: No LiDAR Measurements present in: " << path+"/lidar.csv\n";
+    if (numberOfLines - 1 <= 0) {
+        std::cerr << "Error: No LiDAR Measurements present in: " << path + "/lidar.csv\n";
         return false;
     }
-    else{
+    else {
         std::clog << "Found " << numberOfLines << " measurement points\n";
     }
 
@@ -156,7 +158,7 @@ bool readLidarAndPoses(const std::string& path, float scan_time_interval, std::v
     std::getline(lidarStream, line);
     // Skip LiDAR measurements that are older than trajectory
     LeicaLiDAREntry lidarMeas(line);
-    while(lidarMeas.timestamp < pose.timestamp){
+    while (lidarMeas.timestamp < pose.timestamp) {
         std::getline(lidarStream, line);
         lidarMeas = LeicaLiDAREntry(line);
     }
@@ -169,81 +171,86 @@ bool readLidarAndPoses(const std::string& path, float scan_time_interval, std::v
 
     bool endOfFile = false;
 
-    while(true){
+    while (true) {
         // Initialize Point Cloud
         std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> cloud;
 
-        if(last_timestamp == 0){ //first pose
+        if (last_timestamp == 0) { //first pose
 
             // add to point cloud
-            cloud.push_back(Eigen::Vector3f(lidarMeas.position[0], lidarMeas.position[1], lidarMeas.position[2]));
+            cloud.push_back(Eigen::Vector3f(
+                lidarMeas.position[0], lidarMeas.position[1], lidarMeas.position[2]));
             last_timestamp = lidarMeas.timestamp;
         }
 
-        while((lidarMeas.timestamp - last_timestamp) * 1e-09 <= scan_time_interval){
+        while ((lidarMeas.timestamp - last_timestamp) * 1e-09 <= scan_time_interval) {
             // take two seconds of scan
             // get first line
             std::getline(lidarStream, line);
-            if(!lidarStream.good()){
+            if (!lidarStream.good()) {
                 std::cout << "reached end of lidar file" << std::endl;
                 endOfFile = true;
                 break;
             }
             lidarMeas = LeicaLiDAREntry(line);
-            cloud.push_back(Eigen::Vector3f(lidarMeas.position[0], lidarMeas.position[1], lidarMeas.position[2]));
+            cloud.push_back(Eigen::Vector3f(
+                lidarMeas.position[0], lidarMeas.position[1], lidarMeas.position[2]));
         }
 
         LeicaPoseEntry prevPose;
-        while(pose.timestamp < (lidarMeas.timestamp+last_timestamp)/2){
+        while (pose.timestamp < (lidarMeas.timestamp + last_timestamp) / 2) {
             prevPose = pose;
-            std::getline(poseStream,poseLine);
+            std::getline(poseStream, poseLine);
             pose = LeicaPoseEntry(poseLine);
         }
 
         // do interpolation
-        double r = (static_cast<double>((lidarMeas.timestamp+last_timestamp)/2 - prevPose.timestamp)) / static_cast<double>(pose.timestamp - prevPose.timestamp);
-        uint64_t tsInterp = (lidarMeas.timestamp+last_timestamp)/2;
-        Eigen::Vector3f posInterp = r * pose.position + (1.-r) * prevPose.position;
+        double r =
+            (static_cast<double>((lidarMeas.timestamp + last_timestamp) / 2 - prevPose.timestamp))
+            / static_cast<double>(pose.timestamp - prevPose.timestamp);
+        uint64_t tsInterp = (lidarMeas.timestamp + last_timestamp) / 2;
+        Eigen::Vector3f posInterp = r * pose.position + (1. - r) * prevPose.position;
         Eigen::Quaternionf oriInterp = prevPose.orientation.slerp(r, pose.orientation);
-        LeicaPoseEntry poseInterp(tsInterp,posInterp,oriInterp);
+        LeicaPoseEntry poseInterp(tsInterp, posInterp, oriInterp);
         interpolatedPoses.push_back(poseInterp);
 
-        cloudTimestamps.push_back((lidarMeas.timestamp+last_timestamp)/2);
+        cloudTimestamps.push_back((lidarMeas.timestamp + last_timestamp) / 2);
         last_timestamp = lidarMeas.timestamp;
         clouds.push_back(cloud);
-        if(endOfFile)
+        if (endOfFile)
             break;
     }
-    std::clog << "Created " << clouds.size() << " point clouds from overall LiDAR scan data" << std::endl;
+    std::clog << "Created " << clouds.size() << " point clouds from overall LiDAR scan data"
+              << std::endl;
     return true;
 }
 
-bool readLidarAndPosesWithMotionCompensation(const std::string& path,
-                                             const float scan_time_interval,
-                                             const Eigen::Matrix4f T_BL,
-                                             std::vector<std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>>& clouds,
-                                             std::vector<LeicaPoseEntry>& poses)
+bool readLidarAndPosesWithMotionCompensation(
+    const std::string& path,
+    const float scan_time_interval,
+    const Eigen::Matrix4f T_BL,
+    std::vector<std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>>& clouds,
+    std::vector<LeicaPoseEntry>& poses)
 {
-
     // Ensure a valid directory was provided
     if (!stdfs::is_directory(path)) {
-        std::cerr << "Error: " << path+" is not a valid path \n";
+        std::cerr << "Error: " << path + " is not a valid path \n";
         return false;
     }
 
     // Setup stream of pose data
     std::ifstream poseStream;
-    poseStream.open(path+"/trajectory.csv");
-    if(!poseStream.good()){
-        std::cerr << "Error: " << path+"/trajectory.csv could not be found \n";
+    poseStream.open(path + "/trajectory.csv");
+    if (!poseStream.good()) {
+        std::cerr << "Error: " << path + "/trajectory.csv could not be found \n";
         return false;
     }
 
     // Setup stream of lidar data
     std::ifstream lidarStream;
-    lidarStream.open(path+"/lidar.csv");
-    if(!lidarStream.good()){
-        std::cerr << "Error: " << path+"/lidar.csv could not be found \n";
+    lidarStream.open(path + "/lidar.csv");
+    if (!lidarStream.good()) {
+        std::cerr << "Error: " << path + "/lidar.csv could not be found \n";
         return false;
     }
 
@@ -261,7 +268,7 @@ bool readLidarAndPosesWithMotionCompensation(const std::string& path,
     LeicaPoseEntry pose(poseLine);
 
     // Skip LiDAR measurements that are older than trajectory
-    while(lidarMeas.timestamp < pose.timestamp){
+    while (lidarMeas.timestamp < pose.timestamp) {
         std::getline(lidarStream, lidarLine);
         lidarMeas = LeicaLiDAREntry(lidarLine);
     }
@@ -282,15 +289,14 @@ bool readLidarAndPosesWithMotionCompensation(const std::string& path,
     bool endOfLidarFile = false;
     bool endOfTrajectoryFile = false;
 
-    while(true){
-
+    while (true) {
         // Initialize Point Cloud
         std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> cloud;
 
         // Variable holding motion compensated measurement
         Eigen::Vector3f posMotionCompensated;
 
-        if(prevTimestamp == 0){ // first measurement
+        if (prevTimestamp == 0) { // first measurement
 
             // Get next (second) pose
             std::getline(poseStream, poseLine);
@@ -298,38 +304,40 @@ bool readLidarAndPosesWithMotionCompensation(const std::string& path,
 
             // interpolate pose
             double r = static_cast<double>((lidarMeas.timestamp - prevPose.timestamp))
-                            / static_cast<double>(pose.timestamp - prevPose.timestamp);
-            Eigen::Vector3f posInterp = r * pose.position + (1.-r) * prevPose.position;
+                / static_cast<double>(pose.timestamp - prevPose.timestamp);
+            Eigen::Vector3f posInterp = r * pose.position + (1. - r) * prevPose.position;
             Eigen::Quaternionf oriInterp = prevPose.orientation.slerp(r, pose.orientation);
             interpPose = LeicaPoseEntry(lidarMeas.timestamp, posInterp, oriInterp);
             Eigen::Matrix4f T_WB_base;
             T_WB_base.setIdentity();
-            T_WB_base.topLeftCorner<3,3>() = basePose.orientation.toRotationMatrix();
-            T_WB_base.topRightCorner<3,1>() = basePose.position;
+            T_WB_base.topLeftCorner<3, 3>() = basePose.orientation.toRotationMatrix();
+            T_WB_base.topRightCorner<3, 1>() = basePose.position;
             Eigen::Matrix4f T_WB_interp;
             T_WB_interp.setIdentity();
-            T_WB_interp.topLeftCorner<3,3>() = interpPose.orientation.toRotationMatrix();
-            T_WB_interp.topRightCorner<3,1>() = interpPose.position;
+            T_WB_interp.topLeftCorner<3, 3>() = interpPose.orientation.toRotationMatrix();
+            T_WB_interp.topRightCorner<3, 1>() = interpPose.position;
 
-            posMotionCompensated = (T_BL.inverse() * T_WB_base.inverse() * T_WB_interp * T_BL
-                                   * Eigen::Vector4f(lidarMeas.position[0], lidarMeas.position[1], lidarMeas.position[2], 1.0)).head<3>();
+            posMotionCompensated =
+                (T_BL.inverse() * T_WB_base.inverse() * T_WB_interp * T_BL
+                 * Eigen::Vector4f(
+                     lidarMeas.position[0], lidarMeas.position[1], lidarMeas.position[2], 1.0))
+                    .head<3>();
 
-            cloud.push_back(Eigen::Vector3f(posMotionCompensated[0], posMotionCompensated[1], posMotionCompensated[2]));
+            cloud.push_back(Eigen::Vector3f(
+                posMotionCompensated[0], posMotionCompensated[1], posMotionCompensated[2]));
             prevTimestamp = lidarMeas.timestamp;
 
             // set base pose
             basePose = prevPose;
         }
-        else{
-
+        else {
             // Get one scan interval
-            while((lidarMeas.timestamp - prevTimestamp) * 1e-09 <= scan_time_interval){
-
+            while ((lidarMeas.timestamp - prevTimestamp) * 1e-09 <= scan_time_interval) {
                 // check if timestamp still between prevPose and pose
-                while(lidarMeas.timestamp > pose.timestamp){
+                while (lidarMeas.timestamp > pose.timestamp) {
                     prevPose = pose;
                     std::getline(poseStream, poseLine);
-                    if(!poseStream.good()){
+                    if (!poseStream.good()) {
                         std::cout << "reached end of trajectory file" << std::endl;
                         endOfTrajectoryFile = true;
                         break;
@@ -337,33 +345,37 @@ bool readLidarAndPosesWithMotionCompensation(const std::string& path,
                     pose = LeicaPoseEntry(poseLine);
                 }
 
-                if(endOfTrajectoryFile)
+                if (endOfTrajectoryFile)
                     break;
 
                 // interpolate pose
                 double r = static_cast<double>((lidarMeas.timestamp - prevPose.timestamp))
-                           / static_cast<double>(pose.timestamp - prevPose.timestamp);
-                Eigen::Vector3f posInterp = r * pose.position + (1.-r) * prevPose.position;
+                    / static_cast<double>(pose.timestamp - prevPose.timestamp);
+                Eigen::Vector3f posInterp = r * pose.position + (1. - r) * prevPose.position;
                 Eigen::Quaternionf oriInterp = prevPose.orientation.slerp(r, pose.orientation);
                 interpPose = LeicaPoseEntry(lidarMeas.timestamp, posInterp, oriInterp);
                 Eigen::Matrix4f T_WB_base;
                 T_WB_base.setIdentity();
-                T_WB_base.topLeftCorner<3,3>() = basePose.orientation.toRotationMatrix();
-                T_WB_base.topRightCorner<3,1>() = basePose.position;
+                T_WB_base.topLeftCorner<3, 3>() = basePose.orientation.toRotationMatrix();
+                T_WB_base.topRightCorner<3, 1>() = basePose.position;
                 Eigen::Matrix4f T_WB_interp;
                 T_WB_interp.setIdentity();
-                T_WB_interp.topLeftCorner<3,3>() = interpPose.orientation.toRotationMatrix();
-                T_WB_interp.topRightCorner<3,1>() = interpPose.position;
+                T_WB_interp.topLeftCorner<3, 3>() = interpPose.orientation.toRotationMatrix();
+                T_WB_interp.topRightCorner<3, 1>() = interpPose.position;
 
-                posMotionCompensated = (T_BL.inverse() * T_WB_base.inverse() * T_WB_interp * T_BL
-                                       * Eigen::Vector4f(lidarMeas.position[0], lidarMeas.position[1], lidarMeas.position[2], 1.0)).head<3>();
+                posMotionCompensated =
+                    (T_BL.inverse() * T_WB_base.inverse() * T_WB_interp * T_BL
+                     * Eigen::Vector4f(
+                         lidarMeas.position[0], lidarMeas.position[1], lidarMeas.position[2], 1.0))
+                        .head<3>();
 
-                cloud.push_back(Eigen::Vector3f(posMotionCompensated[0], posMotionCompensated[1], posMotionCompensated[2]));
+                cloud.push_back(Eigen::Vector3f(
+                    posMotionCompensated[0], posMotionCompensated[1], posMotionCompensated[2]));
 
 
                 // Get next measurement
                 std::getline(lidarStream, lidarLine);
-                if(!lidarStream.good()){
+                if (!lidarStream.good()) {
                     std::cout << "reached end of lidar file" << std::endl;
                     endOfLidarFile = true;
                     break;
@@ -377,27 +389,28 @@ bool readLidarAndPosesWithMotionCompensation(const std::string& path,
             poses.push_back(basePose);
 
             // set basePose for next scan interval
-            if(lidarMeas.timestamp > pose.timestamp)
+            if (lidarMeas.timestamp > pose.timestamp)
                 basePose = pose;
             else
                 basePose = prevPose;
         }
 
-        if(endOfLidarFile || endOfTrajectoryFile)
+        if (endOfLidarFile || endOfTrajectoryFile)
             break;
     }
 
-    std::clog << "Created " << clouds.size() << " point clouds from overall LiDAR scan data" << std::endl;
+    std::clog << "Created " << clouds.size() << " point clouds from overall LiDAR scan data"
+              << std::endl;
     return true;
-
 }
 
 /** Generate a ground truth file from poses and write it in a temporary file.
  */
-std::string write_ground_truth_tmp(const std::string& path, const std::vector<LeicaPoseEntry>& poses)
+std::string write_ground_truth_tmp(const std::string& path,
+                                   const std::vector<LeicaPoseEntry>& poses)
 {
     // Open a temporary file
-    const std::string tmp_filename =  path + "/trajectory_se.csv";
+    const std::string tmp_filename = path + "/trajectory_se.csv";
     std::ofstream fs(tmp_filename, std::ios::out);
     if (!fs.good()) {
         std::cerr << "Error: Could not write trajectory file " << tmp_filename << "\n";
@@ -424,7 +437,7 @@ se::LeicaReader::LeicaReader(const se::ReaderConfig& c) : se::Reader(c)
     }
     std::cout << "created leica reader" << std::endl;
 
-    if(c.leica_reader_type == "rangeImage"){
+    if (c.leica_reader_type == "rangeImage") {
         // Set the depth and RGBA image resolutions.
         depth_image_res_ = Eigen::Vector2i(c.width, c.height);
         rgba_image_res_ = Eigen::Vector2i(c.width, c.height);
@@ -456,32 +469,32 @@ se::LeicaReader::LeicaReader(const se::ReaderConfig& c) : se::Reader(c)
             status_ = se::ReaderStatus::error;
             return;
         }
-
     }
-    else if(c.leica_reader_type == "ray"){
+    else if (c.leica_reader_type == "ray") {
         // Setup stream of lidar data
-        lidar_stream_.open(sequence_path_+"/lidar.csv");
-        if(!lidar_stream_.good()){
+        lidar_stream_.open(sequence_path_ + "/lidar.csv");
+        if (!lidar_stream_.good()) {
             status_ = se::ReaderStatus::error;
-            std::cerr << "Error: " << sequence_path_+"/lidar.csv could not be found \n";
+            std::cerr << "Error: " << sequence_path_ + "/lidar.csv could not be found \n";
             return;
         }
         std::string line;
         int numberOfLines = 0;
-        while(std::getline(lidar_stream_, line))
+        while (std::getline(lidar_stream_, line))
             numberOfLines++;
-        if(numberOfLines-1 <= 0){
+        if (numberOfLines - 1 <= 0) {
             status_ = se::ReaderStatus::error;
-            std::cerr << "Error: No LiDAR Measurements present in: " << sequence_path_+"/lidar.csv\n";
+            std::cerr << "Error: No LiDAR Measurements present in: "
+                      << sequence_path_ + "/lidar.csv\n";
             return;
         }
-        else if(verbose_ >= 1){
+        else if (verbose_ >= 1) {
             std::clog << "Found " << numberOfLines << " measurement points\n";
         }
 
         // set reading position to second line
         lidar_stream_.clear();
-       lidar_stream_.seekg(0, std::ios::beg);
+        lidar_stream_.seekg(0, std::ios::beg);
         std::getline(lidar_stream_, line);
 
         // initialise current LiDAR timestamp_
@@ -489,22 +502,22 @@ se::LeicaReader::LeicaReader(const se::ReaderConfig& c) : se::Reader(c)
 
 
         // Setup stream of trajectory data
-        trajectory_stream_.open(sequence_path_+"/trajectory.csv");
-        if(!trajectory_stream_.good()){
+        trajectory_stream_.open(sequence_path_ + "/trajectory.csv");
+        if (!trajectory_stream_.good()) {
             status_ = se::ReaderStatus::error;
-            std::cerr << "Error: " << sequence_path_+"/trajectory.csv could not be found \n";
+            std::cerr << "Error: " << sequence_path_ + "/trajectory.csv could not be found \n";
             return;
         }
         std::string line2;
         int numberOfLines2 = 0;
-        while(std::getline(trajectory_stream_, line2))
+        while (std::getline(trajectory_stream_, line2))
             numberOfLines2++;
-        if(numberOfLines2-1 <= 0){
+        if (numberOfLines2 - 1 <= 0) {
             status_ = se::ReaderStatus::error;
-            std::cerr << "Error: No Pose Data present in: " << sequence_path_+"/trajectory.csv\n";
+            std::cerr << "Error: No Pose Data present in: " << sequence_path_ + "/trajectory.csv\n";
             return;
         }
-        else if(verbose_ >= 1){
+        else if (verbose_ >= 1) {
             std::clog << "Found " << numberOfLines << " VIO poses\n";
         }
 
@@ -514,14 +527,14 @@ se::LeicaReader::LeicaReader(const se::ReaderConfig& c) : se::Reader(c)
         std::getline(trajectory_stream_, line2);
 
         // Set reading positions for first measurements (t_ray > t_pose; required for interpolation)
-        std::getline(lidar_stream_,line);
+        std::getline(lidar_stream_, line);
         LeicaLiDAREntry lidarMeas(line);
 
         std::getline(trajectory_stream_, line2);
         LeicaPoseEntry pose(line2);
 
-        while(lidarMeas.timestamp < pose.timestamp){
-            std::getline(lidar_stream_,line);
+        while (lidarMeas.timestamp < pose.timestamp) {
+            std::getline(lidar_stream_, line);
             lidarMeas = LeicaLiDAREntry(line);
         }
         ray_timestamp_ = lidarMeas.timestamp;
@@ -538,7 +551,7 @@ se::LeicaReader::LeicaReader(const se::ReaderConfig& c) : se::Reader(c)
         pos_curr_ = pose.position;
         ori_curr_ = pose.orientation;
 
-        while(ts_curr_ < ray_timestamp_){
+        while (ts_curr_ < ray_timestamp_) {
             std::getline(trajectory_stream_, line2);
             ts_prev_ = ts_curr_;
             pos_prev_ = pos_curr_;
@@ -549,8 +562,6 @@ se::LeicaReader::LeicaReader(const se::ReaderConfig& c) : se::Reader(c)
             ori_curr_ = pose.orientation;
         }
     }
-
-
 }
 
 
@@ -580,7 +591,7 @@ std::string se::LeicaReader::name() const
 se::ReaderStatus se::LeicaReader::nextDepth(se::Image<float>& depth_image)
 {
     std::clog << "frame_ " << frame_ << " with " << clouds_.size() << "pointclouds\n";
-    if(frame_ == clouds_.size()){
+    if (frame_ == clouds_.size()) {
         std::clog << " Reached EOF" << std::endl;
         return se::ReaderStatus::eof;
     }
@@ -614,35 +625,35 @@ se::ReaderStatus se::LeicaReader::nextDepth(se::Image<float>& depth_image)
          */
 
         // Determine row and column in image
-        float_t u = (azimuth + M_PI)*rad2deg  / azimuth_angular_resolution_;
-        float_t v = (elevation + 0.5*M_PI)*rad2deg / elevation_angular_resolution_;
+        float_t u = (azimuth + M_PI) * rad2deg / azimuth_angular_resolution_;
+        float_t v = (elevation + 0.5 * M_PI) * rad2deg / elevation_angular_resolution_;
 
 
         // azimuthal wrap-around
-        if(u < -0.5){
+        if (u < -0.5) {
             u += depth_image_res_.x();
         }
-        if(u > depth_image_res_.x() - 0.5){
+        if (u > depth_image_res_.x() - 0.5) {
             u -= depth_image_res_.x();
         }
-        if(v < -0.5){
+        if (v < -0.5) {
             v += depth_image_res_.y();
         }
-        if(v > depth_image_res_.y() - 0.5){
+        if (v > depth_image_res_.y() - 0.5) {
             v -= depth_image_res_.y();
         }
 
         int row = std::round(v);
         int col = std::round(u);
 
-        if(depth_image(col,row) > 0 ) {
+        if (depth_image(col, row) > 0) {
             if (R < depth_image(col, row)) {
                 depth_image(col, row) = R;
             }
         }
-        else{
+        else {
             ++count;
-            depth_image(col,row) = R;
+            depth_image(col, row) = R;
         }
     }
 
@@ -654,7 +665,7 @@ se::ReaderStatus se::LeicaReader::nextRay(Eigen::Vector3f& ray_measurement)
     std::string line;
     // Get 1 Line of LiDAR measurements = 1 ray
     std::getline(lidar_stream_, line);
-    if(!lidar_stream_.good()) // Reached end of file
+    if (!lidar_stream_.good()) // Reached end of file
         return se::ReaderStatus::eof;
 
     LeicaLiDAREntry ray;
@@ -664,7 +675,6 @@ se::ReaderStatus se::LeicaReader::nextRay(Eigen::Vector3f& ray_measurement)
     ray_timestamp_ = ray.timestamp;
 
     return se::ReaderStatus::ok;
-
 }
 
 se::ReaderStatus se::LeicaReader::nextPose(Eigen::Matrix4f& T_WB)
@@ -673,10 +683,10 @@ se::ReaderStatus se::LeicaReader::nextPose(Eigen::Matrix4f& T_WB)
     LeicaPoseEntry pose;
     T_WB.setIdentity();
 
-    while(ray_timestamp_ > ts_curr_){
+    while (ray_timestamp_ > ts_curr_) {
         // Get next {pse
         std::getline(trajectory_stream_, line);
-        if(!trajectory_stream_.good())
+        if (!trajectory_stream_.good())
             return se::ReaderStatus::eof;
         ts_prev_ = ts_curr_;
         pos_prev_ = pos_curr_;
@@ -688,24 +698,26 @@ se::ReaderStatus se::LeicaReader::nextPose(Eigen::Matrix4f& T_WB)
     }
 
     // interpolate between poses
-    double r = (static_cast<double>(ray_timestamp_ - ts_prev_)) / static_cast<double>(ts_curr_ - ts_prev_);
-    Eigen::Vector3f posInterp = r * pos_curr_ + (1.-r) * pos_prev_;
+    double r =
+        (static_cast<double>(ray_timestamp_ - ts_prev_)) / static_cast<double>(ts_curr_ - ts_prev_);
+    Eigen::Vector3f posInterp = r * pos_curr_ + (1. - r) * pos_prev_;
     Eigen::Quaternionf oriInterp = ori_prev_.slerp(r, ori_curr_);
-    T_WB.topLeftCorner<3,3>() = oriInterp.toRotationMatrix();
-    T_WB.topRightCorner<3,1>() = posInterp;
+    T_WB.topLeftCorner<3, 3>() = oriInterp.toRotationMatrix();
+    T_WB.topRightCorner<3, 1>() = posInterp;
 
     return se::ReaderStatus::ok;
 }
 
-se::ReaderStatus se::LeicaReader::nextRayBatch(const float batch_interval,
-                                               std::vector<std::pair<Eigen::Matrix4f,Eigen::Vector3f>,
-                                                   Eigen::aligned_allocator<std::pair<Eigen::Matrix4f,Eigen::Vector3f>>>& rayPoseBatch)
+se::ReaderStatus se::LeicaReader::nextRayBatch(
+    const float batch_interval,
+    std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
+                Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>&
+        rayPoseBatch)
 {
-
     std::string lidarLine;
     // Get 1 Line of LiDAR measurements = 1 ray
     std::getline(lidar_stream_, lidarLine);
-    if(!lidar_stream_.good()) // Reached end of file
+    if (!lidar_stream_.good()) // Reached end of file
         return se::ReaderStatus::eof;
 
     // Get 1st entry in current interval
@@ -719,10 +731,10 @@ se::ReaderStatus se::LeicaReader::nextRayBatch(const float batch_interval,
     Eigen::Matrix4f T_WB;
     T_WB.setIdentity();
 
-    while(ray_timestamp_ > ts_curr_){
+    while (ray_timestamp_ > ts_curr_) {
         // Get next pose
         std::getline(trajectory_stream_, trajectoryLine);
-        if(!trajectory_stream_.good())
+        if (!trajectory_stream_.good())
             return se::ReaderStatus::eof;
         ts_prev_ = ts_curr_;
         pos_prev_ = pos_curr_;
@@ -734,18 +746,19 @@ se::ReaderStatus se::LeicaReader::nextRayBatch(const float batch_interval,
     }
 
     // interpolate between poses
-    double r = (static_cast<double>(ray_timestamp_ - ts_prev_)) / static_cast<double>(ts_curr_ - ts_prev_);
-    Eigen::Vector3f posInterp = r * pos_curr_ + (1.-r) * pos_prev_;
+    double r =
+        (static_cast<double>(ray_timestamp_ - ts_prev_)) / static_cast<double>(ts_curr_ - ts_prev_);
+    Eigen::Vector3f posInterp = r * pos_curr_ + (1. - r) * pos_prev_;
     Eigen::Quaternionf oriInterp = ori_prev_.slerp(r, ori_curr_);
-    T_WB.topLeftCorner<3,3>() = oriInterp.toRotationMatrix();
-    T_WB.topRightCorner<3,1>() = posInterp;
-    rayPoseBatch.push_back(std::pair<Eigen::Matrix4f, Eigen::Vector3f> (T_WB,ray.position));
+    T_WB.topLeftCorner<3, 3>() = oriInterp.toRotationMatrix();
+    T_WB.topRightCorner<3, 1>() = posInterp;
+    rayPoseBatch.push_back(std::pair<Eigen::Matrix4f, Eigen::Vector3f>(T_WB, ray.position));
 
 
     // now get interval
-    while((ray_timestamp_ - t0) * 1e-09 <= batch_interval){
+    while ((ray_timestamp_ - t0) * 1e-09 <= batch_interval) {
         std::getline(lidar_stream_, lidarLine);
-        if(!lidar_stream_.good()) // Reached end of file
+        if (!lidar_stream_.good()) // Reached end of file
             return se::ReaderStatus::eof;
 
         // Lidar measurement
@@ -756,10 +769,10 @@ se::ReaderStatus se::LeicaReader::nextRayBatch(const float batch_interval,
         // Pose interpolated
         T_WB.setIdentity();
 
-        while(ray_timestamp_ > ts_curr_){
+        while (ray_timestamp_ > ts_curr_) {
             // Get next pose
             std::getline(trajectory_stream_, trajectoryLine);
-            if(!trajectory_stream_.good())
+            if (!trajectory_stream_.good())
                 return se::ReaderStatus::eof;
             ts_prev_ = ts_curr_;
             pos_prev_ = pos_curr_;
@@ -771,16 +784,16 @@ se::ReaderStatus se::LeicaReader::nextRayBatch(const float batch_interval,
         }
 
         // interpolate between poses
-        double r = (static_cast<double>(ray_timestamp_ - ts_prev_)) / static_cast<double>(ts_curr_ - ts_prev_);
-        Eigen::Vector3f posInterp = r * pos_curr_ + (1.-r) * pos_prev_;
+        double r = (static_cast<double>(ray_timestamp_ - ts_prev_))
+            / static_cast<double>(ts_curr_ - ts_prev_);
+        Eigen::Vector3f posInterp = r * pos_curr_ + (1. - r) * pos_prev_;
         Eigen::Quaternionf oriInterp = ori_prev_.slerp(r, ori_curr_);
-        T_WB.topLeftCorner<3,3>() = oriInterp.toRotationMatrix();
-        T_WB.topRightCorner<3,1>() = posInterp;
-        rayPoseBatch.push_back(std::pair<Eigen::Matrix4f, Eigen::Vector3f> (T_WB,ray.position));
+        T_WB.topLeftCorner<3, 3>() = oriInterp.toRotationMatrix();
+        T_WB.topRightCorner<3, 1>() = posInterp;
+        rayPoseBatch.push_back(std::pair<Eigen::Matrix4f, Eigen::Vector3f>(T_WB, ray.position));
     }
 
     return se::ReaderStatus::ok;
-
 }
 se::ReaderStatus se::LeicaReader::nextRGBA(se::Image<uint32_t>& rgba_image)
 {

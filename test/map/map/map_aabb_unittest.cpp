@@ -140,8 +140,8 @@ TEST(Map, aabb_ray)
     sensorConfig.near_plane = 0.6f;
     sensorConfig.far_plane = 30.0f;
     sensorConfig.T_BS = Eigen::Matrix4f::Identity();
-    sensorConfig.elevation_resolution_angle_ = static_cast<float> (elevation_res);
-    sensorConfig.azimuth_resolution_angle_ = static_cast<float> (azimuth_res);
+    sensorConfig.elevation_resolution_angle_ = static_cast<float>(elevation_res);
+    sensorConfig.azimuth_resolution_angle_ = static_cast<float>(azimuth_res);
 
     const se::LeicaLidar sensor(sensorConfig);
 
@@ -162,21 +162,20 @@ TEST(Map, aabb_ray)
     const float half_wall_blocks = dim_to_blocks(half_wall_dim, block_dim);
 
     // lines are commented out.
-    float min_x = block_dim * std::floor(sensor.near_plane / (2*block_dim));
+    float min_x = block_dim * std::floor(sensor.near_plane / (2 * block_dim));
     EXPECT_NEAR(map.aabb().min().x(), min_x, 1e-02f);
     // x should be a multiple of the block size (in meters) depending on tau and the resolution
     // with default tau_min = 3
-    int n_of_blocks_x = std::ceil((d + 3*res)/block_dim);
+    int n_of_blocks_x = std::ceil((d + 3 * res) / block_dim);
     EXPECT_FLOAT_EQ(map.aabb().max().x(), n_of_blocks_x * block_dim);
     EXPECT_FLOAT_EQ(map.aabb().min().z(), map.aabb().min().y());
     EXPECT_FLOAT_EQ(map.aabb().max().z(), map.aabb().max().y());
-    EXPECT_EQ(dim_to_blocks(map.aabb().min().y(), block_dim), -half_wall_blocks-1);
-    EXPECT_EQ(dim_to_blocks(map.aabb().max().y(), block_dim), half_wall_blocks+1);
+    EXPECT_EQ(dim_to_blocks(map.aabb().min().y(), block_dim), -half_wall_blocks - 1);
+    EXPECT_EQ(dim_to_blocks(map.aabb().max().y(), block_dim), half_wall_blocks + 1);
 
     // Un-Comment if debugging necessary (allocated structure visualization)
     map.saveStructure(tmp_ + "/single-ray-aabb-allocated_structure.ply");
     map.saveMeshVoxel(tmp_ + "/single-ray-aabb-mesh.ply");
-
 }
 
 TEST(Map, aabb_ray_batch)
@@ -199,8 +198,9 @@ TEST(Map, aabb_ray_batch)
     // distance of plane wall [m]
     float d = 10.0f;
 
-    std::vector<std::pair<Eigen::Matrix4f,Eigen::Vector3f>,
-                Eigen::aligned_allocator<std::pair<Eigen::Matrix4f,Eigen::Vector3f>>> rayBatch;
+    std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
+                Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>
+        rayBatch;
     size_t num_points_elevation = std::floor((elevation_max - elevation_min) / elevation_res);
     size_t num_points_azimuth = std::floor((azimuth_max - azimuth_min) / azimuth_res);
 
@@ -213,7 +213,8 @@ TEST(Map, aabb_ray_batch)
         for (size_t j = 0; j < num_points_azimuth; j++) {
             y = d * tan(azimuth_angle * deg_to_rad);
             // save point
-            rayBatch.push_back(std::pair<Eigen::Matrix4f,Eigen::Vector3f> (Eigen::Matrix4f::Identity(), Eigen::Vector3f(x,y,z)));
+            rayBatch.push_back(std::pair<Eigen::Matrix4f, Eigen::Vector3f>(
+                Eigen::Matrix4f::Identity(), Eigen::Vector3f(x, y, z)));
             // increase azimuth angle
             azimuth_angle += azimuth_res;
         }
@@ -234,8 +235,8 @@ TEST(Map, aabb_ray_batch)
     sensorConfig.near_plane = 0.6f;
     sensorConfig.far_plane = 30.0f;
     sensorConfig.T_BS = Eigen::Matrix4f::Identity();
-    sensorConfig.elevation_resolution_angle_ = static_cast<float> (elevation_res);
-    sensorConfig.azimuth_resolution_angle_ = static_cast<float> (azimuth_res);
+    sensorConfig.elevation_resolution_angle_ = static_cast<float>(elevation_res);
+    sensorConfig.azimuth_resolution_angle_ = static_cast<float>(azimuth_res);
 
     //se::LeicaLidarConfig sensorConfig(se_config.sensor);
     const se::LeicaLidar sensor(sensorConfig);
@@ -251,16 +252,16 @@ TEST(Map, aabb_ray_batch)
     const float half_wall_blocks = dim_to_blocks(half_wall_dim, block_dim);
 
     // lines are commented out.
-    float min_x = block_dim * std::floor(sensor.near_plane / (2*block_dim));
+    float min_x = block_dim * std::floor(sensor.near_plane / (2 * block_dim));
     EXPECT_NEAR(map.aabb().min().x(), min_x, 1e-02f);
     // x should be a multiple of the block size (in meters) depending on tau and the resolution
     // with default tau_min = 3
-    int n_of_blocks_x = std::ceil((d + 3*res)/block_dim);
+    int n_of_blocks_x = std::ceil((d + 3 * res) / block_dim);
     EXPECT_FLOAT_EQ(map.aabb().max().x(), n_of_blocks_x * block_dim);
     EXPECT_FLOAT_EQ(map.aabb().min().z(), map.aabb().min().y());
     EXPECT_FLOAT_EQ(map.aabb().max().z(), map.aabb().max().y());
-    EXPECT_EQ(dim_to_blocks(map.aabb().min().y(), block_dim), -half_wall_blocks-1);
-    EXPECT_EQ(dim_to_blocks(map.aabb().max().y(), block_dim), half_wall_blocks+1);
+    EXPECT_EQ(dim_to_blocks(map.aabb().min().y(), block_dim), -half_wall_blocks - 1);
+    EXPECT_EQ(dim_to_blocks(map.aabb().max().y(), block_dim), half_wall_blocks + 1);
 
     // Extend wall in other direction (test negative x min
     rayBatch.clear();
@@ -272,7 +273,8 @@ TEST(Map, aabb_ray_batch)
         for (size_t j = 0; j < num_points_azimuth; j++) {
             y = d * tan(azimuth_angle * deg_to_rad);
             // save point
-            rayBatch.push_back(std::pair<Eigen::Matrix4f,Eigen::Vector3f> (Eigen::Matrix4f::Identity(), Eigen::Vector3f(x,y,z)));
+            rayBatch.push_back(std::pair<Eigen::Matrix4f, Eigen::Vector3f>(
+                Eigen::Matrix4f::Identity(), Eigen::Vector3f(x, y, z)));
             // increase azimuth angle
             azimuth_angle += azimuth_res;
         }
@@ -284,13 +286,13 @@ TEST(Map, aabb_ray_batch)
     integrator.integrateRayBatch(sensor, rayBatch, 0);
 
     // lines are commented out.
-    int negative_n_of_blocks_x = std::floor( - (d + 3*res)/block_dim);
+    int negative_n_of_blocks_x = std::floor(-(d + 3 * res) / block_dim);
     EXPECT_FLOAT_EQ(map.aabb().min().x(), negative_n_of_blocks_x * block_dim);
     EXPECT_FLOAT_EQ(map.aabb().max().x(), n_of_blocks_x * block_dim);
     EXPECT_FLOAT_EQ(map.aabb().min().z(), map.aabb().min().y());
     EXPECT_FLOAT_EQ(map.aabb().max().z(), map.aabb().max().y());
-    EXPECT_EQ(dim_to_blocks(map.aabb().min().y(), block_dim), -half_wall_blocks-1);
-    EXPECT_EQ(dim_to_blocks(map.aabb().max().y(), block_dim), half_wall_blocks+1);
+    EXPECT_EQ(dim_to_blocks(map.aabb().min().y(), block_dim), -half_wall_blocks - 1);
+    EXPECT_EQ(dim_to_blocks(map.aabb().max().y(), block_dim), half_wall_blocks + 1);
 
     // Un-Comment if debugging necessary (allocated structure visualization)
     map.saveStructure(tmp_ + "/multi-ray-aabb-allocated_structure.ply");
@@ -299,5 +301,5 @@ TEST(Map, aabb_ray_batch)
     map.saveFieldSlices(tmp_ + "/multi-ray-aabb-slice-x.vtk",
                         tmp_ + "/multi-ray-aabb-slice-y.vtk",
                         tmp_ + "/multi-ray-aabb-slice-z.vtk",
-                        Eigen::Vector3f(0.f,0.f,0.f));
+                        Eigen::Vector3f(0.f, 0.f, 0.f));
 }

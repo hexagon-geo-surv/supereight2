@@ -65,11 +65,13 @@ struct IntegrateRayImplD {
 template<se::Field FldT, se::Res ResT>
 struct IntegrateRayBatchImplD {
     template<typename SensorT, typename MapT>
-    static void integrate(MapT& map,
-                          const SensorT& sensor,
-                          const std::vector<std::pair<Eigen::Matrix4f,Eigen::Vector3f>,
-                              Eigen::aligned_allocator<std::pair<Eigen::Matrix4f,Eigen::Vector3f>>>& rayPoseBatch,
-                          const unsigned int frame);
+    static void integrate(
+        MapT& map,
+        const SensorT& sensor,
+        const std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
+                          Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>&
+            rayPoseBatch,
+        const unsigned int frame);
 };
 
 
@@ -141,11 +143,13 @@ struct IntegrateRayImplD<se::Field::Occupancy, se::Res::Multi> {
 template<>
 struct IntegrateRayBatchImplD<se::Field::Occupancy, se::Res::Multi> {
     template<typename SensorT, typename MapT>
-    static void integrate(MapT& map,
-                          const SensorT& sensor,
-                          const std::vector<std::pair<Eigen::Matrix4f,Eigen::Vector3f>,
-                              Eigen::aligned_allocator<std::pair<Eigen::Matrix4f,Eigen::Vector3f>>>& rayPoseBatch,
-                          const unsigned int frame);
+    static void integrate(
+        MapT& map,
+        const SensorT& sensor,
+        const std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
+                          Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>&
+            rayPoseBatch,
+        const unsigned int frame);
 };
 
 
@@ -290,11 +294,10 @@ void IntegrateRayImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
     const Eigen::Matrix4f& T_WS,
     const unsigned int frame)
 {
-
     omp_set_num_threads(3);
     TICK("Ray Integration")
     TICK("allocation-integration")
-    se::RayIntegrator rayIntegrator(map,sensor,ray_S,T_WS,frame);
+    se::RayIntegrator rayIntegrator(map, sensor, ray_S, T_WS, frame);
     rayIntegrator();
     TOCK("allocation-integration")
     TICK("propagateBlocksToCoarsestScale")
@@ -310,21 +313,26 @@ template<typename SensorT, typename MapT>
 void IntegrateRayBatchImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
     MapT& map,
     const SensorT& sensor,
-    const std::vector<std::pair<Eigen::Matrix4f,Eigen::Vector3f>, Eigen::aligned_allocator<std::pair<Eigen::Matrix4f,Eigen::Vector3f>>>& rayPoseBatch,
+    const std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
+                      Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>&
+        rayPoseBatch,
     const unsigned int frame)
 {
-    se::RayIntegrator<MapT,SensorT> rayIntegrator(map, sensor, rayPoseBatch.at(0).second, rayPoseBatch.at(0).first, frame);
+    se::RayIntegrator<MapT, SensorT> rayIntegrator(
+        map, sensor, rayPoseBatch.at(0).second, rayPoseBatch.at(0).first, frame);
 
     omp_set_num_threads(3); // ToDo: check if this holds for later functions?
     // do downsampling
     int skip_count = 0;
 
-    for(size_t i = 0; i < rayPoseBatch.size(); i++){
+    for (size_t i = 0; i < rayPoseBatch.size(); i++) {
         TICK("Ray Integration")
         TICK("allocation-integration")
-        if(rayIntegrator.resetIntegrator(rayPoseBatch.at(i).second, rayPoseBatch.at(i).first, frame)){
+        if (rayIntegrator.resetIntegrator(
+                rayPoseBatch.at(i).second, rayPoseBatch.at(i).first, frame)) {
             rayIntegrator();
-        }else{
+        }
+        else {
             skip_count++;
         }
         TOCK("allocation-integration")
@@ -390,11 +398,14 @@ void MapIntegrator<MapT>::integrateRay(const SensorT& sensor,
 
 template<typename MapT>
 template<typename SensorT>
-void MapIntegrator<MapT>::integrateRayBatch(const SensorT& sensor,
-                                            const std::vector<std::pair<Eigen::Matrix4f,Eigen::Vector3f>, Eigen::aligned_allocator<std::pair<Eigen::Matrix4f,Eigen::Vector3f>>>& rayPoseBatch,
-                                            /*const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& rayBatch,
+void MapIntegrator<MapT>::integrateRayBatch(
+    const SensorT& sensor,
+    const std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
+                      Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>&
+        rayPoseBatch,
+    /*const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& rayBatch,
                                             const std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f>>& poseBatch,*/
-                                            const unsigned int frame)
+    const unsigned int frame)
 {
     //se::details::IntegrateRayBatchImpl<MapT>::integrate(map_, sensor, rayBatch, poseBatch, frame);
     se::details::IntegrateRayBatchImpl<MapT>::integrate(map_, sensor, rayPoseBatch, frame);

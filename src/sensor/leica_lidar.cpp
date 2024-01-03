@@ -21,8 +21,8 @@ void se::LeicaLidarConfig::readYaml(const std::string& filename)
     // Get the node containing the sensor configuration.
     const cv::FileNode node = fs["sensor"];
 
-    se::yaml::subnode_as_float(node,"elevation_resolution_angle",elevation_resolution_angle_);
-    se::yaml::subnode_as_float(node,"azimuth_resolution_angle",azimuth_resolution_angle_);
+    se::yaml::subnode_as_float(node, "elevation_resolution_angle", elevation_resolution_angle_);
+    se::yaml::subnode_as_float(node, "azimuth_resolution_angle", azimuth_resolution_angle_);
 }
 
 
@@ -34,18 +34,21 @@ std::ostream& se::operator<<(std::ostream& os, const se::LeicaLidarConfig& c)
     os << str_utils::value_to_pretty_str(c.near_plane, "near_plane") << " m\n";
     os << str_utils::value_to_pretty_str(c.far_plane, "far_plane") << " m\n";
     os << str_utils::eigen_matrix_to_pretty_str(c.T_BS, "T_BS") << "\n";
-    os << str_utils::value_to_pretty_str(c.elevation_resolution_angle_, "elevation_resolution_angle") << " deg\n";
-    os << str_utils::value_to_pretty_str(c.azimuth_resolution_angle_, "azimuth_resolution_angle") << " deg\n";
+    os << str_utils::value_to_pretty_str(c.elevation_resolution_angle_,
+                                         "elevation_resolution_angle")
+       << " deg\n";
+    os << str_utils::value_to_pretty_str(c.azimuth_resolution_angle_, "azimuth_resolution_angle")
+       << " deg\n";
     return os;
 }
 
 
 
 se::LeicaLidar::LeicaLidar(const LeicaLidarConfig& c) :
-    se::SensorBase<se::LeicaLidar>(c),
-    model(c.width, c.height),
-    azimuth_resolution_angle(c.azimuth_resolution_angle_),
-    elevation_resolution_angle(c.elevation_resolution_angle_)
+        se::SensorBase<se::LeicaLidar>(c),
+        model(c.width, c.height),
+        azimuth_resolution_angle(c.azimuth_resolution_angle_),
+        elevation_resolution_angle(c.elevation_resolution_angle_)
 {
     assert(c.width > 0);
     assert(c.height > 0);
@@ -62,19 +65,20 @@ se::LeicaLidar::LeicaLidar(const LeicaLidarConfig& c) :
     min_elevation_rad = min_elevation * deg_to_rad;
     const float max_elevation = 90.0f;
     max_elevation_rad = max_elevation * deg_to_rad;
-    vertical_fov = deg_to_rad * (max_elevation - min_elevation); // should be 180 degree respectively PI
+    vertical_fov =
+        deg_to_rad * (max_elevation - min_elevation); // should be 180 degree respectively PI
 
-    pixel_dim_tan = 2.0f * std::tan(max_ray_angle * 0.5f *deg_to_rad);
+    pixel_dim_tan = 2.0f * std::tan(max_ray_angle * 0.5f * deg_to_rad);
     pv_ratio_denominator = 1.0f / (std::sqrt(3.0f) * map_resolution);
 }
 
 
 
 se::LeicaLidar::LeicaLidar(const LeicaLidarConfig& c, const float dsf) :
-    se::SensorBase<se::LeicaLidar>(c),
-    model(c.width / dsf, c.height / dsf),
-    azimuth_resolution_angle(c.azimuth_resolution_angle_),
-    elevation_resolution_angle(c.elevation_resolution_angle_)
+        se::SensorBase<se::LeicaLidar>(c),
+        model(c.width / dsf, c.height / dsf),
+        azimuth_resolution_angle(c.azimuth_resolution_angle_),
+        elevation_resolution_angle(c.elevation_resolution_angle_)
 {
     assert(c.width > 0);
     assert(c.height > 0);
@@ -91,34 +95,36 @@ se::LeicaLidar::LeicaLidar(const LeicaLidarConfig& c, const float dsf) :
     min_elevation_rad = min_elevation * deg_to_rad;
     const float max_elevation = 90.0f;
     max_elevation_rad = max_elevation * deg_to_rad;
-    vertical_fov = deg_to_rad * (max_elevation - min_elevation); // should be 180 degree respectively PI
+    vertical_fov =
+        deg_to_rad * (max_elevation - min_elevation); // should be 180 degree respectively PI
 
-    pixel_dim_tan = 2.0f * std::tan(max_ray_angle * 0.5f *deg_to_rad);
+    pixel_dim_tan = 2.0f * std::tan(max_ray_angle * 0.5f * deg_to_rad);
     pv_ratio_denominator = 1.0f / (std::sqrt(3) * map_resolution);
 }
 
 
 
 se::LeicaLidar::LeicaLidar(const LeicaLidar& ll, const float dsf) :
-    se::SensorBase<se::LeicaLidar>(ll),
-    model(ll.model.imageWidth() / dsf, ll.model.imageHeight() / dsf), // TODO: Does the beam need to be scaled too?
-    min_ray_angle(ll.min_ray_angle),
-    min_elevation_rad(ll.min_elevation_rad),
-    max_elevation_rad(ll.max_elevation_rad),
-    horizontal_fov(ll.horizontal_fov),
-    vertical_fov(ll.vertical_fov),
-    azimuth_resolution_angle(ll.azimuth_resolution_angle),
-    elevation_resolution_angle(ll.elevation_resolution_angle)
+        se::SensorBase<se::LeicaLidar>(ll),
+        model(ll.model.imageWidth() / dsf,
+              ll.model.imageHeight() / dsf), // TODO: Does the beam need to be scaled too?
+        min_ray_angle(ll.min_ray_angle),
+        min_elevation_rad(ll.min_elevation_rad),
+        max_elevation_rad(ll.max_elevation_rad),
+        horizontal_fov(ll.horizontal_fov),
+        vertical_fov(ll.vertical_fov),
+        azimuth_resolution_angle(ll.azimuth_resolution_angle),
+        elevation_resolution_angle(ll.elevation_resolution_angle)
 {
 }
 
 
 
 int se::LeicaLidar::computeIntegrationScaleImpl(const Eigen::Vector3f& block_centre,
-                                                 const float map_res,
-                                                 const int last_scale,
-                                                 const int min_scale,
-                                                 const int max_block_scale) const
+                                                const float map_res,
+                                                const int last_scale,
+                                                const int min_scale,
+                                                const int max_block_scale) const
 {
     //constexpr float deg_to_rad = M_PI / 180.0f;
     const float dist = block_centre.norm();
@@ -235,7 +241,7 @@ bool se::LeicaLidar::sphereInFrustumImpl(const Eigen::Vector3f& centre_S, const 
 
 
 bool se::LeicaLidar::sphereInFrustumInfImpl(const Eigen::Vector3f& centre_S,
-                                             const float radius) const
+                                            const float radius) const
 {
     if (centre_S.norm() + radius < near_plane) {
         return false;

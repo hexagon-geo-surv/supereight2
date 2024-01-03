@@ -44,7 +44,6 @@ class LeicaReader : public Reader {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     private:
-
     /// LidarStream
     std::ifstream lidar_stream_;
     uint64_t ray_timestamp_ = 0;
@@ -57,7 +56,7 @@ class LeicaReader : public Reader {
 
     float azimuth_angular_resolution_;
     float elevation_angular_resolution_;
-    std::vector< std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>> clouds_;
+    std::vector<std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>> clouds_;
 
 
     ReaderStatus nextDepth(Image<float>& depth_image);
@@ -66,9 +65,11 @@ class LeicaReader : public Reader {
 
     ReaderStatus nextPose(Eigen::Matrix4f& T_WB);
 
-    ReaderStatus nextRayBatch(const float batch_interval,
-                              std::vector<std::pair<Eigen::Matrix4f,Eigen::Vector3f>,
-                                  Eigen::aligned_allocator<std::pair<Eigen::Matrix4f,Eigen::Vector3f>>>& rayPoseBatch);
+    ReaderStatus
+    nextRayBatch(const float batch_interval,
+                 std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
+                             Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>&
+                     rayPoseBatch);
 
     ReaderStatus nextRGBA(Image<uint32_t>& rgba_image);
 
@@ -85,5 +86,3 @@ class LeicaReader : public Reader {
 } // namespace se
 
 #endif //__READER_LEICA_HPP
-
-

@@ -12,8 +12,6 @@
 namespace se {
 
 struct LeicaLidarConfig : public SensorBaseConfig {
-
-
     /** \brief The actual sensor resolution in angular directions (in degrees).
      *  It is needed for ray based integration to decide the integration scale.
      */
@@ -99,4 +97,3 @@ class LeicaLidar : public SensorBase<LeicaLidar> {
 #include "impl/leica_lidar_impl.hpp"
 
 #endif // SE_LEICA_LIDAR_HPP
-

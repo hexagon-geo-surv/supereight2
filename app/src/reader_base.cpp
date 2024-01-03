@@ -42,7 +42,7 @@ se::ReaderType se::string_to_reader_type(const std::string& s)
     else if (s_lowered == "interiornet") {
         return se::ReaderType::INTERIORNET;
     }
-    else if (s_lowered == "leica"){
+    else if (s_lowered == "leica") {
         return se::ReaderType::LEICA;
     }
     else {
@@ -69,7 +69,7 @@ std::string se::reader_type_to_string(se::ReaderType t)
     else if (t == se::ReaderType::INTERIORNET) {
         return "InteriorNet";
     }
-    else if (t == se::ReaderType::LEICA){
+    else if (t == se::ReaderType::LEICA) {
         return "leica";
     }
     else {
@@ -150,10 +150,10 @@ std::ostream& se::operator<<(std::ostream& os, const se::ReaderConfig& c)
     os << str_utils::bool_to_pretty_str(c.drop_frames, "drop_frames") << "\n";
     os << str_utils::value_to_pretty_str(c.verbose, "verbose") << "\n";
 
-    if(c.reader_type == se::ReaderType::LEICA){
+    if (c.reader_type == se::ReaderType::LEICA) {
         os << str_utils::value_to_pretty_str(c.leica_reader_type, "leica_reader_type") << "\n";
         os << str_utils::value_to_pretty_str(c.scan_time_interval, "scan_time_interval") << "\n";
-        if(c.leica_reader_type == "rangeImage"){
+        if (c.leica_reader_type == "rangeImage") {
             os << str_utils::value_to_pretty_str(c.use_motion_comp, "use_motion_comp") << "\n";
             os << str_utils::value_to_pretty_str(c.width, "width") << "\n";
             os << str_utils::value_to_pretty_str(c.height, "height") << "\n";
@@ -316,8 +316,7 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
     return status_;
 }
 
-se::ReaderStatus se::Reader::nextData(Eigen::Vector3f& ray_measurement,
-                                      Eigen::Matrix4f& T_WB)
+se::ReaderStatus se::Reader::nextData(Eigen::Vector3f& ray_measurement, Eigen::Matrix4f& T_WB)
 {
     if (!good()) {
         if (verbose_ >= 1) {
@@ -342,9 +341,11 @@ se::ReaderStatus se::Reader::nextData(Eigen::Vector3f& ray_measurement,
     return status_;
 }
 
-se::ReaderStatus se::Reader::nextData(const float batch_interval,
-                                      std::vector<std::pair<Eigen::Matrix4f,Eigen::Vector3f>,
-                                          Eigen::aligned_allocator<std::pair<Eigen::Matrix4f,Eigen::Vector3f>>>& rayPoseBatch)
+se::ReaderStatus se::Reader::nextData(
+    const float batch_interval,
+    std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
+                Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>&
+        rayPoseBatch)
 {
     if (!good()) {
         if (verbose_ >= 1) {
@@ -574,8 +575,11 @@ se::ReaderStatus se::Reader::nextRay(Eigen::Vector3f& /*ray_measurement*/)
     return se::ReaderStatus::error;
 }
 
-se::ReaderStatus se::Reader::nextRayBatch(const float /*batch_interval*/, std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
-    Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>& /*rayPoseBatch*/)
+se::ReaderStatus se::Reader::nextRayBatch(
+    const float /*batch_interval*/,
+    std::vector<
+        std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
+        Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>& /*rayPoseBatch*/)
 {
     return se::ReaderStatus::error;
 }

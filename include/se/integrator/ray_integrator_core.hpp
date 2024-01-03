@@ -6,7 +6,7 @@
 
 #ifndef SE_RAY_INTEGRATOR_CORE_HPP
 #define SE_RAY_INTEGRATOR_CORE_HPP
-namespace se{
+namespace se {
 
 namespace ray_integrator {
 
@@ -19,7 +19,9 @@ namespace ray_integrator {
  * \return True(ToDo: /false if the voxel has been observed the first time)
  */
 template<typename DataT>
-bool weighted_mean_update(DataT& data, const se::field_t sample_value, const se::weight_t max_weight);
+bool weighted_mean_update(DataT& data,
+                          const se::field_t sample_value,
+                          const se::weight_t max_weight);
 
 /**
  * \brief Update a field with a new measurement, a weighting of 1 is considered for the new measurement.
@@ -33,10 +35,10 @@ bool weighted_mean_update(DataT& data, const se::field_t sample_value, const se:
  */
 template<typename DataT, typename ConfigT>
 bool update_voxel(DataT& data,
-                         const float range_diff,
-                         const float tau,
-                         const float three_sigma,
-                         const ConfigT config);
+                  const float range_diff,
+                  const float tau,
+                  const float three_sigma,
+                  const ConfigT config);
 
 /**
  * \brief Reduce the node data by the minimum log-odd occupancy update per iteration.
@@ -70,7 +72,7 @@ bool free_voxel(DataT& voxel_data, const ConfigT config);
  */
 template<typename NodeT, typename BlockT>
 typename NodeT::DataType propagate_to_parent_node(se::OctantBase* octant_ptr,
-                                                         const unsigned int frame);
+                                                  const unsigned int frame);
 
 /**
  * \brief Summariese the values from the current integration scale recursively

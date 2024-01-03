@@ -35,7 +35,6 @@ struct SemanticData<Semantics::On> {
 
 
 
-
 ///////////////////
 /// DATA CONFIG ///
 ///////////////////

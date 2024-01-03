@@ -22,7 +22,7 @@ int main(int argc, char** argv)
 
         // ========= Config & I/O INITIALIZATION  =========
         const std::string config_filename = argv[1];
-        const se::Config<se::OccupancyDataConfig , se::LeicaLidarConfig> config(config_filename);
+        const se::Config<se::OccupancyDataConfig, se::LeicaLidarConfig> config(config_filename);
         std::cout << config;
 
         // Create the mesh output directory
@@ -42,7 +42,9 @@ int main(int argc, char** argv)
         se::perfstats.setFilestream(&log_file_stream);
 
         // Setup input ray / pose batch
-        std::vector<std::pair<Eigen::Matrix4f,Eigen::Vector3f>, Eigen::aligned_allocator<std::pair<Eigen::Matrix4f,Eigen::Vector3f>>> ray_pose_batch;
+        std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
+                    Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>
+            ray_pose_batch;
 
         // ========= Map INITIALIZATION  =========
         // Setup the single-res TSDF map w/ default block size of 8 voxels
@@ -88,9 +90,9 @@ int main(int argc, char** argv)
             ray_pose_batch.clear();
             read_ok = reader->nextData(config.reader.scan_time_interval, ray_pose_batch);
             if (read_ok != se::ReaderStatus::ok) {
-              break;
+                break;
             }
-            for(size_t i = 0; i < ray_pose_batch.size(); i++){
+            for (size_t i = 0; i < ray_pose_batch.size(); i++) {
                 ray_pose_batch[i].first = ray_pose_batch[i].first * T_BS;
             }
             TOCK("read")
@@ -100,11 +102,11 @@ int main(int argc, char** argv)
             integrator.integrateRayBatch(sensor, ray_pose_batch, frame);
             TOCK("integration")
             if (config.app.meshing_rate > 0 && frame % config.app.meshing_rate == 0) {
-                if(!config.app.structure_path.empty()){
-                    map.saveStructure(config.app.structure_path + "/struct_"
-                                      + std::to_string(frame) + ".ply");
+                if (!config.app.structure_path.empty()) {
+                    map.saveStructure(config.app.structure_path + "/struct_" + std::to_string(frame)
+                                      + ".ply");
                 }
-                if(!config.app.slice_path.empty()){
+                if (!config.app.slice_path.empty()) {
                     map.saveFieldSlices(
                         config.app.slice_path + "/slice_x_" + std::to_string(frame) + ".vtk",
                         config.app.slice_path + "/slice_y_" + std::to_string(frame) + ".vtk",
@@ -113,9 +115,9 @@ int main(int argc, char** argv)
                 }
                 if (!config.app.mesh_path.empty()) {
                     map.saveMesh(config.app.mesh_path + "/mesh_" + std::to_string(frame) + ".ply");
-                    map.saveMeshVoxel(config.app.mesh_path + "/voxel_mesh_" + std::to_string(frame) + ".ply");
+                    map.saveMeshVoxel(config.app.mesh_path + "/voxel_mesh_" + std::to_string(frame)
+                                      + ".ply");
                 }
-
             }
 
             TOCK("total")
@@ -124,9 +126,9 @@ int main(int argc, char** argv)
         }
 
         // Final Meshes / Slices
-        if(!config.app.structure_path.empty()){
-            map.saveStructure(config.app.structure_path + "/struct_"
-                              + std::to_string(frame) + ".ply");
+        if (!config.app.structure_path.empty()) {
+            map.saveStructure(config.app.structure_path + "/struct_" + std::to_string(frame)
+                              + ".ply");
         }
         if (!config.app.mesh_path.empty()) {
             map.saveMeshVoxel(config.app.mesh_path + "/mesh_" + std::to_string(frame) + ".ply");

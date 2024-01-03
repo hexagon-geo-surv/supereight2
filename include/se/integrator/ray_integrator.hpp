@@ -13,7 +13,7 @@
 
 #include "se/integrator/ray_integrator_core.hpp"
 
-namespace se{
+namespace se {
 
 enum class RayState { FreeSpace, Transition, Occupied, Undefined };
 
@@ -21,18 +21,18 @@ template<typename MapT, typename SensorT>
 class RayIntegrator {
     public:
     RayIntegrator(MapT& /* map */,
-                    const SensorT& /* sensor */,
-                    const Eigen::Vector3f& /*ray*/,
-                    const Eigen::Matrix4f& /* T_SW need Lidar frame?*/,
-                    const int /* frame */){};
+                  const SensorT& /* sensor */,
+                  const Eigen::Vector3f& /*ray*/,
+                  const Eigen::Matrix4f& /* T_SW need Lidar frame?*/,
+                  const int /* frame */){};
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,SensorT> {
+class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
+                    SensorT> {
     public:
-
     typedef Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize> MapType;
     typedef typename MapType::DataType DataType;
     typedef typename MapType::OctreeType OctreeType;
@@ -46,10 +46,10 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, 
     */
     struct RayIntegratorConfig {
         RayIntegratorConfig(const MapType& map) :
-            sigma_min(map.getDataConfig().sigma_min_factor * map.getRes()),
-            sigma_max(map.getDataConfig().sigma_max_factor * map.getRes()),
-            tau_min(map.getDataConfig().tau_min_factor * map.getRes()),
-            tau_max(map.getDataConfig().tau_max_factor * map.getRes())
+                sigma_min(map.getDataConfig().sigma_min_factor * map.getRes()),
+                sigma_max(map.getDataConfig().sigma_max_factor * map.getRes()),
+                tau_min(map.getDataConfig().tau_min_factor * map.getRes()),
+                tau_max(map.getDataConfig().tau_max_factor * map.getRes())
         {
         }
 
@@ -85,10 +85,10 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, 
      *
      * \return False if ray should be skipped. Otherwise true
      */
-   bool resetIntegrator(const Eigen::Vector3f& ray,
-                        const Eigen::Matrix4f& T_WS,
-                        const int frame,
-                        bool skip_check = false);
+    bool resetIntegrator(const Eigen::Vector3f& ray,
+                         const Eigen::Matrix4f& T_WS,
+                         const int frame,
+                         bool skip_check = false);
 
     /**
      * \brief Allocate and update along the ray using a step size depending on the chosen resolution.
@@ -118,7 +118,6 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     private:
-
     /**
     * \brief Recursively decide if to allocate or terminate a node.
     *
@@ -142,7 +141,10 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, 
      * Update Operations
      */
 
-    void updateBlock(se::OctantBase* octant_ptr, Eigen::Vector3i& voxel_coords, int desired_scale, float sample_dist);
+    void updateBlock(se::OctantBase* octant_ptr,
+                     Eigen::Vector3i& voxel_coords,
+                     int desired_scale,
+                     float sample_dist);
 
     MapType& map_;
     OctreeType& octree_;
@@ -167,7 +169,6 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, 
     float ray_dist_ = 0.;
     float tau_ = 0.;
     float three_sigma_ = 0.;
-
 };
 
 } // namespace se
