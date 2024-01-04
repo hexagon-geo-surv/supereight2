@@ -32,9 +32,9 @@ std::ostream& se::operator<<(std::ostream& os, const se::LeicaLidarConfig& c)
     os << static_cast<const se::SensorBaseConfig&>(c);
     os << str_utils::value_to_pretty_str(c.elevation_resolution_angle_,
                                          "elevation_resolution_angle")
-       << " deg\n";
+       << " degrees\n";
     os << str_utils::value_to_pretty_str(c.azimuth_resolution_angle_, "azimuth_resolution_angle")
-       << " deg\n";
+       << " degrees\n";
     return os;
 }
 
