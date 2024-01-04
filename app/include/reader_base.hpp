@@ -93,11 +93,6 @@ struct ReaderConfig {
      */
     int verbose = 0;
 
-    /** Type of Leica Reader ("rangeImage" or "ray")
-     *  \note Only for se::ReaderType::LEICA ("rangeImage" or "ray")
-     */
-    std::string leica_reader_type = "ray";
-
     /** Provide Transformation Sensor (LiDAR) to Body (Drone) also to reader. T_BS.
      *  \note Only for se::ReaderType::LEICA ("rangeImage" or "ray")
      */
@@ -108,23 +103,6 @@ struct ReaderConfig {
      *  \note Only for se::ReaderType::LEICA ("rangeImage" or "ray")
      */
     float scan_time_interval = 1.0;
-
-    /** Flag whether motion compensation for single LiDAR measurements is applied.
-     * \note Only for se::ReaderType::LEICA ("rangeImage" or "ray")
-     */
-    bool use_motion_comp = false;
-
-    /** Width of range image to project points onto.
-     *  (Width default 360 results in 1 degree resolution for "rangeImage" type reader.)
-     *  \note Only for se::ReaderType::LEICA ("rangeImage" or "ray")
-     */
-    int width = 360;
-
-    /** Height of range image to project points onto.
-     *  (Height default 180 results in 1 degree resolution for "rangeImage" type reader.)
-     *  \note Only for se::ReaderType::LEICA ("rangeImage" or "ray")
-     */
-    int height = 180;
 
     /** Reads the struct members from the "reader" node of a YAML file. Members not present in the
      * YAML file aren't modified.

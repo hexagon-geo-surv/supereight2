@@ -56,7 +56,6 @@ class LeicaReader : public Reader {
 
     float azimuth_angular_resolution_;
     float elevation_angular_resolution_;
-    std::vector<std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>> clouds_;
 
 
     ReaderStatus nextDepth(Image<float>& depth_image);

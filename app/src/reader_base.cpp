@@ -114,11 +114,7 @@ void se::ReaderConfig::readYaml(const std::string& filename)
     se::yaml::subnode_as_string(node, "sequence_path", sequence_path);
     se::yaml::subnode_as_string(node, "ground_truth_file", ground_truth_file);
     // Leica specific config params (initialised to default if not existing)
-    se::yaml::subnode_as_string(node, "leica_reader_type", leica_reader_type);
     se::yaml::subnode_as_float(node, "scan_time_interval", scan_time_interval);
-    se::yaml::subnode_as_bool(node, "use_motion_comp", use_motion_comp);
-    se::yaml::subnode_as_int(node, "width", width);
-    se::yaml::subnode_as_int(node, "height", height);
     se::yaml::subnode_as_eigen_matrix4f(fs["sensor"], "T_BS", T_BL);
 
     // Expand ~ in the paths.
@@ -151,13 +147,7 @@ std::ostream& se::operator<<(std::ostream& os, const se::ReaderConfig& c)
     os << str_utils::value_to_pretty_str(c.verbose, "verbose") << "\n";
 
     if (c.reader_type == se::ReaderType::LEICA) {
-        os << str_utils::value_to_pretty_str(c.leica_reader_type, "leica_reader_type") << "\n";
         os << str_utils::value_to_pretty_str(c.scan_time_interval, "scan_time_interval") << "\n";
-        if (c.leica_reader_type == "rangeImage") {
-            os << str_utils::value_to_pretty_str(c.use_motion_comp, "use_motion_comp") << "\n";
-            os << str_utils::value_to_pretty_str(c.width, "width") << "\n";
-            os << str_utils::value_to_pretty_str(c.height, "height") << "\n";
-        }
         os << str_utils::eigen_matrix_to_pretty_str(c.T_BL, "T_BS") << "\n";
     }
     return os;

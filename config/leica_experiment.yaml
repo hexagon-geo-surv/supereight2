@@ -53,11 +53,7 @@ reader:
   drop_frames:                false
   verbose:                    0
   # following parameters are only used for Leica BLK LiDAR sensor
-  leica_reader_type:          "ray" # "ray" | "rangeImage"
   scan_time_interval:         1.0 # size of interval that lidar measurements are clustered together
-  use_motion_comp:            true
-  width:                      360 # only for "rangeImage; should match sensor.width
-  height:                     180 # only for "rangeImage; should match sensor.height
 
 app:
   enable_ground_truth:        true
