@@ -40,15 +40,11 @@ void se::OusterLidarConfig::readYaml(const std::string& filename)
 
 std::ostream& se::operator<<(std::ostream& os, const se::OusterLidarConfig& c)
 {
-    os << str_utils::value_to_pretty_str(c.width, "width") << " px\n";
-    os << str_utils::value_to_pretty_str(c.height, "height") << " px\n";
-    os << str_utils::value_to_pretty_str(c.near_plane, "near_plane") << " m\n";
-    os << str_utils::value_to_pretty_str(c.far_plane, "far_plane") << " m\n";
+    os << static_cast<const se::SensorBaseConfig&>(c);
     os << str_utils::eigen_vector_to_pretty_str(c.beam_azimuth_angles, "beam_azimuth_angles")
        << " degrees\n";
     os << str_utils::eigen_vector_to_pretty_str(c.beam_elevation_angles, "beam_elevation_angles")
        << " degrees\n";
-    os << str_utils::eigen_matrix_to_pretty_str(c.T_BS, "T_BS") << "\n";
     return os;
 }
 

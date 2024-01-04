@@ -29,11 +29,7 @@ void se::LeicaLidarConfig::readYaml(const std::string& filename)
 
 std::ostream& se::operator<<(std::ostream& os, const se::LeicaLidarConfig& c)
 {
-    os << str_utils::value_to_pretty_str(c.width, "width") << " px\n";
-    os << str_utils::value_to_pretty_str(c.height, "height") << " px\n";
-    os << str_utils::value_to_pretty_str(c.near_plane, "near_plane") << " m\n";
-    os << str_utils::value_to_pretty_str(c.far_plane, "far_plane") << " m\n";
-    os << str_utils::eigen_matrix_to_pretty_str(c.T_BS, "T_BS") << "\n";
+    os << static_cast<const se::SensorBaseConfig&>(c);
     os << str_utils::value_to_pretty_str(c.elevation_resolution_angle_,
                                          "elevation_resolution_angle")
        << " deg\n";
