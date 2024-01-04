@@ -128,7 +128,7 @@ TEST(RayIntegrator, SingleRay)
         EXPECT_TRUE(finest_octant_ptr->isBlock());
 
         const OctreeType::BlockType* const block_ptr =
-            static_cast<const OctreeType::BlockType* const>(finest_octant_ptr);
+            static_cast<const OctreeType::BlockType*>(finest_octant_ptr);
         const int allocatedScale = block_ptr->getCurrentScale();
         EXPECT_NE(allocatedScale, -1);
 
