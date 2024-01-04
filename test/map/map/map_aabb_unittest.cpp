@@ -137,6 +137,8 @@ TEST(Map, aabb_ray)
 
     // ========= Sensor INITIALIZATION  =========
     se::LeicaLidarConfig sensorConfig;
+    sensorConfig.width = 1;  // To satisfy assert
+    sensorConfig.height = 1; // To satisfy assert
     sensorConfig.near_plane = 0.6f;
     sensorConfig.far_plane = 30.0f;
     sensorConfig.T_BS = Eigen::Matrix4f::Identity();
@@ -232,6 +234,8 @@ TEST(Map, aabb_ray_batch)
 
     // ========= Sensor INITIALIZATION  =========
     se::LeicaLidarConfig sensorConfig;
+    sensorConfig.width = 1;  // To satisfy assert
+    sensorConfig.height = 1; // To satisfy assert
     sensorConfig.near_plane = 0.6f;
     sensorConfig.far_plane = 30.0f;
     sensorConfig.T_BS = Eigen::Matrix4f::Identity();
