@@ -11,5 +11,6 @@
 #include "se/integrator/map_integrator.hpp"
 #include "se/map/map.hpp"
 #include "se/tracker/tracker.hpp"
+#include "submap.hpp"
 
 #endif // SE_SUPEREIGHT_HPP
