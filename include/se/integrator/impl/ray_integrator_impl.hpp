@@ -125,7 +125,7 @@ template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
 void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
                    SensorT>::propagateBlocksToCoarsestScale()
 {
-#pragma omp parallel for // default(none)
+#pragma omp parallel for num_threads(3)
     for (size_t i = 0; i < updated_blocks_vector_.size(); i++) {
         se::ray_integrator::propagate_block_to_coarsest_scale<BlockType>(updated_blocks_vector_[i]);
     }

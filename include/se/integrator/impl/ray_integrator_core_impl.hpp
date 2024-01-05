@@ -189,7 +189,6 @@ void propagate_block_to_scale(se::OctantBase* octant_ptr, int desired_scale)
     DataType* data_at_child_scale = block.blockDataAtScale(child_scale);
 
     // Iter over all parent scale data
-    //#pragma omp parallel for //collapse(3) ToDo: Is this actually possible
     for (int z = 0; z < size_at_parent_scale_li; z++) {
         for (int y = 0; y < size_at_parent_scale_li; y++) {
             for (int x = 0; x < size_at_parent_scale_li; x++) {
@@ -290,7 +289,6 @@ void propagate_block_to_scale(se::OctantBase* octant_ptr, int desired_scale)
         DataType* max_data_at_child_scale = block.blockMaxDataAtScale(child_scale);
         DataType* data_at_child_scale = block.blockDataAtScale(child_scale);
 
-        //#pragma omp parallel for // collapse(3)
         for (int z = 0; z < size_at_parent_scale_li; z++) {
             for (int y = 0; y < size_at_parent_scale_li; y++) {
                 for (int x = 0; x < size_at_parent_scale_li; x++) {

@@ -105,7 +105,6 @@ TEST(RayIntegrator, SingleRay)
     integrator.integrateRay(sensor, ray, Eigen::Matrix4f::Identity(), 0);
 
     se::RayIntegrator rayIntegrator(map, sensor, ray, Eigen::Matrix4f::Identity(), 0);
-    omp_set_num_threads(3);
     rayIntegrator();
     rayIntegrator.propagateBlocksToCoarsestScale();
     rayIntegrator.propagateToRoot();

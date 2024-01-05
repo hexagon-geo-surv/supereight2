@@ -294,7 +294,6 @@ void IntegrateRayImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
     const Eigen::Matrix4f& T_WS,
     const unsigned int frame)
 {
-    omp_set_num_threads(3);
     TICK("Ray Integration")
     TICK("allocation-integration")
     se::RayIntegrator rayIntegrator(map, sensor, ray_S, T_WS, frame);
@@ -321,7 +320,6 @@ void IntegrateRayBatchImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
     se::RayIntegrator<MapT, SensorT> rayIntegrator(
         map, sensor, rayPoseBatch.at(0).second, rayPoseBatch.at(0).first, frame);
 
-    omp_set_num_threads(3); // ToDo: check if this holds for later functions?
     // do downsampling
     int skip_count = 0;
 
