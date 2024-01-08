@@ -38,7 +38,8 @@ Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
 
 template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
 void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::operator()(
-    VolumeCarverAllocation& allocation_list)
+    VolumeCarverAllocation& allocation_list,
+    std::vector<const OctantBase*>* updated_octants)
 {
     TICK("fusion-total")
 
@@ -76,11 +77,28 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
     }
     TOCK("propagation-blocks")
 
+    // updated_octants_ must be populated with blocks before the call to propagateToRoot because it
+    // may prune octants.
+    track_updated_octants_ = updated_octants;
+    if (track_updated_octants_) {
+        updated_octants_.clear();
+        updated_octants_.insert(allocation_list.block_list.begin(),
+                                allocation_list.block_list.end());
+        updated_octants_.insert(freed_block_list_.begin(), freed_block_list_.end());
+    }
+
     TICK("propagation-to-root")
     propagateToRoot(allocation_list.block_list);
     TOCK("propagation-to-root")
 
     TOCK("propagation-total")
+
+    if (track_updated_octants_) {
+        updated_octants->clear();
+        updated_octants->reserve(updated_octants_.size());
+        updated_octants->insert(
+            updated_octants->end(), updated_octants_.begin(), updated_octants_.end());
+    }
 }
 
 
@@ -108,10 +126,22 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
                 auto node_data =
                     updater::propagate_to_parent_node<NodeType, BlockType>(octant_ptr, frame_);
                 node_set_[d - 1].insert(octant_ptr->getParent());
+                if (track_updated_octants_) {
+                    updated_octants_.insert(octant_ptr);
+                }
 
                 if (node_data.observed
                     && get_field(node_data) <= 0.95 * MapType::DataType::min_occupancy) {
-                    octree_.deleteChildren(static_cast<NodeType*>(octant_ptr));
+                    auto* node_ptr = static_cast<NodeType*>(octant_ptr);
+                    if (track_updated_octants_) {
+                        for (int i = 0; i < 8; i++) {
+                            OctantBase* const child_ptr = node_ptr->getChild(i);
+                            if (child_ptr) {
+                                updated_octants_.erase(child_ptr);
+                            }
+                        }
+                    }
+                    octree_.deleteChildren(node_ptr);
                 }
 
             } // if parent

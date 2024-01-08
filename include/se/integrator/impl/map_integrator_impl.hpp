@@ -266,22 +266,8 @@ void IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
     // Update
     TICK("update")
     se::Updater updater(map, sensor, depth_img, T_WS, frame);
-    updater(allocation_list);
+    updater(allocation_list, updated_octants);
     TOCK("update")
-
-    if (updated_octants) {
-        // TODO: Currently returning allocated, not updated octants. Remove non-updated octants from
-        // allocation_list during the call to se::Updater::update() to return only updated octants.
-        updated_octants->clear();
-        updated_octants->reserve(allocation_list.node_list.size()
-                                 + allocation_list.block_list.size());
-        updated_octants->insert(updated_octants->end(),
-                                allocation_list.node_list.begin(),
-                                allocation_list.node_list.end());
-        updated_octants->insert(updated_octants->end(),
-                                allocation_list.block_list.begin(),
-                                allocation_list.block_list.end());
-    }
 }
 
 

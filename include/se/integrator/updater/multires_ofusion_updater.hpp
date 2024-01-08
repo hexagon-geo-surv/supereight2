@@ -10,6 +10,8 @@
 
 
 
+#include <set>
+
 #include "se/sensor/sensor.hpp"
 
 
@@ -57,7 +59,8 @@ class Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Se
             const Eigen::Matrix4f& T_WS,
             const int frame);
 
-    void operator()(VolumeCarverAllocation& allocation_list);
+    void operator()(VolumeCarverAllocation& allocation_list,
+                    std::vector<const OctantBase*>* updated_octants = nullptr);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -97,6 +100,8 @@ class Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Se
     const UpdaterConfig config_;
     std::vector<std::set<OctantBase*>> node_set_;
     std::vector<OctantBase*> freed_block_list_;
+    std::set<OctantBase*> updated_octants_;
+    bool track_updated_octants_ = false;
 };
 
 
