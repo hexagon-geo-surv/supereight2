@@ -113,6 +113,18 @@ static inline void rgba_to_rgb(const uint32_t* rgba, uint8_t* rgb, size_t num_pi
         rgb[3 * p + 2] = b_from_rgba(rgba[p]);
     }
 }
+
+
+
+const Eigen::Vector3f& scale_colour(const int scale)
+{
+    assert(scale >= 0);
+    if (static_cast<size_t>(scale) < colours::scale.size()) {
+        return colours::scale[scale];
+    }
+    return colours::scale.back();
+}
+
 } // namespace se
 
 #endif // SE_COLOUR_UTILS_IMPL_HPP

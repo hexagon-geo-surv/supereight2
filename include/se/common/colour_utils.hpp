@@ -188,6 +188,13 @@ void depth_to_rgba(uint32_t* depth_RGBA_image_data,
                    const Eigen::Vector2i& depth_image_res,
                    const float min_depth,
                    const float max_depth);
+
+/** Return the color from se::colours::scale that should be used to visualize the supplied \p scale.
+ * If the scale is greater or equal to the number of colours in se::colours::scale then the last
+ * colour will be returned.
+ */
+static inline const Eigen::Vector3f& scale_colour(const int scale);
+
 } // namespace se
 
 #include "impl/colour_utils_impl.hpp"

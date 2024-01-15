@@ -90,7 +90,7 @@ void render_volume_kernel(uint32_t* volume_RGBA_image_data,
                 Eigen::Vector3f col = dir + ambient_M;
                 se::eigen::clamp(col, Eigen::Vector3f::Zero(), Eigen::Vector3f::Ones());
 
-                col = col.cwiseProduct(se::colours::scale[surface_scale(x, y)]);
+                col = col.cwiseProduct(scale_colour(surface_scale(x, y)));
                 volume_RGBA_image_data[pixel_idx] = se::pack_rgba(col.x(), col.y(), col.z(), 0xFF);
             }
             else {
