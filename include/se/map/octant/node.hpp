@@ -11,22 +11,6 @@
 
 namespace se {
 
-/**
- * \brief Get the child idx for a given child coordinate and pointer to the parent node.
- *
- * \warning The function requires a pointer to the actual node rather than the se::OctantBase*.
- *
- * \tparam NodeT
- * \param[in] child_coord   The voxel coordinates of the child
- * \param[in] parent_ptr    The pointer to the parent node
- *
- * \return The child index
- */
-template<typename NodeT>
-int get_child_idx(const Eigen::Vector3i& octant_coord, const NodeT* node_ptr);
-
-
-
 // Forward Declaration
 template<typename DataT, typename DerivedT>
 class NodeMultiRes {
@@ -231,6 +215,14 @@ class Node : public OctantBase,
 
     /** Return the coordinates in voxels of the child with index \p child_idx. */
     Eigen::Vector3i getChildCoord(const int child_idx) const;
+
+    /** Return the index of the child of the node with coordinates \p child_coord. The returned
+     * index is in the interval [0, 7] inclusive.
+     *
+     * \warning Will return garbage if \p child_coord doesn't correspond to the coordinates of a
+     * child of the node.
+     */
+    int getChildIdx(const Eigen::Vector3i& child_coord);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 

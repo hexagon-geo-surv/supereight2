@@ -11,25 +11,6 @@
 
 namespace se {
 
-template<typename NodeT>
-int get_child_idx(const Eigen::Vector3i& child_coord, const NodeT* parent_ptr)
-{
-    assert(parent_ptr);
-    const Eigen::Vector3i parent_coord = parent_ptr->getCoord();
-    const int parent_size = parent_ptr->getSize();
-
-    assert(keyops::is_child(keyops::encode_key(parent_coord, math::log2_const(parent_size)),
-                            keyops::encode_key(child_coord, 0)));
-
-    Eigen::Vector3i offset = child_coord - parent_coord;
-    const unsigned int child_size = parent_size >> 1;
-
-    return ((offset.x() & child_size) > 0) + 2 * ((offset.y() & child_size) > 0)
-        + 4 * ((offset.z() & child_size) > 0);
-}
-
-
-
 template<typename DataT, Res ResT>
 Node<DataT, ResT>::Node(const Eigen::Vector3i& coord, const int size, const DataT& init_data) :
         OctantBase(false, coord, nullptr),
@@ -114,6 +95,24 @@ Eigen::Vector3i Node<DataT, ResT>::getChildCoord(const int child_idx) const
         (child_idx & 1) != 0, (child_idx & 2) != 0, (child_idx & 4) != 0);
     const int child_size = getSize() / 2;
     return getCoord() + child_size * child_offset;
+}
+
+
+
+template<typename DataT, Res ResT>
+int Node<DataT, ResT>::getChildIdx(const Eigen::Vector3i& child_coord)
+{
+    const Eigen::Vector3i parent_coord = getCoord();
+    const int parent_size = getSize();
+
+    assert(keyops::is_child(keyops::encode_key(parent_coord, math::log2_const(parent_size)),
+                            keyops::encode_key(child_coord, 0)));
+
+    Eigen::Vector3i offset = child_coord - parent_coord;
+    const unsigned int child_size = parent_size >> 1;
+
+    return ((offset.x() & child_size) > 0) + 2 * ((offset.y() & child_size) > 0)
+        + 4 * ((offset.z() & child_size) > 0);
 }
 
 } // namespace se

@@ -29,7 +29,7 @@ setData(OctreeT& octree, const Eigen::Vector3i& voxel_coord, const typename Octr
         typename OctreeT::NodeType* node_ptr =
             std::static_pointer_cast<typename OctreeT::NodeType>(octant_ptr);
         se::OctantBase* octant_tmp_ptr = nullptr;
-        const int child_idx = get_child_idx(voxel_coord, node_ptr);
+        const int child_idx = node_ptr->getChildIdx(voxel_coord);
         if (!node_ptr->getChild(child_idx, octant_tmp_ptr)) {
             octant_ptr = std::static_pointer_cast<OctantBase>(
                 se::allocator::block(voxel_coord, octree, node_ptr));
