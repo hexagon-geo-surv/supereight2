@@ -148,11 +148,13 @@ class NodeSingleRes {
 };
 
 
-/**
- * \brief The node type of the octant
+
+/** An intermediate node of an se::Octree.
  *
- * \tparam DataT
- * \tparam ResT
+ * An se::Node is never a leaf in TSDF octrees but may be a leaf in occupancy octrees.
+ *
+ * \tparam DataT The type of data stored in the octree.
+ * \tparam ResT  The value of se::Res for the octree.
  */
 template<typename DataT, Res ResT = Res::Single>
 class Node : public OctantBase,
@@ -162,54 +164,32 @@ class Node : public OctantBase,
     public:
     typedef DataT DataType;
 
-    /**
-     * \brief Setup a node via its voxel coordinates and size
+    /** Construct a node at coordinates \p coord in voxels, with an edge length \p size in voxels
+     * and initialize its data with \p init_data.
      *
-     * \warning This function should only be used for the octrees root.
-     *
-     * \param[in] coord   The coordinates in [voxel] of the node
-     * \param[in] size    The size in [voxel] of the node
+     * \warning This constructor should only be used for the octree root node as it doesn't set the
+     * parent pointer.
      */
     Node(const Eigen::Vector3i& coord, const int size, const DataT& init_data);
 
-    /**
-     * \brief Setup a node via its parent and child index.
-     *
-     * \param[in] parent_ptr  The pointer to the parent node
-     * \param[in] child_idx   The child index of the node
+    /** Construct the child node of \p parent_ptr with index \p child_idx and initialize its data
+     * with \p init_data. The value of \p child_idx must be in the interval [0, 7] inclusive.
      */
     Node(Node* parent_ptr, const int child_idx, const DataT& init_data);
 
-    /**
-     * \brief Get the size in [voxel] of the node.
-     *
-     * \return The size of the node
-     */
+    /** Return the edge length of the node in voxels */
     int getSize() const;
 
-    /**
-     * \brief Get the pointer to one of the children of the node.
-     *
-     * \param[in] child_idx   The child index of the requested child
-     *
-     * \return The pointer to the child. nullptr if not allocated
+    /** Return a pointer to the node child with index \p child_idx. The value of \p child_idx must
+     * be in the interval [0, 7] inclusive. Returns nullptr if the child is not allocated.
      */
     const OctantBase* getChild(const int child_idx) const;
 
-    /**
-     * \brief Get the pointer to one of the children of the node.
-     *
-     * \param[in] child_idx   The child index of the requested child
-     *
-     * \return The pointer to the child. nullptr if not allocated
-     */
+    /** A non-const overload of the previous member function. */
     OctantBase* getChild(const int child_idx);
 
-    /**
-     * \brief Set the pointer of one of the children of the node.
-     *
-     * \param[in] child_idx   The child index of the child to be set
-     * \param[in] child_ptr   The pointer to the child to be set
+    /** Set the node child with index \p child_idx to \p child_ptr and return a pointer to the old
+     * child. The value of \p child_idx must be in the interval [0, 7] inclusive.
      */
     OctantBase* setChild(const int child_idx, OctantBase* child_ptr);
 
@@ -227,9 +207,10 @@ class Node : public OctantBase,
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     private:
-    std::array<OctantBase*, 8>
-        children_ptr_; ///< Pointers to the eight children (should be all nullptr at initialisation due to smart pointers)
-    const int size_; ///< The size in [voxel] of the node in comparision to the finest voxel
+    // Pointers to the eight node children. Must be nullptr for unallocated children.
+    std::array<OctantBase*, 8> children_ptr_;
+    // The edge length of the node in voxels.
+    const int size_;
 };
 
 } // namespace se
