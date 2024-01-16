@@ -68,15 +68,9 @@ frustum(MapT& map, const SensorT& sensor, const Eigen::Matrix4f& T_WS);
 
 
 
-/**
- * \brief compute the sample coordinates for a given octant coordinate
- *
- * \param octant_coord       The octant coordinates
- * \param octant_size        The size of the octant
- * \param sample_offset_frac The offset fraction of the sample point to the octant corner,
- *                           i.e. (0,0,0) for octant corner and (0.5, 0.5, 0.5) for octant centre
- *
- * \return The octant sample coordinates
+/** Return the sample point coordinates in voxels for an octant with coordinates \p octant_coord and
+ * edge length \p octant_size. The sample point is where data is assumed to be sampled, typically at
+ * the centre of the octant.
  */
 static inline Eigen::Vector3f get_sample_coord(const Eigen::Vector3i& octant_coord,
                                                const int octant_size);
