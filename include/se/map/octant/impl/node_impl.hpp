@@ -102,15 +102,10 @@ Eigen::Vector3i Node<DataT, ResT>::getChildCoord(const int child_idx) const
 template<typename DataT, Res ResT>
 int Node<DataT, ResT>::getChildIdx(const Eigen::Vector3i& child_coord)
 {
-    const Eigen::Vector3i parent_coord = getCoord();
-    const int parent_size = getSize();
-
-    assert(keyops::is_child(keyops::encode_key(parent_coord, math::log2_const(parent_size)),
+    assert(keyops::is_child(keyops::encode_key(getCoord(), math::log2_const(getSize())),
                             keyops::encode_key(child_coord, 0)));
-
-    Eigen::Vector3i offset = child_coord - parent_coord;
-    const unsigned int child_size = parent_size >> 1;
-
+    const Eigen::Vector3i offset = child_coord - getCoord();
+    const int child_size = getSize() / 2;
     return ((offset.x() & child_size) > 0) + 2 * ((offset.y() & child_size) > 0)
         + 4 * ((offset.z() & child_size) > 0);
 }
