@@ -22,40 +22,40 @@ namespace se {
 #define SCALE_OFFSET 5
 #define KEY_SCALE_LIMIT 19
 
-/**
-  #define NUM_DIM 3
-  uint64_t MASK[64];
-  MASK[0] = 0x1c0000000000000;
-
-  for (int i = 1; i < 19; ++i) {
-    MASK[i] = MASK[i-1] | (MASK[0] >> (i*3));
-  }
-
-  for (int i = 18; i >= 0; --i) {
-    std::bitset<64> b(MASK[i]);
-    std::cout << "0x" << std::hex << b.to_ullong() << "," << std::endl;
-  }
+/** The code mask for a given scale.
+ *
+ * Generated using the following code:
+ * \code
+ * uint64_t MASK[64];
+ * MASK[0] = 0x1c0000000000000;
+ * for (int i = 1; i < 19; ++i) {
+ *     MASK[i] = MASK[i-1] | (MASK[0] >> (i*3));
+ * }
+ * for (int i = 18; i >= 0; --i) {
+ *     std::bitset<64> b(MASK[i]);
+ *     std::cout << "0x" << std::hex << b.to_ullong() << "," << std::endl;
+ * }
+ * \endcode
  */
-constexpr uint64_t CODE_MASK[] = { ///< Get the code mask for a given scale
-    0x1ffffffffffffff,
-    0x1fffffffffffff8,
-    0x1ffffffffffffc0,
-    0x1fffffffffffe00,
-    0x1fffffffffff000,
-    0x1ffffffffff8000,
-    0x1fffffffffc0000,
-    0x1ffffffffe00000,
-    0x1ffffffff000000,
-    0x1fffffff8000000,
-    0x1ffffffc0000000,
-    0x1fffffe00000000,
-    0x1fffff000000000,
-    0x1ffff8000000000,
-    0x1fffc0000000000,
-    0x1ffe00000000000,
-    0x1ff000000000000,
-    0x1f8000000000000,
-    0x1c0000000000000};
+constexpr uint64_t CODE_MASK[] = {0x1ffffffffffffff,
+                                  0x1fffffffffffff8,
+                                  0x1ffffffffffffc0,
+                                  0x1fffffffffffe00,
+                                  0x1fffffffffff000,
+                                  0x1ffffffffff8000,
+                                  0x1fffffffffc0000,
+                                  0x1ffffffffe00000,
+                                  0x1ffffffff000000,
+                                  0x1fffffff8000000,
+                                  0x1ffffffc0000000,
+                                  0x1fffffe00000000,
+                                  0x1fffff000000000,
+                                  0x1ffff8000000000,
+                                  0x1fffc0000000000,
+                                  0x1ffe00000000000,
+                                  0x1ff000000000000,
+                                  0x1f8000000000000,
+                                  0x1c0000000000000};
 
 constexpr uint64_t SCALE_MASK = 0x1F; ///< 11 111
 
