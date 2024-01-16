@@ -729,18 +729,19 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
 };
 
 
-/**
- * \brief The actual block used in the tree.
+
+/** A leaf node of an se::Octree.
  *
- * \note Template defaults set in forward decleration further up
+ * \tparam DataT     The type of data stored in the octree.
+ * \tparam ResT      The value of se::Res for the octree.
+ * \tparam BlockSize The edge length of se::Block in voxels.
  */
 template<typename DataT, Res ResT, int BlockSize, typename PolicyT>
-class Block
-        : public OctantBase,
-          public std::conditional<ResT == Res::Single,
-                                  BlockSingleRes<Block<DataT, ResT, BlockSize>, DataT, BlockSize>,
-                                  BlockMultiRes<DataT, BlockSize, Block<DataT, ResT, BlockSize>>>::
-              type ///< Conditional CRTP
+class Block : public OctantBase,
+              public std::conditional<
+                  ResT == Res::Single,
+                  BlockSingleRes<Block<DataT, ResT, BlockSize>, DataT, BlockSize>,
+                  BlockMultiRes<DataT, BlockSize, Block<DataT, ResT, BlockSize>>>::type
 
 {
     public:
@@ -749,15 +750,13 @@ class Block
     static constexpr int size_sq = BlockSize * BlockSize;
     static constexpr int size_cu = BlockSize * BlockSize * BlockSize;
 
-    /**
-     * \brief Initialise block via parent node
-     *
-     * \param[in] parent        The shared pointer to the parent node
-     * \param[in] child_idx      The child id {0,...,7} in relation to the parent
-     * \param[in] init_data     The initial data of the block
+    /** Construct the child block of \p parent_ptr with index \p child_idx and initialize its data
+     * at the coarsest scale with \p init_data. The value of \p child_idx must be in the interval
+     * [0, 7] inclusive.
      */
     Block(Node<DataT, ResT>* parent_ptr, const int child_idx, const DataT init_data);
 
+    /** Return the edge length of the block in voxels */
     static constexpr int getSize()
     {
         return BlockSize;
@@ -765,8 +764,6 @@ class Block
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
-
-
 
 } // namespace se
 
