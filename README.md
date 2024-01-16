@@ -462,10 +462,10 @@ respectively.
 
 ## License
 
-Copyright 2018-2019 Emanuele Vespa</br>
-Copyright 2019-2022 Smart Robotics Lab, Imperial College London, Technical University of Munich</br>
-Copyright 2019-2022 Nils Funk</br>
-Copyright 2019-2022 Sotiris Papatheodorou</br>
+Copyright 2018-2019 Emanuele Vespa<br>
+Copyright 2019-2022 Smart Robotics Lab, Imperial College London, Technical University of Munich<br>
+Copyright 2019-2022 Nils Funk<br>
+Copyright 2019-2022 Sotiris Papatheodorou<br>
 
 supereight 2 is distributed under the
 [BSD 3-clause license](LICENSES/BSD-3-Clause.txt).
