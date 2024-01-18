@@ -40,13 +40,12 @@ RaycastCarver<MapT, SensorT>::RaycastCarver(MapT& map,
                                             const SensorT& sensor,
                                             const se::Image<float>& depth_img,
                                             const Eigen::Matrix4f& T_WS,
-                                            const int frame) :
+                                            const int /* frame */) :
         map_(map),
         octree_(map_.getOctree()),
         sensor_(sensor),
         depth_img_(depth_img),
         T_WS_(T_WS),
-        frame_(frame),
         band_(2.0f * map.getRes() * map.getDataConfig().truncation_boundary_factor)
 {
 }

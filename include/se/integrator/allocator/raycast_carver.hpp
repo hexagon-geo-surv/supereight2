@@ -63,7 +63,6 @@ class RaycastCarver {
     const SensorT& sensor_;
     const se::Image<float>& depth_img_;
     const Eigen::Matrix4f& T_WS_;
-    const int frame_;
     const float band_;
 };
 
