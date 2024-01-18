@@ -34,22 +34,6 @@ template<typename MapT, typename SensorT>
 class RaycastCarver {
     public:
     /**
-     * \brief The config file of the raycast carver
-     *
-     * \param[in] map   The map allocate the frustum in
-     */
-    struct RaycastCarverConfig {
-        RaycastCarverConfig(const MapT& map) :
-                truncation_boundary(map.getRes() * map.getDataConfig().truncation_boundary_factor),
-                band(2 * truncation_boundary)
-        {
-        }
-
-        const float truncation_boundary;
-        const float band;
-    };
-
-    /**
      * \brief Setup the raycast carver.
      *
      * \param[in]  map                  The reference to the map to be updated.
@@ -80,7 +64,7 @@ class RaycastCarver {
     const se::Image<float>& depth_img_;
     const Eigen::Matrix4f& T_WS_;
     const int frame_;
-    const RaycastCarverConfig config_;
+    const float band_;
 };
 
 

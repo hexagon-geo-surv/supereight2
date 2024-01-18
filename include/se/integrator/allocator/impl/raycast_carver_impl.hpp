@@ -47,7 +47,7 @@ RaycastCarver<MapT, SensorT>::RaycastCarver(MapT& map,
         depth_img_(depth_img),
         T_WS_(T_WS),
         frame_(frame),
-        config_(map)
+        band_(2.0f * map.getRes() * map.getDataConfig().truncation_boundary_factor)
 {
 }
 
@@ -65,7 +65,7 @@ std::vector<se::OctantBase*> RaycastCarver<MapT, SensorT>::operator()()
     TICK("create-list")
     se::OctantBase* root_ptr = octree_.getRoot();
 
-    const int num_steps = ceil(config_.band / (2 * map_.getRes()));
+    const int num_steps = ceil(band_ / (2 * map_.getRes()));
 
     const Eigen::Vector3f t_WS = T_WS_.topRightCorner<3, 1>();
 
@@ -79,7 +79,7 @@ std::vector<se::OctantBase*> RaycastCarver<MapT, SensorT>::operator()()
             const float depth_value = depth_img_(pixel.x(), pixel.y());
             // Only consider depth values inside the valid sensor range
             if (depth_value < sensor_.near_plane
-                || depth_value > (sensor_.far_plane + config_.band * 0.5f)) {
+                || depth_value > (sensor_.far_plane + band_ * 0.5f)) {
                 continue;
             }
 
@@ -91,9 +91,8 @@ std::vector<se::OctantBase*> RaycastCarver<MapT, SensorT>::operator()()
 
             const Eigen::Vector3f reverse_ray_dir_W = (t_WS - point_W).normalized();
 
-            const Eigen::Vector3f ray_origin_W =
-                point_W - (config_.band * 0.5f) * reverse_ray_dir_W;
-            const Eigen::Vector3f step = (reverse_ray_dir_W * config_.band) / num_steps;
+            const Eigen::Vector3f ray_origin_W = point_W - (band_ * 0.5f) * reverse_ray_dir_W;
+            const Eigen::Vector3f step = (reverse_ray_dir_W * band_) / num_steps;
 
             Eigen::Vector3f ray_pos_W = ray_origin_W;
             for (int i = 0; i < num_steps; i++) {
