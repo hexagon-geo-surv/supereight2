@@ -73,6 +73,9 @@ class RaycastCarver {
      */
     std::vector<se::OctantBase*> operator()();
 
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+    private:
     MapT& map_;
     OctreeType& octree_;
     const SensorT& sensor_;
@@ -80,8 +83,6 @@ class RaycastCarver {
     const Eigen::Matrix4f& T_WS_;
     const int frame_;
     const RaycastCarverConfig config_;
-
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 
