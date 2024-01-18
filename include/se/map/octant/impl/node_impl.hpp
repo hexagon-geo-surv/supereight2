@@ -103,7 +103,8 @@ template<typename DataT, Res ResT>
 int Node<DataT, ResT>::getChildIdx(const Eigen::Vector3i& child_coord)
 {
     assert(keyops::is_child(keyops::encode_key(getCoord(), math::log2_const(getSize())),
-                            keyops::encode_key(child_coord, 0)));
+                            keyops::encode_key(child_coord, math::log2_const(getSize() / 2)))
+           && "child_coord must correspond to a child of the node");
     const Eigen::Vector3i offset = child_coord - getCoord();
     const int child_size = getSize() / 2;
     return ((offset.x() & child_size) > 0) + 2 * ((offset.y() & child_size) > 0)
