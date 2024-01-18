@@ -33,8 +33,6 @@ frustum(MapT& map, const SensorT& sensor, const Eigen::Matrix4f& T_WS);
 template<typename MapT, typename SensorT>
 class RaycastCarver {
     public:
-    typedef typename MapT::OctreeType OctreeType;
-
     /**
      * \brief The config file of the raycast carver
      *
@@ -77,7 +75,7 @@ class RaycastCarver {
 
     private:
     MapT& map_;
-    OctreeType& octree_;
+    typename MapT::OctreeType& octree_;
     const SensorT& sensor_;
     const se::Image<float>& depth_img_;
     const Eigen::Matrix4f& T_WS_;
