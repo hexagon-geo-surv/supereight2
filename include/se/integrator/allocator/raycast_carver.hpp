@@ -30,17 +30,21 @@ frustum(MapT& map, const SensorT& sensor, const Eigen::Matrix4f& T_WS);
 
 
 
+/** Allocator used for TSDF mapping. It allocates blocks (i.e. octree leaves) in a band around the
+ * surface by performing ray marching along the depth measurement rays.
+ */
 template<typename MapT, typename SensorT>
 class RaycastCarver {
     public:
-    /**
-     * \brief Setup the raycast carver.
+    /** Constructs a RaycastCarver but doesn't perform any allocations yet. Call
+     * se::RaycastCarver::operator()() to perform the actual allocations.
      *
-     * \param[in]  map                  The reference to the map to be updated.
-     * \param[in]  sensor               The sensor model.
-     * \param[in]  depth_img            The depth image to be integrated.
-     * \param[in]  T_WS                 The transformation from sensor to world frame.
-     * \param[in]  frame                The frame number to be integrated.
+     * \param[in] map         The map to be updated.
+     * \param[in] sensor      The sensor model used to capture \p depth_img.
+     * \param[in] depth_img   The depth image to be integrated into \p map.
+     * \param[in] T_WS        The transformation from the sensor frame S that \p depth_img was
+     *                        captured from to the world frame W.
+     * \param[in] frame       The number of the frame to be integrated. Currently unused.
      */
     RaycastCarver(MapT& map,
                   const SensorT& sensor,
@@ -48,11 +52,7 @@ class RaycastCarver {
                   const Eigen::Matrix4f& T_WS,
                   const int frame);
 
-    /**
-     * \brief Allocate a band around the depth measurements using a raycasting approach
-     *
-     * \retrun The allocated blocks
-     */
+    /** Performs the necessary allocations and returns the allocated blocks. */
     std::vector<se::OctantBase*> operator()();
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -65,8 +65,6 @@ class RaycastCarver {
     const Eigen::Matrix4f& T_WS_;
     const float band_;
 };
-
-
 
 } // namespace se
 
