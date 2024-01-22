@@ -200,8 +200,8 @@ TEST(Map, aabb_ray_batch)
     // distance of plane wall [m]
     float d = 10.0f;
 
-    std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
-                Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>
+    std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
+                Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>
         rayBatch;
     size_t num_points_elevation = std::floor((elevation_max - elevation_min) / elevation_res);
     size_t num_points_azimuth = std::floor((azimuth_max - azimuth_min) / azimuth_res);
@@ -215,8 +215,8 @@ TEST(Map, aabb_ray_batch)
         for (size_t j = 0; j < num_points_azimuth; j++) {
             y = d * tan(azimuth_angle * deg_to_rad);
             // save point
-            rayBatch.push_back(std::pair<Eigen::Matrix4f, Eigen::Vector3f>(
-                Eigen::Matrix4f::Identity(), Eigen::Vector3f(x, y, z)));
+            rayBatch.push_back(std::pair<Eigen::Isometry3f, Eigen::Vector3f>(
+                Eigen::Isometry3f::Identity(), Eigen::Vector3f(x, y, z)));
             // increase azimuth angle
             azimuth_angle += azimuth_res;
         }
@@ -277,8 +277,8 @@ TEST(Map, aabb_ray_batch)
         for (size_t j = 0; j < num_points_azimuth; j++) {
             y = d * tan(azimuth_angle * deg_to_rad);
             // save point
-            rayBatch.push_back(std::pair<Eigen::Matrix4f, Eigen::Vector3f>(
-                Eigen::Matrix4f::Identity(), Eigen::Vector3f(x, y, z)));
+            rayBatch.push_back(std::pair<Eigen::Isometry3f, Eigen::Vector3f>(
+                Eigen::Isometry3f::Identity(), Eigen::Vector3f(x, y, z)));
             // increase azimuth angle
             azimuth_angle += azimuth_res;
         }

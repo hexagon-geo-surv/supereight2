@@ -146,8 +146,8 @@ class MapIntegrator {
     template<typename SensorT>
     void integrateRayBatch(
         const SensorT& sensor,
-        const std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
-                          Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>&
+        const std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
+                          Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
             rayPoseBatch,
         const unsigned int frame);
 
@@ -157,8 +157,8 @@ class MapIntegrator {
     template<typename SensorT>
     void integrateRayBatch(
         const SensorT& sensor,
-        const std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
-                          Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>&
+        const std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
+                          Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
             rayPoseBatch,
         const unsigned int frame,
         std::vector<const OctantBase*>& updated_octants);

@@ -44,8 +44,8 @@ int main(int argc, char** argv)
         se::perfstats.setFilestream(&log_file_stream);
 
         // Setup input ray / pose batch
-        std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
-                    Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>
+        std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
+                    Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>
             ray_pose_batch;
 
         // ========= Map INITIALIZATION  =========
@@ -93,7 +93,7 @@ int main(int argc, char** argv)
                 break;
             }
             for (size_t i = 0; i < ray_pose_batch.size(); i++) {
-                ray_pose_batch[i].first = ray_pose_batch[i].first * T_BS.matrix();
+                ray_pose_batch[i].first = ray_pose_batch[i].first * T_BS;
             }
             TOCK("read")
 

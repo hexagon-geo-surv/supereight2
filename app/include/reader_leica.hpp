@@ -64,11 +64,11 @@ class LeicaReader : public Reader {
 
     ReaderStatus nextPose(Eigen::Isometry3f& T_WB);
 
-    ReaderStatus
-    nextRayBatch(const float batch_interval,
-                 std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
-                             Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>&
-                     rayPoseBatch);
+    ReaderStatus nextRayBatch(
+        const float batch_interval,
+        std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
+                    Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
+            rayPoseBatch);
 
     ReaderStatus nextRGBA(Image<uint32_t>& rgba_image);
 

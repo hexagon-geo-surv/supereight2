@@ -333,8 +333,8 @@ se::ReaderStatus se::Reader::nextData(Eigen::Vector3f& ray_measurement, Eigen::I
 
 se::ReaderStatus se::Reader::nextData(
     const float batch_interval,
-    std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
-                Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>&
+    std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
+                Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
         rayPoseBatch)
 {
     if (!good()) {
@@ -568,8 +568,8 @@ se::ReaderStatus se::Reader::nextRay(Eigen::Vector3f& /*ray_measurement*/)
 se::ReaderStatus se::Reader::nextRayBatch(
     const float /*batch_interval*/,
     std::vector<
-        std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
-        Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>& /*rayPoseBatch*/)
+        std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
+        Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>& /*rayPoseBatch*/)
 {
     return se::ReaderStatus::error;
 }

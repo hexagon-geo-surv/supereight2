@@ -199,8 +199,8 @@ class Reader {
     */
     ReaderStatus
     nextData(const float batch_interval,
-             std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
-                         Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>&
+             std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
+                         Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
                  rayPoseBatch);
 
     /** Read the next depth and RGBA images and ground truth pose.
@@ -370,11 +370,11 @@ class Reader {
      * \param[out] rayPoseBatch   The batch of (lidar) ray measurements.
      * \return An appropriate status code.
      */
-    virtual ReaderStatus
-    nextRayBatch(const float batch_interval,
-                 std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
-                             Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>&
-                     rayPoseBatch);
+    virtual ReaderStatus nextRayBatch(
+        const float batch_interval,
+        std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
+                    Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
+            rayPoseBatch);
     /** Read the next depth image.
      *
      * \param[out] depth_image The next depth image.
