@@ -290,7 +290,7 @@ void IntegrateRayImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
 {
     TICK("Ray Integration")
     TICK("allocation-integration")
-    se::RayIntegrator rayIntegrator(map, sensor, ray_S, T_WS.matrix(), frame, updated_octants);
+    se::RayIntegrator rayIntegrator(map, sensor, ray_S, T_WS, frame, updated_octants);
     rayIntegrator();
     TOCK("allocation-integration")
     TICK("propagateBlocksToCoarsestScale")
@@ -313,12 +313,8 @@ void IntegrateRayBatchImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
     const unsigned int frame,
     std::vector<const OctantBase*>* updated_octants)
 {
-    se::RayIntegrator<MapT, SensorT> rayIntegrator(map,
-                                                   sensor,
-                                                   rayPoseBatch[0].second,
-                                                   rayPoseBatch[0].first.matrix(),
-                                                   frame,
-                                                   updated_octants);
+    se::RayIntegrator<MapT, SensorT> rayIntegrator(
+        map, sensor, rayPoseBatch[0].second, rayPoseBatch[0].first, frame, updated_octants);
 
     // do downsampling
     int skip_count = 0;
@@ -326,8 +322,7 @@ void IntegrateRayBatchImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
     for (size_t i = 0; i < rayPoseBatch.size(); i++) {
         TICK("Ray Integration")
         TICK("allocation-integration")
-        if (rayIntegrator.resetIntegrator(
-                rayPoseBatch[i].second, rayPoseBatch[i].first.matrix(), frame)) {
+        if (rayIntegrator.resetIntegrator(rayPoseBatch[i].second, rayPoseBatch[i].first, frame)) {
             rayIntegrator();
         }
         else {

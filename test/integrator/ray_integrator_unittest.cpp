@@ -106,7 +106,7 @@ TEST(RayIntegrator, SingleRay)
     std::vector<const se::OctantBase*> updated_octants;
 
     se::RayIntegrator rayIntegrator(
-        map, sensor, ray, Eigen::Matrix4f::Identity(), 0, &updated_octants);
+        map, sensor, ray, Eigen::Isometry3f::Identity(), 0, &updated_octants);
     rayIntegrator();
     rayIntegrator.propagateBlocksToCoarsestScale();
     rayIntegrator.propagateToRoot();

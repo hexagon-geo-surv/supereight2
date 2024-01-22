@@ -23,7 +23,7 @@ class RayIntegrator {
     RayIntegrator(MapT& /* map */,
                   const SensorT& /* sensor */,
                   const Eigen::Vector3f& /*ray*/,
-                  const Eigen::Matrix4f& /* T_SW need Lidar frame?*/,
+                  const Eigen::Isometry3f& /* T_SW need Lidar frame?*/,
                   const int /* frame */,
                   std::vector<const OctantBase*>* /*updated_octants = nullptr*/){};
 
@@ -73,7 +73,7 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, 
     RayIntegrator(MapType& map,
                   const SensorT& sensor,
                   const Eigen::Vector3f& ray,
-                  const Eigen::Matrix4f& T_WS,
+                  const Eigen::Isometry3f& T_WS,
                   const int frame,
                   std::vector<const OctantBase*>* updated_octants = nullptr);
 
@@ -88,7 +88,7 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, 
      * \return False if ray should be skipped. Otherwise true
      */
     bool resetIntegrator(const Eigen::Vector3f& ray,
-                         const Eigen::Matrix4f& T_WS,
+                         const Eigen::Isometry3f& T_WS,
                          const int frame,
                          bool skip_check = false);
 
@@ -160,7 +160,7 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, 
     bool track_updated_octants_ = false;
     RayIntegratorConfig config_;
 
-    Eigen::Matrix4f T_SW_;
+    Eigen::Isometry3f T_SW_;
     Eigen::Vector3f ray_;
     Eigen::Vector3i last_visited_voxel_;
 

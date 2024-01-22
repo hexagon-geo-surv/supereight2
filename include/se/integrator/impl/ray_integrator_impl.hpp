@@ -16,7 +16,7 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockS
               SensorT>::RayIntegrator(MapType& map,
                                       const SensorT& sensor,
                                       const Eigen::Vector3f& ray,
-                                      const Eigen::Matrix4f& T_WS,
+                                      const Eigen::Isometry3f& T_WS,
                                       const int frame,
                                       std::vector<const OctantBase*>* updated_octants) :
         map_(map),
@@ -24,7 +24,7 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockS
         sensor_(sensor),
         node_set_(octree_.getBlockDepth()),
         config_(map),
-        T_SW_(se::math::to_inverse_transformation(T_WS)),
+        T_SW_(T_WS.inverse()),
         ray_(ray),
         last_visited_voxel_(Eigen::Vector3i::Constant(-1)),
         map_res_(map.getRes()),
@@ -43,7 +43,7 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockS
 template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
 bool RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
                    SensorT>::resetIntegrator(const Eigen::Vector3f& ray,
-                                             const Eigen::Matrix4f& T_WS,
+                                             const Eigen::Isometry3f& T_WS,
                                              const int frame,
                                              bool skip_ray)
 {
@@ -63,7 +63,7 @@ bool RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
 
     ray_ = ray;
     ray_dist_ = ray_.norm();
-    T_SW_ = se::math::to_inverse_transformation(T_WS);
+    T_SW_ = T_WS.inverse();
     frame_ = frame;
     return true;
 }
@@ -99,13 +99,13 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
     Eigen::Vector3f starting_point = safe_boundary * ray_dir_S;
     Eigen::Vector3f r_i_S = starting_point;
     Eigen::Vector3f r_i_W;
-    Eigen::Matrix4f T_WS = T_SW_.inverse();
+    Eigen::Isometry3f T_WS = T_SW_.inverse();
 
     while (r_i_S.norm() < max_update_dist) {
         // Compute if in free space
         se::RayState ray_state = computeVariance(r_i_S.norm());
 
-        r_i_W = (T_WS * r_i_S.homogeneous()).head<3>();
+        r_i_W = T_WS * r_i_S;
         Eigen::Vector3i voxel_coord;
         if (!map_.template pointToVoxel<se::Safe::On>(r_i_W, voxel_coord)) {
             break;
@@ -184,8 +184,7 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockS
         const Eigen::Vector3i block_coord = block_ptr->getCoord();
         Eigen::Vector3f block_centre_point_W;
         map_.voxelToPoint(block_coord, block_size, block_centre_point_W);
-        const Eigen::Vector3f block_centre_point_C =
-            (T_SW_ * (block_centre_point_W).homogeneous()).template head<3>();
+        const Eigen::Vector3f block_centre_point_C = T_SW_ * block_centre_point_W;
 
         // The recommended integration scale
         int computed_integration_scale = sensor_.computeIntegrationScale(block_centre_point_C,
