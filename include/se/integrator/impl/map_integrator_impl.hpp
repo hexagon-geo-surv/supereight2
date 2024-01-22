@@ -132,7 +132,7 @@ struct IntegrateRayImplD<se::Field::Occupancy, se::Res::Multi> {
     template<typename SensorT, typename MapT>
     static void integrate(MapT& map,
                           const SensorT& sensor,
-                          const Eigen::Vector3f& depth_img,
+                          const Eigen::Vector3f& ray,
                           const Eigen::Matrix4f& T_WS,
                           const unsigned int frame);
 };
