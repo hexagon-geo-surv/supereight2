@@ -17,7 +17,8 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockS
                                       const SensorT& sensor,
                                       const Eigen::Vector3f& ray,
                                       const Eigen::Matrix4f& T_WS,
-                                      const int frame) :
+                                      const int frame,
+                                      std::vector<const OctantBase*>* updated_octants) :
         map_(map),
         octree_(map.getOctree()),
         sensor_(sensor),
@@ -36,6 +37,7 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockS
                                          config_.sigma_max,
                                          map_.getDataConfig()))
 {
+    track_updated_octants_ = updated_octants;
 }
 
 template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
@@ -304,11 +306,23 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
                 auto node_data = ray_integrator::propagate_to_parent_node<NodeType, BlockType>(
                     octant_ptr, frame_);
                 node_set_[d - 1].insert(octant_ptr->getParent());
+                if (track_updated_octants_) {
+                    updated_blocks_set_.insert(octant_ptr);
+                }
 
                 // If all nodes free space, delete children and just leave coarser resolution
                 if (node_data.observed
                     && get_field(node_data) <= 0.95 * MapType::DataType::min_occupancy) {
-                    octree_.deleteChildren(static_cast<NodeType*>(octant_ptr));
+                    auto* node_ptr = static_cast<NodeType*>(octant_ptr);
+                    if (track_updated_octants_) {
+                        for (int i = 0; i < 8; i++) {
+                            OctantBase* const child_ptr = node_ptr->getChild(i);
+                            if (child_ptr) {
+                                updated_blocks_set_.erase(child_ptr);
+                            }
+                        }
+                    }
+                    octree_.deleteChildren(node_ptr);
                 }
 
             } // if parent
@@ -317,6 +331,18 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
 
     ray_integrator::propagate_to_parent_node<NodeType, BlockType>(octree_.getRoot(), frame_);
 }
+
+template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
+void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
+                   SensorT>::updatedOctants(std::vector<const OctantBase*>* updated_octants)
+{
+    if (track_updated_octants_) {
+        updated_octants->clear();
+        updated_octants->reserve(updated_blocks_set_.size());
+        updated_octants->insert(
+            updated_octants->end(), updated_blocks_set_.begin(), updated_blocks_set_.end());
+    }
+};
 
 } // namespace se
 

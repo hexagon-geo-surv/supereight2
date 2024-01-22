@@ -77,6 +77,7 @@ TEST(RayIntegrator, SingleRay)
 {
     // Temporary directory for test results
     const std::string tmp_ = stdfs::temp_directory_path() / stdfs::path("supereight_test_results");
+    stdfs::create_directories(tmp_);
 
     // Create simple test ray, straight line
     constexpr float d = 10.0f;
@@ -102,12 +103,15 @@ TEST(RayIntegrator, SingleRay)
 
     // ========= Integration =========
     const Eigen::Vector3f ray(d, 0., 0.);
-    integrator.integrateRay(sensor, ray, Eigen::Matrix4f::Identity(), 0);
+    std::vector<const se::OctantBase*> updated_octants;
 
-    se::RayIntegrator rayIntegrator(map, sensor, ray, Eigen::Matrix4f::Identity(), 0);
+    se::RayIntegrator rayIntegrator(map, sensor, ray, Eigen::Matrix4f::Identity(), 0, &updated_octants);
     rayIntegrator();
     rayIntegrator.propagateBlocksToCoarsestScale();
     rayIntegrator.propagateToRoot();
+    rayIntegrator.updatedOctants(&updated_octants);
+    EXPECT_FALSE(updated_octants.empty());
+    std::cout << "Number of updated octants: " << updated_octants.size() << std::endl;
 
     // ========= TESTING =========
 
@@ -154,6 +158,7 @@ TEST(RayIntegrator, Propagation)
 {
     // Temporary directory for test results
     const std::string tmp_ = stdfs::temp_directory_path() / stdfs::path("supereight_test_results");
+    stdfs::create_directories(tmp_);
 
     /**
    * Create plane wall example
@@ -219,8 +224,9 @@ TEST(RayIntegrator, Propagation)
     se::MapIntegrator integrator(map);
 
     // ========= Integration (Batched)
-    integrator.integrateRayBatch(sensor, rayBatch, 0);
-
+    std::vector<const se::OctantBase*> updated_octants;
+    integrator.integrateRayBatch(sensor, rayBatch, 0, updated_octants);
+    std::cout << "Number of updated octants: " << updated_octants.size() << std::endl;
     // Un-Comment if needed for debugging
     map.saveStructure(tmp_ + "/batch_ray_structure.ply");
     map.saveMeshVoxel(tmp_ + "/batch_ray_mesh.ply");

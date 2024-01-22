@@ -128,6 +128,18 @@ class MapIntegrator {
                       const Eigen::Matrix4f& T_WS,
                       const unsigned int frame);
 
+    /** Same as se::MapIntegrator::integrateRay() but also stores pointers to the octants updated
+     * during the integration in \p updated_octants.
+     */
+    template<typename SensorT>
+    void integrateRay(const SensorT& sensor,
+                      const Eigen::Vector3f& ray_S,
+                      const Eigen::Matrix4f& T_WS,
+                      const unsigned int frame,
+                      std::vector<const OctantBase*>& updated_octants);
+
+
+
     /**
      * \brief Integrate a batch of ray images into the maps field representation.
      *
@@ -144,6 +156,18 @@ class MapIntegrator {
                           Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>&
             rayPoseBatch,
         const unsigned int frame);
+
+    /** Same as se::MapIntegrator::integrateRayBatch() but also stores pointers to the octants updated
+     * during the integration in \p updated_octants.
+     */
+    template<typename SensorT>
+    void integrateRayBatch(
+        const SensorT& sensor,
+        const std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
+                          Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>&
+            rayPoseBatch,
+        const unsigned int frame,
+        std::vector<const OctantBase*>& updated_octants);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 

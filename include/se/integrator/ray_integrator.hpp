@@ -24,7 +24,8 @@ class RayIntegrator {
                   const SensorT& /* sensor */,
                   const Eigen::Vector3f& /*ray*/,
                   const Eigen::Matrix4f& /* T_SW need Lidar frame?*/,
-                  const int /* frame */){};
+                  const int /* frame */,
+                  std::vector<const OctantBase*>* /*updated_octants = nullptr*/){};
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
@@ -73,7 +74,8 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, 
                   const SensorT& sensor,
                   const Eigen::Vector3f& ray,
                   const Eigen::Matrix4f& T_WS,
-                  const int frame);
+                  const int frame,
+                  std::vector<const OctantBase*>* updated_octants = nullptr);
 
     /**
      * \brief Reset ray, pose and frame counter for the integrator
@@ -104,6 +106,8 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, 
     void propagateToRoot();
 
     void propagateBlocksToCoarsestScale();
+
+    void updatedOctants(std::vector<const OctantBase*>* updated_octants);
 
     /**
     * \brief Return a conservative measure of the expected variance of a sensor model inside a voxel
@@ -152,7 +156,8 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, 
 
     std::vector<std::set<se::OctantBase*>> node_set_;
     std::vector<se::OctantBase*> updated_blocks_vector_;
-    std::unordered_set<se::OctantBase*> updated_blocks_set_;
+    std::unordered_set<se::OctantBase*> updated_blocks_set_; // ToDo rename: updated_octants_;?
+    bool track_updated_octants_ = false;
     RayIntegratorConfig config_;
 
     Eigen::Matrix4f T_SW_;
