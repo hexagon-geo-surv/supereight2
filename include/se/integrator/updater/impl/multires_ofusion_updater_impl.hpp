@@ -77,14 +77,21 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
     }
     TOCK("propagation-blocks")
 
-    // updated_octants_ must be populated with blocks before the call to propagateToRoot because it
-    // may prune octants.
+    // updated_octants_ must be populated with all potentially updated octants (blocks and leaf
+    // nodes) before the call to propagateToRoot(). propagateToRoot() may prune octants, thus
+    // deallocating blocks and removing elements from updated_octants_, so this prevents having
+    // stale pointers in updated_octants_. Leaf nodes won't be traversed in propagateToRoot() so
+    // they have to be added as well.
     track_updated_octants_ = updated_octants;
     if (track_updated_octants_) {
         updated_octants_.clear();
         updated_octants_.insert(allocation_list.block_list.begin(),
                                 allocation_list.block_list.end());
         updated_octants_.insert(freed_block_list_.begin(), freed_block_list_.end());
+        std::copy_if(allocation_list.node_list.begin(),
+                     allocation_list.node_list.end(),
+                     std::inserter(updated_octants_, updated_octants_.end()),
+                     [](const auto octant) { return octant && octant->isLeaf(); });
     }
 
     TICK("propagation-to-root")
