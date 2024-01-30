@@ -342,7 +342,7 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
         updated_octants->insert(
             updated_octants->end(), updated_blocks_set_.begin(), updated_blocks_set_.end());
     }
-};
+}
 
 } // namespace se
 
