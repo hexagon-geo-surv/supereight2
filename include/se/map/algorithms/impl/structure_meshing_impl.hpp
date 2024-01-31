@@ -12,12 +12,15 @@
 namespace se {
 
 template<typename OctreeT>
-QuadMesh octree_structure_mesh(OctreeT& octree)
+QuadMesh octree_structure_mesh(OctreeT& octree, const bool only_leaves)
 {
     QuadMesh mesh;
 
     for (auto octant_it = octree.begin(); octant_it != octree.end(); ++octant_it) {
         const auto octant_ptr = *octant_it;
+        if (only_leaves && !octant_ptr->isLeaf()) {
+            continue;
+        }
         int node_size;
         int node_scale;
         if (octant_ptr->isBlock()) {

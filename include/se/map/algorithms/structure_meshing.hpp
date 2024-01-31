@@ -13,16 +13,10 @@
 
 namespace se {
 
-/**
- * \brief Extract the octree structure as a quadrilateral mesh.
- *
- * \tparam OctreeT
- * \param octree The octree to extract the structure from.
- *
- * \return A quadrilateral mesh.
- */
+/** Return a mesh of the octants of \p octree. Only leaf octants will be contained in the mesh if
+ * \p only_leaves is true. */
 template<typename OctreeT>
-QuadMesh octree_structure_mesh(OctreeT& octree);
+QuadMesh octree_structure_mesh(OctreeT& octree, const bool only_leaves = true);
 
 } // namespace se
 
