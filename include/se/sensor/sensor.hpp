@@ -43,6 +43,15 @@ struct SensorBaseConfig {
      */
     Eigen::Matrix4f T_BS = Eigen::Matrix4f::Identity();
 
+    /** The pixel-size to voxel-size ratio in physical coordinates for computing the integration scale.
+     *  See SensorBase::computeIntegrationScale()
+     *  Thresholds defining the resolution scale in ascending order.
+     *  pixel/voxel < pixel_voxel_ratio_per_scale[0] -> scale = 0
+     *  pixel/voxel < pixel_voxel_ratio_per_scale[1] -> scale = 1
+     *  ...
+     */
+    std::vector<float> pixel_voxel_ratio_per_scale = {1.5f, 3.0f, 6.0f};
+
     /** Reads the struct members from the "sensor" node of a YAML file. Members not present in the
      * YAML file aren't modified.
      */
@@ -202,6 +211,7 @@ class SensorBase {
     float near_plane;
     float far_plane;
     Eigen::Matrix4f T_BS;
+    std::vector<float> pixel_voxel_ratio_per_scale;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 

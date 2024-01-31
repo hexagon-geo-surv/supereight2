@@ -131,17 +131,11 @@ int se::LeicaLidar::computeIntegrationScaleImpl(const Eigen::Vector3f& block_cen
     // Compute the ratio using the worst case voxel_dim (space diagonal)
     const float pv_ratio = pixel_dim * pv_ratio_denominator;
     int scale = 0;
-    if (pv_ratio < 1.5f) {
-        scale = 0;
-    }
-    else if (pv_ratio < 3.0f) {
-        scale = 1;
-    }
-    else if (pv_ratio < 6.0f) {
-        scale = 2;
-    }
-    else {
-        scale = 3;
+    for (const float scale_ratio : pixel_voxel_ratio_per_scale) {
+        if (pv_ratio < scale_ratio) {
+            break;
+        }
+        scale++;
     }
     scale = std::min(scale, max_block_scale);
     Eigen::Vector3f block_centre_hyst = block_centre;

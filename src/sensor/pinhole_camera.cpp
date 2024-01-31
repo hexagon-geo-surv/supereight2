@@ -140,17 +140,11 @@ int se::PinholeCamera::computeIntegrationScaleImpl(const Eigen::Vector3f& block_
     const float pixel_dim = dist * scaled_pixel;
     const float pv_ratio = pixel_dim / map_res;
     int scale = 0;
-    if (pv_ratio < 1.5) {
-        scale = 0;
-    }
-    else if (pv_ratio < 3) {
-        scale = 1;
-    }
-    else if (pv_ratio < 6) {
-        scale = 2;
-    }
-    else {
-        scale = 3;
+    for (const float scale_ratio : pixel_voxel_ratio_per_scale) {
+        if (pv_ratio < scale_ratio) {
+            break;
+        }
+        scale++;
     }
     scale = std::min(scale, max_block_scale);
 
