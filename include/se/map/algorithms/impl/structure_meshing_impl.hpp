@@ -46,7 +46,7 @@ QuadMesh octree_structure_mesh(OctreeT& octree)
 
         // The Quad::num_vertexes vertex indices to node_corners for each of the 6 faces.
         int face_vertex_idx[6][Quad::num_vertexes] = {
-            {0, 1, 3, 2}, {1, 5, 7, 3}, {5, 7, 6, 4}, {0, 2, 6, 4}, {0, 1, 5, 4}, {2, 3, 7, 6}};
+            {0, 2, 3, 1}, {1, 3, 7, 5}, {5, 7, 6, 4}, {0, 4, 6, 2}, {0, 1, 5, 4}, {2, 6, 7, 3}};
 
         // Create the octant faces.
         for (int f = 0; f < 6; ++f) {
