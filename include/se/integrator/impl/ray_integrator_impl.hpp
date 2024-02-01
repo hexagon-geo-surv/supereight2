@@ -185,7 +185,7 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockS
         Eigen::Vector3f block_centre_point_W;
         map_.voxelToPoint(block_coord, block_size, block_centre_point_W);
         const Eigen::Vector3f block_centre_point_C =
-            (T_SW_ * (block_centre_point_W).homogeneous()).head<3>();
+            (T_SW_ * (block_centre_point_W).homogeneous()).template head<3>();
 
         // The recommended integration scale
         int computed_integration_scale = sensor_.computeIntegrationScale(block_centre_point_C,
