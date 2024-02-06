@@ -318,8 +318,7 @@ void IntegrateRayBatchImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
     for (size_t i = 0; i < rayPoseBatch.size(); i++) {
         TICK("Ray Integration")
         TICK("allocation-integration")
-        if (rayIntegrator.resetIntegrator(
-                rayPoseBatch[i].second, rayPoseBatch[i].first, frame)) {
+        if (rayIntegrator.resetIntegrator(rayPoseBatch[i].second, rayPoseBatch[i].first, frame)) {
             rayIntegrator();
         }
         else {
@@ -395,7 +394,8 @@ void MapIntegrator<MapT>::integrateRay(const SensorT& sensor,
                                        const unsigned int frame,
                                        std::vector<const OctantBase*>& updated_octants)
 {
-    se::details::IntegrateRayImpl<MapT>::integrate(map_, sensor, ray_S, T_WS, frame, &updated_octants);
+    se::details::IntegrateRayImpl<MapT>::integrate(
+        map_, sensor, ray_S, T_WS, frame, &updated_octants);
 }
 
 template<typename MapT>
@@ -407,8 +407,7 @@ void MapIntegrator<MapT>::integrateRayBatch(
         rayPoseBatch,
     const unsigned int frame)
 {
-    se::details::IntegrateRayBatchImpl<MapT>::integrate(
-        map_, sensor, rayPoseBatch, frame, nullptr);
+    se::details::IntegrateRayBatchImpl<MapT>::integrate(map_, sensor, rayPoseBatch, frame, nullptr);
 }
 
 template<typename MapT>
@@ -424,7 +423,6 @@ void MapIntegrator<MapT>::integrateRayBatch(
     se::details::IntegrateRayBatchImpl<MapT>::integrate(
         map_, sensor, rayPoseBatch, frame, &updated_octants);
 }
-
 
 
 
