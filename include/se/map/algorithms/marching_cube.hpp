@@ -161,12 +161,12 @@ namespace algorithms {
 
 template<typename OctreeT>
 void marching_cube_kernel(OctreeT& octree,
-                          std::vector<typename OctreeT::BlockType*>& block_ptrs,
+                          std::vector<const typename OctreeT::BlockType*>& block_ptrs,
                           TriangleMesh& triangles);
 
 template<typename OctreeT>
 void dual_marching_cube_kernel(OctreeT& octree,
-                               std::vector<typename OctreeT::BlockType*>& block_ptrs,
+                               std::vector<const typename OctreeT::BlockType*>& block_ptrs,
                                TriangleMesh& triangles);
 
 
