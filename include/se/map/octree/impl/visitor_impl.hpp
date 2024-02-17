@@ -1123,7 +1123,7 @@ getFieldGrad(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
         (base_coord + Eigen::Vector3i::Constant(2))
             .cwiseMin(Eigen::Vector3i::Constant(octree.getSize()) - Eigen::Vector3i::Constant(1));
 
-    const typename OctreeT::BlockType* block_ptr = static_cast<typename OctreeT::BlockType*>(
+    const auto* const block_ptr = static_cast<const typename OctreeT::BlockType*>(
         fetcher::template block<OctreeT>(base_coord, octree.getRoot()));
     if (!block_ptr) {
         return std::nullopt;
@@ -1304,7 +1304,7 @@ getFieldGrad(const OctreeT& octree,
             return std::nullopt;
         }
     }
-    BlockType* block_ptr = static_cast<BlockType*>(octant);
+    const BlockType* block_ptr = static_cast<const BlockType*>(octant);
 
     int init_scale =
         std::max(scale_desired,
@@ -1329,8 +1329,8 @@ getFieldGrad(const OctreeT& octree,
                 .cwiseMin(Eigen::Vector3i::Constant(octree.getSize())
                           - Eigen::Vector3i::Constant(1));
 
-        block_ptr =
-            static_cast<BlockType*>(fetcher::template block<OctreeT>(base_coord, octree.getRoot()));
+        block_ptr = static_cast<const BlockType*>(
+            fetcher::template block<OctreeT>(base_coord, octree.getRoot()));
         if (!block_ptr) // If this block doesn't exist there's still a chance a gradient exist at a different scale
         {
             continue;
