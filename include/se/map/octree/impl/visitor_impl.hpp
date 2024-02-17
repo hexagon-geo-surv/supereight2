@@ -1329,12 +1329,29 @@ getFieldGrad(const OctreeT& octree,
                 .cwiseMin(Eigen::Vector3i::Constant(octree.getSize())
                           - Eigen::Vector3i::Constant(1));
 
-        block_ptr = static_cast<const BlockType*>(
-            fetcher::template block<OctreeT>(base_coord, octree.getRoot()));
-        if (!block_ptr) // If this block doesn't exist there's still a chance a gradient exist at a different scale
-        {
+        const OctantBase* const octant_ptr =
+            fetcher::template finest_octant<OctreeT>(base_coord, scale, octree.getRoot());
+        if (!octant_ptr) {
+            // If this octant isn't allocated there's still a chance a gradient exists at a coarser
+            // scale.
             continue;
         }
+        // TODO: Is it expected that a node might be queried while computing the gradient or is
+        // there some bug in the algorithm?
+        if (!octant_ptr->isBlock()) {
+            const auto& node = *static_cast<const typename OctreeT::NodeType*>(octant_ptr);
+            if (node.isLeaf() && is_valid(node.getData())) {
+                // Attempting to compute the gradient at a node, approximate with 0 as before.
+                scale_returned = math::log2_const(node.getSize());
+                return field_vec_t::Zero();
+            }
+            else {
+                // If this node isn't observed there's still a chance a gradient exists at a coarser
+                // scale.
+                continue;
+            }
+        }
+        block_ptr = static_cast<const BlockType*>(octant_ptr);
 
         const Eigen::Vector3i grad_coords[32] = {
             Eigen::Vector3i(
