@@ -56,7 +56,8 @@ struct PerfStats {
         POWER,
         TIME,
         UNDEFINED,
-        VOLTAGE
+        VOLTAGE,
+        VOLUME,
     };
 
     struct Stats {
@@ -431,26 +432,11 @@ struct PerfStats {
      */
     void writeSummaryToOStream(std::ostream& ostream, const bool include_iter_data = true);
 
+    /** The order the different types are added to the output. */
     std::vector<PerfStats::Type> header_order_ = {
-        FRAME,
-        ITERATION,
-        TIME,
-        DURATION,
-        MEMORY,
-        POSITION,
-        ORIENTATION,
-        DISTANCE,
-        FREQUENCY,
-        BOOL,
-        POWER,
-        ENERGY,
-        CURRENT,
-        VOLTAGE,
-        COUNT,
-        INT,
-        DOUBLE,
-        PERCENTAGE,
-        UNDEFINED};         ///< The order the different types are added to the output
+        FRAME,    ITERATION, TIME, DURATION, MEMORY,     POSITION, ORIENTATION,
+        DISTANCE, FREQUENCY, BOOL, POWER,    ENERGY,     CURRENT,  VOLTAGE,
+        VOLUME,   COUNT,     INT,  DOUBLE,   PERCENTAGE, UNDEFINED};
     bool include_detailed_; ///< Flag to add stats marked as detailed to the output
 
     int insertion_idx_; ///< The index of the next stat to be inserted to performance stats
