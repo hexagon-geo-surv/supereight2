@@ -197,6 +197,8 @@ inline std::string PerfStats::Stats::unitString()
         return "(MB)";
     case ORIENTATION:
         return "(-)";
+    case PERCENTAGE:
+        return "(%)";
     case POSITION:
         return "(m)";
     case POWER:
