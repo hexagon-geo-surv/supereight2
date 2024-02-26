@@ -60,14 +60,14 @@ class MemoryPool {
      */
     void deleteNode(NodeT* node_ptr)
     {
-        node_buffer_.free(node_ptr);
+        node_buffer_.destroy(node_ptr);
     }
 
     /** Destruct and deallocate the block pointed to by \p block_ptr.
      */
     void deleteBlock(BlockT* block_ptr)
     {
-        block_buffer_.free(block_ptr);
+        block_buffer_.destroy(block_ptr);
     }
 
     boost::object_pool<NodeT> node_buffer_;
