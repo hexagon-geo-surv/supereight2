@@ -258,6 +258,7 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
     else if (desired_scale > last_scale) {
         se::ray_integrator::propagate_block_to_scale<BlockType>(block_ptr, desired_scale);
         integration_scale = desired_scale;
+        block_ptr->deleteUpTo(integration_scale);
         block_ptr->setCurrentScale(integration_scale);
     }
 
