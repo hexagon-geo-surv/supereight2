@@ -66,8 +66,6 @@ class LeicaLidar : public SensorBase<LeicaLidar> {
     srl::projection::LeicaLidar model;
     /** \brief the minimum ray angle between subsequent measurements*/
     float min_ray_angle;
-    /** \brief the maximum ray angle between subsequent measurements */
-    float max_ray_angle;
     float min_elevation_rad;
     float max_elevation_rad;
     /** \brief The horizontal field of view in radians. */
@@ -79,13 +77,7 @@ class LeicaLidar : public SensorBase<LeicaLidar> {
     float azimuth_resolution_angle;
     float elevation_resolution_angle;
 
-    /** \brief Cache the last resolution being used to compute integration scale
-     * That way we can avoid having to repeat costly tan() and sqrt() for every ray */
-    float map_resolution = 0.03f;
-
     float pixel_dim_tan = 0.0f;
-    float pv_ratio_denominator = 0.0f;
-
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };

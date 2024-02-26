@@ -52,7 +52,6 @@ se::LeicaLidar::LeicaLidar(const LeicaLidarConfig& c) :
     assert(c.far_plane > c.near_plane);
 
     min_ray_angle = std::min(c.azimuth_resolution_angle_, c.elevation_resolution_angle_);
-    max_ray_angle = std::max(c.azimuth_resolution_angle_, c.elevation_resolution_angle_);
     horizontal_fov = 2.0f * M_PI;
 
     constexpr float deg_to_rad = M_PI / 180.0f;
@@ -64,8 +63,7 @@ se::LeicaLidar::LeicaLidar(const LeicaLidarConfig& c) :
     vertical_fov =
         deg_to_rad * (max_elevation - min_elevation); // should be 180 degree respectively PI
 
-    pixel_dim_tan = 2.0f * std::tan(max_ray_angle * 0.5f * deg_to_rad);
-    pv_ratio_denominator = 1.0f / (std::sqrt(3.0f) * map_resolution);
+    pixel_dim_tan = 2.0f * std::tan(min_ray_angle * 0.5f * deg_to_rad);
 }
 
 
@@ -82,7 +80,6 @@ se::LeicaLidar::LeicaLidar(const LeicaLidarConfig& c, const float dsf) :
     assert(c.far_plane > c.near_plane);
 
     min_ray_angle = std::min(c.azimuth_resolution_angle_, c.elevation_resolution_angle_);
-    max_ray_angle = std::max(c.azimuth_resolution_angle_, c.elevation_resolution_angle_);
     horizontal_fov = 2.0f * M_PI;
 
     constexpr float deg_to_rad = M_PI / 180.0f;
@@ -94,8 +91,7 @@ se::LeicaLidar::LeicaLidar(const LeicaLidarConfig& c, const float dsf) :
     vertical_fov =
         deg_to_rad * (max_elevation - min_elevation); // should be 180 degree respectively PI
 
-    pixel_dim_tan = 2.0f * std::tan(max_ray_angle * 0.5f * deg_to_rad);
-    pv_ratio_denominator = 1.0f / (std::sqrt(3) * map_resolution);
+    pixel_dim_tan = 2.0f * std::tan(min_ray_angle * 0.5f * deg_to_rad);
 }
 
 
@@ -129,6 +125,7 @@ int se::LeicaLidar::computeIntegrationScaleImpl(const Eigen::Vector3f& block_cen
     // at distance dist.
     const float pixel_dim = dist * pixel_dim_tan;
     // Compute the ratio using the worst case voxel_dim (space diagonal)
+    const float pv_ratio_denominator = 1.0f / (std::sqrt(3.0f) * map_res);
     const float pv_ratio = pixel_dim * pv_ratio_denominator;
     int scale = 0;
     for (const float scale_ratio : pixel_voxel_ratio_per_scale) {
