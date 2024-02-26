@@ -59,10 +59,8 @@ int main(int argc, char** argv)
         const se::LeicaLidar sensor(config.sensor, config.app.sensor_downsampling_factor);
 
         // ========= READER INITIALIZATION  =========
-        se::Reader* reader = nullptr;
-        reader = se::create_reader(config.reader);
-
-        if (reader == nullptr) {
+        std::unique_ptr<se::Reader> reader(se::create_reader(config.reader));
+        if (!reader) {
             return EXIT_FAILURE;
         }
 
