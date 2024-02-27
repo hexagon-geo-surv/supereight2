@@ -234,6 +234,13 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
     const Eigen::Vector3i block_coord =
         block_ptr->getCoord(); /// < Coordinates of block to be updated
 
+    // Set timestamp of the current block
+    timestamp_t previous_time_stamp = block_ptr->getTimeStamp();
+    const bool is_already_integrated = (previous_time_stamp == frame_);
+    if (!is_already_integrated) {
+        block_ptr->setTimeStamp(frame_);
+    }
+
 
     // The last integration scale
     // -- Nothing integrated yet (-1) => set to desired_scale
@@ -255,7 +262,7 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
         // set new scale and min scale
         integration_scale = desired_scale;
     }
-    else if (desired_scale > last_scale) {
+    else if (!is_already_integrated && (desired_scale > last_scale)) {
         se::ray_integrator::propagate_block_to_scale<BlockType>(block_ptr, desired_scale);
         integration_scale = desired_scale;
         block_ptr->deleteUpTo(integration_scale);
