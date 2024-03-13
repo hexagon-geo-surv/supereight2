@@ -13,6 +13,7 @@
 #include <array>
 #include <cstdint>
 #include <vector>
+#include <optional>
 
 namespace se {
 
@@ -46,6 +47,30 @@ typedef Mesh<Quad> QuadMesh;
 /** Return a triangle mesh containig two triangles for each face of \p quad_mesh. */
 static inline TriangleMesh quad_to_triangle_mesh(const QuadMesh& quad_mesh);
 
+namespace meshing{
+
+struct Vertex
+{
+    Vertex(const Eigen::Vector3f& position)
+        : position(position)
+    {
+    }
+    Eigen::Vector3f position;
+    std::optional<Eigen::Vector3f> normal;
+    std::optional<std::array<std::uint8_t, 3>> color;
+};
+
+struct VertexIndexMesh
+{
+    std::vector<Vertex> vertices;
+    std::vector<size_t> indices;    // triangles
+
+    void merge(const VertexIndexMesh& other);
+};
+
+static inline void compute_normals(VertexIndexMesh& mesh);
+
+} // namespace mesh
 } // namespace se
 
 #include "impl/mesh_impl.hpp"

@@ -88,7 +88,8 @@ void gather_dual_data(const BlockT* block,
                       const int scale,
                       const Eigen::Vector3f& primal_corner_coord_f,
                       DataT data[8],
-                      std::array<Eigen::Vector3f, 8>& dual_corner_coords_f);
+                      std::array<Eigen::Vector3f, 8>& dual_corner_coords_f,
+                      std::array<Eigen::Vector3i, 8>& dual_corner_coords_i);
 
 /*! \brief The following strategy is derived from I. Wald, A Simple, General,
  *  and GPU Friendly Method for Computing Dual Mesh and Iso-Surfaces of Adaptive Mesh Refinement (AMR) Data, 2020
@@ -138,7 +139,8 @@ void gather_dual_data(const OctreeT& octree,
                       const int scale,
                       const Eigen::Vector3i& primal_corner_coord,
                       DataT data[8],
-                      std::array<Eigen::Vector3f, 8>& dual_corner_coords_f);
+                      std::array<Eigen::Vector3f, 8>& dual_corner_coords_f,
+                      std::array<Eigen::Vector3i, 8>& dual_corner_coords_i);
 
 template<typename OctreeT, typename DataT>
 void compute_dual_index(const OctreeT& octree,
@@ -147,7 +149,8 @@ void compute_dual_index(const OctreeT& octree,
                         const Eigen::Vector3i& primal_corner_coord,
                         uint8_t& edge_pattern_idx,
                         DataT data[8],
-                        std::array<Eigen::Vector3f, 8>& dual_corner_coords_f);
+                        std::array<Eigen::Vector3f, 8>& dual_corner_coords_f,
+                        std::array<Eigen::Vector3i, 8>& dual_corner_coords_i);
 
 inline bool checkVertex(const Eigen::Vector3f& vertex_M, const float dim);
 
@@ -156,8 +159,6 @@ inline bool checkVertex(const Eigen::Vector3f& vertex_M, const float dim);
 
 
 namespace algorithms {
-
-
 
 template<typename OctreeT>
 void marching_cube_kernel(OctreeT& octree,
@@ -168,6 +169,19 @@ template<typename OctreeT>
 void dual_marching_cube_kernel(OctreeT& octree,
                                std::vector<const typename OctreeT::BlockType*>& block_ptrs,
                                TriangleMesh& triangles);
+
+template<typename OctreeT>
+void dual_marching_cube_kernel(OctreeT& octree,
+                               std::vector<const typename OctreeT::BlockType*>& block_ptrs,
+                               std::vector<std::shared_ptr<meshing::VertexIndexMesh>>& mesh);
+
+template<typename OctreeT>
+std::shared_ptr<meshing::VertexIndexMesh>
+dual_marching_cube_kernel(OctreeT& octree, std::vector<const typename OctreeT::BlockType*>& block_ptrs);
+
+template<typename OctreeT>
+std::shared_ptr<meshing::VertexIndexMesh>
+dual_marching_cube(OctreeT& octree);
 
 
 /**
