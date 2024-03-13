@@ -12,15 +12,15 @@
 
 #include "se/map/map.hpp"
 
-TEST(MeshingTest, EqualScaleNeighbour)
+template<typename OctreeType>
+std::shared_ptr<OctreeType>
+create_octree()
 {
-    typedef se::TSDFData DataType;
-    const int block_size = 8;
     const int blocks_per_side = 2;
+    const int block_size = OctreeType::BlockType::getSize();
     const int octree_size = blocks_per_side * block_size;
-    typedef se::Octree<DataType, se::Res::Single, block_size> OctreeType;
-    typename OctreeType::Ptr octree_ptr = std::shared_ptr<OctreeType>(new OctreeType(octree_size));
-    ;
+    auto octree_ptr = std::shared_ptr<OctreeType>(new OctreeType(octree_size));
+
     std::vector<se::key_t> allocation_list;
     allocation_list.reserve(blocks_per_side * blocks_per_side);
     std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> block_coords;
@@ -62,24 +62,35 @@ TEST(MeshingTest, EqualScaleNeighbour)
         }
     }
 
-    std::string filename = "/PATH/TO/out/multires-mesh-equal-neighbour-single.vtk";
-    std::cout << "Saving triangle mesh to file :" << filename << std::endl;
+    return octree_ptr;
+}
+
+TEST(MeshingTest, EqualScaleNeighbour)
+{
+    auto octree_ptr = create_octree<se::Octree<se::TSDFData, se::Res::Single, 8>>();
 
     se::TriangleMesh mesh;
     se::algorithms::dual_marching_cube(*octree_ptr, mesh);
+    auto vertex_index_mesh = se::algorithms::dual_marching_cube(*octree_ptr);
+
+    ASSERT_GT(mesh.size(), 0);
+    ASSERT_EQ(mesh.size() * 3, vertex_index_mesh.indices.size());
+
+    std::string filename = "multires-mesh-equal-neighbour-single.vtk";
+    std::cout << "Saving triangle mesh to file: " << filename << std::endl;
     Eigen::Isometry3f T_MW = Eigen::Isometry3f::Identity();
     se::io::save_mesh_vtk(mesh, filename.c_str(), T_MW.inverse());
 }
 
-TEST(MeshingTest, EqualScaleNeighbour2)
+template<typename OctreeType>
+std::shared_ptr<OctreeType>
+create_octree_scale()
 {
-    typedef se::TSDFData DataType;
-    const int block_size = 8;
     const int blocks_per_side = 2;
+    const int block_size = OctreeType::BlockType::getSize();
     const int octree_size = blocks_per_side * block_size;
-    typedef se::Octree<DataType, se::Res::Multi, block_size> OctreeType;
-    typename OctreeType::Ptr octree_ptr = std::shared_ptr<OctreeType>(new OctreeType(octree_size));
-    ;
+    auto octree_ptr = std::shared_ptr<OctreeType>(new OctreeType(octree_size));
+
     std::vector<se::key_t> allocation_list;
     allocation_list.reserve(blocks_per_side * blocks_per_side);
     std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> block_coords;
@@ -127,11 +138,22 @@ TEST(MeshingTest, EqualScaleNeighbour2)
         }
     }
 
-    std::string filename = "PATH/TO/out/multires-mesh-equal-neighbour-multi.vtk";
-    std::cout << "Saving triangle mesh to file :" << filename << std::endl;
+    return octree_ptr;
+}
+
+TEST(MeshingTest, EqualScaleNeighbour2)
+{
+    auto octree_ptr = create_octree_scale<se::Octree<se::TSDFData, se::Res::Multi, 8>>();
 
     se::TriangleMesh mesh;
     se::algorithms::dual_marching_cube(*octree_ptr, mesh);
+    auto vertex_index_mesh = se::algorithms::dual_marching_cube(*octree_ptr);
+
+    ASSERT_GT(mesh.size(), 0);
+    ASSERT_EQ(mesh.size() * 3, vertex_index_mesh.indices.size());
+
+    std::string filename = "multires-mesh-equal-neighbour-multi.vtk";
+    std::cout << "Saving triangle mesh to file: " << filename << std::endl;
     Eigen::Isometry3f T_MW = Eigen::Isometry3f::Identity();
     se::io::save_mesh_vtk(mesh, filename.c_str(), T_MW.inverse());
 }

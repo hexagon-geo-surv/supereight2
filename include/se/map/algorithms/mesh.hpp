@@ -10,8 +10,11 @@
 #define SE_MESH_FACE_HPP
 
 #include <Eigen/Core>
+#include <Eigen/StdVector>
 #include <array>
 #include <cstdint>
+#include <optional>
+#include <se/common/rgb.hpp>
 #include <vector>
 
 namespace se {
@@ -46,6 +49,36 @@ typedef Mesh<Quad> QuadMesh;
 /** Return a triangle mesh containig two triangles for each face of \p quad_mesh. */
 static inline TriangleMesh quad_to_triangle_mesh(const QuadMesh& quad_mesh);
 
+namespace meshing {
+
+struct Vertex {
+    Vertex(const Eigen::Vector3f& position) : position(position)
+    {
+    }
+
+    Eigen::Vector3f position;
+    std::optional<Eigen::Vector3f> normal;
+    std::optional<RGB> color;
+
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+};
+
+template<size_t NumFaceVertices = 3>
+class VertexIndexMesh {
+    public:
+    std::vector<Vertex, Eigen::aligned_allocator<Vertex>> vertices;
+    std::vector<size_t> indices; // faces
+
+    static constexpr size_t num_face_vertices = NumFaceVertices;
+
+    void merge(const VertexIndexMesh& other);
+
+    void compute_normals();
+
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+};
+
+} // namespace meshing
 } // namespace se
 
 #include "impl/mesh_impl.hpp"
