@@ -17,62 +17,84 @@
 namespace se {
 
 template<typename T>
-class Image {
-    public:
-    Image(const unsigned w, const unsigned h) : width_(w), height_(h), data_(width_ * height_)
+class ImageView
+{
+public:
+    ImageView(const unsigned w, const unsigned h, T* raw_buffer) : width_(w), height_(h), buffer_(raw_buffer)
     {
         assert(width_ > 0 && height_ > 0);
-    }
-
-    Image(const unsigned w, const unsigned h, const T& val) : width_(w), height_(h)
-    {
-        assert(width_ > 0 && height_ > 0);
-        data_.resize(width_ * height_, val);
     }
 
     T& operator[](std::size_t idx)
     {
-        return data_[idx];
+        return buffer_[idx];
     }
+
     const T& operator[](std::size_t idx) const
     {
-        return data_[idx];
+        return buffer_[idx];
     }
 
     T& operator()(const int x, const int y)
     {
-        return data_[x + y * width_];
+        return buffer_[x + y * width_];
     }
+
     const T& operator()(const int x, const int y) const
     {
-        return data_[x + y * width_];
+        return buffer_[x + y * width_];
     }
 
     std::size_t size() const
     {
         return width_ * height_;
-    };
+    }
+
     int width() const
     {
         return width_;
-    };
+    }
+
     int height() const
     {
         return height_;
-    };
+    }
+
+    const T* data() const
+    {
+        return this->buffer_;
+    }
 
     T* data()
     {
-        return data_.data();
-    }
-    const T* data() const
-    {
-        return data_.data();
+        return this->buffer_;
     }
 
-    private:
+protected:
     int width_;
     int height_;
+    T* buffer_;
+};
+
+template<typename T>
+class Image : public ImageView<T>
+{
+public:
+    Image(const unsigned w, const unsigned h) : ImageView<T>(w,h,nullptr)
+    {
+        data_.resize(this->width_ * this->height_);
+        this->buffer_ = data_.data();
+    }
+
+    Image(const unsigned w, const unsigned h, const T& val) : ImageView<T>(w,h,nullptr)
+    {
+        data_.resize(this->width_ * this->height_, val);
+        this->buffer_ = data_.data();
+    }
+
+
+
+private:
     std::vector<T, Eigen::aligned_allocator<T>> data_;
 
     // std::vector<bool> is specialized for space efficiency which means that element access doesn't
