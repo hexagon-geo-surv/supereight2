@@ -15,7 +15,7 @@ namespace se {
 
 
 template<typename MapT, typename SensorT>
-bool Tracker<MapT, SensorT>::track(const se::Image<float>& depth_img, Eigen::Matrix4f& T_WS)
+bool Tracker<MapT, SensorT>::track(const se::ImageView<float>& depth_img, Eigen::Matrix4f& T_WS)
 {
     se::Image<Eigen::Vector3f> surface_point_cloud_M(
         depth_img.width(), depth_img.height(), Eigen::Vector3f::Zero());
@@ -28,10 +28,10 @@ bool Tracker<MapT, SensorT>::track(const se::Image<float>& depth_img, Eigen::Mat
 
 
 template<typename MapT, typename SensorT>
-bool Tracker<MapT, SensorT>::track(const se::Image<float>& depth_img,
+bool Tracker<MapT, SensorT>::track(const se::ImageView<float>& depth_img,
                                    Eigen::Matrix4f& T_WS,
-                                   se::Image<Eigen::Vector3f>& surface_point_cloud_W,
-                                   se::Image<Eigen::Vector3f>& surface_normals_W)
+                                   const se::ImageView<Eigen::Vector3f>& surface_point_cloud_W,
+                                   const se::ImageView<Eigen::Vector3f>& surface_normals_W)
 {
     assert(depth_img.width() == surface_point_cloud_W.width()
            && depth_img.height() == surface_point_cloud_W.height());
@@ -324,10 +324,10 @@ void Tracker<MapT, SensorT>::reduceKernel(float* output_data,
 template<typename MapT, typename SensorT>
 void Tracker<MapT, SensorT>::trackKernel(
     TrackData* output_data,
-    const se::Image<Eigen::Vector3f>& input_point_cloud_S,
-    const se::Image<Eigen::Vector3f>& input_normals_S,
-    const se::Image<Eigen::Vector3f>& surface_point_cloud_W_ref,
-    const se::Image<Eigen::Vector3f>& surface_normals_W_ref,
+    const se::ImageView<Eigen::Vector3f>& input_point_cloud_S,
+    const se::ImageView<Eigen::Vector3f>& input_normals_S,
+    const se::ImageView<Eigen::Vector3f>& surface_point_cloud_W_ref,
+    const se::ImageView<Eigen::Vector3f>& surface_normals_W_ref,
     const Eigen::Matrix4f& T_WS,
     const Eigen::Matrix4f& T_WS_ref,
     const float dist_threshold,

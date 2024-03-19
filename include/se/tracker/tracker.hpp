@@ -97,7 +97,7 @@ class Tracker {
      *
      * \return The tracking success.
      */
-    bool track(const se::Image<float>& depth_img, Eigen::Matrix4f& T_WS);
+    bool track(const se::ImageView<float>& depth_img, Eigen::Matrix4f& T_WS);
 
     /**
      * \brief Track the current pose using ICP.
@@ -109,10 +109,10 @@ class Tracker {
      *
      * \return The tracking success.
      */
-    bool track(const se::Image<float>& depth_img,
+    bool track(const se::ImageView<float>& depth_img,
                Eigen::Matrix4f& T_WS,
-               se::Image<Eigen::Vector3f>& surface_point_cloud_W,
-               se::Image<Eigen::Vector3f>& surface_normals_W);
+               const se::ImageView<Eigen::Vector3f>& surface_point_cloud_W,
+               const se::ImageView<Eigen::Vector3f>& surface_normals_W);
 
     void renderTrackingResult(uint32_t* tracking_img_data);
 
@@ -131,10 +131,10 @@ class Tracker {
                       const Eigen::Vector2i& J_res);
 
     void trackKernel(TrackData* output_data,
-                     const se::Image<Eigen::Vector3f>& input_point_cloud_S,
-                     const se::Image<Eigen::Vector3f>& input_normals_S,
-                     const se::Image<Eigen::Vector3f>& surface_point_cloud_M_ref,
-                     const se::Image<Eigen::Vector3f>& surface_normals_M_ref,
+                     const se::ImageView<Eigen::Vector3f>& input_point_cloud_S,
+                     const se::ImageView<Eigen::Vector3f>& input_normals_S,
+                     const se::ImageView<Eigen::Vector3f>& surface_point_cloud_M_ref,
+                     const se::ImageView<Eigen::Vector3f>& surface_normals_M_ref,
                      const Eigen::Matrix4f& T_WS,
                      const Eigen::Matrix4f& T_WS_ref,
                      const float dist_threshold,
