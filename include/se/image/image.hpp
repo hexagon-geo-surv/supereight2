@@ -92,8 +92,6 @@ public:
         this->buffer_ = data_.data();
     }
 
-
-
 private:
     std::vector<T, Eigen::aligned_allocator<T>> data_;
 
@@ -105,7 +103,7 @@ private:
 
 
 
-static inline void convert_to_output_rgba_img(const se::Image<uint32_t>& input_rgba_img,
+static inline void convert_to_output_rgba_img(const se::ImageView<uint32_t>& input_rgba_img,
                                               uint32_t* output_rgba_img_data)
 {
     memcpy(output_rgba_img_data,
@@ -115,7 +113,7 @@ static inline void convert_to_output_rgba_img(const se::Image<uint32_t>& input_r
 
 
 
-static inline void convert_to_output_depth_img(const se::Image<float>& input_depth_img,
+static inline void convert_to_output_depth_img(const se::ImageView<float>& input_depth_img,
                                                uint32_t* output_depth_img_data)
 {
     depth_to_rgba(output_depth_img_data,
@@ -127,7 +125,7 @@ static inline void convert_to_output_depth_img(const se::Image<float>& input_dep
 
 
 
-static inline void convert_to_output_depth_img(const se::Image<float>& input_depth_img,
+static inline void convert_to_output_depth_img(const se::ImageView<float>& input_depth_img,
                                                const float min_depth,
                                                const float max_depth,
                                                uint32_t* output_depth_img_data)
