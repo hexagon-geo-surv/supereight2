@@ -222,7 +222,7 @@ int main(int argc, char** argv)
             }
 
             se::perfstats.sample("memory usage",
-                                 se::system::memory_usage_self() / 1024.0 / 1024.0,
+                                 se::system::memory_usage_self() / (1024.0 * 1024.0),
                                  PerfStats::MEMORY);
             se::perfstats.writeToFilestream();
         }
