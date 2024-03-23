@@ -81,7 +81,7 @@ public:
         return this->data_ptr_;
     }
 
-protected:
+private:
     int width_;
     int height_;
     std::unique_ptr<T[]> data_;
