@@ -90,6 +90,14 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
     Map(const MapConfig& map_config,
         const DataConfig<FldT, ColB, SemB>& data_config = DataConfig<FldT, ColB, SemB>());
 
+    /** The copy constructor is explicitly deleted.
+     */
+    Map(const Map&) = delete;
+
+    /** The copy assignment operator is explicitly deleted.
+     */
+    Map& operator=(const Map&) = delete;
+
     /**
      * \brief Verify if a point is inside the map.
      *
