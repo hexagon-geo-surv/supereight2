@@ -32,11 +32,11 @@ namespace se {
  */
 class InteriorNetReader : public Reader {
     public:
-    /** Construct a InteriorNetReader from a ReaderConfig.
+    /** Construct a InteriorNetReader from a Config.
      *
      * \param[in] c The configuration struct to use.
      */
-    InteriorNetReader(const ReaderConfig& c);
+    InteriorNetReader(const Config& c);
 
     /** Restart reading from the beginning. */
     void restart();

@@ -112,7 +112,7 @@ struct Config {
     DataConfigT data;
     SensorConfigT sensor;
     TrackerConfig tracker;
-    ReaderConfig reader;
+    Reader::Config reader;
     AppConfig app;
 
     /** Default initializes all configs.

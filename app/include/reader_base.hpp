@@ -45,75 +45,6 @@ ReaderType string_to_reader_type(const std::string& s);
 std::string reader_type_to_string(ReaderType t);
 
 
-
-struct ReaderConfig {
-    /** The type of the dataset reader to use.
-     */
-    ReaderType reader_type = se::ReaderType::RAW;
-
-    /** The path to the dataset. This might be a path to a file or a directory depending on the
-     * reader type.
-     */
-    std::string sequence_path;
-
-    /** The path to the ground truth file.
-     */
-    std::string ground_truth_file;
-
-    /** The scaling factor to convert depth values to metres. A value of 0 will use the default
-     * scaling for the particular dataset. This only needs to be set when using a modified dataset,
-     * e.g. when using a dataset in the TUM format with depth scaled by 1000 instead of the default
-     * 5000 for TUM, inverse_scale would need to be set to 1/1000.
-     */
-    float inverse_scale = 0.0f;
-
-    /** The rate in Hz at which dataset frames are read. A value of 0 will result in reading frames
-     * as quickly as possible. If frames can be processed faster than they are read, the program
-     * will wait before reading the next frame until the target rate is reached. If frames are
-     * processed slower than they are read the behaviour depends on the value of
-     * se::ReaderConfig::drop_frames.
-     */
-    float fps = 0.0f;
-
-    /** Whether to drop frames when they can't be processed fast enough. This option only has an
-     * effect if se::ReaderConfig::fps is greater than 0 and frames are read faster than they can be
-     * processed:
-     * - When false, all frames in the dataset will be processed. This will result in a processing
-     * rate lower than what was specified in se::ReaderConfig::fps. This simulates a camera with a
-     * framerate of se::ReaderConfig::fps and processing every frame produced by the camera.
-     * - When true, input frames will be skipped, assumming they arrive at a rate of
-     * se::ReaderConfig::fps. This simulates a camera with a framerate of se::ReaderConfig::fps and
-     * always processing the laster frame produced by the camera.
-     */
-    bool drop_frames = false;
-
-    /** The verbosity level of dataset readers. A positive value results in more information being
-     * printed to standard output when reading data. Greater values result in more information being
-     * printed.
-     */
-    int verbose = 0;
-
-    /** Provide Transformation Sensor (LiDAR) to Body (Drone) also to reader. T_BS.
-     *  \note Only for se::ReaderType::LEICA ("rangeImage" or "ray")
-     */
-    Eigen::Matrix4f T_BL = Eigen::Matrix4f::Identity();
-
-    /** The time for the interval of LiDAR Measurements that are grouped together as one scan and
-     *  converted to one range image
-     *  \note Only for se::ReaderType::LEICA ("rangeImage" or "ray")
-     */
-    float scan_time_interval = 1.0;
-
-    /** Reads the struct members from the "reader" node of a YAML file. Members not present in the
-     * YAML file aren't modified.
-     */
-    void readYaml(const std::string& filename);
-};
-
-std::ostream& operator<<(std::ostream& os, const ReaderConfig& c);
-
-
-
 /** The result of trying to read a depth/RGB image or a pose.
  */
 enum class ReaderStatus : int {
@@ -152,14 +83,79 @@ std::ostream& operator<<(std::ostream& os, const ReaderStatus& s);
  */
 class Reader {
     public:
-    /** Construct a Reader from a ReaderConfig.
+    struct Config {
+        /** The type of the dataset reader to use.
+         */
+        ReaderType reader_type = se::ReaderType::RAW;
+
+        /** The path to the dataset. This might be a path to a file or a directory depending on the
+         * reader type.
+         */
+        std::string sequence_path;
+
+        /** The path to the ground truth file.
+         */
+        std::string ground_truth_file;
+
+        /** The scaling factor to convert depth values to metres. A value of 0 will use the default
+         * scaling for the particular dataset. This only needs to be set when using a modified dataset,
+         * e.g. when using a dataset in the TUM format with depth scaled by 1000 instead of the default
+         * 5000 for TUM, inverse_scale would need to be set to 1/1000.
+         */
+        float inverse_scale = 0.0f;
+
+        /** The rate in Hz at which dataset frames are read. A value of 0 will result in reading frames
+         * as quickly as possible. If frames can be processed faster than they are read, the program
+         * will wait before reading the next frame until the target rate is reached. If frames are
+         * processed slower than they are read the behaviour depends on the value of
+         * se::Reader::Config::drop_frames.
+         */
+        float fps = 0.0f;
+
+        /** Whether to drop frames when they can't be processed fast enough. This option only has an
+         * effect if se::Reader::Config::fps is greater than 0 and frames are read faster than they can be
+         * processed:
+         * - When false, all frames in the dataset will be processed. This will result in a processing
+         * rate lower than what was specified in se::Reader::Config::fps. This simulates a camera with a
+         * framerate of se::Reader::Config::fps and processing every frame produced by the camera.
+         * - When true, input frames will be skipped, assumming they arrive at a rate of
+         * se::Reader::Config::fps. This simulates a camera with a framerate of se::Reader::Config::fps and
+         * always processing the laster frame produced by the camera.
+         */
+        bool drop_frames = false;
+
+        /** The verbosity level of dataset readers. A positive value results in more information being
+         * printed to standard output when reading data. Greater values result in more information being
+         * printed.
+         */
+        int verbose = 0;
+
+        /** Provide Transformation Sensor (LiDAR) to Body (Drone) also to reader. T_BS.
+         *  \note Only for se::ReaderType::LEICA ("rangeImage" or "ray")
+         */
+        Eigen::Matrix4f T_BL = Eigen::Matrix4f::Identity();
+
+        /** The time for the interval of LiDAR Measurements that are grouped together as one scan and
+         *  converted to one range image
+         *  \note Only for se::ReaderType::LEICA ("rangeImage" or "ray")
+         */
+        float scan_time_interval = 1.0;
+
+        /** Reads the struct members from the "reader" node of a YAML file. Members not present in the
+         * YAML file aren't modified.
+         */
+        void readYaml(const std::string& filename);
+    };
+
+
+    /** Construct a Reader from a Config.
      *
      * \note This constructor should be called in all derived class
      *       constructors.
      *
      * \param[in] c The configuration struct to use.
      */
-    Reader(const ReaderConfig& c);
+    Reader(const Config& c);
 
     virtual ~Reader(){};
 
@@ -393,6 +389,8 @@ class Reader {
      */
     virtual ReaderStatus nextRGBA(Image<uint32_t>& rgba_image) = 0;
 };
+
+std::ostream& operator<<(std::ostream& os, const Reader::Config& c);
 
 } // namespace se
 

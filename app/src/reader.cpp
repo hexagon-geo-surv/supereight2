@@ -21,7 +21,7 @@
 
 
 
-se::Reader* se::create_reader(const se::ReaderConfig& config)
+se::Reader* se::create_reader(const se::Reader::Config& config)
 {
     se::Reader* reader = nullptr;
     switch (config.reader_type) {

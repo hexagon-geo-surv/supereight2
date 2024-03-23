@@ -26,11 +26,11 @@ namespace se {
  */
 class LeicaReader : public Reader {
     public:
-    /** Construct a LeicaReader from a ReaderConfig.
+    /** Construct a LeicaReader from a Config.
      *
      * \param[in] c The configuration struct to use.
      */
-    LeicaReader(const ReaderConfig& c);
+    LeicaReader(const Config& c);
 
     /** Restart reading from the beginning. */
     void restart();

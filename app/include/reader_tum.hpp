@@ -28,11 +28,11 @@ namespace se {
  */
 class TUMReader : public Reader {
     public:
-    /** Construct a TUMReader from a ReaderConfig.
+    /** Construct a TUMReader from a Config.
      *
      * \param[in] c The configuration struct to use.
      */
-    TUMReader(const ReaderConfig& c);
+    TUMReader(const Config& c);
 
 
     /** Restart reading from the beginning. */

@@ -20,7 +20,7 @@ constexpr size_t se::RAWReader::depth_pixel_size_;
 constexpr size_t se::RAWReader::rgba_pixel_size_;
 constexpr size_t se::RAWReader::res_size_;
 
-se::RAWReader::RAWReader(const se::ReaderConfig& c) : se::Reader(c)
+se::RAWReader::RAWReader(const se::Reader::Config& c) : se::Reader(c)
 {
     // Open the .raw file for reading.
     raw_fs_.open(sequence_path_, std::ios::in | std::ios::binary);

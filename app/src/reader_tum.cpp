@@ -394,7 +394,7 @@ constexpr double se::TUMReader::max_interp_timestamp_dist_;
 
 
 
-se::TUMReader::TUMReader(const se::ReaderConfig& c) : se::Reader(c)
+se::TUMReader::TUMReader(const se::Reader::Config& c) : se::Reader(c)
 {
     inverse_scale_ = (c.inverse_scale != 0) ? c.inverse_scale : tum_inverse_scale_;
 

@@ -262,7 +262,7 @@ constexpr double se::InteriorNetReader::max_interp_timestamp_dist_;
 
 
 
-se::InteriorNetReader::InteriorNetReader(const se::ReaderConfig& c) : se::Reader(c)
+se::InteriorNetReader::InteriorNetReader(const se::Reader::Config& c) : se::Reader(c)
 {
     inverse_scale_ = (c.inverse_scale != 0) ? c.inverse_scale : interiornet_inverse_scale_;
 

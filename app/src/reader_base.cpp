@@ -79,7 +79,30 @@ std::string se::reader_type_to_string(se::ReaderType t)
 
 
 
-void se::ReaderConfig::readYaml(const std::string& filename)
+std::ostream& se::operator<<(std::ostream& os, const ReaderStatus& s)
+{
+    switch (s) {
+    case ReaderStatus::ok:
+        os << "OK";
+        break;
+    case ReaderStatus::skip:
+        os << "skip";
+        break;
+    case ReaderStatus::eof:
+        os << "EOF";
+        break;
+    case ReaderStatus::error:
+        os << "error";
+        break;
+    default:
+        os << "unknown status";
+    }
+    return os;
+}
+
+
+
+void se::Reader::Config::readYaml(const std::string& filename)
 {
     // Open the file for reading.
     cv::FileStorage fs;
@@ -136,7 +159,7 @@ void se::ReaderConfig::readYaml(const std::string& filename)
 
 
 
-std::ostream& se::operator<<(std::ostream& os, const se::ReaderConfig& c)
+std::ostream& se::operator<<(std::ostream& os, const se::Reader::Config& c)
 {
     os << str_utils::str_to_pretty_str(se::reader_type_to_string(c.reader_type), "reader_type")
        << "\n";
@@ -155,30 +178,7 @@ std::ostream& se::operator<<(std::ostream& os, const se::ReaderConfig& c)
 
 
 
-std::ostream& se::operator<<(std::ostream& os, const ReaderStatus& s)
-{
-    switch (s) {
-    case ReaderStatus::ok:
-        os << "OK";
-        break;
-    case ReaderStatus::skip:
-        os << "skip";
-        break;
-    case ReaderStatus::eof:
-        os << "EOF";
-        break;
-    case ReaderStatus::error:
-        os << "error";
-        break;
-    default:
-        os << "unknown status";
-    }
-    return os;
-}
-
-
-
-se::Reader::Reader(const se::ReaderConfig& c) :
+se::Reader::Reader(const se::Reader::Config& c) :
         sequence_path_(c.sequence_path),
         ground_truth_file_(c.ground_truth_file),
         depth_image_res_(1, 1),

@@ -27,11 +27,11 @@ namespace se {
  */
 class RAWReader : public Reader {
     public:
-    /** Construct a RAWReader from a ReaderConfig.
+    /** Construct a RAWReader from a Config.
      *
      * \param[in] c The configuration struct to use.
      */
-    RAWReader(const ReaderConfig& c);
+    RAWReader(const Config& c);
 
     /** Restart reading from the beginning. */
     void restart();

@@ -132,7 +132,7 @@ std::string write_ground_truth_tmp(const std::string& path,
 
 
 
-se::LeicaReader::LeicaReader(const se::ReaderConfig& c) : se::Reader(c)
+se::LeicaReader::LeicaReader(const se::Reader::Config& c) : se::Reader(c)
 {
     // Ensure a valid directory was provided
     if (!stdfs::is_directory(sequence_path_)) {

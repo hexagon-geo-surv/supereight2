@@ -32,11 +32,11 @@ namespace se {
  */
 class OpenNIReader : public Reader {
     public:
-    /** Construct an OpenNIReader from a ReaderConfig.
+    /** Construct an OpenNIReader from a Config.
      *
      * \param[in] c The configuration struct to use.
      */
-    OpenNIReader(const ReaderConfig& c);
+    OpenNIReader(const Config& c);
 
     ~OpenNIReader();
 

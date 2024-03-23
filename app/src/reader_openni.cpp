@@ -17,7 +17,7 @@
 
 #ifdef SE_OPENNI2
 
-se::OpenNIReader::OpenNIReader(const se::ReaderConfig& c) :
+se::OpenNIReader::OpenNIReader(const se::Reader::Config& c) :
         se::Reader(c), depth_image_(nullptr), rgb_image_(nullptr)
 {
     // Ensure this is handled as a live camera reader.
@@ -231,7 +231,7 @@ se::ReaderStatus se::OpenNIReader::nextRGBA(se::Image<uint32_t>& rgba_image)
 
 
 
-se::OpenNIReader::OpenNIReader(const se::ReaderConfig& c) : se::Reader(c)
+se::OpenNIReader::OpenNIReader(const se::Reader::Config& c) : se::Reader(c)
 {
     status_ = se::ReaderStatus::error;
     std::cerr << "Error: not compiled with OpenNI support\n";

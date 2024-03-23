@@ -27,11 +27,11 @@ namespace se {
  */
 class NewerCollegeReader : public Reader {
     public:
-    /** Construct an NewerCollegeReader from a ReaderConfig.
+    /** Construct an NewerCollegeReader from a Config.
      *
      * \param[in] c The configuration struct to use.
      */
-    NewerCollegeReader(const ReaderConfig& c);
+    NewerCollegeReader(const Config& c);
 
     /** Restart reading from the beginning. */
     void restart();

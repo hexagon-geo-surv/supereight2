@@ -59,7 +59,7 @@ Eigen::Vector3f atof3(const std::string& line)
 
 
 
-se::NewerCollegeReader::NewerCollegeReader(const se::ReaderConfig& c) : se::Reader(c)
+se::NewerCollegeReader::NewerCollegeReader(const se::Reader::Config& c) : se::Reader(c)
 {
     // Ensure a valid directory was provided
     if (!stdfs::is_directory(sequence_path_)) {
@@ -180,7 +180,7 @@ std::vector<std::string> se::NewerCollegeReader::getScanFilenames(const std::str
 
 
 #else
-se::NewerCollegeReader::NewerCollegeReader(const se::ReaderConfig& c) : se::Reader(c)
+se::NewerCollegeReader::NewerCollegeReader(const se::Reader::Config& c) : se::Reader(c)
 {
     status_ = se::ReaderStatus::error;
     std::cerr << "Error: not compiled with PCL, no Newer College support\n";
