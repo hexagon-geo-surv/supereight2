@@ -11,38 +11,49 @@
 
 #include <Eigen/StdVector>
 #include <cassert>
+#include <memory>
 
 #include "se/common/colour_utils.hpp"
 
 namespace se {
 
 template<typename T>
-class ImageView
+class Image
 {
 public:
-    ImageView(const unsigned w, const unsigned h, T* raw_buffer) : width_(w), height_(h), buffer_(raw_buffer)
+    Image(const unsigned w, const unsigned h) : width_(w), height_(h), data_(new T[w * h]), data_ptr_(data_.get())
+    {
+        assert(width_ > 0 && height_ > 0);
+    }
+
+    Image(const unsigned w, const unsigned h, const T& val) : Image(w,h)
+    {
+        std::fill(data_.get(), data_.get() + w * h, val);
+    }
+
+    Image(const unsigned w, const unsigned h, T* raw_buffer) : width_(w), height_(h), data_ptr_(raw_buffer)
     {
         assert(width_ > 0 && height_ > 0);
     }
 
     T& operator[](std::size_t idx)
     {
-        return buffer_[idx];
+        return data_ptr_[idx];
     }
 
     const T& operator[](std::size_t idx) const
     {
-        return buffer_[idx];
+        return data_ptr_[idx];
     }
 
     T& operator()(const int x, const int y)
     {
-        return buffer_[x + y * width_];
+        return data_ptr_[x + y * width_];
     }
 
     const T& operator()(const int x, const int y) const
     {
-        return buffer_[x + y * width_];
+        return data_ptr_[x + y * width_];
     }
 
     std::size_t size() const
@@ -62,48 +73,24 @@ public:
 
     const T* data() const
     {
-        return this->buffer_;
+        return this->data_ptr_;
     }
 
     T* data()
     {
-        return this->buffer_;
+        return this->data_ptr_;
     }
 
 protected:
     int width_;
     int height_;
-    T* buffer_;
-};
-
-template<typename T>
-class Image : public ImageView<T>
-{
-public:
-    Image(const unsigned w, const unsigned h) : ImageView<T>(w,h,nullptr)
-    {
-        data_.resize(this->width_ * this->height_);
-        this->buffer_ = data_.data();
-    }
-
-    Image(const unsigned w, const unsigned h, const T& val) : ImageView<T>(w,h,nullptr)
-    {
-        data_.resize(this->width_ * this->height_, val);
-        this->buffer_ = data_.data();
-    }
-
-private:
-    std::vector<T, Eigen::aligned_allocator<T>> data_;
-
-    // std::vector<bool> is specialized for space efficiency which means that element access doesn't
-    // return references to the data as expected, causing compilation issues.
-    static_assert(!std::is_same<T, bool>::value,
-                  "Use char/uint8_t instead of bool to avoid the std::vector<bool> specialization");
+    std::unique_ptr<T[]> data_;
+    T* data_ptr_;
 };
 
 
 
-static inline void convert_to_output_rgba_img(const se::ImageView<uint32_t>& input_rgba_img,
+static inline void convert_to_output_rgba_img(const se::Image<uint32_t>& input_rgba_img,
                                               uint32_t* output_rgba_img_data)
 {
     memcpy(output_rgba_img_data,
@@ -113,7 +100,7 @@ static inline void convert_to_output_rgba_img(const se::ImageView<uint32_t>& inp
 
 
 
-static inline void convert_to_output_depth_img(const se::ImageView<float>& input_depth_img,
+static inline void convert_to_output_depth_img(const se::Image<float>& input_depth_img,
                                                uint32_t* output_depth_img_data)
 {
     depth_to_rgba(output_depth_img_data,
@@ -125,7 +112,7 @@ static inline void convert_to_output_depth_img(const se::ImageView<float>& input
 
 
 
-static inline void convert_to_output_depth_img(const se::ImageView<float>& input_depth_img,
+static inline void convert_to_output_depth_img(const se::Image<float>& input_depth_img,
                                                const float min_depth,
                                                const float max_depth,
                                                uint32_t* output_depth_img_data)
