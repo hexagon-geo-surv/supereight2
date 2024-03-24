@@ -101,52 +101,6 @@ plane_normal(const Eigen::Vector3f& p1, const Eigen::Vector3f& p2, const Eigen::
 
 
 
-template<typename T>
-T median(std::vector<T>& data)
-{
-    if (!data.empty()) {
-        std::sort(data.begin(), data.end());
-        // Compute both the quotient and remainder in one go
-        const std::ldiv_t result = std::ldiv(data.size(), 2);
-        const size_t mid_idx = result.quot;
-        if (result.rem == 0) {
-            return (data[mid_idx - 1] + data[mid_idx]) / 2;
-        }
-        else {
-            return data[mid_idx];
-        }
-    }
-    else {
-        return T();
-    }
-}
-
-
-
-template<typename T>
-T almost_median(std::vector<T>& data)
-{
-    if (!data.empty()) {
-        std::sort(data.begin(), data.end());
-        const size_t mid_idx = data.size() / 2;
-        return data[mid_idx];
-    }
-    else {
-        return T();
-    }
-}
-
-
-
-template<typename T>
-T median(const std::vector<T>& data)
-{
-    std::vector<T> v(data);
-    return median(v);
-}
-
-
-
 static inline Eigen::Matrix3f hat(const Eigen::Vector3f& omega)
 {
     Eigen::Matrix3f Omega;

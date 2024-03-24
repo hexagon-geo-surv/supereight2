@@ -54,44 +54,6 @@ bool in(const Scalar v, const Scalar a, const Scalar b);
 static inline Eigen::Vector3f
 plane_normal(const Eigen::Vector3f& p1, const Eigen::Vector3f& p2, const Eigen::Vector3f& p3);
 
-/*! \brief Compute the median of the data in the vector.
- *
- * \param[in,out] data The data to compute the median of. The vector will
- *                     be sorted in-place.
- * \return The median of the data. If input vector is empty, the value
- * returned by the constructor T() is returned. This is typically 0.
- *
- * \warning The vector will be sorted inside this function.
- *
- * \note Weird things will happen if the vector contains NaNs.
- */
-template<typename T>
-T median(std::vector<T>& data);
-
-/*! \brief Compute the median of the data in the vector.
- * If the vector has an even number of elements, the second of the two
- * middle elements will be returned instead of their average. This is done
- * to avoid creating values that don't exist in the original data.
- *
- * \param[in,out] data The data to compute the median of. The vector will
- *                     be sorted in-place.
- * \return The median of the data. If input vector is empty, the value
- * returned by the constructor T() is returned. This is typically 0.
- *
- * \warning The vector will be sorted inside this function.
- *
- * \note Weird things will happen if the vector contains NaNs.
- */
-template<typename T>
-T almost_median(std::vector<T>& data);
-
-/*! Same as se::math::median() but the order of the original vector is
- * retain. This has a performance impact proportional to the size of the
- * input vector.
- */
-template<typename T>
-T median(const std::vector<T>& data);
-
 /**
  * \brief hat-operator
  *
