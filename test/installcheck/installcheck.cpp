@@ -12,7 +12,7 @@ int main(int argc, char** argv)
     try {
         se::TSDFMap<se::Res::Multi> map(Eigen::Vector3f::Constant(10.0f), 0.1f);
 
-        se::PinholeCameraConfig sensor_config;
+        se::PinholeCamera::Config sensor_config;
         sensor_config.width = 320;
         sensor_config.height = 240;
         sensor_config.fx = 525.0f;

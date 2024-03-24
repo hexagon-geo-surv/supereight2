@@ -14,6 +14,7 @@
 #include "se/common/image_utils.hpp"
 #include "se/common/math_util.hpp"
 #include "se/common/projection.hpp"
+#include "se/common/str_utils.hpp"
 #include "se/common/yaml.hpp"
 #include "se/image/image.hpp"
 
@@ -21,52 +22,48 @@
 
 namespace se {
 
-struct SensorBaseConfig {
-    /** The width of images produced by the sensor in pixels.
-     */
-    int width = 0;
-
-    /** The height of images produced by the sensor in pixels.
-     */
-    int height = 0;
-
-    /** The sensor's near plane in metres. Avoid setting to 0 since numerical issues may arise.
-     */
-    float near_plane = 0.01f;
-
-    /** The sensor's far plane in metres. Avoid setting to infinity since performance may degrade
-     * significantly, for example with depth images containing really large erroneous measurements.
-     */
-    float far_plane = 10.0f;
-
-    /** The transformation from the sensor frame S to the body frame B.
-     */
-    Eigen::Matrix4f T_BS = Eigen::Matrix4f::Identity();
-
-    /** The pixel-size to voxel-size ratio in physical coordinates for computing the integration scale.
-     *  See SensorBase::computeIntegrationScale()
-     *  Thresholds defining the resolution scale in ascending order.
-     *  pixel/voxel < pixel_voxel_ratio_per_scale[0] -> scale = 0
-     *  pixel/voxel < pixel_voxel_ratio_per_scale[1] -> scale = 1
-     *  ...
-     */
-    std::vector<float> pixel_voxel_ratio_per_scale = {1.5f, 3.0f, 6.0f};
-
-    /** Reads the struct members from the "sensor" node of a YAML file. Members not present in the
-     * YAML file aren't modified.
-     */
-    void readYaml(const std::string& filename);
-
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-};
-
-std::ostream& operator<<(std::ostream& os, const SensorBaseConfig& c);
-
-
-
 template<typename DerivedT>
 class SensorBase {
     public:
+    struct Config {
+        /** The width of images produced by the sensor in pixels.
+         */
+        int width = 0;
+
+        /** The height of images produced by the sensor in pixels.
+         */
+        int height = 0;
+
+        /** The sensor's near plane in metres. Avoid setting to 0 since numerical issues may arise.
+         */
+        float near_plane = 0.01f;
+
+        /** The sensor's far plane in metres. Avoid setting to infinity since performance may degrade
+         * significantly, for example with depth images containing really large erroneous measurements.
+         */
+        float far_plane = 10.0f;
+
+        /** The transformation from the sensor frame S to the body frame B.
+         */
+        Eigen::Matrix4f T_BS = Eigen::Matrix4f::Identity();
+
+        /** The pixel-size to voxel-size ratio in physical coordinates for computing the integration scale.
+         *  See SensorBase::computeIntegrationScale()
+         *  Thresholds defining the resolution scale in ascending order.
+         *  pixel/voxel < pixel_voxel_ratio_per_scale[0] -> scale = 0
+         *  pixel/voxel < pixel_voxel_ratio_per_scale[1] -> scale = 1
+         *  ...
+         */
+        std::vector<float> pixel_voxel_ratio_per_scale = {1.5f, 3.0f, 6.0f};
+
+        /** Reads the struct members from the "sensor" node of a YAML file. Members not present in the
+         * YAML file aren't modified.
+         */
+        void readYaml(const std::string& filename);
+
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    };
+
     template<typename ConfigT>
     SensorBase(const ConfigT& c);
 
@@ -224,7 +221,8 @@ class SensorBase {
     const DerivedT* underlying() const;
 };
 
-
+template<typename DerivedT>
+std::ostream& operator<<(std::ostream& os, const typename SensorBase<DerivedT>::Config& c);
 
 } // namespace se
 

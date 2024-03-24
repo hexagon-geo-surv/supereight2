@@ -22,7 +22,7 @@ TEST(Map, Gradient)
     const Eigen::Vector3f map_dim = Eigen::Vector3f::Constant(32);
     constexpr float map_res = 0.03;
     // Sensor config
-    se::PinholeCameraConfig sensor_config;
+    se::PinholeCamera::Config sensor_config;
     sensor_config.width = 640;
     sensor_config.height = 480;
     sensor_config.fx = 525;

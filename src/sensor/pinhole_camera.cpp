@@ -10,10 +10,10 @@
 
 
 
-void se::PinholeCameraConfig::readYaml(const std::string& filename)
+void se::PinholeCamera::Config::readYaml(const std::string& filename)
 {
     // Read the base class members.
-    SensorBaseConfig::readYaml(filename);
+    SensorBase<PinholeCamera>::Config::readYaml(filename);
 
     // Open the file for reading.
     cv::FileStorage fs;
@@ -31,9 +31,9 @@ void se::PinholeCameraConfig::readYaml(const std::string& filename)
 
 
 
-std::ostream& se::operator<<(std::ostream& os, const se::PinholeCameraConfig& c)
+std::ostream& se::operator<<(std::ostream& os, const se::PinholeCamera::Config& c)
 {
-    os << static_cast<const se::SensorBaseConfig&>(c);
+    operator<< <PinholeCamera>(os, static_cast<const SensorBase<PinholeCamera>::Config&>(c));
     os << str_utils::value_to_pretty_str(c.fx, "fx") << " px\n";
     os << str_utils::value_to_pretty_str(c.fy, "fy") << " px\n";
     os << str_utils::value_to_pretty_str(c.cx, "cx") << " px\n";
@@ -55,7 +55,7 @@ constexpr int se::PinholeCamera::num_frustum_normals_;
 
 
 
-se::PinholeCamera::PinholeCamera(const PinholeCameraConfig& c) :
+se::PinholeCamera::PinholeCamera(const Config& c) :
         se::SensorBase<se::PinholeCamera>(c),
         model(c.width, c.height, c.fx, c.fy, c.cx, c.cy, _distortion),
         scaled_pixel(1 / c.fx)
@@ -80,7 +80,7 @@ se::PinholeCamera::PinholeCamera(const PinholeCameraConfig& c) :
 
 
 
-se::PinholeCamera::PinholeCamera(const PinholeCameraConfig& c, const float dsf) :
+se::PinholeCamera::PinholeCamera(const Config& c, const float dsf) :
         se::SensorBase<se::PinholeCamera>(c),
         model(c.width / dsf,
               c.height / dsf,

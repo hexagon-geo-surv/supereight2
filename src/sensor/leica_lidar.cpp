@@ -9,10 +9,10 @@
 
 
 
-void se::LeicaLidarConfig::readYaml(const std::string& filename)
+void se::LeicaLidar::Config::readYaml(const std::string& filename)
 {
     // Read the base class members.
-    SensorBaseConfig::readYaml(filename);
+    SensorBase<LeicaLidar>::Config::readYaml(filename);
 
     // Open the file for reading.
     cv::FileStorage fs;
@@ -27,9 +27,9 @@ void se::LeicaLidarConfig::readYaml(const std::string& filename)
 
 
 
-std::ostream& se::operator<<(std::ostream& os, const se::LeicaLidarConfig& c)
+std::ostream& se::operator<<(std::ostream& os, const se::LeicaLidar::Config& c)
 {
-    os << static_cast<const se::SensorBaseConfig&>(c);
+    operator<< <LeicaLidar>(os, static_cast<const SensorBase<LeicaLidar>::Config&>(c));
     os << str_utils::value_to_pretty_str(c.elevation_resolution_angle_,
                                          "elevation_resolution_angle")
        << " degrees\n";
@@ -40,7 +40,7 @@ std::ostream& se::operator<<(std::ostream& os, const se::LeicaLidarConfig& c)
 
 
 
-se::LeicaLidar::LeicaLidar(const LeicaLidarConfig& c) :
+se::LeicaLidar::LeicaLidar(const Config& c) :
         se::SensorBase<se::LeicaLidar>(c),
         model(c.width, c.height),
         azimuth_resolution_angle(c.azimuth_resolution_angle_),
@@ -68,7 +68,7 @@ se::LeicaLidar::LeicaLidar(const LeicaLidarConfig& c) :
 
 
 
-se::LeicaLidar::LeicaLidar(const LeicaLidarConfig& c, const float dsf) :
+se::LeicaLidar::LeicaLidar(const Config& c, const float dsf) :
         se::SensorBase<se::LeicaLidar>(c),
         model(c.width / dsf, c.height / dsf),
         azimuth_resolution_angle(c.azimuth_resolution_angle_),
