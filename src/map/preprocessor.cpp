@@ -85,53 +85,6 @@ Image<size_t> downsample_depth(const Image<float>& input_depth_img, Image<float>
     return map;
 }
 
-void downsample_rgba(se::Image<uint32_t>& input_RGBA_img, se::Image<uint32_t>& output_RGBA_img)
-{
-    const uint32_t* input_RGBA_data = input_RGBA_img.data();
-
-    // Check for correct image sizes.
-    assert((input_RGBA_img.width() >= output_RGBA_img.width())
-           && "Error: input width must be greater than output width");
-    assert((input_RGBA_img.height() >= output_RGBA_img.height())
-           && "Error: input height must be greater than output height");
-    assert((input_RGBA_img.width() % output_RGBA_img.width() == 0)
-           && "Error: input width must be an integer multiple of output width");
-    assert((input_RGBA_img.height() % output_RGBA_img.height() == 0)
-           && "Error: input height must be an integer multiple of output height");
-    assert((input_RGBA_img.width() / output_RGBA_img.width()
-            == input_RGBA_img.height() / output_RGBA_img.height())
-           && "Error: input and output image aspect ratios must be the same");
-
-    const int ratio = input_RGBA_img.width() / output_RGBA_img.width();
-    // Iterate over each output pixel.
-#pragma omp parallel for
-    for (int y_out = 0; y_out < output_RGBA_img.height(); ++y_out) {
-        for (int x_out = 0; x_out < output_RGBA_img.width(); ++x_out) {
-            // Average the neighboring pixels by iterating over the nearby input
-            // pixels.
-            uint16_t r = 0, g = 0, b = 0;
-            for (int yy = 0; yy < ratio; ++yy) {
-                for (int xx = 0; xx < ratio; ++xx) {
-                    const int x_in = x_out * ratio + xx;
-                    const int y_in = y_out * ratio + yy;
-                    const uint32_t pixel_value =
-                        input_RGBA_data[x_in + input_RGBA_img.width() * y_in];
-                    r += se::r_from_rgba(pixel_value);
-                    g += se::g_from_rgba(pixel_value);
-                    b += se::b_from_rgba(pixel_value);
-                }
-            }
-            r /= ratio * ratio;
-            g /= ratio * ratio;
-            b /= ratio * ratio;
-
-            // Combine into a uint32_t by adding an alpha channel with 100% opacity.
-            const uint32_t rgba = se::pack_rgba(r, g, b, 255);
-            output_RGBA_img(x_out, y_out) = rgba;
-        }
-    }
-}
-
 
 
 void point_cloud_to_depth(se::Image<float>& depth_image,
