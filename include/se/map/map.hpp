@@ -65,7 +65,7 @@ template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
     public:
     typedef Data<FldT, ColB, SemB> DataType;
-    typedef DataConfig<FldT, ColB, SemB> DataConfigType;
+    typedef typename Data<FldT, ColB, SemB>::Config DataConfigType;
     typedef se::Octree<DataType, ResT, BlockSize> OctreeType;
 
     /**
@@ -79,7 +79,8 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      */
     Map(const Eigen::Vector3f& dim,
         const float res,
-        const DataConfig<FldT, ColB, SemB>& data_config = DataConfig<FldT, ColB, SemB>());
+        const typename Data<FldT, ColB, SemB>::Config& data_config =
+            typename Data<FldT, ColB, SemB>::Config());
 
     /**
      * \brief The map constructor.
@@ -88,7 +89,8 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \param data_config         The configuration file for the data
      */
     Map(const MapConfig& map_config,
-        const DataConfig<FldT, ColB, SemB>& data_config = DataConfig<FldT, ColB, SemB>());
+        const typename Data<FldT, ColB, SemB>::Config& data_config =
+            typename Data<FldT, ColB, SemB>::Config());
 
     /** The copy constructor is explicitly deleted.
      */

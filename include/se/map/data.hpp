@@ -18,10 +18,44 @@ namespace se {
 
 template<Field FldT = Field::TSDF, Colour ColB = Colour::Off, Semantics SemB = Semantics::Off>
 struct Data : public FieldData<FldT>, ColourData<ColB>, SemanticData<SemB> {
+    struct Config : public FieldData<FldT>::Config,
+                    ColourData<ColB>::Config,
+                    SemanticData<SemB>::Config {
+        static constexpr Field fld_ = FldT;
+        static constexpr Colour col_ = ColB;
+        static constexpr Semantics sem_ = SemB;
+
+        /** Initializes all sub-configs to their sensible defaults.
+         */
+        Config()
+        {
+        }
+
+        /** Initializes the config from a YAML file. Data not present in the YAML file will be
+         * initialized as in Data<FldT, ColB, SemB>::Config().
+         */
+        Config(const std::string& yaml_file) :
+                FieldData<FldT>::Config(yaml_file),
+                ColourData<ColB>::Config(yaml_file),
+                SemanticData<SemB>::Config(yaml_file)
+        {
+        }
+    };
+
     static constexpr Field fld_ = FldT;
     static constexpr Colour col_ = ColB;
     static constexpr Semantics sem_ = SemB;
 };
+
+template<Field FldT, Colour ColB, Semantics SemB>
+std::ostream& operator<<(std::ostream& os, const typename Data<FldT, ColB, SemB>::Config& c)
+{
+    // Call the operator<< of the base classes.
+    os << static_cast<const typename FieldData<FldT>::Config&>(c);
+    operator<< <ColB>(os, static_cast<const typename ColourData<ColB>::Config&>(c));
+    operator<< <SemB>(os, static_cast<const typename SemanticData<SemB>::Config&>(c));
+    return os;
+}
 
 
 
@@ -35,47 +69,6 @@ struct DeltaData : public FieldDeltaData<FldT>, ColourDeltaData<ColB> {
     static constexpr Colour col_ = ColB;
     static constexpr Semantics sem_ = SemB;
 };
-
-
-
-///////////////////
-/// DATA CONFIG ///
-///////////////////
-
-template<Field FldT = Field::TSDF, Colour ColB = Colour::Off, Semantics SemB = Semantics::Off>
-struct DataConfig : public FieldData<FldT>::Config,
-                    ColourData<ColB>::Config,
-                    SemanticData<SemB>::Config {
-    static constexpr Field fld_ = FldT;
-    static constexpr Colour col_ = ColB;
-    static constexpr Semantics sem_ = SemB;
-
-    /** Initializes all sub-configs to their sensible defaults.
-     */
-    DataConfig()
-    {
-    }
-
-    /** Initializes the config from a YAML file. Data not present in the YAML file will be
-     * initialized as in DataConfig::DataConfig().
-     */
-    DataConfig(const std::string& yaml_file) :
-            FieldData<FldT>::Config(yaml_file),
-            ColourData<ColB>::Config(yaml_file),
-            SemanticData<SemB>::Config(yaml_file)
-    {
-    }
-};
-
-template<Field FldT, Colour ColB, Semantics SemB>
-std::ostream& operator<<(std::ostream& os, const DataConfig<FldT, ColB, SemB>& c)
-{
-    // Call the operator<< of the base classes.
-    os << static_cast<const typename FieldData<FldT>::Config&>(c);
-    operator<< <ColB>(os, static_cast<const typename ColourData<ColB>::Config&>(c));
-    operator<< <SemB>(os, static_cast<const typename SemanticData<SemB>::Config&>(c));
-    return os;
-}
 
 
 
@@ -153,10 +146,10 @@ typedef Data<Field::Occupancy, Colour::Off, Semantics::On> OccupancySemData;
 typedef Data<Field::Occupancy, Colour::On, Semantics::On> OccupancyColSemData;
 
 // Occupancy data setups
-typedef DataConfig<Field::Occupancy, Colour::Off, Semantics::Off> OccupancyDataConfig;
-typedef DataConfig<Field::Occupancy, Colour::On, Semantics::Off> OccupancyColDataConfig;
-typedef DataConfig<Field::Occupancy, Colour::Off, Semantics::On> OccupancySemDataConfig;
-typedef DataConfig<Field::Occupancy, Colour::On, Semantics::On> OccupancyColSemDataConfig;
+typedef Data<Field::Occupancy, Colour::Off, Semantics::Off>::Config OccupancyDataConfig;
+typedef Data<Field::Occupancy, Colour::On, Semantics::Off>::Config OccupancyColDataConfig;
+typedef Data<Field::Occupancy, Colour::Off, Semantics::On>::Config OccupancySemDataConfig;
+typedef Data<Field::Occupancy, Colour::On, Semantics::On>::Config OccupancyColSemDataConfig;
 
 // TSDF data setups
 typedef Data<Field::TSDF, Colour::Off, Semantics::Off> TSDFData;
@@ -164,10 +157,10 @@ typedef Data<Field::TSDF, Colour::On, Semantics::Off> TSDFColData;
 typedef Data<Field::TSDF, Colour::Off, Semantics::On> TSDFSemData;
 typedef Data<Field::TSDF, Colour::On, Semantics::On> TSDFColSemData;
 
-typedef DataConfig<Field::TSDF, Colour::Off, Semantics::Off> TSDFDataConfig;
-typedef DataConfig<Field::TSDF, Colour::On, Semantics::Off> TSDFColDataConfig;
-typedef DataConfig<Field::TSDF, Colour::Off, Semantics::On> TSDFSemDataConfig;
-typedef DataConfig<Field::TSDF, Colour::On, Semantics::On> TSDFColSemDataConfig;
+typedef Data<Field::TSDF, Colour::Off, Semantics::Off>::Config TSDFDataConfig;
+typedef Data<Field::TSDF, Colour::On, Semantics::Off>::Config TSDFColDataConfig;
+typedef Data<Field::TSDF, Colour::Off, Semantics::On>::Config TSDFSemDataConfig;
+typedef Data<Field::TSDF, Colour::On, Semantics::On>::Config TSDFColSemDataConfig;
 
 } // namespace se
 

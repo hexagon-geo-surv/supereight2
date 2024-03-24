@@ -22,9 +22,10 @@ const Eigen::Matrix<float, 3, 8> Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::c
 
 
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
-Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const Eigen::Vector3f& dim,
-                                                  const float res,
-                                                  const DataConfig<FldT, ColB, SemB>& data_config) :
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(
+    const Eigen::Vector3f& dim,
+    const float res,
+    const typename Data<FldT, ColB, SemB>::Config& data_config) :
         Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(
             {dim, res /* T_MW uses default member initializer */},
             data_config)
@@ -34,8 +35,9 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const Eigen::Vector3f& dim,
 
 
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
-Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const MapConfig& map_config,
-                                                  const DataConfig<FldT, ColB, SemB>& data_config) :
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(
+    const MapConfig& map_config,
+    const typename Data<FldT, ColB, SemB>::Config& data_config) :
         octree_(std::ceil(map_config.dim.maxCoeff() / map_config.res)),
         resolution_(map_config.res),
         dimension_(Eigen::Vector3f::Constant(octree_.getSize() * resolution_)),
