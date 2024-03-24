@@ -20,12 +20,40 @@ static constexpr rgba_t dflt_delta_rgba = 0;
 // Colour data
 template<Colour ColB>
 struct ColourData {
+    struct Config {
+        Config()
+        {
+        }
+        Config(const std::string& /* yaml_file */)
+        {
+        }
+    };
 };
+
+template<Colour ColB>
+std::ostream& operator<<(std::ostream& os, const typename ColourData<ColB>::Config& /* c */)
+{
+    return os;
+}
 
 template<>
 struct ColourData<Colour::On> {
+    struct Config {
+        /** Initializes the config to some sensible defaults.
+         */
+        Config();
+
+        /** Initializes the config from a YAML file. Data not present in the YAML file will be
+         * initialized as in ColourData<se::Colour::On>::Config().
+         */
+        Config(const std::string& yaml_file);
+    };
+
     rgba_t rgba = dflt_rgba;
 };
+
+template<>
+std::ostream& operator<< <Colour::On>(std::ostream& os, const ColourData<Colour::On>::Config& c);
 
 ///////////////////
 /// DELTA DATA  ///
@@ -33,50 +61,12 @@ struct ColourData<Colour::On> {
 
 // Colour data
 template<Colour ColB>
-struct ColourDeltaData {
-};
+struct ColourDeltaData {};
 
 template<>
 struct ColourDeltaData<Colour::On> {
     rgba_t delta_rgba = dflt_delta_rgba;
 };
-
-
-
-///////////////////
-/// DATA CONFIG ///
-///////////////////
-
-// Colour data
-template<Colour ColB>
-struct ColourDataConfig {
-    ColourDataConfig()
-    {
-    }
-    ColourDataConfig(const std::string& /* yaml_file */)
-    {
-    }
-};
-
-template<Colour ColB>
-std::ostream& operator<<(std::ostream& os, const ColourDataConfig<ColB>& /* c */)
-{
-    return os;
-}
-
-template<>
-struct ColourDataConfig<Colour::On> {
-    /** Initializes the config to some sensible defaults.
-     */
-    ColourDataConfig();
-
-    /** Initializes the config from a YAML file. Data not present in the YAML file will be
-     * initialized as in ColourDataConfig<se::Colour::On>::ColourDataConfig().
-     */
-    ColourDataConfig(const std::string& yaml_file);
-};
-
-std::ostream& operator<<(std::ostream& os, const ColourDataConfig<Colour::On>& c);
 
 } // namespace se
 

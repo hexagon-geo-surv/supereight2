@@ -43,7 +43,9 @@ struct DeltaData : public FieldDeltaData<FldT>, ColourDeltaData<ColB> {
 ///////////////////
 
 template<Field FldT = Field::TSDF, Colour ColB = Colour::Off, Semantics SemB = Semantics::Off>
-struct DataConfig : public FieldDataConfig<FldT>, ColourDataConfig<ColB>, SemanticDataConfig<SemB> {
+struct DataConfig : public FieldData<FldT>::Config,
+                    ColourData<ColB>::Config,
+                    SemanticData<SemB>::Config {
     static constexpr Field fld_ = FldT;
     static constexpr Colour col_ = ColB;
     static constexpr Semantics sem_ = SemB;
@@ -58,9 +60,9 @@ struct DataConfig : public FieldDataConfig<FldT>, ColourDataConfig<ColB>, Semant
      * initialized as in DataConfig::DataConfig().
      */
     DataConfig(const std::string& yaml_file) :
-            FieldDataConfig<FldT>(yaml_file),
-            ColourDataConfig<ColB>(yaml_file),
-            SemanticDataConfig<SemB>(yaml_file)
+            FieldData<FldT>::Config(yaml_file),
+            ColourData<ColB>::Config(yaml_file),
+            SemanticData<SemB>::Config(yaml_file)
     {
     }
 };
@@ -69,9 +71,9 @@ template<Field FldT, Colour ColB, Semantics SemB>
 std::ostream& operator<<(std::ostream& os, const DataConfig<FldT, ColB, SemB>& c)
 {
     // Call the operator<< of the base classes.
-    os << *static_cast<const FieldDataConfig<FldT>*>(&c);
-    os << *static_cast<const ColourDataConfig<ColB>*>(&c);
-    os << *static_cast<const SemanticDataConfig<SemB>*>(&c);
+    os << static_cast<const typename FieldData<FldT>::Config&>(c);
+    operator<< <ColB>(os, static_cast<const typename ColourData<ColB>::Config&>(c));
+    operator<< <SemB>(os, static_cast<const typename SemanticData<SemB>::Config&>(c));
     return os;
 }
 

@@ -13,7 +13,7 @@
 #include "se/common/yaml.hpp"
 
 namespace se {
-FieldDataConfig<Field::Occupancy>::FieldDataConfig() :
+FieldData<Field::Occupancy>::Config::Config() :
         k_sigma(0.052f),
         sigma_min_factor(1.5f),
         sigma_max_factor(6.f),
@@ -31,8 +31,8 @@ FieldDataConfig<Field::Occupancy>::FieldDataConfig() :
 
 
 
-FieldDataConfig<Field::Occupancy>::FieldDataConfig(const std::string& yaml_file) :
-        FieldDataConfig<Field::Occupancy>::FieldDataConfig()
+FieldData<Field::Occupancy>::Config::Config(const std::string& yaml_file) :
+        FieldData<Field::Occupancy>::Config()
 {
     // Open the file for reading.
     cv::FileStorage fs;
@@ -83,7 +83,7 @@ FieldDataConfig<Field::Occupancy>::FieldDataConfig(const std::string& yaml_file)
 
 
 
-std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::Occupancy>& c)
+std::ostream& operator<<(std::ostream& os, const FieldData<Field::Occupancy>::Config& c)
 {
     os << str_utils::value_to_pretty_str(c.k_sigma, "k_sigma") << "\n";
     os << str_utils::value_to_pretty_str(c.sigma_min_factor, "sigma_min_factor") << "\n";
@@ -104,14 +104,14 @@ std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::Occu
 
 
 
-FieldDataConfig<Field::TSDF>::FieldDataConfig() : truncation_boundary_factor(8), max_weight(100)
+FieldData<Field::TSDF>::Config::Config() : truncation_boundary_factor(8), max_weight(100)
 {
 }
 
 
 
-FieldDataConfig<Field::TSDF>::FieldDataConfig(const std::string& yaml_file) :
-        FieldDataConfig<Field::TSDF>::FieldDataConfig()
+FieldData<Field::TSDF>::Config::Config(const std::string& yaml_file) :
+        FieldData<Field::TSDF>::Config()
 {
     // Open the file for reading.
     cv::FileStorage fs;
@@ -141,7 +141,7 @@ FieldDataConfig<Field::TSDF>::FieldDataConfig(const std::string& yaml_file) :
 
 
 
-std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::TSDF>& c)
+std::ostream& operator<<(std::ostream& os, const FieldData<Field::TSDF>::Config& c)
 {
     os << str_utils::value_to_pretty_str(c.truncation_boundary_factor, "truncation_boundary_factor")
        << "x\n";
@@ -151,22 +151,24 @@ std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::TSDF
 
 
 
-ColourDataConfig<se::Colour::On>::ColourDataConfig()
+ColourData<se::Colour::On>::Config::Config()
 {
     // TODO Implement when colour fusion is added.
 }
 
 
 
-ColourDataConfig<se::Colour::On>::ColourDataConfig(const std::string& /* yaml_file */) :
-        ColourDataConfig<se::Colour::On>::ColourDataConfig()
+ColourData<se::Colour::On>::Config::Config(const std::string& /* yaml_file */) :
+        ColourData<se::Colour::On>::Config()
 {
     // TODO Implement when colour fusion is added.
 }
 
 
 
-std::ostream& operator<<(std::ostream& os, const ColourDataConfig<se::Colour::On>& /* c */)
+template<>
+std::ostream& operator<< <se::Colour::On>(std::ostream& os,
+                                          const ColourData<se::Colour::On>::Config& /* c */)
 {
     // TODO Implement when colour fusion is added.
     return os;
@@ -174,22 +176,24 @@ std::ostream& operator<<(std::ostream& os, const ColourDataConfig<se::Colour::On
 
 
 
-SemanticDataConfig<se::Semantics::On>::SemanticDataConfig()
+SemanticData<se::Semantics::On>::Config::Config()
 {
     // TODO Implement when semantics fusion is added.
 }
 
 
 
-SemanticDataConfig<se::Semantics::On>::SemanticDataConfig(const std::string& /* yaml_file */) :
-        SemanticDataConfig<se::Semantics::On>::SemanticDataConfig()
+SemanticData<se::Semantics::On>::Config::Config(const std::string& /* yaml_file */) :
+        SemanticData<se::Semantics::On>::Config()
 {
     // TODO Implement when semantics fusion is added.
 }
 
 
 
-std::ostream& operator<<(std::ostream& os, const SemanticDataConfig<se::Semantics::On>& /* c */)
+template<>
+std::ostream& operator<< <se::Semantics::On>(std::ostream& os,
+                                             const SemanticData<se::Semantics::On>::Config& /* c */)
 {
     // TODO Implement when semantics fusion is added.
     return os;
