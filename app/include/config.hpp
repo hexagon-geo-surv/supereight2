@@ -106,9 +106,9 @@ std::ostream& operator<<(std::ostream& os, const AppConfig& c);
 
 
 
-template<typename DataConfigT, typename SensorConfigT>
+template<typename DataConfigT, typename SensorConfigT, typename MapT>
 struct Config {
-    MapConfig map;
+    struct MapT::Config map;
     DataConfigT data;
     SensorConfigT sensor;
     TrackerConfig tracker;
@@ -129,8 +129,8 @@ struct Config {
 
 
 
-template<typename DataConfigT, typename SensorConfigT>
-std::ostream& operator<<(std::ostream& os, const Config<DataConfigT, SensorConfigT>& c);
+template<typename DataConfigT, typename SensorConfigT, typename MapT>
+std::ostream& operator<<(std::ostream& os, const Config<DataConfigT, SensorConfigT, MapT>& c);
 
 
 

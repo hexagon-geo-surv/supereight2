@@ -15,6 +15,7 @@
 #include "se/common/eigen_utils.hpp"
 #include "se/common/math_util.hpp"
 #include "se/common/str_utils.hpp"
+#include "se/common/yaml.hpp"
 #include "se/map/algorithms/marching_cube.hpp"
 #include "se/map/algorithms/structure_meshing.hpp"
 #include "se/map/data.hpp"
@@ -27,31 +28,6 @@
 
 
 namespace se {
-
-struct MapConfig {
-    /** The dimensions of the map in metres.
-     */
-    Eigen::Vector3f dim = Eigen::Vector3f::Constant(10.0f);
-
-    /** The resolution of map voxels in metres.
-     */
-    float res = 0.1f;
-
-    /** The transformation from the world frame W to the map frame M.
-     */
-    Eigen::Isometry3f T_MW = Eigen::Isometry3f(Eigen::Translation3f(dim / 2));
-
-    /** Reads the struct members from the "map" node of a YAML file. Members not present in the YAML
-     * file aren't modified.
-     */
-    void readYaml(const std::string& yaml_file);
-
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-};
-
-std::ostream& operator<<(std::ostream& os, const MapConfig& c);
-
-
 
 // Forward Declaration
 template<typename DataT = se::Data<Field::TSDF, Colour::Off, Semantics::Off>,
@@ -67,6 +43,27 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
     typedef Data<FldT, ColB, SemB> DataType;
     typedef typename Data<FldT, ColB, SemB>::Config DataConfigType;
     typedef se::Octree<DataType, ResT, BlockSize> OctreeType;
+
+    struct Config {
+        /** The dimensions of the map in metres.
+         */
+        Eigen::Vector3f dim = Eigen::Vector3f::Constant(10.0f);
+
+        /** The resolution of map voxels in metres.
+         */
+        float res = 0.1f;
+
+        /** The transformation from the world frame W to the map frame M.
+         */
+        Eigen::Isometry3f T_MW = Eigen::Isometry3f(Eigen::Translation3f(dim / 2));
+
+        /** Reads the struct members from the "map" node of a YAML file. Members not present in the YAML
+         * file aren't modified.
+         */
+        void readYaml(const std::string& yaml_file);
+
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    };
 
     /**
      * \brief The map constructor.
@@ -88,7 +85,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \param map_config          The configuration file for the map (e.g. map dimension, resolution and origin)
      * \param data_config         The configuration file for the data
      */
-    Map(const MapConfig& map_config,
+    Map(const Config& map_config,
         const typename Data<FldT, ColB, SemB>::Config& data_config =
             typename Data<FldT, ColB, SemB>::Config());
 
@@ -533,6 +530,9 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
     /** The eight relative unit corner offsets */
     static const Eigen::Matrix<float, 3, 8> corner_rel_steps_;
 };
+
+template<typename MapT>
+std::ostream& operator<<(std::ostream& os, const typename MapT::Config& c);
 
 //// Full alias template for alternative setup
 template<se::Field FldT = se::Field::TSDF,
