@@ -342,7 +342,7 @@ class Reader {
      * \param[out] T_WB The next ground truth pose.
      * \return An appropriate status code.
      */
-    ReaderStatus nextPose(Eigen::Isometry3f& T_WB);
+    virtual ReaderStatus nextPose(Eigen::Isometry3f& T_WB);
 
     private:
     size_t ground_truth_frame_;
