@@ -10,6 +10,7 @@
 
 #include <Eigen/Core>
 #include <cstdint>
+#include <se/common/rgba.hpp>
 #include <vector>
 
 
@@ -183,7 +184,7 @@ static inline void rgba_to_rgb(const uint32_t* rgba, uint8_t* rgb, size_t num_pi
  * \param[in] min_depth             The minimum possible depth value.
  * \param[in] max_depth             The maximum possible depth value.
  */
-void depth_to_rgba(uint32_t* depth_RGBA_image_data,
+void depth_to_rgba(RGBA* depth_RGBA_image_data,
                    const float* depth_image_data,
                    const Eigen::Vector2i& depth_image_res,
                    const float min_depth,

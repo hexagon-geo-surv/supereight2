@@ -95,7 +95,7 @@ static inline void convert_to_output_rgba_img(const se::Image<RGBA>& input_rgba_
 
 
 static inline void convert_to_output_depth_img(const se::Image<float>& input_depth_img,
-                                               uint32_t* output_depth_img_data)
+                                               RGBA* output_depth_img_data)
 {
     depth_to_rgba(output_depth_img_data,
                   input_depth_img.data(),
@@ -109,7 +109,7 @@ static inline void convert_to_output_depth_img(const se::Image<float>& input_dep
 static inline void convert_to_output_depth_img(const se::Image<float>& input_depth_img,
                                                const float min_depth,
                                                const float max_depth,
-                                               uint32_t* output_depth_img_data)
+                                               RGBA* output_depth_img_data)
 {
     depth_to_rgba(output_depth_img_data,
                   input_depth_img.data(),
