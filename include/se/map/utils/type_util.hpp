@@ -54,7 +54,7 @@ typedef se::field_t weight_t; ///< The type of the field type weight
 
 typedef int timestamp_t; ///< The type of the time stamp
 
-typedef uint32_t rgba_t; ///< The type of the colour
+typedef uint32_t colour_t; ///< The type of the colour
 
 typedef uint8_t semantics_t; ///< The type of the semantic class
 

@@ -67,9 +67,9 @@ se::NewerCollegeReader::NewerCollegeReader(const se::Reader::Config& c) : se::Re
         std::cerr << "Error: " << sequence_path_ << " is not a directory\n";
         return;
     }
-    // Set the depth and RGBA image resolutions.
+    // Set the depth and colour image resolutions.
     depth_image_res_ = Eigen::Vector2i(1024, 64);
-    rgba_image_res_ = Eigen::Vector2i(1024, 64);
+    colour_image_res_ = Eigen::Vector2i(1024, 64);
     // Get the scan filenames and total number of frames.
     scan_filenames_ = getScanFilenames(sequence_path_);
     num_frames_ = scan_filenames_.size();
@@ -141,15 +141,15 @@ se::ReaderStatus se::NewerCollegeReader::nextDepth(se::Image<float>& depth_image
 
 
 
-se::ReaderStatus se::NewerCollegeReader::nextRGBA(se::Image<uint32_t>& rgba_image)
+se::ReaderStatus se::NewerCollegeReader::nextColour(se::Image<uint32_t>& colour_image)
 {
     // Resize the output image if needed.
-    if ((rgba_image.width() != rgba_image_res_.x())
-        || (rgba_image.height() != rgba_image_res_.y())) {
-        rgba_image = se::Image<uint32_t>(rgba_image_res_.x(), rgba_image_res_.y());
+    if ((colour_image.width() != colour_image_res_.x())
+        || (colour_image.height() != colour_image_res_.y())) {
+        colour_image = se::Image<uint32_t>(colour_image_res_.x(), colour_image_res_.y());
     }
     // Create a blank image
-    std::memset(rgba_image.data(), 0, rgba_image_res_.prod() * sizeof(uint32_t));
+    std::memset(colour_image.data(), 0, colour_image_res_.prod() * sizeof(uint32_t));
     return se::ReaderStatus::ok;
 }
 
@@ -209,7 +209,7 @@ se::ReaderStatus se::NewerCollegeReader::nextDepth(se::Image<float>&)
 
 
 
-se::ReaderStatus se::NewerCollegeReader::nextRGBA(se::Image<uint32_t>&)
+se::ReaderStatus se::NewerCollegeReader::nextColour(se::Image<uint32_t>&)
 {
     return se::ReaderStatus::error;
 }

@@ -70,7 +70,7 @@ class LeicaReader : public Reader {
                     Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
             rayPoseBatch);
 
-    ReaderStatus nextRGBA(Image<uint32_t>& rgba_image);
+    ReaderStatus nextColour(Image<uint32_t>& colour_image);
 
     /** Return the filenames of LIDAR scans in PCD formatin the supplied directory.
      * LIDAR scans are considered those whose name conforms to the pattern

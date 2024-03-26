@@ -435,7 +435,7 @@ se::TUMReader::TUMReader(const se::Reader::Config& c) : se::Reader(c)
 
         depth_image_res_ = Eigen::Vector2i(image_data.cols, image_data.rows);
     }
-    // Set the RGBA image resolution to that of the first RGBA image.
+    // Set the Colour image resolution to that of the first colour image.
     if (!rgb_filenames_.empty()) {
         const std::string first_rgb_filename = sequence_path_ + "/" + rgb_filenames_[0];
 
@@ -446,7 +446,7 @@ se::TUMReader::TUMReader(const se::Reader::Config& c) : se::Reader(c)
             status_ = se::ReaderStatus::error;
             return;
         }
-        rgba_image_res_ = Eigen::Vector2i(image_data.cols, image_data.rows);
+        colour_image_res_ = Eigen::Vector2i(image_data.cols, image_data.rows);
     }
 }
 
@@ -522,7 +522,7 @@ se::ReaderStatus se::TUMReader::nextDepth(se::Image<float>& depth_image)
 
 
 
-se::ReaderStatus se::TUMReader::nextRGBA(se::Image<uint32_t>& rgba_image)
+se::ReaderStatus se::TUMReader::nextColour(se::Image<uint32_t>& colour_image)
 {
     if (frame_ >= num_frames_) {
         return se::ReaderStatus::error;
@@ -535,19 +535,19 @@ se::ReaderStatus se::TUMReader::nextRGBA(se::Image<uint32_t>& rgba_image)
         return se::ReaderStatus::error;
     }
 
-    cv::Mat rgba_data;
-    cv::cvtColor(image_data, rgba_data, cv::COLOR_BGR2RGBA);
+    cv::Mat colour_data;
+    cv::cvtColor(image_data, colour_data, cv::COLOR_BGR2RGBA);
 
-    assert(rgba_image_res_.x() == static_cast<int>(rgba_data.cols));
-    assert(rgba_image_res_.y() == static_cast<int>(rgba_data.rows));
+    assert(colour_image_res_.x() == static_cast<int>(colour_data.cols));
+    assert(colour_image_res_.y() == static_cast<int>(colour_data.rows));
     // Resize the output image if needed.
-    if ((rgba_image.width() != rgba_image_res_.x())
-        || (rgba_image.height() != rgba_image_res_.y())) {
-        rgba_image = se::Image<uint32_t>(rgba_image_res_.x(), rgba_image_res_.y());
+    if ((colour_image.width() != colour_image_res_.x())
+        || (colour_image.height() != colour_image_res_.y())) {
+        colour_image = se::Image<uint32_t>(colour_image_res_.x(), colour_image_res_.y());
     }
 
-    cv::Mat wrapper_mat(rgba_data.rows, rgba_data.cols, CV_8UC4, rgba_image.data());
-    rgba_data.copyTo(wrapper_mat);
+    cv::Mat wrapper_mat(colour_data.rows, colour_data.cols, CV_8UC4, colour_image.data());
+    colour_data.copyTo(wrapper_mat);
 
     return se::ReaderStatus::ok;
 }

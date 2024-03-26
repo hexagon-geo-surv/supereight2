@@ -69,7 +69,7 @@ class InteriorNetReader : public Reader {
 
     ReaderStatus nextDepth(Image<float>& depth_image);
 
-    ReaderStatus nextRGBA(Image<uint32_t>& rgba_image);
+    ReaderStatus nextColour(Image<uint32_t>& colour_image);
 };
 
 

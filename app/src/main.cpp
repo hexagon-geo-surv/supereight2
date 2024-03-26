@@ -48,16 +48,16 @@ int main(int argc, char** argv)
         // Setup input images
         const Eigen::Vector2i input_img_res(config.sensor.width, config.sensor.height);
         se::Image<float> input_depth_img(input_img_res.x(), input_img_res.y());
-        se::Image<uint32_t> input_rgba_img(input_img_res.x(), input_img_res.y());
+        se::Image<uint32_t> input_colour_img(input_img_res.x(), input_img_res.y());
 
         // Setup processed images
         const Eigen::Vector2i processed_img_res =
             input_img_res / config.app.sensor_downsampling_factor;
         se::Image<float> processed_depth_img(processed_img_res.x(), processed_img_res.y());
-        se::Image<uint32_t> processed_rgba_img(processed_img_res.x(), processed_img_res.y());
+        se::Image<uint32_t> processed_colour_img(processed_img_res.x(), processed_img_res.y());
 
         // Setup output images / renders
-        std::unique_ptr<uint32_t[]> output_rgba_img_data(
+        std::unique_ptr<uint32_t[]> output_colour_img_data(
             new uint32_t[processed_img_res.x() * processed_img_res.y()]);
         std::unique_ptr<uint32_t[]> output_depth_img_data(
             new uint32_t[processed_img_res.x() * processed_img_res.y()]);
@@ -112,11 +112,11 @@ int main(int argc, char** argv)
             TICK("read")
             se::ReaderStatus read_ok = se::ReaderStatus::ok;
             if (config.app.enable_ground_truth || frame == 1) {
-                read_ok = reader->nextData(input_depth_img, input_rgba_img, T_WB);
+                read_ok = reader->nextData(input_depth_img, input_colour_img, T_WB);
                 T_WS = T_WB * T_BS;
             }
             else {
-                read_ok = reader->nextData(input_depth_img, input_rgba_img);
+                read_ok = reader->nextData(input_depth_img, input_colour_img);
             }
             if (read_ok != se::ReaderStatus::ok) {
                 break;
@@ -128,9 +128,9 @@ int main(int argc, char** argv)
             const se::Image<size_t> downsample_map =
                 se::preprocessor::downsample_depth(input_depth_img, processed_depth_img);
             TOCK("ds-depth")
-            TICK("ds-rgba")
-            se::image::remap(input_rgba_img, processed_rgba_img, downsample_map);
-            TOCK("ds-rgba")
+            TICK("ds-colour")
+            se::image::remap(input_colour_img, processed_colour_img, downsample_map);
+            TOCK("ds-colour")
 
             // Track pose (if enabled)
             // Initial pose (frame == 0) is initialised with the identity matrix
@@ -157,12 +157,12 @@ int main(int argc, char** argv)
             }
             TOCK("raycast")
 
-            // Convert rgba, depth and render the volume (if enabled)
+            // Convert colour, depth and render the volume (if enabled)
             // The volume is only rendered at the set rendering rate
             TICK("render")
             if (config.app.enable_rendering) {
                 const Eigen::Vector3f ambient{0.1, 0.1, 0.1};
-                convert_to_output_rgba_img(processed_rgba_img, output_rgba_img_data.get());
+                convert_to_output_rgba_img(processed_colour_img, output_colour_img_data.get());
                 convert_to_output_depth_img(processed_depth_img,
                                             sensor.near_plane,
                                             sensor.far_plane,
@@ -180,7 +180,7 @@ int main(int argc, char** argv)
             }
             TOCK("render")
 
-            // Visualise rgba, depth, tracking data and the volume render (if enabled)
+            // Visualise colour, depth, tracking data and the volume render (if enabled)
             TICK("draw")
             if (config.app.enable_gui) {
                 // Create vectors of images and labels.
@@ -188,7 +188,7 @@ int main(int argc, char** argv)
                 std::vector<cv::Mat> images;
                 std::vector<std::string> labels;
                 labels.emplace_back("INPUT RGB");
-                images.emplace_back(res, CV_8UC4, output_rgba_img_data.get());
+                images.emplace_back(res, CV_8UC4, output_colour_img_data.get());
                 labels.emplace_back("INPUT DEPTH");
                 images.emplace_back(res, CV_8UC4, output_depth_img_data.get());
                 labels.emplace_back(config.app.enable_ground_truth ? "TRACKING OFF" : "TRACKING");

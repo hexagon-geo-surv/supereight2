@@ -63,16 +63,16 @@ void point_cloud_to_normal(se::Image<Eigen::Vector3f>& normals,
 
 
 
-void render_volume_kernel(uint32_t* volume_RGBA_image_data,
-                          const Eigen::Vector2i& volume_RGBA_image_res,
+void render_volume_kernel(uint32_t* volume_image_data,
+                          const Eigen::Vector2i& volume_image_res,
                           const Eigen::Vector3f& light_M,
                           const Eigen::Vector3f& ambient_M,
                           const se::Image<Eigen::Vector3f>& surface_point_cloud_M,
                           const se::Image<Eigen::Vector3f>& surface_normals_M,
                           const se::Image<int8_t>& surface_scale)
 {
-    const int h = volume_RGBA_image_res.y(); // clang complains if this is inside the for loop
-    const int w = volume_RGBA_image_res.x(); // clang complains if this is inside the for loop
+    const int h = volume_image_res.y(); // clang complains if this is inside the for loop
+    const int w = volume_image_res.x(); // clang complains if this is inside the for loop
 
 #pragma omp parallel for
     for (int y = 0; y < h; y++) {
@@ -91,10 +91,10 @@ void render_volume_kernel(uint32_t* volume_RGBA_image_data,
                 se::eigen::clamp(col, Eigen::Vector3f::Zero(), Eigen::Vector3f::Ones());
 
                 col = col.cwiseProduct(scale_colour(surface_scale(x, y)));
-                volume_RGBA_image_data[pixel_idx] = se::pack_rgba(col.x(), col.y(), col.z(), 0xFF);
+                volume_image_data[pixel_idx] = se::pack_rgba(col.x(), col.y(), col.z(), 0xFF);
             }
             else {
-                volume_RGBA_image_data[pixel_idx] = 0xFF000000;
+                volume_image_data[pixel_idx] = 0xFF000000;
             }
         } // x
     }     // y
