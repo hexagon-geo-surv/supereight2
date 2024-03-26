@@ -49,7 +49,7 @@ class NewerCollegeReader : public Reader {
 
     ReaderStatus nextDepth(Image<float>& depth_image);
 
-    ReaderStatus nextColour(Image<uint32_t>& colour_image);
+    ReaderStatus nextColour(Image<RGBA>& colour_image);
 
     static constexpr int8_t pixel_offset[64] = {
         0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,

@@ -212,15 +212,17 @@ se::ReaderStatus se::OpenNIReader::nextDepth(se::Image<float>& depth_image)
 
 
 
-se::ReaderStatus se::OpenNIReader::nextColour(se::Image<uint32_t>& colour_image)
+se::ReaderStatus se::OpenNIReader::nextColour(se::Image<RGBA>& colour_image)
 {
     // Resize the output image if needed.
     if ((colour_image.width() != colour_image_res_.x())
         || (colour_image.height() != colour_image_res_.y())) {
-        colour_image = se::Image<uint32_t>(colour_image_res_.x(), colour_image_res_.y());
+        colour_image = se::Image<RGBA>(colour_image_res_.x(), colour_image_res_.y());
     }
 
-    se::rgb_to_rgba(rgb_image_.get(), colour_image.data(), colour_image_res_.prod());
+    se::rgb_to_rgba(rgb_image_.get(),
+                    reinterpret_cast<uint32_t*>(colour_image.data()),
+                    colour_image_res_.prod());
 
     return se::ReaderStatus::ok;
 }
@@ -266,7 +268,7 @@ se::ReaderStatus se::OpenNIReader::nextDepth(se::Image<float>&)
 
 
 
-se::ReaderStatus se::OpenNIReader::nextColour(se::Image<uint32_t>&)
+se::ReaderStatus se::OpenNIReader::nextColour(se::Image<RGBA>&)
 {
     return se::ReaderStatus::error;
 }

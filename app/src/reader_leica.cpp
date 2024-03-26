@@ -391,7 +391,7 @@ se::ReaderStatus se::LeicaReader::nextRayBatch(
 
     return se::ReaderStatus::ok;
 }
-se::ReaderStatus se::LeicaReader::nextColour(se::Image<uint32_t>& /*colour_image*/)
+se::ReaderStatus se::LeicaReader::nextColour(se::Image<RGBA>& /*colour_image*/)
 {
     std::clog << "nextColour() not supported for LeicaReader\n";
     return se::ReaderStatus::error;

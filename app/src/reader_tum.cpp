@@ -522,7 +522,7 @@ se::ReaderStatus se::TUMReader::nextDepth(se::Image<float>& depth_image)
 
 
 
-se::ReaderStatus se::TUMReader::nextColour(se::Image<uint32_t>& colour_image)
+se::ReaderStatus se::TUMReader::nextColour(se::Image<RGBA>& colour_image)
 {
     if (frame_ >= num_frames_) {
         return se::ReaderStatus::error;
@@ -543,7 +543,7 @@ se::ReaderStatus se::TUMReader::nextColour(se::Image<uint32_t>& colour_image)
     // Resize the output image if needed.
     if ((colour_image.width() != colour_image_res_.x())
         || (colour_image.height() != colour_image_res_.y())) {
-        colour_image = se::Image<uint32_t>(colour_image_res_.x(), colour_image_res_.y());
+        colour_image = se::Image<RGBA>(colour_image_res_.x(), colour_image_res_.y());
     }
 
     cv::Mat wrapper_mat(colour_data.rows, colour_data.cols, CV_8UC4, colour_image.data());

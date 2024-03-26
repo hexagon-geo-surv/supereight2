@@ -244,8 +244,7 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image)
 
 
 
-se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
-                                      se::Image<uint32_t>& colour_image)
+se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image, se::Image<RGBA>& colour_image)
 {
     if (!good()) {
         if (verbose_ >= 1) {
@@ -273,7 +272,7 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
 
 
 se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
-                                      se::Image<uint32_t>& colour_image,
+                                      se::Image<RGBA>& colour_image,
                                       Eigen::Isometry3f& T_WB)
 {
     if (!good()) {

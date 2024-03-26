@@ -381,12 +381,12 @@ TEST(MultiResOFusionSystemTest, Raycasting)
     // Setup input images
     const Eigen::Vector2i input_img_res(config.sensor.width, config.sensor.height);
     se::Image<float> input_depth_img(input_img_res.x(), input_img_res.y());
-    se::Image<uint32_t> input_colour_img(input_img_res.x(), input_img_res.y());
+    se::Image<se::RGBA> input_colour_img(input_img_res.x(), input_img_res.y());
 
     // Setup processed images
     const Eigen::Vector2i processed_img_res = input_img_res / config.app.sensor_downsampling_factor;
     se::Image<float> processed_depth_img(processed_img_res.x(), processed_img_res.y());
-    se::Image<uint32_t> processed_colour_img(processed_img_res.x(), processed_img_res.y());
+    se::Image<se::RGBA> processed_colour_img(processed_img_res.x(), processed_img_res.y());
 
     // Setup output images / renders
     std::unique_ptr<uint32_t[]> output_colour_img_data(

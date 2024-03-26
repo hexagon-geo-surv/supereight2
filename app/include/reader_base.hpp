@@ -15,6 +15,7 @@
 #include <chrono>
 #include <cstdint>
 #include <fstream>
+#include <se/common/rgba.hpp>
 #include <string>
 
 #include "se/common/str_utils.hpp"
@@ -176,7 +177,7 @@ class Reader {
      * \param[out] colour_image  The next colour image.
      * \return An appropriate status code.
      */
-    ReaderStatus nextData(Image<float>& depth_image, Image<uint32_t>& colour_image);
+    ReaderStatus nextData(Image<float>& depth_image, Image<RGBA>& colour_image);
 
 
     /** Read the next ray and ground truth pose.
@@ -213,7 +214,7 @@ class Reader {
      * \return An appropriate status code.
      */
     ReaderStatus
-    nextData(Image<float>& depth_image, Image<uint32_t>& colour_image, Eigen::Isometry3f& T_WB);
+    nextData(Image<float>& depth_image, Image<RGBA>& colour_image, Eigen::Isometry3f& T_WB);
 
     /** Read the ground truth pose at the provided frame number.
      * Each line in the ground truth file should correspond to a single
@@ -387,7 +388,7 @@ class Reader {
      * \param[out] colour_image The next colour image.
      * \return An appropriate status code.
      */
-    virtual ReaderStatus nextColour(Image<uint32_t>& colour_image) = 0;
+    virtual ReaderStatus nextColour(Image<RGBA>& colour_image) = 0;
 };
 
 std::ostream& operator<<(std::ostream& os, const Reader::Config& c);

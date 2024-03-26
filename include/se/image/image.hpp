@@ -11,6 +11,7 @@
 
 #include <Eigen/StdVector>
 #include <cassert>
+#include <se/common/rgba.hpp>
 
 #include "se/common/colour_utils.hpp"
 
@@ -83,7 +84,7 @@ class Image {
 
 
 
-static inline void convert_to_output_rgba_img(const se::Image<uint32_t>& input_rgba_img,
+static inline void convert_to_output_rgba_img(const se::Image<RGBA>& input_rgba_img,
                                               uint32_t* output_rgba_img_data)
 {
     memcpy(output_rgba_img_data,

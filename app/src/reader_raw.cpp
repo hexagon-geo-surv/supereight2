@@ -129,7 +129,7 @@ se::ReaderStatus se::RAWReader::nextDepth(se::Image<float>& depth_image)
 
 
 
-se::ReaderStatus se::RAWReader::nextColour(se::Image<uint32_t>& colour_image)
+se::ReaderStatus se::RAWReader::nextColour(se::Image<RGBA>& colour_image)
 {
     // Seek to the appropriate place in the file.
     raw_fs_.seekg(frame_ * (depth_total_size_ + colour_total_size_) + depth_total_size_);
@@ -140,7 +140,7 @@ se::ReaderStatus se::RAWReader::nextColour(se::Image<uint32_t>& colour_image)
     }
     // Resize the output image if needed.
     if ((colour_image.width() != size.x()) || (colour_image.height() != size.y())) {
-        colour_image = se::Image<uint32_t>(size.x(), size.y());
+        colour_image = se::Image<RGBA>(size.x(), size.y());
     }
     // Read the whole image into a buffer.
     const size_t image_size = colour_image.size();
@@ -149,6 +149,6 @@ se::ReaderStatus se::RAWReader::nextColour(se::Image<uint32_t>& colour_image)
         return se::ReaderStatus::error;
     }
     // Convert the RGB image in the buffer to colour.
-    rgb_to_rgba(buffer.data(), colour_image.data(), image_size);
+    rgb_to_rgba(buffer.data(), reinterpret_cast<uint32_t*>(colour_image.data()), image_size);
     return se::ReaderStatus::ok;
 }
