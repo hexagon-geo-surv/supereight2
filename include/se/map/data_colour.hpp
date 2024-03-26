@@ -13,10 +13,6 @@
 
 namespace se {
 
-// Defaults
-static constexpr colour_t dflt_colour = 0xFFFFFFFF; // White
-static constexpr colour_t dflt_delta_colour = 0;
-
 // Colour data
 template<Colour ColB>
 struct ColourData {
@@ -49,7 +45,7 @@ struct ColourData<Colour::On> {
         Config(const std::string& yaml_file);
     };
 
-    colour_t colour = dflt_colour;
+    colour_t colour;
 };
 
 template<>
@@ -65,7 +61,7 @@ struct ColourDeltaData {};
 
 template<>
 struct ColourDeltaData<Colour::On> {
-    colour_t delta_colour = dflt_delta_colour;
+    colour_t delta_colour;
 };
 
 } // namespace se
