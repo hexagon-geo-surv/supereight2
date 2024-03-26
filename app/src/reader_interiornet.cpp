@@ -260,10 +260,10 @@ constexpr float se::InteriorNetReader::interiornet_inverse_scale_;
 
 
 
-se::InteriorNetReader::InteriorNetReader(const se::Reader::Config& c) : se::Reader(c)
+se::InteriorNetReader::InteriorNetReader(const se::Reader::Config& c) :
+        se::Reader(c),
+        inverse_scale_(c.inverse_scale == 0.0f ? interiornet_inverse_scale_ : c.inverse_scale)
 {
-    inverse_scale_ = (c.inverse_scale != 0) ? c.inverse_scale : interiornet_inverse_scale_;
-
     // Ensure sequence_path_ refers to a valid InteriorNet directory structure.
     if (!stdfs::is_directory(sequence_path_)
         || !stdfs::is_directory(sequence_path_ + "/depth0/data")

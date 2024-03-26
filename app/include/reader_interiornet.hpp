@@ -52,7 +52,7 @@ class InteriorNetReader : public Reader {
 
     private:
     static constexpr float interiornet_inverse_scale_ = 1.0f / 1000.0f;
-    float inverse_scale_;
+    const float inverse_scale_;
 
     cv::Mat projection_inv_;
 
