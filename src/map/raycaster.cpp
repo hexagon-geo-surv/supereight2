@@ -63,7 +63,7 @@ void point_cloud_to_normal(se::Image<Eigen::Vector3f>& normals,
 
 
 
-void render_volume_kernel(uint32_t* volume_image_data,
+void render_volume_kernel(RGBA* volume_image_data,
                           const Eigen::Vector2i& volume_image_res,
                           const Eigen::Vector3f& light_M,
                           const Eigen::Vector3f& ambient_M,
@@ -91,10 +91,11 @@ void render_volume_kernel(uint32_t* volume_image_data,
                 se::eigen::clamp(col, Eigen::Vector3f::Zero(), Eigen::Vector3f::Ones());
 
                 col = col.cwiseProduct(scale_colour(surface_scale(x, y)));
-                volume_image_data[pixel_idx] = se::pack_rgba(col.x(), col.y(), col.z(), 0xFF);
+                const Eigen::Matrix<std::uint8_t, 3, 1> rgb8 = col.cast<std::uint8_t>();
+                volume_image_data[pixel_idx] = {rgb8.x(), rgb8.y(), rgb8.z(), 0xFF};
             }
             else {
-                volume_image_data[pixel_idx] = 0xFF000000;
+                volume_image_data[pixel_idx] = {0x00, 0x00, 0x00, 0xFF};
             }
         } // x
     }     // y

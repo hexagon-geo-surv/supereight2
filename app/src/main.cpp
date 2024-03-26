@@ -63,8 +63,8 @@ int main(int argc, char** argv)
             new uint32_t[processed_img_res.x() * processed_img_res.y()]);
         std::unique_ptr<uint32_t[]> output_tracking_img_data(
             new uint32_t[processed_img_res.x() * processed_img_res.y()]);
-        std::unique_ptr<uint32_t[]> output_volume_img_data(
-            new uint32_t[processed_img_res.x() * processed_img_res.y()]);
+        std::unique_ptr<se::RGBA[]> output_volume_img_data(
+            new se::RGBA[processed_img_res.x() * processed_img_res.y()]);
 
         // ========= Map INITIALIZATION  =========
         // Setup the single-res TSDF map w/ default block size of 8 voxels

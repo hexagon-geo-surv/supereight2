@@ -395,8 +395,8 @@ TEST(MultiResOFusionSystemTest, Raycasting)
         new uint32_t[processed_img_res.x() * processed_img_res.y()]);
     std::unique_ptr<uint32_t[]> output_tracking_img_data(
         new uint32_t[processed_img_res.x() * processed_img_res.y()]);
-    std::unique_ptr<uint32_t[]> output_volume_img_data(
-        new uint32_t[processed_img_res.x() * processed_img_res.y()]);
+    std::unique_ptr<se::RGBA[]> output_volume_img_data(
+        new se::RGBA[processed_img_res.x() * processed_img_res.y()]);
 
     // Create a pinhole camera and downsample the intrinsics
     const se::PinholeCamera sensor(config.sensor, config.app.sensor_downsampling_factor);
