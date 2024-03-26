@@ -85,11 +85,11 @@ class Image {
 
 
 static inline void convert_to_output_rgba_img(const se::Image<RGBA>& input_rgba_img,
-                                              uint32_t* output_rgba_img_data)
+                                              RGBA* output_rgba_img_data)
 {
     memcpy(output_rgba_img_data,
            input_rgba_img.data(),
-           input_rgba_img.width() * input_rgba_img.height() * sizeof(uint32_t));
+           input_rgba_img.width() * input_rgba_img.height() * sizeof(RGBA));
 }
 
 

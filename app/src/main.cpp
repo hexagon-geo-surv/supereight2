@@ -57,8 +57,8 @@ int main(int argc, char** argv)
         se::Image<se::RGBA> processed_colour_img(processed_img_res.x(), processed_img_res.y());
 
         // Setup output images / renders
-        std::unique_ptr<uint32_t[]> output_colour_img_data(
-            new uint32_t[processed_img_res.x() * processed_img_res.y()]);
+        std::unique_ptr<se::RGBA[]> output_colour_img_data(
+            new se::RGBA[processed_img_res.x() * processed_img_res.y()]);
         std::unique_ptr<se::RGBA[]> output_depth_img_data(
             new se::RGBA[processed_img_res.x() * processed_img_res.y()]);
         std::unique_ptr<se::RGBA[]> output_tracking_img_data(
