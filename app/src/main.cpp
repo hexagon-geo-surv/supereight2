@@ -197,7 +197,7 @@ int main(int argc, char** argv)
                 images.emplace_back(res, CV_8UC4, output_volume_img_data.get());
                 // Combine all the images into one, overlay the labels and show it.
                 cv::Mat render = se::montage(2, 2, images, labels);
-                drawit(reinterpret_cast<uint32_t*>(render.data),
+                drawit(reinterpret_cast<se::RGBA*>(render.data),
                        Eigen::Vector2i(render.cols, render.rows));
             }
             TOCK("draw")
