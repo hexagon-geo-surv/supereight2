@@ -115,7 +115,7 @@ bool Tracker<MapT, SensorT>::track(const se::Image<float>& depth_img,
 
 
 template<typename MapT, typename SensorT>
-void Tracker<MapT, SensorT>::renderTrackingResult(uint32_t* tracking_img_data)
+void Tracker<MapT, SensorT>::renderTrackingResult(RGBA* tracking_img_data)
 {
 #pragma omp parallel for
     for (int y = 0; y < sensor_.model.imageHeight(); y++) {
@@ -124,31 +124,31 @@ void Tracker<MapT, SensorT>::renderTrackingResult(uint32_t* tracking_img_data)
             switch (tracking_result[pixel_idx].result) {
             case 1:
                 // Gray
-                tracking_img_data[pixel_idx] = 0xFF808080;
+                tracking_img_data[pixel_idx] = {0x80, 0x80, 0x80, 0xFF};
                 break;
             case -1:
                 // Black
-                tracking_img_data[pixel_idx] = 0xFF000000;
+                tracking_img_data[pixel_idx] = {0x00, 0x00, 0x00, 0xFF};
                 break;
             case -2:
                 // Red
-                tracking_img_data[pixel_idx] = 0xFF0000FF;
+                tracking_img_data[pixel_idx] = {0xFF, 0x00, 0x00, 0xFF};
                 break;
             case -3:
                 // Green
-                tracking_img_data[pixel_idx] = 0xFF00FF00;
+                tracking_img_data[pixel_idx] = {0x00, 0xFF, 0x00, 0xFF};
                 break;
             case -4:
                 // Blue
-                tracking_img_data[pixel_idx] = 0xFFFF0000;
+                tracking_img_data[pixel_idx] = {0x00, 0x00, 0xFF, 0xFF};
                 break;
             case -5:
                 // Yellow
-                tracking_img_data[pixel_idx] = 0xFF00FFFF;
+                tracking_img_data[pixel_idx] = {0xFF, 0xFF, 0x00, 0xFF};
                 break;
             default:
                 // Orange
-                tracking_img_data[pixel_idx] = 0xFF8080FF;
+                tracking_img_data[pixel_idx] = {0xFF, 0x80, 0x80, 0xFF};
                 break;
             }
         }

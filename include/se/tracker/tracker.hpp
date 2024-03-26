@@ -10,6 +10,8 @@
 #ifndef SE_TRACKER_HPP
 #define SE_TRACKER_HPP
 
+#include <se/common/rgba.hpp>
+
 #include "se/common/math_util.hpp"
 #include "se/map/preprocessor.hpp"
 #include "se/map/raycaster.hpp"
@@ -114,7 +116,7 @@ class Tracker {
                se::Image<Eigen::Vector3f>& surface_point_cloud_W,
                se::Image<Eigen::Vector3f>& surface_normals_W);
 
-    void renderTrackingResult(uint32_t* tracking_img_data);
+    void renderTrackingResult(RGBA* tracking_img_data);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
