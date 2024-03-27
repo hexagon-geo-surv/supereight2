@@ -198,10 +198,10 @@ bool Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
     if (sdf_value < -config_.truncation_boundary) {
         return false;
     }
-    const field_t tsdf_value = std::min(field_t(1), sdf_value / config_.truncation_boundary);
+    // We only need to truncate positive SDF values due to the test above.
+    const field_t tsdf_value = std::min(sdf_value / config_.truncation_boundary, field_t(1));
     data_union.data.tsdf = (data_union.data.tsdf * data_union.data.weight + tsdf_value)
         / (data_union.data.weight + weight_t(1));
-    data_union.data.tsdf = std::clamp(data_union.data.tsdf, field_t(-1), field_t(1));
     data_union.data.weight =
         std::min(data_union.data.weight + weight_t(1), map_.getDataConfig().max_weight);
     data_union.prop_data.delta_weight++;
