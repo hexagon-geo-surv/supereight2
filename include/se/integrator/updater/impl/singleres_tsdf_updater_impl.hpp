@@ -22,8 +22,19 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::Up
     const SensorT& sensor,
     const Image<float>& depth_img,
     const Eigen::Isometry3f& T_WS,
+    const SensorT* const colour_sensor,
+    const Image<colour_t>* const colour_img,
+    const Eigen::Isometry3f* const T_SSc,
     const int frame) :
-        map_(map), sensor_(sensor), depth_img_(depth_img), T_WS_(T_WS), frame_(frame), config_(map)
+        map_(map),
+        sensor_(sensor),
+        depth_img_(depth_img),
+        T_WS_(T_WS),
+        colour_sensor_(colour_sensor),
+        colour_img_(colour_img),
+        T_SSc_(T_SSc),
+        frame_(frame),
+        config_(map)
 {
 }
 

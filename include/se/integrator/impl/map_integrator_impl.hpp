@@ -201,9 +201,9 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(
     const SensorT& sensor,
     const se::Image<float>& depth_img,
     const Eigen::Isometry3f& T_WS,
-    const SensorT* const /* colour_sensor */,
-    const se::Image<colour_t>* const /* colour_img */,
-    const Eigen::Isometry3f* const /* T_SSc */,
+    const SensorT* const colour_sensor,
+    const se::Image<colour_t>* const colour_img,
+    const Eigen::Isometry3f* const T_SSc,
     const unsigned int frame,
     std::vector<const OctantBase*>* updated_octants)
 {
@@ -217,7 +217,7 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(
 
     // Update
     TICK("update")
-    se::Updater updater(map, sensor, depth_img, T_WS, frame);
+    se::Updater updater(map, sensor, depth_img, T_WS, colour_sensor, colour_img, T_SSc, frame);
     updater(block_ptrs);
     TOCK("update")
 
@@ -238,9 +238,9 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi>::integrate(
     const SensorT& sensor,
     const se::Image<float>& depth_img,
     const Eigen::Isometry3f& T_WS,
-    const SensorT* const /* colour_sensor */,
-    const se::Image<colour_t>* const /* colour_img */,
-    const Eigen::Isometry3f* const /* T_SSc */,
+    const SensorT* const colour_sensor,
+    const se::Image<colour_t>* const colour_img,
+    const Eigen::Isometry3f* const T_SSc,
     const unsigned int frame,
     std::vector<const OctantBase*>* updated_octants)
 {
@@ -254,7 +254,7 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi>::integrate(
 
     // Update
     TICK("update")
-    se::Updater updater(map, sensor, depth_img, T_WS, frame);
+    se::Updater updater(map, sensor, depth_img, T_WS, colour_sensor, colour_img, T_SSc, frame);
     updater(block_ptrs);
     TOCK("update")
 
@@ -275,9 +275,9 @@ void IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
     const SensorT& sensor,
     const se::Image<float>& depth_img,
     const Eigen::Isometry3f& T_WS,
-    const SensorT* const /* colour_sensor */,
-    const se::Image<colour_t>* const /* colour_img */,
-    const Eigen::Isometry3f* const /* T_SSc */,
+    const SensorT* const colour_sensor,
+    const se::Image<colour_t>* const colour_img,
+    const Eigen::Isometry3f* const T_SSc,
     const unsigned int frame,
     std::vector<const OctantBase*>* updated_octants)
 {
@@ -296,7 +296,14 @@ void IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
 
     // Update
     TICK("update")
-    se::Updater updater(map, sensor, depth_img, T_WS, frame);
+    se::Updater updater(map,
+                        sensor,
+                        depth_img,
+                        T_WS,
+                        colour_sensor,
+                        colour_img,
+                        T_SSc,
+                        frame);
     updater(allocation_list, updated_octants);
     TOCK("update")
 }
