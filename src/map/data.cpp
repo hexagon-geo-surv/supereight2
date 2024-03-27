@@ -176,15 +176,7 @@ std::ostream& operator<< <se::Colour::On>(std::ostream& os,
 
 
 
-SemanticData<se::Semantics::On>::Config::Config()
-{
-    // TODO Implement when semantics fusion is added.
-}
-
-
-
-SemanticData<se::Semantics::On>::Config::Config(const std::string& /* yaml_file */) :
-        SemanticData<se::Semantics::On>::Config()
+void SemanticData<se::Semantics::On>::Config::readYaml(const std::string& /* yaml_file */)
 {
     // TODO Implement when semantics fusion is added.
 }

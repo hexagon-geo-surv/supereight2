@@ -20,10 +20,7 @@ static constexpr semantics_t dflt_semantics = 0;
 template<Semantics SemB>
 struct SemanticData {
     struct Config {
-        Config()
-        {
-        }
-        Config(const std::string& /* yaml_file */)
+        void readYaml(const std::string& /* yaml_file */)
         {
         }
     };
@@ -39,14 +36,10 @@ std::ostream& operator<<(std::ostream& os, const typename SemanticData<SemB>::Co
 template<>
 struct SemanticData<Semantics::On> {
     struct Config {
-        /** Initializes the config to some sensible defaults.
+        /** Reads the struct members from the "data" node of a YAML file. Members not present in the
+         * YAML file aren't modified.
          */
-        Config();
-
-        /** Initializes the config from a YAML file. Data not present in the YAML file will be
-         * initialized as in SemanticData<se::Semantics::On>::Config().
-         */
-        Config(const std::string& yaml_file);
+        void readYaml(const std::string& yaml_file);
     };
 
     semantics_t sem = dflt_semantics;
