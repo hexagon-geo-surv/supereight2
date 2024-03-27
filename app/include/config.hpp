@@ -117,7 +117,7 @@ struct Config {
 
     /** Default initializes all configs.
      */
-    Config();
+    Config() = default;
 
     /** Initializes the config from a YAML file. Data not present in the YAML file will be
      * initialized as in Config::Config().
@@ -127,12 +127,8 @@ struct Config {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
-
-
 template<typename MapT, typename SensorT>
 std::ostream& operator<<(std::ostream& os, const Config<MapT, SensorT>& c);
-
-
 
 } // namespace se
 

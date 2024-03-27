@@ -9,18 +9,7 @@
 #ifndef SE_CONFIG_IMPL_HPP
 #define SE_CONFIG_IMPL_HPP
 
-#include "se/common/yaml.hpp"
-
 namespace se {
-
-
-
-template<typename MapT, typename SensorT>
-Config<MapT, SensorT>::Config()
-{
-}
-
-
 
 template<typename MapT, typename SensorT>
 Config<MapT, SensorT>::Config(const std::string& yaml_file)
@@ -53,10 +42,6 @@ std::ostream& operator<<(std::ostream& os, const Config<MapT, SensorT>& c)
     return os;
 }
 
-
-
 } // namespace se
-
-
 
 #endif // SE_CONFIG_IMPL_HPP
