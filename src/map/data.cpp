@@ -13,26 +13,8 @@
 #include "se/common/yaml.hpp"
 
 namespace se {
-FieldData<Field::Occupancy>::Config::Config() :
-        k_sigma(0.052f),
-        sigma_min_factor(1.5f),
-        sigma_max_factor(6.f),
-        k_tau(0.026f),
-        tau_min_factor(6.f),
-        tau_max_factor(16.f),
-        log_odd_min(-5.015),
-        log_odd_max(5.015),
-        fs_integr_scale(1),
-        uncertainty_model(UncertaintyModel::Linear)
-{
-    max_weight =
-        std::floor(std::fabs(FieldData<Field::Occupancy>::min_occupancy / (0.97f * log_odd_min)));
-}
 
-
-
-FieldData<Field::Occupancy>::Config::Config(const std::string& yaml_file) :
-        FieldData<Field::Occupancy>::Config()
+void FieldData<Field::Occupancy>::Config::readYaml(const std::string& yaml_file)
 {
     // Open the file for reading.
     cv::FileStorage fs;
@@ -104,14 +86,7 @@ std::ostream& operator<<(std::ostream& os, const FieldData<Field::Occupancy>::Co
 
 
 
-FieldData<Field::TSDF>::Config::Config() : truncation_boundary_factor(8), max_weight(100)
-{
-}
-
-
-
-FieldData<Field::TSDF>::Config::Config(const std::string& yaml_file) :
-        FieldData<Field::TSDF>::Config()
+void FieldData<Field::TSDF>::Config::readYaml(const std::string& yaml_file)
 {
     // Open the file for reading.
     cv::FileStorage fs;

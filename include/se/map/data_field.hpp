@@ -23,31 +23,27 @@ struct FieldData {
 template<>
 struct FieldData<Field::Occupancy> {
     struct Config {
-        float k_sigma;
-        float sigma_min_factor;
-        float sigma_max_factor;
+        float k_sigma = 0.052f;
+        float sigma_min_factor = 1.5f;
+        float sigma_max_factor = 6.0f;
 
-        float k_tau;
-        float tau_min_factor;
-        float tau_max_factor;
+        float k_tau = 0.026f;
+        float tau_min_factor = 6.0f;
+        float tau_max_factor = 16.0f;
 
-        weight_t max_weight;
+        field_t log_odd_min = -5.015;
+        field_t log_odd_max = 5.015;
 
-        field_t log_odd_min;
-        field_t log_odd_max;
+        weight_t max_weight = std::floor(std::fabs(min_occupancy / (0.97f * log_odd_min)));
 
-        int fs_integr_scale;
+        int fs_integr_scale = 1;
 
-        UncertaintyModel uncertainty_model;
+        UncertaintyModel uncertainty_model = UncertaintyModel::Linear;
 
-        /** Initializes the config to some sensible defaults.
+        /** Reads the struct members from the "data" node of a YAML file. Members not present in the
+         * YAML file aren't modified.
          */
-        Config();
-
-        /** Initializes the config from a YAML file. Data not present in the YAML file will be
-         * initialized as in FieldData<se::Field::Occupancy>::Config().
-         */
-        Config(const std::string& yaml_file);
+        void readYaml(const std::string& yaml_file);
 
         static constexpr Field FldT = Field::Occupancy;
     };
@@ -66,17 +62,13 @@ std::ostream& operator<<(std::ostream& os, const FieldData<Field::Occupancy>::Co
 template<>
 struct FieldData<Field::TSDF> {
     struct Config {
-        field_t truncation_boundary_factor;
-        weight_t max_weight;
+        field_t truncation_boundary_factor = 8;
+        weight_t max_weight = 100;
 
-        /** Initializes the config to some sensible defaults.
+        /** Reads the struct members from the "data" node of a YAML file. Members not present in the
+         * YAML file aren't modified.
          */
-        Config();
-
-        /** Initializes the config from a YAML file. Data not present in the YAML file will be
-         * initialized as in FieldData<se::Field::TSDF>::Config().
-         */
-        Config(const std::string& yaml_file);
+        void readYaml(const std::string& yaml_file);
 
         static constexpr Field FldT = Field::TSDF;
     };
