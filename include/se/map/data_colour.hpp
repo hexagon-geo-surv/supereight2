@@ -17,10 +17,7 @@ namespace se {
 template<Colour ColB>
 struct ColourData {
     struct Config {
-        Config()
-        {
-        }
-        Config(const std::string& /* yaml_file */)
+        void readYaml(const std::string& /* yaml_file */)
         {
         }
     };
@@ -35,14 +32,10 @@ std::ostream& operator<<(std::ostream& os, const typename ColourData<ColB>::Conf
 template<>
 struct ColourData<Colour::On> {
     struct Config {
-        /** Initializes the config to some sensible defaults.
+        /** Reads the struct members from the "data" node of a YAML file. Members not present in the
+         * YAML file aren't modified.
          */
-        Config();
-
-        /** Initializes the config from a YAML file. Data not present in the YAML file will be
-         * initialized as in ColourData<se::Colour::On>::Config().
-         */
-        Config(const std::string& yaml_file);
+        void readYaml(const std::string& yaml_file);
     };
 
     colour_t colour;

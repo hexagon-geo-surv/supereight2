@@ -34,9 +34,9 @@ struct Data : public FieldData<FldT>, ColourData<ColB>, SemanticData<SemB> {
         /** Initializes the config from a YAML file. Data not present in the YAML file will be
          * initialized as in Data<FldT, ColB, SemB>::Config().
          */
-        Config(const std::string& yaml_file) :
-                FieldData<FldT>::Config(yaml_file), ColourData<ColB>::Config(yaml_file)
+        Config(const std::string& yaml_file) : FieldData<FldT>::Config(yaml_file)
         {
+            ColourData<ColB>::Config::readYaml(yaml_file);
             SemanticData<SemB>::Config::readYaml(yaml_file);
         }
     };
