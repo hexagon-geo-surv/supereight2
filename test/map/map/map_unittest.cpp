@@ -32,7 +32,7 @@ TEST(Map, Gradient)
     sensor_config.near_plane = 0.4f;
     sensor_config.far_plane = 20.0f;
     // Data Config
-    se::OccupancyDataConfig data_config;
+    se::OccupancyData::Config data_config;
     data_config.tau_min_factor = 20;
     data_config.tau_max_factor = 20;
     data_config.k_tau = 1;

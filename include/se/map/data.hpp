@@ -135,22 +135,11 @@ typedef Data<Field::Occupancy, Colour::On, Semantics::Off> OccupancyColData;
 typedef Data<Field::Occupancy, Colour::Off, Semantics::On> OccupancySemData;
 typedef Data<Field::Occupancy, Colour::On, Semantics::On> OccupancyColSemData;
 
-// Occupancy data setups
-typedef Data<Field::Occupancy, Colour::Off, Semantics::Off>::Config OccupancyDataConfig;
-typedef Data<Field::Occupancy, Colour::On, Semantics::Off>::Config OccupancyColDataConfig;
-typedef Data<Field::Occupancy, Colour::Off, Semantics::On>::Config OccupancySemDataConfig;
-typedef Data<Field::Occupancy, Colour::On, Semantics::On>::Config OccupancyColSemDataConfig;
-
 // TSDF data setups
 typedef Data<Field::TSDF, Colour::Off, Semantics::Off> TSDFData;
 typedef Data<Field::TSDF, Colour::On, Semantics::Off> TSDFColData;
 typedef Data<Field::TSDF, Colour::Off, Semantics::On> TSDFSemData;
 typedef Data<Field::TSDF, Colour::On, Semantics::On> TSDFColSemData;
-
-typedef Data<Field::TSDF, Colour::Off, Semantics::Off>::Config TSDFDataConfig;
-typedef Data<Field::TSDF, Colour::On, Semantics::Off>::Config TSDFColDataConfig;
-typedef Data<Field::TSDF, Colour::Off, Semantics::On>::Config TSDFSemDataConfig;
-typedef Data<Field::TSDF, Colour::On, Semantics::On>::Config TSDFColSemDataConfig;
 
 } // namespace se
 
