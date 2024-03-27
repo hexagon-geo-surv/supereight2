@@ -21,10 +21,6 @@ struct Data : public FieldData<FldT>, ColourData<ColB>, SemanticData<SemB> {
     struct Config : public FieldData<FldT>::Config,
                     ColourData<ColB>::Config,
                     SemanticData<SemB>::Config {
-        static constexpr Field fld_ = FldT;
-        static constexpr Colour col_ = ColB;
-        static constexpr Semantics sem_ = SemB;
-
         /** Reads the struct members from the "data" node of a YAML file. Members not present in the
          * YAML file aren't modified.
          */
