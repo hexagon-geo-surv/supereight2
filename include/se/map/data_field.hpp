@@ -44,8 +44,6 @@ struct FieldData<Field::Occupancy> {
          * YAML file aren't modified.
          */
         void readYaml(const std::string& yaml_file);
-
-        static constexpr Field FldT = Field::Occupancy;
     };
 
     field_t occupancy = 0;
@@ -69,8 +67,6 @@ struct FieldData<Field::TSDF> {
          * YAML file aren't modified.
          */
         void readYaml(const std::string& yaml_file);
-
-        static constexpr Field FldT = Field::TSDF;
     };
 
     field_t tsdf = 1;
