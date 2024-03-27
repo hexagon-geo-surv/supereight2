@@ -25,16 +25,10 @@ struct Data : public FieldData<FldT>, ColourData<ColB>, SemanticData<SemB> {
         static constexpr Colour col_ = ColB;
         static constexpr Semantics sem_ = SemB;
 
-        /** Initializes all sub-configs to their sensible defaults.
+        /** Reads the struct members from the "data" node of a YAML file. Members not present in the
+         * YAML file aren't modified.
          */
-        Config()
-        {
-        }
-
-        /** Initializes the config from a YAML file. Data not present in the YAML file will be
-         * initialized as in Data<FldT, ColB, SemB>::Config().
-         */
-        Config(const std::string& yaml_file)
+        void readYaml(const std::string& yaml_file)
         {
             FieldData<FldT>::Config::readYaml(yaml_file);
             ColourData<ColB>::Config::readYaml(yaml_file);
