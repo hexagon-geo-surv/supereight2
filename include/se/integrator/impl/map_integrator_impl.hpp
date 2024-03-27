@@ -38,6 +38,9 @@ struct IntegrateDepthImplD {
                           const SensorT& sensor,
                           const se::Image<float>& depth_img,
                           const Eigen::Isometry3f& T_WS,
+                          const SensorT* const colour_sensor,
+                          const se::Image<colour_t>* const colour_img,
+                          const Eigen::Isometry3f* const T_SSc,
                           const unsigned int frame,
                           std::vector<const OctantBase*>* updated_octants);
 };
@@ -87,6 +90,9 @@ struct IntegrateDepthImplD<se::Field::TSDF, se::Res::Single> {
                           const SensorT& sensor,
                           const se::Image<float>& depth_img,
                           const Eigen::Isometry3f& T_WS,
+                          const SensorT* const colour_sensor,
+                          const se::Image<colour_t>* const colour_img,
+                          const Eigen::Isometry3f* const T_SSc,
                           const unsigned int frame,
                           std::vector<const OctantBase*>* updated_octants);
 };
@@ -103,6 +109,9 @@ struct IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi> {
                           const SensorT& sensor,
                           const se::Image<float>& depth_img,
                           const Eigen::Isometry3f& T_WS,
+                          const SensorT* const colour_sensor,
+                          const se::Image<colour_t>* const colour_img,
+                          const Eigen::Isometry3f* const T_SSc,
                           const unsigned int frame,
                           std::vector<const OctantBase*>* updated_octants);
 };
@@ -119,6 +128,9 @@ struct IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi> {
                           const SensorT& sensor,
                           const se::Image<float>& depth_img,
                           const Eigen::Isometry3f& T_WS,
+                          const SensorT* const colour_sensor,
+                          const se::Image<colour_t>* const colour_img,
+                          const Eigen::Isometry3f* const T_SSc,
                           const unsigned int frame,
                           std::vector<const OctantBase*>* updated_octants);
 };
@@ -173,6 +185,9 @@ void IntegrateDepthImplD<FldT, ResT>::integrate(
     const SensorT& /* sensor */,
     const se::Image<float>& /* depth_img */,
     const Eigen::Isometry3f& /* T_WS */,
+    const SensorT* const /* colour_sensor */,
+    const se::Image<colour_t>* const /* colour_img */,
+    const Eigen::Isometry3f* const /* T_SSc */,
     const unsigned int /* frame */,
     std::vector<const OctantBase*>* /* updated_octants */)
 {
@@ -186,6 +201,9 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(
     const SensorT& sensor,
     const se::Image<float>& depth_img,
     const Eigen::Isometry3f& T_WS,
+    const SensorT* const /* colour_sensor */,
+    const se::Image<colour_t>* const /* colour_img */,
+    const Eigen::Isometry3f* const /* T_SSc */,
     const unsigned int frame,
     std::vector<const OctantBase*>* updated_octants)
 {
@@ -220,6 +238,9 @@ void IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi>::integrate(
     const SensorT& sensor,
     const se::Image<float>& depth_img,
     const Eigen::Isometry3f& T_WS,
+    const SensorT* const /* colour_sensor */,
+    const se::Image<colour_t>* const /* colour_img */,
+    const Eigen::Isometry3f* const /* T_SSc */,
     const unsigned int frame,
     std::vector<const OctantBase*>* updated_octants)
 {
@@ -254,6 +275,9 @@ void IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
     const SensorT& sensor,
     const se::Image<float>& depth_img,
     const Eigen::Isometry3f& T_WS,
+    const SensorT* const /* colour_sensor */,
+    const se::Image<colour_t>* const /* colour_img */,
+    const Eigen::Isometry3f* const /* T_SSc */,
     const unsigned int frame,
     std::vector<const OctantBase*>* updated_octants)
 {
@@ -361,7 +385,8 @@ void MapIntegrator<MapT>::integrateDepth(const SensorT& sensor,
                                          const Eigen::Isometry3f& T_WS,
                                          const unsigned int frame)
 {
-    se::details::IntegrateDepthImpl<MapT>::integrate(map_, sensor, depth_img, T_WS, frame, nullptr);
+    se::details::IntegrateDepthImpl<MapT>::template integrate<SensorT>(
+        map_, sensor, depth_img, T_WS, nullptr, nullptr, nullptr, frame, nullptr);
 }
 
 
@@ -374,8 +399,8 @@ void MapIntegrator<MapT>::integrateDepth(const SensorT& sensor,
                                          const unsigned int frame,
                                          std::vector<const OctantBase*>& updated_octants)
 {
-    se::details::IntegrateDepthImpl<MapT>::integrate(
-        map_, sensor, depth_img, T_WS, frame, &updated_octants);
+    se::details::IntegrateDepthImpl<MapT>::template integrate<SensorT>(
+        map_, sensor, depth_img, T_WS, nullptr, nullptr, nullptr, frame, &updated_octants);
 }
 
 
@@ -385,12 +410,13 @@ template<typename SensorT>
 void MapIntegrator<MapT>::integrateDepth(const SensorT& sensor,
                                          const se::Image<float>& depth_img,
                                          const Eigen::Isometry3f& T_WS,
-                                         const SensorT& /* colour_sensor */,
-                                         const se::Image<colour_t>& /* colour_img */,
-                                         const Eigen::Isometry3f& /* T_SSc */,
+                                         const SensorT& colour_sensor,
+                                         const se::Image<colour_t>& colour_img,
+                                         const Eigen::Isometry3f& T_SSc,
                                          const unsigned int frame)
 {
-    se::details::IntegrateDepthImpl<MapT>::integrate(map_, sensor, depth_img, T_WS, frame, nullptr);
+    se::details::IntegrateDepthImpl<MapT>::template integrate<SensorT>(
+        map_, sensor, depth_img, T_WS, &colour_sensor, &colour_img, &T_SSc, frame, nullptr);
 }
 
 
@@ -400,14 +426,21 @@ template<typename SensorT>
 void MapIntegrator<MapT>::integrateDepth(const SensorT& sensor,
                                          const se::Image<float>& depth_img,
                                          const Eigen::Isometry3f& T_WS,
-                                         const SensorT& /* colour_sensor */,
-                                         const se::Image<colour_t>& /* colour_img */,
-                                         const Eigen::Isometry3f& /* T_SSc */,
+                                         const SensorT& colour_sensor,
+                                         const se::Image<colour_t>& colour_img,
+                                         const Eigen::Isometry3f& T_SSc,
                                          const unsigned int frame,
                                          std::vector<const OctantBase*>& updated_octants)
 {
-    se::details::IntegrateDepthImpl<MapT>::integrate(
-        map_, sensor, depth_img, T_WS, frame, &updated_octants);
+    se::details::IntegrateDepthImpl<MapT>::template integrate<SensorT>(map_,
+                                                                       sensor,
+                                                                       depth_img,
+                                                                       T_WS,
+                                                                       &colour_sensor,
+                                                                       &colour_img,
+                                                                       &T_SSc,
+                                                                       frame,
+                                                                       &updated_octants);
 }
 
 
