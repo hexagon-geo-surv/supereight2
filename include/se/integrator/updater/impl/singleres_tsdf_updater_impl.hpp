@@ -86,7 +86,7 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
 
 
 template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
-void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::updateVoxel(
+bool Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::updateVoxel(
     DataType& data,
     const field_t sdf_value)
 {
@@ -96,7 +96,9 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
         data.tsdf = (data.tsdf * data.weight + tsdf_value) / (data.weight + 1.f);
         data.tsdf = std::clamp(data.tsdf, field_t(-1), field_t(1));
         data.weight = std::min(data.weight + 1, map_.getDataConfig().max_weight);
+        return true;
     }
+    return false;
 }
 
 

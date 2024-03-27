@@ -191,7 +191,7 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
 
 
 template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
-void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::updateVoxel(
+bool Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::updateVoxel(
     typename BlockType::DataUnion& data_union,
     const field_t sdf_value)
 {
@@ -203,7 +203,9 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
         data_union.data.weight =
             std::min(data_union.data.weight + weight_t(1), map_.getDataConfig().max_weight);
         data_union.prop_data.delta_weight++;
+        return true;
     }
+    return false;
 }
 
 
