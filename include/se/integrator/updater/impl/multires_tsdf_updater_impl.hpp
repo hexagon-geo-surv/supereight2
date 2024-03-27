@@ -195,17 +195,17 @@ bool Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
     typename BlockType::DataUnion& data_union,
     const field_t sdf_value)
 {
-    if (sdf_value > -config_.truncation_boundary) {
-        const field_t tsdf_value = std::min(field_t(1), sdf_value / config_.truncation_boundary);
-        data_union.data.tsdf = (data_union.data.tsdf * data_union.data.weight + tsdf_value)
-            / (data_union.data.weight + weight_t(1));
-        data_union.data.tsdf = std::clamp(data_union.data.tsdf, field_t(-1), field_t(1));
-        data_union.data.weight =
-            std::min(data_union.data.weight + weight_t(1), map_.getDataConfig().max_weight);
-        data_union.prop_data.delta_weight++;
-        return true;
+    if (sdf_value < -config_.truncation_boundary) {
+        return false;
     }
-    return false;
+    const field_t tsdf_value = std::min(field_t(1), sdf_value / config_.truncation_boundary);
+    data_union.data.tsdf = (data_union.data.tsdf * data_union.data.weight + tsdf_value)
+        / (data_union.data.weight + weight_t(1));
+    data_union.data.tsdf = std::clamp(data_union.data.tsdf, field_t(-1), field_t(1));
+    data_union.data.weight =
+        std::min(data_union.data.weight + weight_t(1), map_.getDataConfig().max_weight);
+    data_union.prop_data.delta_weight++;
+    return true;
 }
 
 
