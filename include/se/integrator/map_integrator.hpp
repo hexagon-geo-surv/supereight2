@@ -107,6 +107,25 @@ class MapIntegrator {
                         const unsigned int frame,
                         std::vector<const OctantBase*>& updated_octants);
 
+    template<typename SensorT>
+    void integrateDepth(const SensorT& sensor,
+                        const se::Image<float>& depth_img,
+                        const Eigen::Isometry3f& T_WS,
+                        const SensorT& colour_sensor,
+                        const se::Image<colour_t>& colour_img,
+                        const Eigen::Isometry3f& T_SSc,
+                        const unsigned int frame);
+
+    template<typename SensorT>
+    void integrateDepth(const SensorT& sensor,
+                        const se::Image<float>& depth_img,
+                        const Eigen::Isometry3f& T_WS,
+                        const SensorT& colour_sensor,
+                        const se::Image<colour_t>& colour_img,
+                        const Eigen::Isometry3f& T_SSc,
+                        const unsigned int frame,
+                        std::vector<const OctantBase*>& updated_octants);
+
     /**
      * \brief Integrate single ray measurement into the maps field representation.
      *

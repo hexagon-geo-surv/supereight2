@@ -382,6 +382,38 @@ void MapIntegrator<MapT>::integrateDepth(const SensorT& sensor,
 
 template<typename MapT>
 template<typename SensorT>
+void MapIntegrator<MapT>::integrateDepth(const SensorT& sensor,
+                                         const se::Image<float>& depth_img,
+                                         const Eigen::Isometry3f& T_WS,
+                                         const SensorT& /* colour_sensor */,
+                                         const se::Image<colour_t>& /* colour_img */,
+                                         const Eigen::Isometry3f& /* T_SSc */,
+                                         const unsigned int frame)
+{
+    se::details::IntegrateDepthImpl<MapT>::integrate(map_, sensor, depth_img, T_WS, frame, nullptr);
+}
+
+
+
+template<typename MapT>
+template<typename SensorT>
+void MapIntegrator<MapT>::integrateDepth(const SensorT& sensor,
+                                         const se::Image<float>& depth_img,
+                                         const Eigen::Isometry3f& T_WS,
+                                         const SensorT& /* colour_sensor */,
+                                         const se::Image<colour_t>& /* colour_img */,
+                                         const Eigen::Isometry3f& /* T_SSc */,
+                                         const unsigned int frame,
+                                         std::vector<const OctantBase*>& updated_octants)
+{
+    se::details::IntegrateDepthImpl<MapT>::integrate(
+        map_, sensor, depth_img, T_WS, frame, &updated_octants);
+}
+
+
+
+template<typename MapT>
+template<typename SensorT>
 void MapIntegrator<MapT>::integrateRay(const SensorT& sensor,
                                        const Eigen::Vector3f& ray_S,
                                        const Eigen::Isometry3f& T_WS,
