@@ -39,6 +39,7 @@ struct ColourData<Colour::On> {
     };
 
     colour_t colour;
+    std::uint8_t colour_weight = 0;
 };
 
 template<>
@@ -55,6 +56,7 @@ struct ColourDeltaData {};
 template<>
 struct ColourDeltaData<Colour::On> {
     colour_t delta_colour;
+    std::uint8_t delta_colour_weight = 0;
 };
 
 } // namespace se
