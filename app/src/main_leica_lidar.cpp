@@ -24,10 +24,7 @@ int main(int argc, char** argv)
 
         // ========= Config & I/O INITIALIZATION  =========
         const std::string config_filename = argv[1];
-        const se::Config<se::OccupancyDataConfig,
-                         se::LeicaLidar::Config,
-                         se::OccupancyMap<se::Res::Multi>>
-            config(config_filename);
+        const se::Config<se::OccupancyMap<se::Res::Multi>, se::LeicaLidar> config(config_filename);
         std::cout << config;
 
         // Create the mesh output directory

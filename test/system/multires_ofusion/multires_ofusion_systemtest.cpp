@@ -44,8 +44,7 @@ int main(int argc, char** argv)
 TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
 {
     const std::string config_filename(my_argv[1]);
-    se::Config<se::OccupancyDataConfig, se::PinholeCamera::Config, se::OccupancyMap<se::Res::Multi>>
-        config(config_filename);
+    se::Config<se::OccupancyMap<se::Res::Multi>, se::PinholeCamera> config(config_filename);
     se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
 
     // Output files in a temporary directory.
@@ -118,10 +117,7 @@ TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
 TEST(MultiResOFusionSystemTest, GetField)
 {
     const std::string config_filename(my_argv[1]);
-    se::Config<se::OccupancyDataConfig,
-               se::PinholeCamera::Config,
-               se::OccupancyMap<se::Res::Multi>::Config>
-        config(config_filename);
+    se::Config<se::OccupancyMap<se::Res::Multi>, se::PinholeCamera> config(config_filename);
     se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
 
     // Output files in a temporary directory.
@@ -198,10 +194,7 @@ TEST(MultiResOFusionSystemTest, GetField)
 TEST(MultiResOFusionSystemTest, GetMaxField)
 {
     const std::string config_filename(my_argv[1]);
-    se::Config<se::OccupancyDataConfig,
-               se::PinholeCamera::Config,
-               se::OccupancyMap<se::Res::Multi>::Config>
-        config(config_filename);
+    se::Config<se::OccupancyMap<se::Res::Multi>, se::PinholeCamera> config(config_filename);
     se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
 
     // Output files in a temporary directory.
@@ -282,10 +275,7 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
 TEST(MultiResOFusionSystemTest, DeleteChildren)
 {
     const std::string config_filename(my_argv[1]);
-    se::Config<se::OccupancyDataConfig,
-               se::PinholeCamera::Config,
-               se::OccupancyMap<se::Res::Multi>::Config>
-        config(config_filename);
+    se::Config<se::OccupancyMap<se::Res::Multi>, se::PinholeCamera::Config> config(config_filename);
     se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
 
     // Output files in a temporary directory.
@@ -357,8 +347,7 @@ TEST(MultiResOFusionSystemTest, Raycasting)
 {
     // Read the configuration
     const std::string config_filename(my_argv[1]);
-    se::Config<se::OccupancyDataConfig, se::PinholeCamera::Config, se::OccupancyMap<se::Res::Multi>>
-        config(config_filename);
+    se::Config<se::OccupancyMap<se::Res::Multi>, se::PinholeCamera> config(config_filename);
     std::cout << config;
 
     // Output files in a temporary directory.

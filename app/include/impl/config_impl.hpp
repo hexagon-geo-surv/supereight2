@@ -15,15 +15,15 @@ namespace se {
 
 
 
-template<typename DataConfigT, typename SensorConfigT, typename MapT>
-Config<DataConfigT, SensorConfigT, MapT>::Config()
+template<typename MapT, typename SensorT>
+Config<MapT, SensorT>::Config()
 {
 }
 
 
 
-template<typename DataConfigT, typename SensorConfigT, typename MapT>
-Config<DataConfigT, SensorConfigT, MapT>::Config(const std::string& yaml_file) : data(yaml_file)
+template<typename MapT, typename SensorT>
+Config<MapT, SensorT>::Config(const std::string& yaml_file) : data(yaml_file)
 {
     map.readYaml(yaml_file);
     sensor.readYaml(yaml_file);
@@ -34,8 +34,8 @@ Config<DataConfigT, SensorConfigT, MapT>::Config(const std::string& yaml_file) :
 
 
 
-template<typename DataConfigT, typename SensorConfigT, typename MapT>
-std::ostream& operator<<(std::ostream& os, const Config<DataConfigT, SensorConfigT, MapT>& c)
+template<typename MapT, typename SensorT>
+std::ostream& operator<<(std::ostream& os, const Config<MapT, SensorT>& c)
 {
     os << "Data config -----------------------\n";
     os << c.data;

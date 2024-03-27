@@ -24,9 +24,7 @@ int main(int argc, char** argv)
 
         // ========= Config & I/O INITIALIZATION  =========
         const std::string config_filename = argv[1];
-        const se::
-            Config<se::TSDFDataConfig, se::PinholeCamera::Config, se::TSDFMap<se::Res::Single>>
-                config(config_filename);
+        const se::Config<se::TSDFMap<se::Res::Single>, se::PinholeCamera> config(config_filename);
         std::cout << config;
 
         // Create the mesh output directory
