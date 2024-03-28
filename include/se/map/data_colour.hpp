@@ -40,6 +40,11 @@ struct ColourData<Colour::On> {
          */
         void readYaml(const std::string& yaml_file);
     };
+
+    /** Perform a weighted averge colour update using \p colour, while ensuring the weight doesn't
+     * exceed \p max_weight. Return whether the data was updated.
+     */
+    bool update(const colour_t colour, const std::uint8_t max_weight);
 };
 
 template<>
@@ -65,5 +70,7 @@ struct ColourDeltaData<Colour::On> {
 };
 
 } // namespace se
+
+#include "impl/data_colour_impl.hpp"
 
 #endif // SE_DATA_COLOUR_HPP
