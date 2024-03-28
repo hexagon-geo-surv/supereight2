@@ -95,8 +95,11 @@ bool Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
     }
     // We only need to truncate positive SDF values due to the test above.
     const field_t tsdf_value = std::min(sdf_value / config_.truncation_boundary, field_t(1));
-    data.tsdf = (data.tsdf * data.weight + tsdf_value) / (data.weight + 1.f);
-    data.weight = std::min(data.weight + 1, map_.getDataConfig().max_weight);
+    // Avoid overflow if max_weight is equal to the maximum value of weight_t.
+    if (data.weight < map_.getDataConfig().max_weight) {
+        data.weight++;
+    }
+    data.tsdf = (data.tsdf * (data.weight - weight_t(1)) + tsdf_value) / data.weight;
     return true;
 }
 
