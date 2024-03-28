@@ -70,23 +70,6 @@ class SensorBase {
     SensorBase(const DerivedT& d);
 
     /**
-     * \brief Project a point in sensor frame to its image value.
-     *
-     * \tparam ValidPredicate
-     * \param[in]  point_S          The point to project to the image
-     * \param[in]  img              The image to get the value from
-     * \param[out] img_value        The image value the point projects to
-     * \param[in]  valid_predicate  The lambda function verifying if the value is valid (e.g. infront of far dist)
-     *
-     * \return True if the image value is valid, false otherwise
-     */
-    template<typename ValidPredicate>
-    bool projectToPixelValue(const Eigen::Vector3f& point_S,
-                             const se::Image<float>& img,
-                             float& img_value,
-                             ValidPredicate valid_predicate) const;
-
-    /**
      * \brief Get the image value for a given pixel coordindate.
      *
      * \tparam ValidPredicate

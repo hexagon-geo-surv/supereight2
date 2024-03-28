@@ -36,8 +36,6 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
     unsigned int block_size = BlockType::getSize();
     const Eigen::Isometry3f T_SW = T_WS_.inverse();
 
-    auto valid_predicate = [&](float depth_value) { return depth_value >= sensor_.near_plane; };
-
 #pragma omp parallel for
     for (unsigned int i = 0; i < block_ptrs.size(); i++) {
         BlockType* block_ptr = static_cast<BlockType*>(block_ptrs[i]);
@@ -62,10 +60,15 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
                         continue;
                     }
 
-                    // Fetch image value
-                    float depth_value(0);
-                    if (!sensor_.projectToPixelValue(
-                            point_S, depth_img_, depth_value, valid_predicate)) {
+                    // Get the depth value this voxel projects into.
+                    Eigen::Vector2f depth_pixel_f;
+                    if (sensor_.model.project(point_S, &depth_pixel_f)
+                        != srl::projection::ProjectionStatus::Successful) {
+                        continue;
+                    }
+                    const Eigen::Vector2i depth_pixel = se::round_pixel(depth_pixel_f);
+                    const float depth_value = depth_img_(depth_pixel.x(), depth_pixel.y());
+                    if (depth_value < sensor_.near_plane) {
                         continue;
                     }
 

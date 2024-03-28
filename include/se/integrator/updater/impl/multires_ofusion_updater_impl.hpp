@@ -451,8 +451,6 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                    recommended_stride)
                       .finished()));
 
-        auto valid_predicate = [&](float depth_value) { return depth_value >= sensor_.near_plane; };
-
         for (unsigned int z = 0; z < size_at_recommended_scale_li; z++) {
             for (unsigned int y = 0; y < size_at_recommended_scale_li; y++) {
 #pragma omp simd
@@ -460,10 +458,15 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                     const Eigen::Vector3f sample_point_C = sample_point_base_S
                         + sample_point_delta_matrix_S * Eigen::Vector3f(x, y, z);
 
-                    // Fetch image value
-                    float depth_value(0);
-                    if (!sensor_.projectToPixelValue(
-                            sample_point_C, depth_img_, depth_value, valid_predicate)) {
+                    // Get the depth value this voxel projects into.
+                    Eigen::Vector2f depth_pixel_f;
+                    if (sensor_.model.project(sample_point_C, &depth_pixel_f)
+                        != srl::projection::ProjectionStatus::Successful) {
+                        continue;
+                    }
+                    const Eigen::Vector2i depth_pixel = se::round_pixel(depth_pixel_f);
+                    const float depth_value = depth_img_(depth_pixel.x(), depth_pixel.y());
+                    if (depth_value < sensor_.near_plane) {
                         continue;
                     }
 
@@ -521,8 +524,6 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                integration_stride)
                   .finished()));
 
-    auto valid_predicate = [&](float depth_value) { return depth_value >= sensor_.near_plane; };
-
     for (unsigned int z = 0; z < size_at_integration_scale_li; z++) {
         for (unsigned int y = 0; y < size_at_integration_scale_li; y++) {
 #pragma omp simd
@@ -530,10 +531,15 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                 const Eigen::Vector3f sample_point_C =
                     sample_point_base_S + sample_point_delta_matrix_S * Eigen::Vector3f(x, y, z);
 
-                // Fetch image value
-                float depth_value(0);
-                if (!sensor_.projectToPixelValue(
-                        sample_point_C, depth_img_, depth_value, valid_predicate)) {
+                // Get the depth value this voxel projects into.
+                Eigen::Vector2f depth_pixel_f;
+                if (sensor_.model.project(sample_point_C, &depth_pixel_f)
+                    != srl::projection::ProjectionStatus::Successful) {
+                    continue;
+                }
+                const Eigen::Vector2i depth_pixel = se::round_pixel(depth_pixel_f);
+                const float depth_value = depth_img_(depth_pixel.x(), depth_pixel.y());
+                if (depth_value < sensor_.near_plane) {
                     continue;
                 }
 
