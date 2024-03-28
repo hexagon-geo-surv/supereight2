@@ -77,7 +77,8 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
                     const field_t sdf_value = (depth_value - m) / m * point_S.norm();
 
                     DataType& data = block_ptr->getData(voxel_coord);
-                    updateVoxel(data, sdf_value);
+                    data.update(
+                        sdf_value, config_.truncation_boundary, map_.getDataConfig().max_weight);
                 } // k
             }     // j
         }         // i
@@ -85,28 +86,6 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
 
     propagator::propagateTimeStampToRoot(block_ptrs);
 }
-
-
-
-template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
-bool Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::updateVoxel(
-    DataType& data,
-    const field_t sdf_value)
-{
-    if (sdf_value < -config_.truncation_boundary) {
-        return false;
-    }
-    // We only need to truncate positive SDF values due to the test above.
-    const field_t tsdf_value = std::min(sdf_value / config_.truncation_boundary, field_t(1));
-    // Avoid overflow if max_weight is equal to the maximum value of weight_t.
-    if (data.weight < map_.getDataConfig().max_weight) {
-        data.weight++;
-    }
-    data.tsdf = (data.tsdf * (data.weight - weight_t(1)) + tsdf_value) / data.weight;
-    return true;
-}
-
-
 
 } // namespace se
 
