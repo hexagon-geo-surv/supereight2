@@ -73,6 +73,12 @@ struct FieldData<Field::TSDF> {
     weight_t weight = 0;
     static constexpr bool invert_normals = true;
     static constexpr field_t surface_boundary = 0;
+
+    /** Perform a weighted average TSDF update by truncating the SDF value \p sdf within \p
+     * truncation_boundary, while ensuring the weight doesn't exceed \p max_weight. Return whether
+     * the data was updated. Data isn't updated if \p sdf is less than \p -truncation_boundary.
+     */
+    bool update(const field_t sdf, const field_t truncation_boundary, const weight_t max_weight);
 };
 
 std::ostream& operator<<(std::ostream& os, const FieldData<Field::TSDF>::Config& c);
@@ -97,5 +103,7 @@ struct FieldDeltaData<Field::TSDF> {
 
 
 } // namespace se
+
+#include "impl/data_field_impl.hpp"
 
 #endif // SE_DATA_FIELD_HPP
