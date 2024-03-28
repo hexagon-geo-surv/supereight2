@@ -147,7 +147,9 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
 
                     typename BlockType::DataUnion data_union =
                         block_ptr->getDataUnion(voxel_coord, block_ptr->getCurrentScale());
-                    updateVoxel(data_union, sdf_value);
+                    data_union.data.update(
+                        sdf_value, config_.truncation_boundary, map_.getDataConfig().max_weight);
+                    data_union.prop_data.delta_weight++;
                     block_ptr->setDataUnion(data_union);
                 } // k
             }     // j
@@ -190,31 +192,6 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
 
     propagator::propagateTimeStampToRoot(block_ptrs);
 }
-
-
-
-template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
-bool Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::updateVoxel(
-    typename BlockType::DataUnion& data_union,
-    const field_t sdf_value)
-{
-    if (sdf_value < -config_.truncation_boundary) {
-        return false;
-    }
-    // We only need to truncate positive SDF values due to the test above.
-    const field_t tsdf_value = std::min(sdf_value / config_.truncation_boundary, field_t(1));
-    // Avoid overflow if max_weight is equal to the maximum value of weight_t.
-    if (data_union.data.weight < map_.getDataConfig().max_weight) {
-        data_union.data.weight++;
-    }
-    data_union.data.tsdf =
-        (data_union.data.tsdf * (data_union.data.weight - weight_t(1)) + tsdf_value)
-        / data_union.data.weight;
-    data_union.prop_data.delta_weight++;
-    return true;
-}
-
-
 
 } // namespace se
 

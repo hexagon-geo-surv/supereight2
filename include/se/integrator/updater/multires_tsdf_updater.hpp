@@ -59,8 +59,6 @@ class Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     private:
-    bool updateVoxel(typename BlockType::DataUnion& data_union, const field_t sdf_value);
-
     MapType& map_;
     const SensorT& sensor_;
     const Image<float>& depth_img_;
