@@ -53,6 +53,11 @@ struct FieldData<Field::Occupancy> {
     static constexpr field_t surface_boundary = 0;
     static constexpr field_t min_occupancy = -100;
     static constexpr field_t max_occupancy = 100;
+
+    /** Perform a weighted average log-odds occupancy update and set the data to observed, while
+     * ensuring the weight doesn't exceed \p max_weight. Return whether the data was updated.
+     */
+    bool update(const field_t occupancy, const weight_t max_weight);
 };
 
 std::ostream& operator<<(std::ostream& os, const FieldData<Field::Occupancy>::Config& c);

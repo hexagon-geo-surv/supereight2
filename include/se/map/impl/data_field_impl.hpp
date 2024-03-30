@@ -9,6 +9,19 @@
 
 namespace se {
 
+inline bool FieldData<Field::Occupancy>::update(const field_t occupancy_, const weight_t max_weight)
+{
+    // Avoid overflow if max_weight is equal to the maximum value of weight_t.
+    if (weight < max_weight) {
+        weight++;
+    }
+    occupancy = (occupancy * (weight - weight_t(1)) + occupancy_) / weight;
+    observed = true;
+    return true;
+}
+
+
+
 inline bool FieldData<Field::TSDF>::update(const field_t sdf,
                                            const field_t truncation_boundary,
                                            const weight_t max_weight)
