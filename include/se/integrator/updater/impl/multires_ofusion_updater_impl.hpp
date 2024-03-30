@@ -192,8 +192,8 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
     // The minimum integration scale (change to last if data has already been integrated)
     const int min_integration_scale =
         ((block_ptr->getMinScale() == -1
-          || block_ptr->getMaxData().occupancy < 0.95 * map_.getDataConfig().log_odd_min))
-        ? map_.getDataConfig().fs_integr_scale
+          || block_ptr->getMaxData().occupancy < 0.95 * map_.getDataConfig().field.log_odd_min))
+        ? map_.getDataConfig().field.fs_integr_scale
         : std::max(0, last_scale - 1);
     const int max_integration_scale = (block_ptr->getMinScale() == -1)
         ? BlockType::getMaxScale()
@@ -356,8 +356,8 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
     const int min_integration_scale =
         (low_variance
          && (block_ptr->getMinScale() == -1
-             || block_ptr->getMaxData().occupancy < 0.95 * map_.getDataConfig().log_odd_min))
-        ? map_.getDataConfig().fs_integr_scale
+             || block_ptr->getMaxData().occupancy < 0.95 * map_.getDataConfig().field.log_odd_min))
+        ? map_.getDataConfig().field.fs_integr_scale
         : std::max(0, last_scale - 1);
     const int max_integration_scale = (block_ptr->getMinScale() == -1)
         ? BlockType::getMaxScale()

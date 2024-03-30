@@ -18,17 +18,19 @@ namespace se {
 
 template<Field FldT = Field::TSDF, Colour ColB = Colour::Off, Semantics SemB = Semantics::Off>
 struct Data : public FieldData<FldT>, ColourData<ColB>, SemanticData<SemB> {
-    struct Config : public FieldData<FldT>::Config,
-                    ColourData<ColB>::Config,
-                    SemanticData<SemB>::Config {
+    struct Config {
+        typename FieldData<FldT>::Config field;
+        typename ColourData<ColB>::Config colour;
+        typename SemanticData<SemB>::Config semantic;
+
         /** Reads the struct members from the "data" node of a YAML file. Members not present in the
          * YAML file aren't modified.
          */
         void readYaml(const std::string& yaml_file)
         {
-            FieldData<FldT>::Config::readYaml(yaml_file);
-            ColourData<ColB>::Config::readYaml(yaml_file);
-            SemanticData<SemB>::Config::readYaml(yaml_file);
+            field.readYaml(yaml_file);
+            colour.readYaml(yaml_file);
+            semantic.readYaml(yaml_file);
         }
     };
 
@@ -40,10 +42,9 @@ struct Data : public FieldData<FldT>, ColourData<ColB>, SemanticData<SemB> {
 template<Field FldT, Colour ColB, Semantics SemB>
 std::ostream& operator<<(std::ostream& os, const typename Data<FldT, ColB, SemB>::Config& c)
 {
-    // Call the operator<< of the base classes.
-    os << static_cast<const typename FieldData<FldT>::Config&>(c);
-    operator<< <ColB>(os, static_cast<const typename ColourData<ColB>::Config&>(c));
-    operator<< <SemB>(os, static_cast<const typename SemanticData<SemB>::Config&>(c));
+    os << c.field;
+    operator<<<ColB>(os, c.colour);
+    operator<<<SemB>(os, c.semantic);
     return os;
 }
 

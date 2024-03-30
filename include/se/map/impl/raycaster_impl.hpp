@@ -476,7 +476,8 @@ raycast(MapT& map,
 
     float t = t_min;
 
-    const float truncation_boundary = map.getRes() * map.getDataConfig().truncation_boundary_factor;
+    const float truncation_boundary =
+        map.getRes() * map.getDataConfig().field.truncation_boundary_factor;
 
     if (t_near < t_max) {
         // first walk with largesteps until we found a hit

@@ -77,8 +77,9 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
                     const field_t sdf_value = (depth_value - m) / m * point_S.norm();
 
                     DataType& data = block_ptr->getData(voxel_coord);
-                    data.update(
-                        sdf_value, config_.truncation_boundary, map_.getDataConfig().max_weight);
+                    data.update(sdf_value,
+                                config_.truncation_boundary,
+                                map_.getDataConfig().field.max_weight);
                 } // k
             }     // j
         }         // i

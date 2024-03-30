@@ -33,10 +33,10 @@ class Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Se
 
     struct UpdaterConfig {
         UpdaterConfig(const MapType& map) :
-                sigma_min(map.getRes() * map.getDataConfig().sigma_min_factor),
-                sigma_max(map.getRes() * map.getDataConfig().sigma_max_factor),
-                tau_min(map.getRes() * map.getDataConfig().tau_min_factor),
-                tau_max(map.getRes() * map.getDataConfig().tau_max_factor)
+                sigma_min(map.getRes() * map.getDataConfig().field.sigma_min_factor),
+                sigma_max(map.getRes() * map.getDataConfig().field.sigma_max_factor),
+                tau_min(map.getRes() * map.getDataConfig().field.tau_min_factor),
+                tau_max(map.getRes() * map.getDataConfig().field.tau_max_factor)
         {
         }
 

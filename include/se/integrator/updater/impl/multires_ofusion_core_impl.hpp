@@ -20,13 +20,15 @@ float compute_three_sigma(const field_t depth_value,
                           const float sigma_max,
                           const ConfigT config)
 {
-    if (config.uncertainty_model == UncertaintyModel::Linear) {
+    if (config.field.uncertainty_model == UncertaintyModel::Linear) {
         return 3
-            * std::clamp(config.k_sigma * depth_value, sigma_min, sigma_max); // Livingroom dataset
+            * std::clamp(config.field.k_sigma * depth_value,
+                         sigma_min,
+                         sigma_max); // Livingroom dataset
     }
     else {
         return 3
-            * std::clamp(config.k_sigma * math::sq(depth_value),
+            * std::clamp(config.field.k_sigma * math::sq(depth_value),
                          sigma_min,
                          sigma_max); // Cow and lady
     }
@@ -40,7 +42,7 @@ float compute_tau(const field_t depth_value,
                   const float tau_max,
                   const ConfigT config)
 {
-    return std::clamp(config.k_tau * depth_value, tau_min, tau_max);
+    return std::clamp(config.field.k_tau * depth_value, tau_min, tau_max);
 }
 
 
@@ -57,22 +59,24 @@ bool update_voxel(DataT& data,
     float sample_value;
 
     if (range_diff < -three_sigma) {
-        sample_value = config.log_odd_min;
+        sample_value = config.field.log_odd_min;
     }
     else if (range_diff < tau / 2) {
-        sample_value = std::min(config.log_odd_min
-                                    - config.log_odd_min / three_sigma * (range_diff + three_sigma),
-                                config.log_odd_max);
+        sample_value =
+            std::min(config.field.log_odd_min
+                         - config.field.log_odd_min / three_sigma * (range_diff + three_sigma),
+                     config.field.log_odd_max);
     }
     else if (range_diff < tau) {
-        sample_value = std::min(-config.log_odd_min * tau / (2 * three_sigma), config.log_odd_max);
+        sample_value =
+            std::min(-config.field.log_odd_min * tau / (2 * three_sigma), config.field.log_odd_max);
     }
     else {
         return false;
     }
 
     const bool newly_observed = !data.observed;
-    data.update(sample_value, config.max_weight);
+    data.field.update(sample_value, config.max_weight);
     return newly_observed;
 }
 
@@ -82,7 +86,7 @@ template<typename DataT, typename ConfigT>
 bool free_voxel(DataT& voxel_data, const ConfigT config)
 {
     const bool newly_observed = !voxel_data.observed;
-    voxel_data.update(config.log_odd_min, config.max_weight);
+    voxel_data.field.update(config.log_odd_min, config.max_weight);
     return newly_observed;
 }
 

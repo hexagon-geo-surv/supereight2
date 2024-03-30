@@ -78,7 +78,7 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
                         std::max(child_data_union.data.tsdf + delta_tsdf, field_t(-1));
                     child_data_union.data.weight = fminf(
                         child_data_union.data.weight + parent_data_union.prop_data.delta_weight,
-                        map_.getDataConfig().max_weight);
+                        map_.getDataConfig().field.max_weight);
                     ;
                     child_data_union.prop_data.delta_weight =
                         parent_data_union.prop_data.delta_weight;
@@ -147,8 +147,9 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
 
                     typename BlockType::DataUnion data_union =
                         block_ptr->getDataUnion(voxel_coord, block_ptr->getCurrentScale());
-                    data_union.data.update(
-                        sdf_value, config_.truncation_boundary, map_.getDataConfig().max_weight);
+                    data_union.data.update(sdf_value,
+                                           config_.truncation_boundary,
+                                           map_.getDataConfig().field.max_weight);
                     data_union.prop_data.delta_weight++;
                     block_ptr->setDataUnion(data_union);
                 } // k

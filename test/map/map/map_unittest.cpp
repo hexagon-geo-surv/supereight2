@@ -33,12 +33,12 @@ TEST(Map, Gradient)
     sensor_config.far_plane = 20.0f;
     // Data Config
     se::OccupancyData::Config data_config;
-    data_config.tau_min_factor = 20;
-    data_config.tau_max_factor = 20;
-    data_config.k_tau = 1;
-    data_config.sigma_min_factor = 1;
-    data_config.sigma_max_factor = 3;
-    data_config.k_sigma = 0.05f;
+    data_config.field.tau_min_factor = 20;
+    data_config.field.tau_max_factor = 20;
+    data_config.field.k_tau = 1;
+    data_config.field.sigma_min_factor = 1;
+    data_config.field.sigma_max_factor = 3;
+    data_config.field.k_sigma = 0.05f;
 
     // Create Map
     se::OccupancyMap<se::Res::Multi> map(map_dim, map_res, data_config);
@@ -57,7 +57,7 @@ TEST(Map, Gradient)
         // Check free space occupancy value
         const std::optional<se::field_t> occupancy = map.getFieldInterp(point);
         ASSERT_TRUE(occupancy);
-        EXPECT_FLOAT_EQ(*occupancy, data_config.log_odd_min);
+        EXPECT_FLOAT_EQ(*occupancy, data_config.field.log_odd_min);
         // Check for zero gradients
         const std::optional<Eigen::Vector3f> gradient = map.getFieldGrad(point);
         ASSERT_TRUE(gradient);

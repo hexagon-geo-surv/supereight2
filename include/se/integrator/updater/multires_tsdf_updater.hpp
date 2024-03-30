@@ -33,7 +33,8 @@ class Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT
 
     struct UpdaterConfig {
         UpdaterConfig(const MapType& map) :
-                truncation_boundary(map.getRes() * map.getDataConfig().truncation_boundary_factor)
+                truncation_boundary(map.getRes()
+                                    * map.getDataConfig().field.truncation_boundary_factor)
         {
         }
 

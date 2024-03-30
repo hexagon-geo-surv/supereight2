@@ -72,10 +72,10 @@ class VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
      */
     struct VolumeCarverConfig {
         VolumeCarverConfig(const MapType& map) :
-                sigma_min(map.getDataConfig().sigma_min_factor * map.getRes()),
-                sigma_max(map.getDataConfig().sigma_max_factor * map.getRes()),
-                tau_min(map.getDataConfig().tau_min_factor * map.getRes()),
-                tau_max(map.getDataConfig().tau_max_factor * map.getRes())
+                sigma_min(map.getDataConfig().field.sigma_min_factor * map.getRes()),
+                sigma_max(map.getDataConfig().field.sigma_max_factor * map.getRes()),
+                tau_min(map.getDataConfig().field.tau_min_factor * map.getRes()),
+                tau_max(map.getDataConfig().field.tau_max_factor * map.getRes())
         {
         }
 

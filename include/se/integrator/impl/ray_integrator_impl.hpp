@@ -28,7 +28,7 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockS
         ray_(ray),
         last_visited_voxel_(Eigen::Vector3i::Constant(-1)),
         map_res_(map.getRes()),
-        free_space_scale_(map_.getDataConfig().fs_integr_scale),
+        free_space_scale_(map_.getDataConfig().field.fs_integr_scale),
         frame_(frame),
         ray_dist_(ray_.norm()),
         tau_(compute_tau(ray_dist_, config_.tau_min, config_.tau_max, map_.getDataConfig())),

@@ -46,7 +46,7 @@ RaycastCarver<MapT, SensorT>::RaycastCarver(MapT& map,
         sensor_(sensor),
         depth_img_(depth_img),
         T_WS_(T_WS),
-        band_(2.0f * map.getRes() * map.getDataConfig().truncation_boundary_factor)
+        band_(2.0f * map.getRes() * map.getDataConfig().field.truncation_boundary_factor)
 {
 }
 

@@ -22,22 +22,24 @@ bool update_voxel(DataT& data,
     float sample_value;
 
     if (range_diff < -three_sigma) {
-        sample_value = config.log_odd_min;
+        sample_value = config.field.log_odd_min;
     }
     else if (range_diff < tau / 2) {
-        sample_value = std::min(config.log_odd_min
-                                    - config.log_odd_min / three_sigma * (range_diff + three_sigma),
-                                config.log_odd_max);
+        sample_value =
+            std::min(config.field.log_odd_min
+                         - config.field.log_odd_min / three_sigma * (range_diff + three_sigma),
+                     config.field.log_odd_max);
     }
     else if (range_diff < tau) {
-        sample_value = std::min(-config.log_odd_min * tau / (2 * three_sigma), config.log_odd_max);
+        sample_value =
+            std::min(-config.field.log_odd_min * tau / (2 * three_sigma), config.field.log_odd_max);
     }
     else {
         return false;
     }
 
     const bool newly_observed = !data.observed;
-    data.update(sample_value, config.max_weight);
+    data.field.update(sample_value, config.max_weight);
     return newly_observed;
 }
 
@@ -46,7 +48,7 @@ template<typename DataT, typename ConfigT>
 bool free_voxel(DataT& voxel_data, const ConfigT config)
 {
     const bool newly_observed = !voxel_data.observed;
-    voxel_data.update(config.log_odd_min, config.max_weight);
+    voxel_data.field.update(config.log_odd_min, config.max_weight);
     return newly_observed;
 }
 
