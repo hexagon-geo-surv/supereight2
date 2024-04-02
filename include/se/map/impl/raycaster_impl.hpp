@@ -541,6 +541,10 @@ void raycast_volume(const MapT& map,
                     const Eigen::Isometry3f& T_WS,
                     const SensorT& sensor)
 {
+    assert(surface_point_cloud_W.width() == surface_normals_W.width());
+    assert(surface_point_cloud_W.height() == surface_normals_W.height());
+    assert(surface_point_cloud_W.width() == surface_scale.width());
+    assert(surface_point_cloud_W.height() == surface_scale.height());
     const typename MapT::OctreeType& octree = map.getOctree();
 #pragma omp parallel for
     for (int y = 0; y < surface_point_cloud_W.height(); y++) {
