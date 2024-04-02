@@ -377,14 +377,10 @@ TEST(MultiResOFusionSystemTest, Raycasting)
     se::Image<se::RGBA> processed_colour_img(processed_img_res.x(), processed_img_res.y());
 
     // Setup output images / renders
-    std::unique_ptr<se::RGBA[]> output_colour_img_data(
-        new se::RGBA[processed_img_res.x() * processed_img_res.y()]);
-    std::unique_ptr<se::RGBA[]> output_depth_img_data(
-        new se::RGBA[processed_img_res.x() * processed_img_res.y()]);
-    std::unique_ptr<se::RGBA[]> output_tracking_img_data(
-        new se::RGBA[processed_img_res.x() * processed_img_res.y()]);
-    std::unique_ptr<se::RGBA[]> output_volume_img_data(
-        new se::RGBA[processed_img_res.x() * processed_img_res.y()]);
+    se::Image<se::RGBA> output_colour_img(processed_img_res.x(), processed_img_res.y());
+    se::Image<se::RGBA> output_depth_img(processed_img_res.x(), processed_img_res.y());
+    se::Image<se::RGBA> output_tracking_img(processed_img_res.x(), processed_img_res.y());
+    se::Image<se::RGBA> output_volume_img(processed_img_res.x(), processed_img_res.y());
 
     // Create a pinhole camera and downsample the intrinsics
     const se::PinholeCamera sensor(config.sensor, config.app.sensor_downsampling_factor);
@@ -418,9 +414,9 @@ TEST(MultiResOFusionSystemTest, Raycasting)
         map, surface_point_cloud_W, surface_normals_W, surface_scale, T_WS, sensor);
 
     const Eigen::Vector3f ambient{0.1, 0.1, 0.1};
-    convert_to_output_rgba_img(processed_colour_img, output_colour_img_data.get());
-    convert_to_output_depth_img(processed_depth_img, output_depth_img_data.get());
-    se::raycaster::render_volume_kernel(output_volume_img_data.get(),
+    convert_to_output_rgba_img(processed_colour_img, output_colour_img.data());
+    convert_to_output_depth_img(processed_depth_img, output_depth_img.data());
+    se::raycaster::render_volume_kernel(output_volume_img.data(),
                                         processed_img_res,
                                         T_WS.translation(),
                                         ambient,
@@ -444,7 +440,7 @@ TEST(MultiResOFusionSystemTest, Raycasting)
     map.saveMesh(config.app.mesh_path + "/test-raycasting-mesh_" + std::to_string(frame) + ".obj");
 
     cv::Mat depth_cv_image(
-        processed_img_res.y(), processed_img_res.x(), CV_8UC4, output_volume_img_data.get());
+        processed_img_res.y(), processed_img_res.x(), CV_8UC4, output_volume_img.data());
     cv::cvtColor(depth_cv_image, depth_cv_image, cv::COLOR_RGBA2BGRA);
     cv::imwrite((config.app.mesh_path + "/test-raycasting-img.png").c_str(), depth_cv_image);
 }

@@ -55,14 +55,10 @@ int main(int argc, char** argv)
         se::Image<se::RGBA> processed_colour_img(processed_img_res.x(), processed_img_res.y());
 
         // Setup output images / renders
-        std::unique_ptr<se::RGBA[]> output_colour_img_data(
-            new se::RGBA[processed_img_res.x() * processed_img_res.y()]);
-        std::unique_ptr<se::RGBA[]> output_depth_img_data(
-            new se::RGBA[processed_img_res.x() * processed_img_res.y()]);
-        std::unique_ptr<se::RGBA[]> output_tracking_img_data(
-            new se::RGBA[processed_img_res.x() * processed_img_res.y()]);
-        std::unique_ptr<se::RGBA[]> output_volume_img_data(
-            new se::RGBA[processed_img_res.x() * processed_img_res.y()]);
+        se::Image<se::RGBA> output_colour_img(processed_img_res.x(), processed_img_res.y());
+        se::Image<se::RGBA> output_depth_img(processed_img_res.x(), processed_img_res.y());
+        se::Image<se::RGBA> output_tracking_img(processed_img_res.x(), processed_img_res.y());
+        se::Image<se::RGBA> output_volume_img(processed_img_res.x(), processed_img_res.y());
 
         // ========= Map INITIALIZATION  =========
         // Setup the single-res TSDF map w/ default block size of 8 voxels
@@ -160,14 +156,14 @@ int main(int argc, char** argv)
             TICK("render")
             if (config.app.enable_rendering) {
                 const Eigen::Vector3f ambient{0.1, 0.1, 0.1};
-                convert_to_output_rgba_img(processed_colour_img, output_colour_img_data.get());
+                convert_to_output_rgba_img(processed_colour_img, output_colour_img.data());
                 convert_to_output_depth_img(processed_depth_img,
                                             sensor.near_plane,
                                             sensor.far_plane,
-                                            output_depth_img_data.get());
-                tracker.renderTrackingResult(output_tracking_img_data.get());
+                                            output_depth_img.data());
+                tracker.renderTrackingResult(output_tracking_img.data());
                 if (frame % config.app.rendering_rate == 0) {
-                    se::raycaster::render_volume_kernel(output_volume_img_data.get(),
+                    se::raycaster::render_volume_kernel(output_volume_img.data(),
                                                         processed_img_res,
                                                         T_WS.translation(),
                                                         ambient,
@@ -186,13 +182,13 @@ int main(int argc, char** argv)
                 std::vector<cv::Mat> images;
                 std::vector<std::string> labels;
                 labels.emplace_back("INPUT RGB");
-                images.emplace_back(res, CV_8UC4, output_colour_img_data.get());
+                images.emplace_back(res, CV_8UC4, output_colour_img.data());
                 labels.emplace_back("INPUT DEPTH");
-                images.emplace_back(res, CV_8UC4, output_depth_img_data.get());
+                images.emplace_back(res, CV_8UC4, output_depth_img.data());
                 labels.emplace_back(config.app.enable_ground_truth ? "TRACKING OFF" : "TRACKING");
-                images.emplace_back(res, CV_8UC4, output_tracking_img_data.get());
+                images.emplace_back(res, CV_8UC4, output_tracking_img.data());
                 labels.emplace_back("RENDER");
-                images.emplace_back(res, CV_8UC4, output_volume_img_data.get());
+                images.emplace_back(res, CV_8UC4, output_volume_img.data());
                 // Combine all the images into one, overlay the labels and show it.
                 cv::Mat render = se::montage(2, 2, images, labels);
                 drawit(reinterpret_cast<se::RGBA*>(render.data),
