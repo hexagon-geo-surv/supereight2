@@ -550,12 +550,11 @@ void raycast_volume(const MapT& map,
     for (int y = 0; y < surface_point_cloud_W.height(); y++) {
 #pragma omp simd
         for (int x = 0; x < surface_point_cloud_W.width(); x++) {
-            const Eigen::Vector2i pixel(x, y);
-            const Eigen::Vector2f pixel_f = pixel.cast<float>();
+            const size_t idx = x + y * static_cast<size_t>(surface_point_cloud_W.width());
             Eigen::Vector3f ray_dir_S; //< Ray direction in sensor frame
-            sensor.model.backProject(pixel_f, &ray_dir_S);
+            sensor.model.backProject(Eigen::Vector2f(x, y), &ray_dir_S);
             const Eigen::Vector3f ray_dir_W = T_WS.linear() * ray_dir_S.normalized();
-            std::optional<Eigen::Vector4f> surface_intersection_W =
+            const std::optional<Eigen::Vector4f> surface_intersection_W =
                 raycast(map,
                         octree,
                         T_WS.translation(),
@@ -565,29 +564,25 @@ void raycast_volume(const MapT& map,
 
             if (surface_intersection_W) {
                 // Set surface scale
-                surface_scale(x, y) = static_cast<int>((*surface_intersection_W).w());
+                surface_scale[idx] = static_cast<int>(surface_intersection_W->w());
                 // Set surface point
-                surface_point_cloud_W[x + y * surface_point_cloud_W.width()] =
-                    (*surface_intersection_W).head<3>();
+                surface_point_cloud_W[idx] = surface_intersection_W->head<3>();
                 // Set surface normal
-                std::optional<Eigen::Vector3f> surface_normal_W =
-                    map.template getFieldGrad((*surface_intersection_W).head<3>());
-                if (!surface_normal_W) {
-                    surface_normals_W[pixel.x() + pixel.y() * surface_normals_W.width()] =
-                        math::g_invalid_normal;
+                const std::optional<Eigen::Vector3f> surface_normal_W =
+                    map.template getFieldGrad(surface_intersection_W->head<3>());
+                if (surface_normal_W) {
+                    // Invert surface normals for TSDF representations.
+                    surface_normals_W[idx] = (MapT::DataType::invert_normals)
+                        ? (-1.f * (*surface_normal_W)).normalized()
+                        : surface_normal_W->normalized();
                 }
                 else {
-                    // Invert surface normals for TSDF representations.
-                    surface_normals_W[pixel.x() + pixel.y() * surface_normals_W.width()] =
-                        (MapT::DataType::invert_normals) ? (-1.f * (*surface_normal_W)).normalized()
-                                                         : (*surface_normal_W).normalized();
+                    surface_normals_W[idx] = math::g_invalid_normal;
                 }
             }
             else {
-                surface_point_cloud_W[pixel.x() + pixel.y() * surface_point_cloud_W.width()] =
-                    Eigen::Vector3f::Zero();
-                surface_normals_W[pixel.x() + pixel.y() * surface_normals_W.width()] =
-                    math::g_invalid_normal;
+                surface_point_cloud_W[idx] = Eigen::Vector3f::Zero();
+                surface_normals_W[idx] = math::g_invalid_normal;
             }
         } // x
     }     // y
