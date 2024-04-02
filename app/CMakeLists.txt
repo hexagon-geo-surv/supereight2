@@ -107,8 +107,8 @@ endforeach()
 
 # build ray interface
 add_executable(supereight_occupancy_multi_leicalidar_ray src/main_leica_lidar.cpp)
+target_compile_options(supereight_occupancy_multi_leicalidar_ray PRIVATE ${SE_PRIVATE_CXX_FLAGS})
 target_include_directories(supereight_occupancy_multi_leicalidar_ray BEFORE PRIVATE include)
 target_link_libraries(supereight_occupancy_multi_leicalidar_ray PRIVATE SRL::Supereight2 ${LIB_NAME})
 # Allow handling large files in 32-bit systems
 target_compile_definitions(supereight_occupancy_multi_leicalidar_ray PRIVATE _FILE_OFFSET_BITS=64)
-
