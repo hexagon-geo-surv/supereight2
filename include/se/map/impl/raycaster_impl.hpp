@@ -44,7 +44,7 @@ inline std::optional<se::field_t> find_valid_point(const MapT& map,
     Eigen::Vector3f ray_pos_W = ray_origin_W + t * ray_dir_W;
     if (map.contains(ray_pos_W)) {
         peek_data = map.getData(ray_pos_W);
-        if (peek_data.weight > 0) {
+        if (is_valid(peek_data)) {
             value = map.getFieldInterp(ray_pos_W);
         }
     }
@@ -58,7 +58,7 @@ inline std::optional<se::field_t> find_valid_point(const MapT& map,
         ray_pos_W = ray_origin_W + t * ray_dir_W;
         if (map.contains(ray_pos_W)) {
             peek_data = map.getData(ray_pos_W);
-            if (peek_data.weight > 0) {
+            if (is_valid(peek_data)) {
                 value = map.getFieldInterp(ray_pos_W);
             }
         }
@@ -401,7 +401,7 @@ raycast(MapT& map,
         for (; t < t_far; t += step_size) {
             ray_pos_W = ray_origin_W + ray_dir_W * t;
             DataType data = map.getData(ray_pos_W);
-            if (data.weight == 0) {
+            if (!se::is_valid(data)) {
                 t += step_size;
                 value_t =
                     find_valid_point(map, ray_origin_W, ray_dir_W, step_size, t_far, t, point_W_t);
