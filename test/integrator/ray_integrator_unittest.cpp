@@ -28,13 +28,11 @@ static void expect_valid_node_data(const NodeType& node, const se::OctantBase* c
     failure_message << "for node (" << node.getCoord().transpose() << ") with size "
                     << node.getSize();
     if (min_data.observed) {
-        EXPECT_LE(node.getMinData().occupancy * node.getMinData().weight,
-                  min_data.occupancy * min_data.weight)
+        EXPECT_LE(se::get_field(node.getMinData()), se::get_field(min_data))
             << failure_message.str();
     }
     if (max_data.observed) {
-        EXPECT_GE(node.getMaxData().occupancy * node.getMaxData().weight,
-                  max_data.occupancy * max_data.weight)
+        EXPECT_GE(se::get_field(node.getMaxData()), se::get_field(max_data))
             << failure_message.str();
     }
 }
@@ -59,13 +57,11 @@ static void expect_valid_scale_data(const BlockType& block,
                                 << scale;
 
                 if (child_min_data.observed) {
-                    EXPECT_LE(parent_min_data.occupancy * parent_min_data.weight,
-                              child_min_data.occupancy * child_min_data.weight)
+                    EXPECT_LE(se::get_field(parent_min_data), se::get_field(child_min_data))
                         << failure_message.str();
                 }
                 if (child_max_data.observed) {
-                    EXPECT_GE(parent_max_data.occupancy * parent_max_data.weight,
-                              child_max_data.occupancy * child_max_data.weight)
+                    EXPECT_GE(se::get_field(parent_max_data), se::get_field(child_max_data))
                         << failure_message.str();
                 }
             }
