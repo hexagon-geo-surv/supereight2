@@ -22,7 +22,12 @@ namespace isosurface {
 /** Mesh the surface between occupied and free space. This is what's typically wanted when meshing.
  * The mesh faces are oriented away from occupied space.
  */
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
+template<typename T>
+static constexpr auto occupied = [](const T data[8]) -> std::uint8_t {
+#else
 static constexpr auto occupied = [](const auto data[8]) -> std::uint8_t {
+#endif
     // A face should be meshed if there are no unknown vertices (not valid) and if there is at least
     // 1 occupied vertex (valid and inside).
     std::uint8_t edge_index = 0;
@@ -40,7 +45,12 @@ static constexpr auto occupied = [](const auto data[8]) -> std::uint8_t {
 /** Mesh the surface between free and occupied or unknown space. This will create a mesh that
  * encloses all free space in the map. The mesh faces are oriented away from free space.
  */
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
+template<typename T>
+static constexpr auto free = [](const T data[8]) -> std::uint8_t {
+#else
 static constexpr auto free = [](const auto data[8]) -> std::uint8_t {
+#endif
     // A face should be meshed if there is at least 1 free vertex (valid and not inside). Since both
     // the boundaries between free and unknown, and free and occupied are needed there's no early
     // exit on invalid data.
@@ -56,7 +66,12 @@ static constexpr auto free = [](const auto data[8]) -> std::uint8_t {
 /** Mesh the surface between free and unknown space, also known as frontiers. The mesh faces are
  * oriented towards unknown space.
  */
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
+template<typename T>
+static constexpr auto frontier = [](const T data[8]) -> std::uint8_t {
+#else
 static constexpr auto frontier = [](const auto data[8]) -> std::uint8_t {
+#endif
     // Frontiers are the boundaries between free and unknown space. This means there should be at
     // least 1 free vertex (valid and not inside) and at least 1 unknown vertex (not valid) for a
     // face to be meshed.

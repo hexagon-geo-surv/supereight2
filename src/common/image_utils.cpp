@@ -26,7 +26,11 @@ int se::save_depth_png(const float* depth_image_data,
     const size_t num_pixels = depth_image_res.prod();
     std::unique_ptr<uint16_t[]> depth_image_data_scaled(new uint16_t[num_pixels]);
 #pragma omp parallel for
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
+    for (int i = 0; i < static_cast<int>(num_pixels); ++i) {
+#else
     for (size_t i = 0; i < num_pixels; ++i) {
+#endif
         depth_image_data_scaled.get()[i] = std::roundf(scale * depth_image_data[i]);
     }
     // Save the uint16_t depth image
@@ -68,7 +72,11 @@ int se::load_depth_png(float** depth_image_data,
     const size_t num_pixels = depth_image_res.prod();
     *depth_image_data = new float[num_pixels];
 #pragma omp parallel for
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
+    for (int i = 0; i < static_cast<int>(num_pixels); ++i) {
+#else
     for (size_t i = 0; i < num_pixels; ++i) {
+#endif
         (*depth_image_data)[i] = inverse_scale * depth_image_data_scaled[i];
     }
     delete[] depth_image_data_scaled;
@@ -107,7 +115,11 @@ int se::save_depth_pgm(const float* depth_image_data,
     const size_t num_pixels = depth_image_res.prod();
     std::unique_ptr<uint16_t[]> depth_image_data_scaled(new uint16_t[num_pixels]);
 #pragma omp parallel for
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
+    for (int i = 0; i < static_cast<int>(num_pixels); ++i) {
+#else
     for (size_t i = 0; i < num_pixels; ++i) {
+#endif
         depth_image_data_scaled.get()[i] = std::roundf(scale * depth_image_data[i]);
     }
     // Save the uint16_t depth image
@@ -170,7 +182,11 @@ int se::load_depth_pgm(float** depth_image_data,
     const size_t num_pixels = depth_image_res.prod();
     *depth_image_data = new float[num_pixels];
 #pragma omp parallel for
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
+    for (int i = 0; i < static_cast<int>(num_pixels); ++i) {
+#else
     for (size_t i = 0; i < num_pixels; ++i) {
+#endif
         (*depth_image_data)[i] = inverse_scale * depth_image_data_scaled[i];
     }
     delete[] depth_image_data_scaled;

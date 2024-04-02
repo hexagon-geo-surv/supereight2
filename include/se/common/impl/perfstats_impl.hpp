@@ -11,6 +11,13 @@
 #ifndef SE_PERFSTATS_IMPL_HPP
 #define SE_PERFSTATS_IMPL_HPP
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
+#include <Windows.h>
+#include <sysinfoapi.h>
+#undef max
+#undef min
+#endif
+
 inline double PerfStats::Stats::meanIter(const std::vector<double>& iter_data_vec)
 {
     return sumIter(iter_data_vec) / std::max(iter_data_vec.size(), size_t(1));
@@ -292,6 +299,13 @@ inline double PerfStats::getTime()
     host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &cclock);
     clock_get_time(cclock, &clockData);
     mach_port_deallocate(mach_task_self(), cclock);
+#elif defined(WIN32) || defined(_WIN32) || defined(__WIN32)
+	__int64 wintime;
+	timespec clockData;
+	GetSystemTimeAsFileTime((FILETIME*)&wintime);
+    wintime      -=116444736000000000i64;  //1jan1601 to 1jan1970
+    clockData.tv_sec  =wintime / 10000000i64;           //seconds
+    clockData.tv_nsec =wintime % 10000000i64 *100;      //nano-seconds
 #else
     struct timespec clockData;
     clock_gettime(CLOCK_MONOTONIC, &clockData);

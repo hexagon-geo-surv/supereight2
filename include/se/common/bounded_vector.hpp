@@ -23,7 +23,7 @@ class ArrayAllocator {
 
     T data_[N];
 
-    public:
+public:
     typedef T value_type;
     typedef std::true_type propagate_on_container_copy_assignment;
     typedef std::true_type propagate_on_container_move_assignment;
@@ -59,6 +59,15 @@ class ArrayAllocator {
     {
         return !(*this == rhs);
     }
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
+#        if _ITERATOR_DEBUG_LEVEL != 0
+     ArrayAllocator() = default;
+    ~ArrayAllocator() = default;
+
+    template<typename U, std::size_t M>
+    ArrayAllocator(const ArrayAllocator<U, M>& other) {}
+#endif //_ITERATOR_DEBUG_LEVEL != 0
+#endif
 };
 
 } // namespace detail

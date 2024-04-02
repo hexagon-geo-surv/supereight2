@@ -13,7 +13,11 @@
 
 // POSIX systems must have the unistd.h header.
 #if __has_include(<unistd.h>)
-#    include <wordexp.h>
+    #ifdef __ANDROID__
+    // Android has no wordepx
+    #else
+    #    include <wordexp.h>
+    #endif
 #endif
 
 
@@ -189,6 +193,11 @@ std::string expand_user(const std::string& path)
 
     // POSIX systems must have the unistd.h header.
 #if __has_include(<unistd.h>)
+#if __APPLE__
+    // wordexp is not supported on iOS
+#elif __ANDROID__
+    // android has no wordexp
+#else
     wordexp_t expansion;
     if (wordexp(path.c_str(), &expansion, WRDE_NOCMD) == 0) {
         if (expansion.we_wordc >= 1) {
@@ -196,6 +205,7 @@ std::string expand_user(const std::string& path)
         }
     }
     wordfree(&expansion);
+#endif //__APPLE__
 #endif
     return expanded_path;
 }
@@ -204,7 +214,7 @@ std::string resolve_relative_path(const std::string& relative_path, const std::s
 {
     const stdfs::path relative_path_p(relative_path);
     if (relative_path_p.is_relative()) {
-        return base_dir / relative_path_p;
+        return (base_dir / relative_path_p).string();
     }
     return relative_path;
 }

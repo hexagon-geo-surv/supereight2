@@ -94,7 +94,11 @@ static inline uint32_t blend(const uint32_t rgba_1, const uint32_t rgba_2, const
 static inline void rgb_to_rgba(const uint8_t* rgb, uint32_t* rgba, size_t num_pixels)
 {
 #pragma omp parallel for
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
+    for (int p = 0; p < static_cast<int>(num_pixels); ++p) {
+#else
     for (size_t p = 0; p < num_pixels; ++p) {
+#endif
         const uint8_t r = rgb[3 * p + 0];
         const uint8_t g = rgb[3 * p + 1];
         const uint8_t b = rgb[3 * p + 2];
@@ -107,7 +111,11 @@ static inline void rgb_to_rgba(const uint8_t* rgb, uint32_t* rgba, size_t num_pi
 static inline void rgba_to_rgb(const uint32_t* rgba, uint8_t* rgb, size_t num_pixels)
 {
 #pragma omp parallel for
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
+    for (int p = 0; p < static_cast<int>(num_pixels); ++p) {
+#else
     for (size_t p = 0; p < num_pixels; ++p) {
+#endif
         rgb[3 * p + 0] = r_from_rgba(rgba[p]);
         rgb[3 * p + 1] = g_from_rgba(rgba[p]);
         rgb[3 * p + 2] = b_from_rgba(rgba[p]);
