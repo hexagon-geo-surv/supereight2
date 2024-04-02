@@ -540,12 +540,19 @@ void raycast_volume(const MapT& map,
                     const Eigen::Isometry3f& T_WS,
                     se::Image<Eigen::Vector3f>& surface_point_cloud_W,
                     se::Image<Eigen::Vector3f>& surface_normals_W,
-                    se::Image<int8_t>& surface_scale)
+                    se::Image<int8_t>& surface_scale,
+                    se::Image<colour_t>* surface_colour)
 {
     assert(surface_point_cloud_W.width() == surface_normals_W.width());
     assert(surface_point_cloud_W.height() == surface_normals_W.height());
     assert(surface_point_cloud_W.width() == surface_scale.width());
     assert(surface_point_cloud_W.height() == surface_scale.height());
+    if constexpr (MapT::col_ == Colour::On) {
+        if (surface_colour) {
+            assert(surface_point_cloud_W.width() == surface_colour->width());
+            assert(surface_point_cloud_W.height() == surface_colour->height());
+        }
+    }
     const typename MapT::OctreeType& octree = map.getOctree();
 #pragma omp parallel for
     for (int y = 0; y < surface_point_cloud_W.height(); y++) {
@@ -580,10 +587,21 @@ void raycast_volume(const MapT& map,
                 else {
                     surface_normals_W[idx] = math::g_invalid_normal;
                 }
+                if constexpr (MapT::col_ == Colour::On) {
+                    if (surface_colour) {
+                        const auto result = map.getColourInterp(surface_intersection_W->head<3>());
+                        (*surface_colour)[idx] = result ? *result : colour_t();
+                    }
+                }
             }
             else {
                 surface_point_cloud_W[idx] = Eigen::Vector3f::Zero();
                 surface_normals_W[idx] = math::g_invalid_normal;
+                if constexpr (MapT::col_ == Colour::On) {
+                    if (surface_colour) {
+                        (*surface_colour)[idx] = colour_t();
+                    }
+                }
             }
         } // x
     }     // y

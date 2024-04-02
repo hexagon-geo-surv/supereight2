@@ -87,6 +87,7 @@ int main(int argc, char** argv)
                                                          processed_img_res.y());
         se::Image<Eigen::Vector3f> surface_normals_W(processed_img_res.x(), processed_img_res.y());
         se::Image<int8_t> surface_scale(processed_img_res.x(), processed_img_res.y());
+        se::Image<se::colour_t> surface_colour(processed_img_res.x(), processed_img_res.y());
 
         int frame = 0;
         while (frame != config.app.max_frames) {
@@ -137,8 +138,13 @@ int main(int argc, char** argv)
             // Raycast from T_MS
             TICK("raycast")
             if (config.app.enable_rendering || !config.app.enable_ground_truth) {
-                se::raycaster::raycast_volume(
-                    map, sensor, T_WS, surface_point_cloud_W, surface_normals_W, surface_scale);
+                se::raycaster::raycast_volume(map,
+                                              sensor,
+                                              T_WS,
+                                              surface_point_cloud_W,
+                                              surface_normals_W,
+                                              surface_scale,
+                                              &surface_colour);
             }
             TOCK("raycast")
 
