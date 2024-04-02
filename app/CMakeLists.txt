@@ -50,10 +50,10 @@ endif()
 
 # Compile the apps for each configuration in SE_APP_CONFIG.
 set(SE_APP_CONFIG
-  "TSDF Single PinholeCamera"
-  "TSDF Multi PinholeCamera"
+  "TSDFCol Single PinholeCamera"
+  "TSDFCol Multi PinholeCamera"
   "TSDF Multi OusterLidar"
-  "Occupancy Multi PinholeCamera"
+  "OccupancyCol Multi PinholeCamera"
   "Occupancy Multi OusterLidar"
 )
 foreach(APP_CONFIG ${SE_APP_CONFIG})
