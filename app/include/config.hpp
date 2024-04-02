@@ -106,18 +106,18 @@ std::ostream& operator<<(std::ostream& os, const AppConfig& c);
 
 
 
-template<typename DataConfigT, typename SensorConfigT>
+template<typename MapT, typename SensorT>
 struct Config {
-    MapConfig map;
-    DataConfigT data;
-    SensorConfigT sensor;
+    struct MapT::Config map;
+    struct MapT::DataType::Config data;
+    struct SensorT::Config sensor;
     TrackerConfig tracker;
-    ReaderConfig reader;
+    Reader::Config reader;
     AppConfig app;
 
     /** Default initializes all configs.
      */
-    Config();
+    Config() = default;
 
     /** Initializes the config from a YAML file. Data not present in the YAML file will be
      * initialized as in Config::Config().
@@ -127,12 +127,8 @@ struct Config {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
-
-
-template<typename DataConfigT, typename SensorConfigT>
-std::ostream& operator<<(std::ostream& os, const Config<DataConfigT, SensorConfigT>& c);
-
-
+template<typename MapT, typename SensorT>
+std::ostream& operator<<(std::ostream& os, const Config<MapT, SensorT>& c);
 
 } // namespace se
 

@@ -22,7 +22,7 @@ TEST(Map, Gradient)
     const Eigen::Vector3f map_dim = Eigen::Vector3f::Constant(32);
     constexpr float map_res = 0.03;
     // Sensor config
-    se::PinholeCameraConfig sensor_config;
+    se::PinholeCamera::Config sensor_config;
     sensor_config.width = 640;
     sensor_config.height = 480;
     sensor_config.fx = 525;
@@ -32,7 +32,7 @@ TEST(Map, Gradient)
     sensor_config.near_plane = 0.4f;
     sensor_config.far_plane = 20.0f;
     // Data Config
-    se::OccupancyDataConfig data_config;
+    se::OccupancyData::Config data_config;
     data_config.tau_min_factor = 20;
     data_config.tau_max_factor = 20;
     data_config.k_tau = 1;
@@ -48,7 +48,7 @@ TEST(Map, Gradient)
         sensor.model.imageWidth(), sensor.model.imageHeight(), surface_distance);
     // Integrate depth image from an identity T_WS.
     se::MapIntegrator integrator(map);
-    integrator.integrateDepth(sensor, depth_img, Eigen::Matrix4f::Identity(), 0);
+    integrator.integrateDepth(sensor, depth_img, Eigen::Isometry3f::Identity(), 0);
 
     // Test that points in free space have 0 gradients
     const std::array free_points{

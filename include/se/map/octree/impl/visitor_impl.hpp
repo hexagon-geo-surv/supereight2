@@ -934,8 +934,7 @@ getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 /// Multi-res get field interp functions
 
 template<typename OctreeT>
-typename std::enable_if_t<(OctreeT::fld_ == Field::TSDF && OctreeT::res_ == Res::Multi),
-                          std::optional<field_t>>
+typename std::enable_if_t<OctreeT::res_ == Res::Multi, std::optional<field_t>>
 getFieldInterp(const OctreeT& octree,
                const Eigen::Vector3f& voxel_coord_f,
                const int scale_desired,
@@ -946,79 +945,6 @@ getFieldInterp(const OctreeT& octree,
 
     const unsigned int octree_size = octree.getSize();
 
-    // TODO: Adjust for MultiresOFusion where data is not necessarily stored in a block!
-    OctantBase* octant_ptr =
-        fetcher::template block<OctreeT>(voxel_coord_f.cast<int>(), octree.getRoot());
-    if (!octant_ptr) {
-        return std::nullopt;
-    }
-
-    typedef typename OctreeT::BlockType BlockType;
-    BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
-    const int init_scale = std::max(block_ptr->getCurrentScale(), scale_desired);
-
-    for (int scale = init_scale; scale <= BlockType::getMaxScale(); scale++) {
-        // Reset the neighbours. Assigning {} only works during initialization
-        std::fill_n(neighbour_data, 8, init_data);
-        scale_returned = scale;
-
-        Eigen::Vector3f factor;
-        const int stride = 1 << scale; // Multi-res
-        const Eigen::Vector3f scaled_voxel_coord_f =
-            1.f / stride * voxel_coord_f - sample_offset_frac;
-        factor = math::fracf(scaled_voxel_coord_f);
-        const Eigen::Vector3i base_coord = stride * scaled_voxel_coord_f.template cast<int>();
-
-        if ((base_coord.array() < 0).any()
-            || ((base_coord + Eigen::Vector3i::Constant(stride)).array() >= octree_size).any()) {
-            return std::nullopt;
-        }
-
-        if (!detail::get_neighbours(octree, base_coord, scale, neighbour_data)) {
-            continue;
-        }
-
-        for (int n = 0; n < 8; n++) //< 8 neighbours
-        {
-            if (!is_valid(neighbour_data[n])) {
-                return std::nullopt;
-            }
-        }
-
-        return (((get_field(neighbour_data[0]) * (1 - factor.x())
-                  + get_field(neighbour_data[1]) * factor.x())
-                     * (1 - factor.y())
-                 + (get_field(neighbour_data[2]) * (1 - factor.x())
-                    + get_field(neighbour_data[3]) * factor.x())
-                     * factor.y())
-                    * (1 - factor.z())
-                + ((get_field(neighbour_data[4]) * (1 - factor.x())
-                    + get_field(neighbour_data[5]) * factor.x())
-                       * (1 - factor.y())
-                   + (get_field(neighbour_data[6]) * (1 - factor.x())
-                      + get_field(neighbour_data[7]) * factor.x())
-                       * factor.y())
-                    * factor.z());
-    }
-    return std::nullopt;
-}
-
-
-
-template<typename OctreeT>
-typename std::enable_if_t<OctreeT::fld_ == Field::Occupancy && OctreeT::res_ == Res::Multi,
-                          std::optional<field_t>>
-getFieldInterp(const OctreeT& octree,
-               const Eigen::Vector3f& voxel_coord_f,
-               const int scale_desired,
-               int& scale_returned)
-{
-    typename OctreeT::DataType init_data;
-    typename OctreeT::DataType neighbour_data[8] = {};
-
-    const unsigned int octree_size = octree.getSize();
-
-    // TODO: Adjust for MultiresOFusion where data is not necessarily stored in a block!
     OctantBase* octant_ptr =
         fetcher::template leaf<OctreeT>(voxel_coord_f.cast<int>(), octree.getRoot());
 
@@ -1123,7 +1049,7 @@ getFieldGrad(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
         (base_coord + Eigen::Vector3i::Constant(2))
             .cwiseMin(Eigen::Vector3i::Constant(octree.getSize()) - Eigen::Vector3i::Constant(1));
 
-    const typename OctreeT::BlockType* block_ptr = static_cast<typename OctreeT::BlockType*>(
+    const auto* const block_ptr = static_cast<const typename OctreeT::BlockType*>(
         fetcher::template block<OctreeT>(base_coord, octree.getRoot()));
     if (!block_ptr) {
         return std::nullopt;
@@ -1304,7 +1230,7 @@ getFieldGrad(const OctreeT& octree,
             return std::nullopt;
         }
     }
-    BlockType* block_ptr = static_cast<BlockType*>(octant);
+    const BlockType* block_ptr = static_cast<const BlockType*>(octant);
 
     int init_scale =
         std::max(scale_desired,
@@ -1329,12 +1255,29 @@ getFieldGrad(const OctreeT& octree,
                 .cwiseMin(Eigen::Vector3i::Constant(octree.getSize())
                           - Eigen::Vector3i::Constant(1));
 
-        block_ptr =
-            static_cast<BlockType*>(fetcher::template block<OctreeT>(base_coord, octree.getRoot()));
-        if (!block_ptr) // If this block doesn't exist there's still a chance a gradient exist at a different scale
-        {
+        const OctantBase* const octant_ptr =
+            fetcher::template finest_octant<OctreeT>(base_coord, scale, octree.getRoot());
+        if (!octant_ptr) {
+            // If this octant isn't allocated there's still a chance a gradient exists at a coarser
+            // scale.
             continue;
         }
+        // TODO: Is it expected that a node might be queried while computing the gradient or is
+        // there some bug in the algorithm?
+        if (!octant_ptr->isBlock()) {
+            const auto& node = *static_cast<const typename OctreeT::NodeType*>(octant_ptr);
+            if (node.isLeaf() && is_valid(node.getData())) {
+                // Attempting to compute the gradient at a node, approximate with 0 as before.
+                scale_returned = math::log2_const(node.getSize());
+                return field_vec_t::Zero();
+            }
+            else {
+                // If this node isn't observed there's still a chance a gradient exists at a coarser
+                // scale.
+                continue;
+            }
+        }
+        block_ptr = static_cast<const BlockType*>(octant_ptr);
 
         const Eigen::Vector3i grad_coords[32] = {
             Eigen::Vector3i(

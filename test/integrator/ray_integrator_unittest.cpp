@@ -88,12 +88,12 @@ TEST(RayIntegrator, SingleRay)
     se::OccupancyMap<se::Res::Multi> map(Eigen::Vector3f::Constant(dim), res);
 
     // ========= Sensor INITIALIZATION  =========
-    se::LeicaLidarConfig sensorConfig;
+    se::LeicaLidar::Config sensorConfig;
     sensorConfig.width = 360;
     sensorConfig.height = 180;
     sensorConfig.near_plane = 0.2f;
     sensorConfig.far_plane = 30.0f;
-    sensorConfig.T_BS = Eigen::Matrix4f::Identity();
+    sensorConfig.T_BS = Eigen::Isometry3f::Identity();
     sensorConfig.elevation_resolution_angle_ = 1.0f;
     sensorConfig.azimuth_resolution_angle_ = 1.0f;
     const se::LeicaLidar sensor(sensorConfig);
@@ -106,7 +106,7 @@ TEST(RayIntegrator, SingleRay)
     std::vector<const se::OctantBase*> updated_octants;
 
     se::RayIntegrator rayIntegrator(
-        map, sensor, ray, Eigen::Matrix4f::Identity(), 0, &updated_octants);
+        map, sensor, ray, Eigen::Isometry3f::Identity(), 0, &updated_octants);
     rayIntegrator();
     rayIntegrator.propagateBlocksToCoarsestScale();
     rayIntegrator.propagateToRoot();
@@ -176,8 +176,8 @@ TEST(RayIntegrator, Propagation)
     // distance of plane wall [m]
     float d = 10.0f;
 
-    std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
-                Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>
+    std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
+                Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>
         rayBatch;
     size_t num_points_elevation = std::floor((elevation_max - elevation_min) / elevation_res);
     size_t num_points_azimuth = std::floor((azimuth_max - azimuth_min) / azimuth_res);
@@ -191,8 +191,8 @@ TEST(RayIntegrator, Propagation)
         for (size_t j = 0; j < num_points_azimuth; j++) {
             y = d * tan(azimuth_angle * deg_to_rad);
             // save point
-            rayBatch.push_back(std::pair<Eigen::Matrix4f, Eigen::Vector3f>(
-                Eigen::Matrix4f::Identity(), Eigen::Vector3f(x, y, z)));
+            rayBatch.push_back(std::pair<Eigen::Isometry3f, Eigen::Vector3f>(
+                Eigen::Isometry3f::Identity(), Eigen::Vector3f(x, y, z)));
             // increase azimuth angle
             azimuth_angle += azimuth_res;
         }
@@ -209,16 +209,16 @@ TEST(RayIntegrator, Propagation)
 
 
     // ========= Sensor INITIALIZATION  =========
-    se::LeicaLidarConfig sensorConfig;
+    se::LeicaLidar::Config sensorConfig;
     sensorConfig.width = 360;
     sensorConfig.height = 180;
     sensorConfig.near_plane = 0.6f;
     sensorConfig.far_plane = 30.0f;
-    sensorConfig.T_BS = Eigen::Matrix4f::Identity();
+    sensorConfig.T_BS = Eigen::Isometry3f::Identity();
     sensorConfig.elevation_resolution_angle_ = static_cast<float>(elevation_res);
     sensorConfig.azimuth_resolution_angle_ = static_cast<float>(azimuth_res);
 
-    //se::LeicaLidarConfig sensorConfig(se_config.sensor);
+    //se::LeicaLidar::Config sensorConfig(se_config.sensor);
     const se::LeicaLidar sensor(sensorConfig);
 
     // ========= Integrator INITIALIZATION  =========

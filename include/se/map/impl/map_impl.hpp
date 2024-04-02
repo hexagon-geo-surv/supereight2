@@ -22,9 +22,10 @@ const Eigen::Matrix<float, 3, 8> Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::c
 
 
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
-Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const Eigen::Vector3f& dim,
-                                                  const float res,
-                                                  const DataConfig<FldT, ColB, SemB>& data_config) :
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(
+    const Eigen::Vector3f& dim,
+    const float res,
+    const typename Data<FldT, ColB, SemB>::Config& data_config) :
         Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(
             {dim, res /* T_MW uses default member initializer */},
             data_config)
@@ -34,18 +35,19 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const Eigen::Vector3f& dim,
 
 
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
-Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const MapConfig& map_config,
-                                                  const DataConfig<FldT, ColB, SemB>& data_config) :
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(
+    const Config& map_config,
+    const typename Data<FldT, ColB, SemB>::Config& data_config) :
         octree_(std::ceil(map_config.dim.maxCoeff() / map_config.res)),
         resolution_(map_config.res),
         dimension_(Eigen::Vector3f::Constant(octree_.getSize() * resolution_)),
         T_MW_(map_config.T_MW),
-        T_WM_(se::math::to_inverse_transformation(T_MW_)),
+        T_WM_(T_MW_.inverse()),
         lb_M_(Eigen::Vector3f::Zero()),
         ub_M_(dimension_),
         data_config_(data_config)
 {
-    const Eigen::Vector3f t_MW = se::math::to_translation(T_MW_);
+    const Eigen::Vector3f t_MW = T_MW_.translation();
     if (t_MW.x() < 0 || t_MW.x() >= dimension_.x() || t_MW.y() < 0 || t_MW.y() >= dimension_.y()
         || t_MW.z() < 0 || t_MW.z() >= dimension_.z()) {
         std::cout << "World origin is outside the map" << std::endl;
@@ -56,7 +58,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Map(const MapConfig& map_config,
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 bool Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::contains(const Eigen::Vector3f& point_W) const
 {
-    const Eigen::Vector3f point_M = (T_MW_ * point_W.homogeneous()).template head<3>();
+    const Eigen::Vector3f point_M = T_MW_ * point_W;
     return (point_M.x() >= lb_M_.x() && point_M.x() < ub_M_.x() && point_M.y() >= lb_M_.y()
             && point_M.y() < ub_M_.y() && point_M.z() >= lb_M_.z() && point_M.z() < ub_M_.z());
 }
@@ -369,7 +371,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveScaleSlices(const std::string&
 
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveStructure(const std::string& filename,
-                                                                const Eigen::Matrix4f& T_WM) const
+                                                                const Eigen::Isometry3f& T_WM) const
 {
     const QuadMesh mesh = octree_structure_mesh(octree_);
     return io::save_mesh(mesh, filename, T_WM);
@@ -379,7 +381,7 @@ int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveStructure(const std::strin
 
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMesh(const std::string& filename,
-                                                           const Eigen::Matrix4f& T_OW) const
+                                                           const Eigen::Isometry3f& T_OW) const
 {
     se::TriangleMesh mesh;
     if constexpr (ResT == se::Res::Single) {
@@ -388,9 +390,7 @@ int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMesh(const std::string& fi
     else {
         se::algorithms::dual_marching_cube(octree_, mesh);
     }
-    Eigen::Matrix4f T_WM_scale = T_WM_;
-    T_WM_scale.topLeftCorner<3, 3>() *= resolution_;
-    const Eigen::Matrix4f T_OM = T_OW * T_WM_scale;
+    const Eigen::Affine3f T_OM = T_OW * T_WM_ * Eigen::Scaling(resolution_);
     return io::save_mesh(mesh, filename, T_OM);
 }
 
@@ -415,9 +415,7 @@ template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::voxelToPoint(const Eigen::Vector3i& voxel_coord,
                                                                 Eigen::Vector3f& point_W) const
 {
-    point_W =
-        (T_WM_ * ((voxel_coord.cast<float>() + sample_offset_frac) * resolution_).homogeneous())
-            .template head<3>();
+    point_W = T_WM_ * ((voxel_coord.cast<float>() + sample_offset_frac) * resolution_);
 }
 
 
@@ -427,10 +425,7 @@ void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::voxelToPoint(const Eigen::Vec
                                                                 const int stride,
                                                                 Eigen::Vector3f& point_W) const
 {
-    point_W =
-        (T_WM_
-         * ((voxel_coord.cast<float>() + stride * sample_offset_frac) * resolution_).homogeneous())
-            .template head<3>();
+    point_W = T_WM_ * ((voxel_coord.cast<float>() + stride * sample_offset_frac) * resolution_);
 }
 
 
@@ -442,7 +437,7 @@ void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::voxelToCornerPoints(
 {
     Eigen::Matrix<float, 3, 8> corner_points_M =
         (corner_rel_steps_.colwise() + voxel_coord.cast<float>()) * resolution_;
-    corner_points_W = (T_WM_ * corner_points_M.colwise().homogeneous()).topRows(3);
+    corner_points_W = T_WM_ * corner_points_M;
 }
 
 
@@ -455,7 +450,7 @@ void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::voxelToCornerPoints(
 {
     Eigen::Matrix<float, 3, 8> corner_points_M =
         ((stride * corner_rel_steps_).colwise() + voxel_coord.cast<float>()) * resolution_;
-    corner_points_W = (T_WM_ * corner_points_M.colwise().homogeneous()).topRows(3);
+    corner_points_W = T_WM_ * corner_points_M;
 }
 
 
@@ -470,8 +465,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointToVoxel(const Eigen::Vector3f
         voxel_coord = Eigen::Vector3i::Constant(-1);
         return false;
     }
-    voxel_coord =
-        (((T_MW_ * point_W.homogeneous()).template head<3>()) / resolution_).template cast<int>();
+    voxel_coord = ((T_MW_ * point_W) / resolution_).template cast<int>();
     return true;
 }
 
@@ -483,8 +477,7 @@ typename std::enable_if_t<SafeB == se::Safe::Off, bool>
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointToVoxel(const Eigen::Vector3f& point_W,
                                                            Eigen::Vector3i& voxel_coord) const
 {
-    voxel_coord =
-        (((T_MW_ * point_W.homogeneous()).template head<3>()) / resolution_).template cast<int>();
+    voxel_coord = ((T_MW_ * point_W) / resolution_).template cast<int>();
     return true;
 }
 
@@ -500,7 +493,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointToVoxel(const Eigen::Vector3f
         voxel_coord_f = Eigen::Vector3f::Constant(-1);
         return false;
     }
-    voxel_coord_f = ((T_MW_ * point_W.homogeneous()).template head<3>()) / resolution_;
+    voxel_coord_f = (T_MW_ * point_W) / resolution_;
     return true;
 }
 
@@ -512,7 +505,7 @@ typename std::enable_if_t<SafeB == se::Safe::Off, bool>
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::pointToVoxel(const Eigen::Vector3f& point_W,
                                                            Eigen::Vector3f& voxel_coord_f) const
 {
-    voxel_coord_f = ((T_MW_ * point_W.homogeneous()).template head<3>()) / resolution_;
+    voxel_coord_f = (T_MW_ * point_W) / resolution_;
     return true;
 }
 
@@ -587,6 +580,68 @@ const Eigen::AlignedBox3f& Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::aabb() 
         }
     }
     return cached_aabb_;
+}
+
+
+
+template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
+void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Config::readYaml(const std::string& yaml_file)
+{
+    // Open the file for reading.
+    cv::FileStorage fs;
+    try {
+        if (!fs.open(yaml_file, cv::FileStorage::READ | cv::FileStorage::FORMAT_YAML)) {
+            std::cerr << "Error: couldn't read configuration file " << yaml_file << "\n";
+            return;
+        }
+    }
+    catch (const cv::Exception& e) {
+        // OpenCV throws if the file contains non-YAML data.
+        std::cerr << "Error: invalid YAML in configuration file " << yaml_file << "\n";
+        return;
+    }
+
+    // Get the node containing the map configuration.
+    const cv::FileNode node = fs["map"];
+    if (node.type() != cv::FileNode::MAP) {
+        std::cerr << "Warning: using default map configuration, no \"map\" section found in "
+                  << yaml_file << "\n";
+        return;
+    }
+
+    // Read the config parameters.
+    se::yaml::subnode_as_eigen_vector3f(node, "dim", dim);
+    se::yaml::subnode_as_float(node, "res", res);
+
+    // Don't show a warning if origin is not available, set it to dim / 2.
+    T_MW = Eigen::Isometry3f(Eigen::Translation3f(dim / 2));
+
+    if (!node["T_MW"].isNone()) {
+        se::yaml::subnode_as_eigen_matrix4f(node, "T_MW", T_MW.matrix());
+    }
+
+    if (!node["t_MW"].isNone()) {
+        Eigen::Vector3f t_MW;
+        se::yaml::subnode_as_eigen_vector3f(node, "t_MW", t_MW);
+        T_MW.translation() = t_MW;
+    }
+
+    if (!node["R_MW"].isNone()) {
+        Eigen::Matrix3f R_MW;
+        se::yaml::subnode_as_eigen_matrix3f(node, "R_MW", R_MW);
+        T_MW.linear() = R_MW;
+    }
+}
+
+
+
+template<typename MapT>
+std::ostream& operator<<(std::ostream& os, const typename MapT::Config& c)
+{
+    os << str_utils::volume_to_pretty_str(c.dim, "dim") << " m\n";
+    os << str_utils::value_to_pretty_str(c.res, "res") << " m/voxel\n";
+    os << str_utils::eigen_matrix_to_pretty_str(c.T_MW.matrix(), "T_MW") << "\n";
+    return os;
 }
 
 } // namespace se

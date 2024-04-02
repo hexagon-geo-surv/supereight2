@@ -132,7 +132,7 @@ std::string write_ground_truth_tmp(const std::string& path,
 
 
 
-se::LeicaReader::LeicaReader(const se::ReaderConfig& c) : se::Reader(c)
+se::LeicaReader::LeicaReader(const se::Reader::Config& c) : se::Reader(c)
 {
     // Ensure a valid directory was provided
     if (!stdfs::is_directory(sequence_path_)) {
@@ -280,7 +280,7 @@ se::ReaderStatus se::LeicaReader::nextRay(Eigen::Vector3f& ray_measurement)
     return se::ReaderStatus::ok;
 }
 
-se::ReaderStatus se::LeicaReader::nextPose(Eigen::Matrix4f& T_WB)
+se::ReaderStatus se::LeicaReader::nextPose(Eigen::Isometry3f& T_WB)
 {
     std::string line;
     LeicaPoseEntry pose;
@@ -303,18 +303,16 @@ se::ReaderStatus se::LeicaReader::nextPose(Eigen::Matrix4f& T_WB)
     // interpolate between poses
     double r =
         (static_cast<double>(ray_timestamp_ - ts_prev_)) / static_cast<double>(ts_curr_ - ts_prev_);
-    Eigen::Vector3f posInterp = r * pos_curr_ + (1. - r) * pos_prev_;
-    Eigen::Quaternionf oriInterp = ori_prev_.slerp(r, ori_curr_);
-    T_WB.topLeftCorner<3, 3>() = oriInterp.toRotationMatrix();
-    T_WB.topRightCorner<3, 1>() = posInterp;
+    T_WB.translation() = r * pos_curr_ + (1. - r) * pos_prev_;
+    T_WB.linear() = ori_prev_.slerp(r, ori_curr_).toRotationMatrix();
 
     return se::ReaderStatus::ok;
 }
 
 se::ReaderStatus se::LeicaReader::nextRayBatch(
     const float batch_interval,
-    std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
-                Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>&
+    std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
+                Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
         rayPoseBatch)
 {
     std::string lidarLine;
@@ -331,8 +329,7 @@ se::ReaderStatus se::LeicaReader::nextRayBatch(
 
     std::string trajectoryLine;
     LeicaPoseEntry pose;
-    Eigen::Matrix4f T_WB;
-    T_WB.setIdentity();
+    Eigen::Isometry3f T_WB = Eigen::Isometry3f::Identity();
 
     while (ray_timestamp_ > ts_curr_) {
         // Get next pose
@@ -351,11 +348,9 @@ se::ReaderStatus se::LeicaReader::nextRayBatch(
     // interpolate between poses
     double r =
         (static_cast<double>(ray_timestamp_ - ts_prev_)) / static_cast<double>(ts_curr_ - ts_prev_);
-    Eigen::Vector3f posInterp = r * pos_curr_ + (1. - r) * pos_prev_;
-    Eigen::Quaternionf oriInterp = ori_prev_.slerp(r, ori_curr_);
-    T_WB.topLeftCorner<3, 3>() = oriInterp.toRotationMatrix();
-    T_WB.topRightCorner<3, 1>() = posInterp;
-    rayPoseBatch.push_back(std::pair<Eigen::Matrix4f, Eigen::Vector3f>(T_WB, ray.position));
+    T_WB.translation() = r * pos_curr_ + (1. - r) * pos_prev_;
+    T_WB.linear() = ori_prev_.slerp(r, ori_curr_).toRotationMatrix();
+    rayPoseBatch.push_back(std::pair<Eigen::Isometry3f, Eigen::Vector3f>(T_WB, ray.position));
 
 
     // now get interval
@@ -389,17 +384,15 @@ se::ReaderStatus se::LeicaReader::nextRayBatch(
         // interpolate between poses
         double r = (static_cast<double>(ray_timestamp_ - ts_prev_))
             / static_cast<double>(ts_curr_ - ts_prev_);
-        Eigen::Vector3f posInterp = r * pos_curr_ + (1. - r) * pos_prev_;
-        Eigen::Quaternionf oriInterp = ori_prev_.slerp(r, ori_curr_);
-        T_WB.topLeftCorner<3, 3>() = oriInterp.toRotationMatrix();
-        T_WB.topRightCorner<3, 1>() = posInterp;
-        rayPoseBatch.push_back(std::pair<Eigen::Matrix4f, Eigen::Vector3f>(T_WB, ray.position));
+        T_WB.translation() = r * pos_curr_ + (1. - r) * pos_prev_;
+        T_WB.linear() = ori_prev_.slerp(r, ori_curr_).toRotationMatrix();
+        rayPoseBatch.push_back(std::pair<Eigen::Isometry3f, Eigen::Vector3f>(T_WB, ray.position));
     }
 
     return se::ReaderStatus::ok;
 }
-se::ReaderStatus se::LeicaReader::nextRGBA(se::Image<uint32_t>& /*rgba_image*/)
+se::ReaderStatus se::LeicaReader::nextColour(se::Image<RGBA>& /*colour_image*/)
 {
-    std::clog << "nextRGBA() not supported for LeicaReader\n";
+    std::clog << "nextColour() not supported for LeicaReader\n";
     return se::ReaderStatus::error;
 }

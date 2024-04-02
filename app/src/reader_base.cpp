@@ -79,7 +79,30 @@ std::string se::reader_type_to_string(se::ReaderType t)
 
 
 
-void se::ReaderConfig::readYaml(const std::string& filename)
+std::ostream& se::operator<<(std::ostream& os, const ReaderStatus& s)
+{
+    switch (s) {
+    case ReaderStatus::ok:
+        os << "OK";
+        break;
+    case ReaderStatus::skip:
+        os << "skip";
+        break;
+    case ReaderStatus::eof:
+        os << "EOF";
+        break;
+    case ReaderStatus::error:
+        os << "error";
+        break;
+    default:
+        os << "unknown status";
+    }
+    return os;
+}
+
+
+
+void se::Reader::Config::readYaml(const std::string& filename)
 {
     // Open the file for reading.
     cv::FileStorage fs;
@@ -115,7 +138,7 @@ void se::ReaderConfig::readYaml(const std::string& filename)
     se::yaml::subnode_as_string(node, "ground_truth_file", ground_truth_file);
     // Leica specific config params (initialised to default if not existing)
     se::yaml::subnode_as_float(node, "scan_time_interval", scan_time_interval);
-    se::yaml::subnode_as_eigen_matrix4f(fs["sensor"], "T_BS", T_BL);
+    se::yaml::subnode_as_eigen_matrix4f(fs["sensor"], "T_BS", T_BL.matrix());
 
     // Expand ~ in the paths.
     sequence_path = se::str_utils::expand_user(sequence_path);
@@ -136,7 +159,7 @@ void se::ReaderConfig::readYaml(const std::string& filename)
 
 
 
-std::ostream& se::operator<<(std::ostream& os, const se::ReaderConfig& c)
+std::ostream& se::operator<<(std::ostream& os, const se::Reader::Config& c)
 {
     os << str_utils::str_to_pretty_str(se::reader_type_to_string(c.reader_type), "reader_type")
        << "\n";
@@ -148,41 +171,18 @@ std::ostream& se::operator<<(std::ostream& os, const se::ReaderConfig& c)
 
     if (c.reader_type == se::ReaderType::LEICA) {
         os << str_utils::value_to_pretty_str(c.scan_time_interval, "scan_time_interval") << "\n";
-        os << str_utils::eigen_matrix_to_pretty_str(c.T_BL, "T_BS") << "\n";
+        os << str_utils::eigen_matrix_to_pretty_str(c.T_BL.matrix(), "T_BS") << "\n";
     }
     return os;
 }
 
 
 
-std::ostream& se::operator<<(std::ostream& os, const ReaderStatus& s)
-{
-    switch (s) {
-    case ReaderStatus::ok:
-        os << "OK";
-        break;
-    case ReaderStatus::skip:
-        os << "skip";
-        break;
-    case ReaderStatus::eof:
-        os << "EOF";
-        break;
-    case ReaderStatus::error:
-        os << "error";
-        break;
-    default:
-        os << "unknown status";
-    }
-    return os;
-}
-
-
-
-se::Reader::Reader(const se::ReaderConfig& c) :
+se::Reader::Reader(const se::Reader::Config& c) :
         sequence_path_(c.sequence_path),
         ground_truth_file_(c.ground_truth_file),
         depth_image_res_(1, 1),
-        rgba_image_res_(1, 1),
+        colour_image_res_(1, 1),
         fps_(c.fps),
         spf_(1.0 / c.fps),
         drop_frames_(c.drop_frames),
@@ -191,6 +191,7 @@ se::Reader::Reader(const se::ReaderConfig& c) :
         status_(se::ReaderStatus::ok),
         frame_(SIZE_MAX),
         num_frames_(0),
+        has_colour_(false),
         ground_truth_frame_(SIZE_MAX),
         ground_truth_delimiter_(' ')
 {
@@ -226,87 +227,33 @@ se::Reader::Reader(const se::ReaderConfig& c) :
 
 se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image)
 {
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to reader status: " << status_ << "\n";
-        }
-        return status_;
-    }
-    nextFrame();
-    status_ = nextDepth(depth_image);
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to nextDepth() status: " << status_ << "\n";
-        }
-    }
-    return status_;
+    return nextDataImpl(depth_image, nullptr, nullptr);
+}
+
+
+
+se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image, Eigen::Isometry3f& T_WB)
+{
+    return nextDataImpl(depth_image, nullptr, &T_WB);
+}
+
+
+
+se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image, se::Image<RGBA>& colour_image)
+{
+    return nextDataImpl(depth_image, &colour_image, nullptr);
 }
 
 
 
 se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
-                                      se::Image<uint32_t>& rgba_image)
+                                      se::Image<RGBA>& colour_image,
+                                      Eigen::Isometry3f& T_WB)
 {
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to reader status: " << status_ << "\n";
-        }
-        return status_;
-    }
-    nextFrame();
-    status_ = nextDepth(depth_image);
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to nextDepth() status: " << status_ << "\n";
-        }
-        return status_;
-    }
-    status_ = mergeStatus(nextRGBA(rgba_image), status_);
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to nextRGBA() status: " << status_ << "\n";
-        }
-    }
-    return status_;
+    return nextDataImpl(depth_image, &colour_image, &T_WB);
 }
 
-
-
-se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
-                                      se::Image<uint32_t>& rgba_image,
-                                      Eigen::Matrix4f& T_WB)
-{
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to reader status: " << status_ << "\n";
-        }
-        return status_;
-    }
-    nextFrame();
-    status_ = nextDepth(depth_image);
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to nextDepth() status: " << status_ << "\n";
-        }
-        return status_;
-    }
-    status_ = mergeStatus(nextRGBA(rgba_image), status_);
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to nextRGBA() status: " << status_ << "\n";
-        }
-        return status_;
-    }
-    status_ = mergeStatus(nextPose(T_WB), status_);
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to nextPose() status: " << status_ << "\n";
-        }
-    }
-    return status_;
-}
-
-se::ReaderStatus se::Reader::nextData(Eigen::Vector3f& ray_measurement, Eigen::Matrix4f& T_WB)
+se::ReaderStatus se::Reader::nextData(Eigen::Vector3f& ray_measurement, Eigen::Isometry3f& T_WB)
 {
     if (!good()) {
         if (verbose_ >= 1) {
@@ -333,8 +280,8 @@ se::ReaderStatus se::Reader::nextData(Eigen::Vector3f& ray_measurement, Eigen::M
 
 se::ReaderStatus se::Reader::nextData(
     const float batch_interval,
-    std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
-                Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>&
+    std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
+                Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
         rayPoseBatch)
 {
     if (!good()) {
@@ -397,9 +344,9 @@ Eigen::Vector2i se::Reader::depthImageRes() const
 
 
 
-Eigen::Vector2i se::Reader::RGBAImageRes() const
+Eigen::Vector2i se::Reader::colourImageRes() const
 {
-    return rgba_image_res_;
+    return colour_image_res_;
 }
 
 
@@ -407,6 +354,13 @@ Eigen::Vector2i se::Reader::RGBAImageRes() const
 bool se::Reader::isLiveReader() const
 {
     return is_live_reader_;
+}
+
+
+
+bool se::Reader::hasColour() const
+{
+    return has_colour_;
 }
 
 
@@ -420,12 +374,23 @@ se::ReaderStatus se::Reader::mergeStatus(se::ReaderStatus status_1, se::ReaderSt
 
 
 
-se::ReaderStatus se::Reader::nextPose(Eigen::Matrix4f& T_WB)
+se::ReaderStatus se::Reader::nextPose(Eigen::Isometry3f& T_WB)
 {
     return readPose(T_WB, frame_, ground_truth_delimiter_);
 }
 
-se::ReaderStatus se::Reader::getPose(Eigen::Matrix4f& T_WB, const size_t frame)
+
+
+se::ReaderStatus se::Reader::nextColour(se::Image<se::RGBA>& colour_image)
+{
+    // Set to a default-initialized (opaque black) image.
+    colour_image = se::Image<RGBA>(colour_image_res_.x(), colour_image_res_.y(), RGBA());
+    return se::ReaderStatus::ok;
+}
+
+
+
+se::ReaderStatus se::Reader::getPose(Eigen::Isometry3f& T_WB, const size_t frame)
 {
     // Store and reset current ground truth frame
     size_t ground_truth_frame_curr = ground_truth_frame_;
@@ -448,7 +413,7 @@ se::ReaderStatus se::Reader::getPose(Eigen::Matrix4f& T_WB, const size_t frame)
 
 
 se::ReaderStatus
-se::Reader::readPose(Eigen::Matrix4f& T_WB, const size_t frame, const char delimiter)
+se::Reader::readPose(Eigen::Isometry3f& T_WB, const size_t frame, const char delimiter)
 {
     std::string line;
     while (true) {
@@ -509,9 +474,9 @@ se::Reader::readPose(Eigen::Matrix4f& T_WB, const size_t frame, const char delim
             return se::ReaderStatus::skip;
         }
         // Combine into the pose
-        T_WB = Eigen::Matrix4f::Identity();
-        T_WB.block<3, 1>(0, 3) = position;
-        T_WB.block<3, 3>(0, 0) = orientation.toRotationMatrix();
+        T_WB = Eigen::Isometry3f::Identity();
+        T_WB.translation() = position;
+        T_WB.linear() = orientation.toRotationMatrix();
 
         return se::ReaderStatus::ok;
     }
@@ -568,8 +533,47 @@ se::ReaderStatus se::Reader::nextRay(Eigen::Vector3f& /*ray_measurement*/)
 se::ReaderStatus se::Reader::nextRayBatch(
     const float /*batch_interval*/,
     std::vector<
-        std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
-        Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>& /*rayPoseBatch*/)
+        std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
+        Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>& /*rayPoseBatch*/)
 {
     return se::ReaderStatus::error;
+}
+
+
+se::ReaderStatus se::Reader::nextDataImpl(se::Image<float>& depth_image,
+                                          se::Image<se::RGBA>* colour_image,
+                                          Eigen::Isometry3f* T_WB)
+{
+    if (!good()) {
+        if (verbose_ >= 1) {
+            std::clog << "Stopping reading due to reader status: " << status_ << "\n";
+        }
+        return status_;
+    }
+    nextFrame();
+    status_ = nextDepth(depth_image);
+    if (!good()) {
+        if (verbose_ >= 1) {
+            std::clog << "Stopping reading due to nextDepth() status: " << status_ << "\n";
+        }
+        return status_;
+    }
+    if (colour_image) {
+        status_ = mergeStatus(nextColour(*colour_image), status_);
+        if (!good()) {
+            if (verbose_ >= 1) {
+                std::clog << "Stopping reading due to nextColour() status: " << status_ << "\n";
+            }
+            return status_;
+        }
+    }
+    if (T_WB) {
+        status_ = mergeStatus(nextPose(*T_WB), status_);
+        if (!good()) {
+            if (verbose_ >= 1) {
+                std::clog << "Stopping reading due to nextPose() status: " << status_ << "\n";
+            }
+        }
+    }
+    return status_;
 }

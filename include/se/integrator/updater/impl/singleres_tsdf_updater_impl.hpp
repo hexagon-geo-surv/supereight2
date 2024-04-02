@@ -21,7 +21,7 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::Up
     MapType& map,
     const SensorT& sensor,
     const Image<float>& depth_img,
-    const Eigen::Matrix4f& T_WS,
+    const Eigen::Isometry3f& T_WS,
     const int frame) :
         map_(map), sensor_(sensor), depth_img_(depth_img), T_WS_(T_WS), frame_(frame), config_(map)
 {
@@ -34,7 +34,7 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
     std::vector<OctantBase*>& block_ptrs)
 {
     unsigned int block_size = BlockType::getSize();
-    const Eigen::Matrix4f T_SW = math::to_inverse_transformation(T_WS_);
+    const Eigen::Isometry3f T_SW = T_WS_.inverse();
 
     auto valid_predicate = [&](float depth_value) { return depth_value >= sensor_.near_plane; };
 
@@ -45,9 +45,8 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
         Eigen::Vector3i block_coord = block_ptr->getCoord();
         Eigen::Vector3f point_base_W;
         map_.voxelToPoint(block_coord, point_base_W);
-        const Eigen::Vector3f point_base_S = (T_SW * point_base_W.homogeneous()).head(3);
-        const Eigen::Matrix3f point_delta_matrix_S =
-            (math::to_rotation(T_SW) * map_.getRes() * Eigen::Matrix3f::Identity());
+        const Eigen::Vector3f point_base_S = T_SW * point_base_W;
+        const Eigen::Matrix3f point_delta_matrix_S = T_SW.linear() * map_.getRes();
 
         for (unsigned int i = 0; i < block_size; ++i) {
             for (unsigned int j = 0; j < block_size; ++j) {
@@ -87,17 +86,21 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
 
 
 template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
-void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::updateVoxel(
+bool Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::updateVoxel(
     DataType& data,
     const field_t sdf_value)
 {
-    if (sdf_value > -config_.truncation_boundary) {
-        const float tsdf_value = std::min(1.f, sdf_value / config_.truncation_boundary);
-
-        data.tsdf = (data.tsdf * data.weight + tsdf_value) / (data.weight + 1.f);
-        data.tsdf = std::clamp(data.tsdf, field_t(-1), field_t(1));
-        data.weight = std::min(data.weight + 1, map_.getDataConfig().max_weight);
+    if (sdf_value < -config_.truncation_boundary) {
+        return false;
     }
+    // We only need to truncate positive SDF values due to the test above.
+    const field_t tsdf_value = std::min(sdf_value / config_.truncation_boundary, field_t(1));
+    // Avoid overflow if max_weight is equal to the maximum value of weight_t.
+    if (data.weight < map_.getDataConfig().max_weight) {
+        data.weight++;
+    }
+    data.tsdf = (data.tsdf * (data.weight - weight_t(1)) + tsdf_value) / data.weight;
+    return true;
 }
 
 

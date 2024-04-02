@@ -12,6 +12,8 @@
 #define SE_DRAW_HPP
 
 #include <Eigen/Core>
+#include <se/common/rgb.hpp>
+#include <se/common/rgba.hpp>
 
 #ifdef SE_GLUT
 #    include <algorithm>
@@ -47,6 +49,18 @@ struct gl<uint16_t> {
 
 template<>
 struct gl<uint32_t> {
+    static const int format = GL_RGBA;
+    static const int type = GL_UNSIGNED_BYTE;
+};
+
+template<>
+struct gl<se::RGB> {
+    static const int format = GL_RGB;
+    static const int type = GL_UNSIGNED_BYTE;
+};
+
+template<>
+struct gl<se::RGBA> {
     static const int format = GL_RGBA;
     static const int type = GL_UNSIGNED_BYTE;
 };

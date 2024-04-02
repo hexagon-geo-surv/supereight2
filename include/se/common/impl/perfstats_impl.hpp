@@ -441,10 +441,10 @@ PerfStats::sample(const std::string& key, const double value, const Type type, c
 
 
 
-inline double PerfStats::sampleT_WB(const Eigen::Matrix4f& T_WB, const bool detailed)
+inline double PerfStats::sampleT_WB(const Eigen::Isometry3f& T_WB, const bool detailed)
 {
-    const Eigen::Vector3f t_WS = T_WB.topRightCorner<3, 1>();
-    const Eigen::Quaternionf q_WS(T_WB.topLeftCorner<3, 3>());
+    const Eigen::Vector3f t_WS = T_WB.translation();
+    const Eigen::Quaternionf q_WS(T_WB.linear());
     sample("tx", t_WS.x(), POSITION, detailed);
     sample("ty", t_WS.y(), POSITION, detailed);
     sample("tz", t_WS.z(), POSITION, detailed);

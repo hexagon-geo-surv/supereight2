@@ -15,7 +15,7 @@ namespace se {
 
 
 template<typename MapT, typename SensorT>
-bool Tracker<MapT, SensorT>::track(const se::Image<float>& depth_img, Eigen::Matrix4f& T_WS)
+bool Tracker<MapT, SensorT>::track(const se::Image<float>& depth_img, Eigen::Isometry3f& T_WS)
 {
     se::Image<Eigen::Vector3f> surface_point_cloud_M(
         depth_img.width(), depth_img.height(), Eigen::Vector3f::Zero());
@@ -29,7 +29,7 @@ bool Tracker<MapT, SensorT>::track(const se::Image<float>& depth_img, Eigen::Mat
 
 template<typename MapT, typename SensorT>
 bool Tracker<MapT, SensorT>::track(const se::Image<float>& depth_img,
-                                   Eigen::Matrix4f& T_WS,
+                                   Eigen::Isometry3f& T_WS,
                                    se::Image<Eigen::Vector3f>& surface_point_cloud_W,
                                    se::Image<Eigen::Vector3f>& surface_normals_W)
 {
@@ -38,7 +38,7 @@ bool Tracker<MapT, SensorT>::track(const se::Image<float>& depth_img,
     assert(depth_img.width() == surface_normals_W.width()
            && depth_img.height() == surface_normals_W.height());
 
-    Eigen::Matrix4f T_WS_ref = T_WS; // Camera pose of the previous image in world frame
+    Eigen::Isometry3f T_WS_ref = T_WS; // Camera pose of the previous image in world frame
 
     Eigen::Vector2i depth_img_res = Eigen::Vector2i(depth_img.width(), depth_img.height());
 
@@ -115,7 +115,7 @@ bool Tracker<MapT, SensorT>::track(const se::Image<float>& depth_img,
 
 
 template<typename MapT, typename SensorT>
-void Tracker<MapT, SensorT>::renderTrackingResult(uint32_t* tracking_img_data)
+void Tracker<MapT, SensorT>::renderTrackingResult(RGBA* tracking_img_data)
 {
 #pragma omp parallel for
     for (int y = 0; y < sensor_.model.imageHeight(); y++) {
@@ -124,31 +124,31 @@ void Tracker<MapT, SensorT>::renderTrackingResult(uint32_t* tracking_img_data)
             switch (tracking_result[pixel_idx].result) {
             case 1:
                 // Gray
-                tracking_img_data[pixel_idx] = 0xFF808080;
+                tracking_img_data[pixel_idx] = {0x80, 0x80, 0x80, 0xFF};
                 break;
             case -1:
                 // Black
-                tracking_img_data[pixel_idx] = 0xFF000000;
+                tracking_img_data[pixel_idx] = {0x00, 0x00, 0x00, 0xFF};
                 break;
             case -2:
                 // Red
-                tracking_img_data[pixel_idx] = 0xFF0000FF;
+                tracking_img_data[pixel_idx] = {0xFF, 0x00, 0x00, 0xFF};
                 break;
             case -3:
                 // Green
-                tracking_img_data[pixel_idx] = 0xFF00FF00;
+                tracking_img_data[pixel_idx] = {0x00, 0xFF, 0x00, 0xFF};
                 break;
             case -4:
                 // Blue
-                tracking_img_data[pixel_idx] = 0xFFFF0000;
+                tracking_img_data[pixel_idx] = {0x00, 0x00, 0xFF, 0xFF};
                 break;
             case -5:
                 // Yellow
-                tracking_img_data[pixel_idx] = 0xFF00FFFF;
+                tracking_img_data[pixel_idx] = {0xFF, 0xFF, 0x00, 0xFF};
                 break;
             default:
                 // Orange
-                tracking_img_data[pixel_idx] = 0xFF8080FF;
+                tracking_img_data[pixel_idx] = {0xFF, 0x80, 0x80, 0xFF};
                 break;
             }
         }
@@ -328,8 +328,8 @@ void Tracker<MapT, SensorT>::trackKernel(
     const se::Image<Eigen::Vector3f>& input_normals_S,
     const se::Image<Eigen::Vector3f>& surface_point_cloud_W_ref,
     const se::Image<Eigen::Vector3f>& surface_normals_W_ref,
-    const Eigen::Matrix4f& T_WS,
-    const Eigen::Matrix4f& T_WS_ref,
+    const Eigen::Isometry3f& T_WS,
+    const Eigen::Isometry3f& T_WS_ref,
     const float dist_threshold,
     const float normal_threshold)
 {
@@ -352,12 +352,10 @@ void Tracker<MapT, SensorT>::trackKernel(
             }
 
             // point_W := The input point in world frame
-            const Eigen::Vector3f point_W =
-                (T_WS * input_point_cloud_S[pixel.x() + pixel.y() * w].homogeneous()).head<3>();
+            const Eigen::Vector3f point_W = T_WS * input_point_cloud_S[pixel.x() + pixel.y() * w];
             // point_S_ref := The input point expressed in the sensor frame the
             // surface_point_cloud_W_ref and surface_point_cloud_W_ref was raycasted from.
-            const Eigen::Vector3f point_S_ref =
-                (T_WS_ref.inverse() * point_W.homogeneous()).head<3>();
+            const Eigen::Vector3f point_S_ref = T_WS_ref.inverse() * point_W;
 
             // ref_pixel_f := The pixel in the surface_point_cloud_M_ref and surface_point_cloud_M_ref image.
             Eigen::Vector2f ref_pixel_f;
@@ -380,7 +378,7 @@ void Tracker<MapT, SensorT>::trackKernel(
                 surface_point_cloud_W_ref[ref_pixel.x() + ref_pixel.y() * ref_res.x()];
             const Eigen::Vector3f diff = ref_point_W - point_W;
             const Eigen::Vector3f input_normal_W =
-                T_WS.topLeftCorner<3, 3>() * input_normals_S[pixel.x() + pixel.y() * w];
+                T_WS.linear() * input_normals_S[pixel.x() + pixel.y() * w];
 
             if (diff.norm() > dist_threshold) {
                 row.result = -4;
@@ -407,14 +405,14 @@ void Tracker<MapT, SensorT>::trackKernel(
 
 
 template<typename MapT, typename SensorT>
-bool Tracker<MapT, SensorT>::updatePoseKernel(Eigen::Matrix4f& T_WS,
+bool Tracker<MapT, SensorT>::updatePoseKernel(Eigen::Isometry3f& T_WS,
                                               const float* reduction_output_data,
                                               const float icp_threshold)
 {
     bool result = false;
     Eigen::Map<const Eigen::Matrix<float, 8, 32, Eigen::RowMajor>> values(reduction_output_data);
     Eigen::Matrix<float, 6, 1> x = solve(values.row(0).segment(1, 27));
-    Eigen::Matrix4f delta = se::math::exp(x);
+    const Eigen::Isometry3f delta(se::math::exp(x));
     T_WS = delta * T_WS;
 
     if (x.norm() < icp_threshold) {
@@ -427,8 +425,8 @@ bool Tracker<MapT, SensorT>::updatePoseKernel(Eigen::Matrix4f& T_WS,
 
 
 template<typename MapT, typename SensorT>
-bool Tracker<MapT, SensorT>::checkPoseKernel(Eigen::Matrix4f& T_WS,
-                                             Eigen::Matrix4f& previous_T_WS,
+bool Tracker<MapT, SensorT>::checkPoseKernel(Eigen::Isometry3f& T_WS,
+                                             Eigen::Isometry3f& previous_T_WS,
                                              const float* reduction_output_data,
                                              const Eigen::Vector2i& reduction_output_res,
                                              const float track_threshold)

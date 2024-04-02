@@ -9,6 +9,7 @@
 #ifndef SE_MESHING_IO_HPP
 #define SE_MESHING_IO_HPP
 
+#include <Eigen/Geometry>
 #include <algorithm>
 #include <array>
 #include <fstream>
@@ -45,7 +46,7 @@ bool has_supported_mesh_extension(const std::string& filename);
 template<typename FaceT>
 int save_mesh(const Mesh<FaceT>& mesh_M,
               const std::string& filename,
-              const Eigen::Matrix4f& T_OM = Eigen::Matrix4f::Identity());
+              const Eigen::Affine3f& T_OM = Eigen::Affine3f::Identity());
 
 /** \brief Save a mesh as a VTK file.
  * The VTK file format is documented here:
@@ -60,7 +61,7 @@ int save_mesh(const Mesh<FaceT>& mesh_M,
 template<typename FaceT>
 int save_mesh_vtk(const Mesh<FaceT>& mesh_M,
                   const std::string& filename,
-                  const Eigen::Matrix4f& T_OM = Eigen::Matrix4f::Identity());
+                  const Eigen::Affine3f& T_OM = Eigen::Affine3f::Identity());
 
 /** \brief Save a mesh as a PLY file.
  * The PLY file format is documented here:
@@ -75,7 +76,7 @@ int save_mesh_vtk(const Mesh<FaceT>& mesh_M,
 template<typename FaceT>
 int save_mesh_ply(const Mesh<FaceT>& mesh_M,
                   const std::string& filename,
-                  const Eigen::Matrix4f& T_OM = Eigen::Matrix4f::Identity());
+                  const Eigen::Affine3f& T_OM = Eigen::Affine3f::Identity());
 
 /** \brief Save a mesh as an Wavefront OBJ file.
  * The Wavefront OBJ file format is documented here:
@@ -90,7 +91,7 @@ int save_mesh_ply(const Mesh<FaceT>& mesh_M,
 template<typename FaceT>
 int save_mesh_obj(const Mesh<FaceT>& mesh_M,
                   const std::string& filename,
-                  const Eigen::Matrix4f& T_OM = Eigen::Matrix4f::Identity());
+                  const Eigen::Affine3f& T_OM = Eigen::Affine3f::Identity());
 
 } // namespace io
 } // namespace se

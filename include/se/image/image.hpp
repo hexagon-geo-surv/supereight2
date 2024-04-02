@@ -12,6 +12,7 @@
 #include <Eigen/StdVector>
 #include <cassert>
 #include <memory>
+#include <se/common/rgba.hpp>
 
 #include "se/common/colour_utils.hpp"
 
@@ -90,18 +91,18 @@ private:
 
 
 
-static inline void convert_to_output_rgba_img(const se::Image<uint32_t>& input_rgba_img,
-                                              uint32_t* output_rgba_img_data)
+static inline void convert_to_output_rgba_img(const se::Image<RGBA>& input_rgba_img,
+                                              RGBA* output_rgba_img_data)
 {
     memcpy(output_rgba_img_data,
            input_rgba_img.data(),
-           input_rgba_img.width() * input_rgba_img.height() * sizeof(uint32_t));
+           input_rgba_img.width() * input_rgba_img.height() * sizeof(RGBA));
 }
 
 
 
 static inline void convert_to_output_depth_img(const se::Image<float>& input_depth_img,
-                                               uint32_t* output_depth_img_data)
+                                               RGBA* output_depth_img_data)
 {
     depth_to_rgba(output_depth_img_data,
                   input_depth_img.data(),
@@ -115,7 +116,7 @@ static inline void convert_to_output_depth_img(const se::Image<float>& input_dep
 static inline void convert_to_output_depth_img(const se::Image<float>& input_depth_img,
                                                const float min_depth,
                                                const float max_depth,
-                                               uint32_t* output_depth_img_data)
+                                               RGBA* output_depth_img_data)
 {
     depth_to_rgba(output_depth_img_data,
                   input_depth_img.data(),
@@ -126,6 +127,18 @@ static inline void convert_to_output_depth_img(const se::Image<float>& input_dep
 
 
 
+namespace image {
+
+/** Remap \p input to \p output by using a \p map which contains and index into \p input for each
+ * element of \p output.
+ */
+template<typename T>
+void remap(const Image<T>& input, Image<T>& output, const Image<size_t>& map);
+
+} // namespace image
+
 } // end namespace se
+
+#include "impl/image_impl.hpp"
 
 #endif // SE_IMAGE_HPP

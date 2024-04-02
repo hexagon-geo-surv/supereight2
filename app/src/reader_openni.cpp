@@ -17,7 +17,7 @@
 
 #ifdef SE_OPENNI2
 
-se::OpenNIReader::OpenNIReader(const se::ReaderConfig& c) :
+se::OpenNIReader::OpenNIReader(const se::Reader::Config& c) :
         se::Reader(c), depth_image_(nullptr), rgb_image_(nullptr)
 {
     // Ensure this is handled as a live camera reader.
@@ -103,9 +103,9 @@ se::OpenNIReader::OpenNIReader(const se::ReaderConfig& c) :
     depth_image_res_.x() = depth_video_mode.getResolutionX();
     depth_image_res_.y() = depth_video_mode.getResolutionY();
     openni::VideoMode rgb_video_mode = rgb_stream_.getVideoMode();
-    rgba_image_res_.x() = rgb_video_mode.getResolutionX();
-    rgba_image_res_.y() = rgb_video_mode.getResolutionY();
-    if (depth_image_res_ != rgba_image_res_) {
+    colour_image_res_.x() = rgb_video_mode.getResolutionX();
+    colour_image_res_.y() = rgb_video_mode.getResolutionY();
+    if (depth_image_res_ != colour_image_res_) {
         std::cout << "Error: Depth and RGB resolution mismatch\n";
         status_ = se::ReaderStatus::error;
         return;
@@ -140,6 +140,7 @@ se::OpenNIReader::OpenNIReader(const se::ReaderConfig& c) :
     // Start the streams
     depth_stream_.start();
     rgb_stream_.start();
+    has_colour_ = true;
 }
 
 
@@ -212,15 +213,17 @@ se::ReaderStatus se::OpenNIReader::nextDepth(se::Image<float>& depth_image)
 
 
 
-se::ReaderStatus se::OpenNIReader::nextRGBA(se::Image<uint32_t>& rgba_image)
+se::ReaderStatus se::OpenNIReader::nextColour(se::Image<RGBA>& colour_image)
 {
     // Resize the output image if needed.
-    if ((rgba_image.width() != rgba_image_res_.x())
-        || (rgba_image.height() != rgba_image_res_.y())) {
-        rgba_image = se::Image<uint32_t>(rgba_image_res_.x(), rgba_image_res_.y());
+    if ((colour_image.width() != colour_image_res_.x())
+        || (colour_image.height() != colour_image_res_.y())) {
+        colour_image = se::Image<RGBA>(colour_image_res_.x(), colour_image_res_.y());
     }
 
-    se::rgb_to_rgba(rgb_image_.get(), rgba_image.data(), rgba_image_res_.prod());
+    se::rgb_to_rgba(rgb_image_.get(),
+                    reinterpret_cast<uint32_t*>(colour_image.data()),
+                    colour_image_res_.prod());
 
     return se::ReaderStatus::ok;
 }
@@ -231,7 +234,7 @@ se::ReaderStatus se::OpenNIReader::nextRGBA(se::Image<uint32_t>& rgba_image)
 
 
 
-se::OpenNIReader::OpenNIReader(const se::ReaderConfig& c) : se::Reader(c)
+se::OpenNIReader::OpenNIReader(const se::Reader::Config& c) : se::Reader(c)
 {
     status_ = se::ReaderStatus::error;
     std::cerr << "Error: not compiled with OpenNI support\n";
@@ -266,7 +269,7 @@ se::ReaderStatus se::OpenNIReader::nextDepth(se::Image<float>&)
 
 
 
-se::ReaderStatus se::OpenNIReader::nextRGBA(se::Image<uint32_t>&)
+se::ReaderStatus se::OpenNIReader::nextColour(se::Image<RGBA>&)
 {
     return se::ReaderStatus::error;
 }

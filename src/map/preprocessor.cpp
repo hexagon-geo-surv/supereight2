@@ -9,6 +9,7 @@
 
 #include "se/map/preprocessor.hpp"
 
+#include <Eigen/StdVector>
 #include <iostream>
 #include <se/common/eigen_utils.hpp>
 
@@ -17,107 +18,83 @@
 namespace se {
 namespace preprocessor {
 
-void downsample_depth(se::Image<float>& input_depth_img, se::Image<float>& output_depth_img)
+Image<size_t> downsample_depth(const Image<float>& input_depth_img, Image<float>& output_depth_img)
 {
-    const float* input_depth_data = input_depth_img.data();
+    const int w_in = input_depth_img.width();
+    const int w_out = output_depth_img.width();
+    const int h_out = output_depth_img.height();
 
-    assert((input_depth_img.width() >= output_depth_img.width())
-           && "Error: input width must be greater than output width");
-    assert((input_depth_img.height() >= output_depth_img.height())
-           && "Error: input height must be greater than output height");
-    assert((input_depth_img.width() % output_depth_img.width() == 0)
-           && "Error: input width must be an integer multiple of output width");
-    assert((input_depth_img.height() % output_depth_img.height() == 0)
-           && "Error: input height must be an integer multiple of output height");
-    assert((input_depth_img.width() / output_depth_img.width()
-            == input_depth_img.height() / output_depth_img.height())
-           && "Error: input and output image aspect ratios must be the same");
+    assert((w_in >= w_out) && "The input width isn't smaller than the output width");
+    assert((input_depth_img.height() >= h_out)
+           && "The input height isn't smaller than the output height");
+    assert((w_in % w_out == 0) && "The input width is an integer multiple of the output width");
+    assert((input_depth_img.height() % h_out == 0)
+           && "The input height is an integer multiple of the output height");
+    assert((w_in / w_out == input_depth_img.height() / h_out)
+           && "The input and output image aspect ratios are the same");
 
-    const int ratio = input_depth_img.width() / output_depth_img.width();
+    struct Pixel {
+        int x;
+        int y;
+        float depth;
+    };
+
+    Image<size_t> map(w_out, h_out);
+    const int ratio = w_in / w_out;
 #pragma omp parallel for
-    for (int y_out = 0; y_out < output_depth_img.height(); y_out++) {
-        for (int x_out = 0; x_out < output_depth_img.width(); x_out++) {
-            std::vector<float> box_values;
-            box_values.reserve(ratio * ratio);
-            for (int b = 0; b < ratio; b++) {
-                for (int a = 0; a < ratio; a++) {
-                    const int y_in = y_out * ratio + b;
-                    const int x_in = x_out * ratio + a;
-                    const float depth_value =
-                        input_depth_data[x_in + input_depth_img.width() * y_in];
-                    // Only consider positive, non-NaN values for the median
-                    if ((depth_value < 1e-5) || std::isnan(depth_value)) {
-                        continue;
-                    }
-                    else {
-                        box_values.push_back(depth_value);
+    for (int y_out = 0; y_out < h_out; y_out++) {
+        std::vector<Pixel> region;
+        region.reserve(ratio * ratio);
+        for (int x_out = 0; x_out < w_out; x_out++) {
+            // Iterate over the region of the input image that will be aggregated into this pixel of
+            // the output image and keep track of pixels containing valid depth values.
+            const int x_in_base = x_out * ratio;
+            const int y_in_base = y_out * ratio;
+            for (int y_region = 0; y_region < ratio; y_region++) {
+                for (int x_region = 0; x_region < ratio; x_region++) {
+                    const int x_in = x_in_base + x_region;
+                    const int y_in = y_in_base + y_region;
+                    const float depth_value = input_depth_img(x_in, y_in);
+                    // Only consider positive, non-NaN values.
+                    if (depth_value >= 1e-5f) {
+                        region.push_back({x_in, y_in, depth_value});
                     }
                 }
             }
-            output_depth_img(x_out, y_out) =
-                box_values.empty() ? 0.0f : se::math::almost_median(box_values);
-            box_values.clear();
-        }
-    }
-}
-
-void downsample_rgba(se::Image<uint32_t>& input_RGBA_img, se::Image<uint32_t>& output_RGBA_img)
-{
-    const uint32_t* input_RGBA_data = input_RGBA_img.data();
-
-    // Check for correct image sizes.
-    assert((input_RGBA_img.width() >= output_RGBA_img.width())
-           && "Error: input width must be greater than output width");
-    assert((input_RGBA_img.height() >= output_RGBA_img.height())
-           && "Error: input height must be greater than output height");
-    assert((input_RGBA_img.width() % output_RGBA_img.width() == 0)
-           && "Error: input width must be an integer multiple of output width");
-    assert((input_RGBA_img.height() % output_RGBA_img.height() == 0)
-           && "Error: input height must be an integer multiple of output height");
-    assert((input_RGBA_img.width() / output_RGBA_img.width()
-            == input_RGBA_img.height() / output_RGBA_img.height())
-           && "Error: input and output image aspect ratios must be the same");
-
-    const int ratio = input_RGBA_img.width() / output_RGBA_img.width();
-    // Iterate over each output pixel.
-#pragma omp parallel for
-    for (int y_out = 0; y_out < output_RGBA_img.height(); ++y_out) {
-        for (int x_out = 0; x_out < output_RGBA_img.width(); ++x_out) {
-            // Average the neighboring pixels by iterating over the nearby input
-            // pixels.
-            uint16_t r = 0, g = 0, b = 0;
-            for (int yy = 0; yy < ratio; ++yy) {
-                for (int xx = 0; xx < ratio; ++xx) {
-                    const int x_in = x_out * ratio + xx;
-                    const int y_in = y_out * ratio + yy;
-                    const uint32_t pixel_value =
-                        input_RGBA_data[x_in + input_RGBA_img.width() * y_in];
-                    r += se::r_from_rgba(pixel_value);
-                    g += se::g_from_rgba(pixel_value);
-                    b += se::b_from_rgba(pixel_value);
-                }
+            if (region.empty()) {
+                // All depth values in the region were invalid, set the depth of the output image to
+                // invalid and arbitrarily map to the first pixel in the region.
+                output_depth_img(x_out, y_out) = 0.0f;
+                map(x_out, y_out) = x_in_base + y_in_base * w_in;
             }
-            r /= ratio * ratio;
-            g /= ratio * ratio;
-            b /= ratio * ratio;
-
-            // Combine into a uint32_t by adding an alpha channel with 100% opacity.
-            const uint32_t rgba = se::pack_rgba(r, g, b, 255);
-            output_RGBA_img(x_out, y_out) = rgba;
+            else {
+                // Sort the region pixels based on depth.
+                std::sort(region.begin(), region.end(), [](const auto& a, const auto& b) {
+                    return a.depth < b.depth;
+                });
+                // Find the region pixel containing the median depth. Don't average the midpoints
+                // when region contains an even number of elements to avoid introducing unobserved
+                // depth values. Get the first of the two middle elements instead.
+                const Pixel value = region[region.size() / 2];
+                output_depth_img(x_out, y_out) = value.depth;
+                map(x_out, y_out) = value.x + value.y * w_in;
+            }
+            region.clear();
         }
     }
+    return map;
 }
 
 
 
 void point_cloud_to_depth(se::Image<float>& depth_image,
                           const se::Image<Eigen::Vector3f>& point_cloud_X,
-                          const Eigen::Matrix4f& T_CX)
+                          const Eigen::Isometry3f& T_CX)
 {
 #pragma omp parallel for
     for (int y = 0; y < depth_image.height(); y++) {
         for (int x = 0; x < depth_image.width(); x++) {
-            depth_image(x, y) = (T_CX * point_cloud_X(x, y).homogeneous()).z();
+            depth_image(x, y) = (T_CX * point_cloud_X(x, y)).z();
         }
     }
 }

@@ -11,33 +11,29 @@
 
 namespace se {
 
-struct LeicaLidarConfig : public SensorBaseConfig {
-    /** \brief The actual sensor resolution in angular directions (in degrees).
-     *  It is needed for ray based integration to decide the integration scale.
-     */
-    float elevation_resolution_angle_ = 1.0f;
-    float azimuth_resolution_angle_ = 1.0f;
-
-    /** Reads the struct members from the "sensor" node of a YAML file. Members not present in the
-     * YAML file aren't modified.
-     *
-     * \throws std::invalid_argument Throws std::invalid_argument if the number of beam elevation or
-     * azimuth angles is different than the sensor height.
-     */
-    void readYaml(const std::string& filename);
-
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-};
-
-std::ostream& operator<<(std::ostream& os, const LeicaLidarConfig& c);
-
-
-
 class LeicaLidar : public SensorBase<LeicaLidar> {
     public:
-    LeicaLidar(const LeicaLidarConfig& config);
+    struct Config : public SensorBase<LeicaLidar>::Config {
+        /** \brief The actual sensor resolution in angular directions (in degrees).
+         *  It is needed for ray based integration to decide the integration scale.
+         */
+        float elevation_resolution_angle_ = 1.0f;
+        float azimuth_resolution_angle_ = 1.0f;
 
-    LeicaLidar(const LeicaLidarConfig& config, const float downsampling_factor);
+        /** Reads the struct members from the "sensor" node of a YAML file. Members not present in the
+         * YAML file aren't modified.
+         *
+         * \throws std::invalid_argument Throws std::invalid_argument if the number of beam elevation or
+         * azimuth angles is different than the sensor height.
+         */
+        void readYaml(const std::string& filename);
+
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    };
+
+    LeicaLidar(const Config& config);
+
+    LeicaLidar(const Config& config, const float downsampling_factor);
 
     LeicaLidar(const LeicaLidar& leica_lidar, const float downsampling_factor);
 
@@ -66,8 +62,6 @@ class LeicaLidar : public SensorBase<LeicaLidar> {
     srl::projection::LeicaLidar model;
     /** \brief the minimum ray angle between subsequent measurements*/
     float min_ray_angle;
-    /** \brief the maximum ray angle between subsequent measurements */
-    float max_ray_angle;
     float min_elevation_rad;
     float max_elevation_rad;
     /** \brief The horizontal field of view in radians. */
@@ -79,18 +73,12 @@ class LeicaLidar : public SensorBase<LeicaLidar> {
     float azimuth_resolution_angle;
     float elevation_resolution_angle;
 
-    /** \brief Cache the last resolution being used to compute integration scale
-     * That way we can avoid having to repeat costly tan() and sqrt() for every ray */
-    float map_resolution = 0.03f;
-
     float pixel_dim_tan = 0.0f;
-    float pv_ratio_denominator = 0.0f;
-
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
-
+std::ostream& operator<<(std::ostream& os, const LeicaLidar::Config& c);
 
 } // namespace se
 

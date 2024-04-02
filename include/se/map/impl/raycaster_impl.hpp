@@ -98,10 +98,8 @@ inline float compute_map_intersection(const MapT& map,
   from "Graphics Gems", Academic Press, 1990
   */
     // Translate position and direction from world to map frame
-    const Eigen::Matrix4f T_MW = map.getTMW();
-    const Eigen::Matrix3f R_MW = se::math::to_rotation(T_MW);
-    const Eigen::Vector3f ray_pos_M = (T_MW * ray_pos_W.homogeneous()).head<3>();
-    const Eigen::Vector3f ray_dir_M = R_MW * ray_dir_W;
+    const Eigen::Vector3f ray_pos_M = map.getTMW() * ray_pos_W;
+    const Eigen::Vector3f ray_dir_M = map.getTMW().linear() * ray_dir_W;
 
     const Eigen::Vector3f map_min = Eigen::Vector3f::Zero();
     const Eigen::Vector3f map_max = map.getDim();
@@ -540,7 +538,7 @@ void raycast_volume(const MapT& map,
                     se::Image<Eigen::Vector3f>& surface_point_cloud_W,
                     se::Image<Eigen::Vector3f>& surface_normals_W,
                     se::Image<int8_t>& surface_scale,
-                    const Eigen::Matrix4f& T_WS,
+                    const Eigen::Isometry3f& T_WS,
                     const SensorT& sensor)
 {
     const typename MapT::OctreeType& octree = map.getOctree();
@@ -552,13 +550,11 @@ void raycast_volume(const MapT& map,
             const Eigen::Vector2f pixel_f = pixel.cast<float>();
             Eigen::Vector3f ray_dir_S; //< Ray direction in sensor frame
             sensor.model.backProject(pixel_f, &ray_dir_S);
-            const Eigen::Vector3f ray_dir_W =
-                (se::math::to_rotation(T_WS) * ray_dir_S.normalized()).head(3);
-            const Eigen::Vector3f t_WS = se::math::to_translation(T_WS);
+            const Eigen::Vector3f ray_dir_W = T_WS.linear() * ray_dir_S.normalized();
             std::optional<Eigen::Vector4f> surface_intersection_W =
                 raycast(map,
                         octree,
-                        t_WS,
+                        T_WS.translation(),
                         ray_dir_W,
                         sensor.nearDist(ray_dir_S),
                         sensor.farDist(ray_dir_S));

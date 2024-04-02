@@ -9,23 +9,13 @@
 #ifndef SE_CONFIG_IMPL_HPP
 #define SE_CONFIG_IMPL_HPP
 
-#include "se/common/yaml.hpp"
-
 namespace se {
 
-
-
-template<typename DataConfigT, typename SensorConfigT>
-Config<DataConfigT, SensorConfigT>::Config()
-{
-}
-
-
-
-template<typename DataConfigT, typename SensorConfigT>
-Config<DataConfigT, SensorConfigT>::Config(const std::string& yaml_file) : data(yaml_file)
+template<typename MapT, typename SensorT>
+Config<MapT, SensorT>::Config(const std::string& yaml_file)
 {
     map.readYaml(yaml_file);
+    data.readYaml(yaml_file);
     sensor.readYaml(yaml_file);
     tracker.readYaml(yaml_file);
     reader.readYaml(yaml_file);
@@ -34,13 +24,13 @@ Config<DataConfigT, SensorConfigT>::Config(const std::string& yaml_file) : data(
 
 
 
-template<typename DataConfigT, typename SensorConfigT>
-std::ostream& operator<<(std::ostream& os, const Config<DataConfigT, SensorConfigT>& c)
+template<typename MapT, typename SensorT>
+std::ostream& operator<<(std::ostream& os, const Config<MapT, SensorT>& c)
 {
     os << "Data config -----------------------\n";
     os << c.data;
     os << "Map config ------------------------\n";
-    os << c.map;
+    operator<< <MapT>(os, c.map);
     os << "Sensor config ---------------------\n";
     os << c.sensor;
     os << "Tracker config --------------------\n";
@@ -52,10 +42,6 @@ std::ostream& operator<<(std::ostream& os, const Config<DataConfigT, SensorConfi
     return os;
 }
 
-
-
 } // namespace se
-
-
 
 #endif // SE_CONFIG_IMPL_HPP

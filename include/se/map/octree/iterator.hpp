@@ -230,7 +230,7 @@ class FrustumIterator : public BaseIterator<FrustumIterator<MapT, SensorT>> {
 
     FrustumIterator() : BaseIterator<FrustumIterator<MapT, SensorT>>(){};
 
-    FrustumIterator(MapT& map, const SensorT& sensor, const Eigen::Matrix4f& T_SM) :
+    FrustumIterator(MapT& map, const SensorT& sensor, const Eigen::Isometry3f& T_SM) :
             BaseIterator<FrustumIterator<MapT, SensorT>>(&map.getOctree()),
             map_ptr_(&map),
             sensor_ptr_(&sensor),
@@ -254,8 +254,7 @@ class FrustumIterator : public BaseIterator<FrustumIterator<MapT, SensorT>> {
             se::octantops::octant_to_size<typename MapT::OctreeType>(octant_ptr);
         map_ptr_->voxelToPoint(octant_ptr->getCoord(), octant_size, octant_centre_point_M);
         // Convert it to the sensor frame.
-        const Eigen::Vector3f octant_centre_point_S =
-            (T_SM_ * octant_centre_point_M.homogeneous()).template head<3>();
+        const Eigen::Vector3f octant_centre_point_S = T_SM_ * octant_centre_point_M;
 
         float octant_radius = std::sqrt(3.0f) / 2.0f * map_ptr_->getRes() * octant_size;
         bool do_ignore = !sensor_ptr_->sphereInFrustum(octant_centre_point_S, octant_radius);
@@ -266,7 +265,7 @@ class FrustumIterator : public BaseIterator<FrustumIterator<MapT, SensorT>> {
 
     MapT* map_ptr_;
     const SensorT* sensor_ptr_;
-    const Eigen::Matrix4f T_SM_; // TODO: Needs to be ref?
+    const Eigen::Isometry3f T_SM_; // TODO: Needs to be ref?
 
     friend class BaseIterator<FrustumIterator<MapT, SensorT>>;
 };

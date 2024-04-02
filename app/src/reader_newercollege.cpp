@@ -59,7 +59,7 @@ Eigen::Vector3f atof3(const std::string& line)
 
 
 
-se::NewerCollegeReader::NewerCollegeReader(const se::ReaderConfig& c) : se::Reader(c)
+se::NewerCollegeReader::NewerCollegeReader(const se::Reader::Config& c) : se::Reader(c)
 {
     // Ensure a valid directory was provided
     if (!stdfs::is_directory(sequence_path_)) {
@@ -67,9 +67,9 @@ se::NewerCollegeReader::NewerCollegeReader(const se::ReaderConfig& c) : se::Read
         std::cerr << "Error: " << sequence_path_ << " is not a directory\n";
         return;
     }
-    // Set the depth and RGBA image resolutions.
+    // Set the depth and colour image resolutions.
     depth_image_res_ = Eigen::Vector2i(1024, 64);
-    rgba_image_res_ = Eigen::Vector2i(1024, 64);
+    colour_image_res_ = Eigen::Vector2i(1024, 64);
     // Get the scan filenames and total number of frames.
     scan_filenames_ = getScanFilenames(sequence_path_);
     num_frames_ = scan_filenames_.size();
@@ -141,20 +141,6 @@ se::ReaderStatus se::NewerCollegeReader::nextDepth(se::Image<float>& depth_image
 
 
 
-se::ReaderStatus se::NewerCollegeReader::nextRGBA(se::Image<uint32_t>& rgba_image)
-{
-    // Resize the output image if needed.
-    if ((rgba_image.width() != rgba_image_res_.x())
-        || (rgba_image.height() != rgba_image_res_.y())) {
-        rgba_image = se::Image<uint32_t>(rgba_image_res_.x(), rgba_image_res_.y());
-    }
-    // Create a blank image
-    std::memset(rgba_image.data(), 0, rgba_image_res_.prod() * sizeof(uint32_t));
-    return se::ReaderStatus::ok;
-}
-
-
-
 std::vector<std::string> se::NewerCollegeReader::getScanFilenames(const std::string& dir)
 {
     static const std::string regex_pattern = ".*cloud_[[:digit:]]{10}_[[:digit:]]{9}.pcd";
@@ -180,7 +166,7 @@ std::vector<std::string> se::NewerCollegeReader::getScanFilenames(const std::str
 
 
 #else
-se::NewerCollegeReader::NewerCollegeReader(const se::ReaderConfig& c) : se::Reader(c)
+se::NewerCollegeReader::NewerCollegeReader(const se::Reader::Config& c) : se::Reader(c)
 {
     status_ = se::ReaderStatus::error;
     std::cerr << "Error: not compiled with PCL, no Newer College support\n";
@@ -203,13 +189,6 @@ std::string se::NewerCollegeReader::name() const
 
 
 se::ReaderStatus se::NewerCollegeReader::nextDepth(se::Image<float>&)
-{
-    return se::ReaderStatus::error;
-}
-
-
-
-se::ReaderStatus se::NewerCollegeReader::nextRGBA(se::Image<uint32_t>&)
 {
     return se::ReaderStatus::error;
 }

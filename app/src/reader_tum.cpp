@@ -319,14 +319,15 @@ void associate_images(std::vector<TUMImageEntry>& depth_images,
  * matching ground truth poses will be removed from depth_images and
  * rgb_images. Return an std::vector with the interpolated poses.
  */
-std::vector<TUMPoseEntry> interpolate_poses(std::vector<TUMImageEntry>& depth_images,
-                                            std::vector<TUMImageEntry>& rgb_images,
-                                            const std::vector<TUMPoseEntry>& gt_poses,
-                                            const double max_timestamp_dist)
+std::vector<Eigen::Isometry3f, Eigen::aligned_allocator<Eigen::Isometry3f>>
+interpolate_poses(std::vector<TUMImageEntry>& depth_images,
+                  std::vector<TUMImageEntry>& rgb_images,
+                  const std::vector<TUMPoseEntry>& gt_poses,
+                  const double max_timestamp_dist)
 {
     std::vector<TUMImageEntry> output_depth_images;
     std::vector<TUMImageEntry> output_rgb_images;
-    std::vector<TUMPoseEntry> associated_poses;
+    std::vector<Eigen::Isometry3f, Eigen::aligned_allocator<Eigen::Isometry3f>> associated_poses;
     // Interpolate the ground truth poses at the depth image timestamps
     for (size_t i = 0; i < depth_images.size(); ++i) {
         const double depth_timestamp = depth_images[i].timestamp;
@@ -352,39 +353,15 @@ std::vector<TUMPoseEntry> interpolate_poses(std::vector<TUMImageEntry>& depth_im
         // Interpolate the pose
         const Eigen::Vector3f p = (1.0f - t) * poses.first.position + t * poses.second.position;
         const Eigen::Quaternionf o = poses.first.orientation.slerp(t, poses.second.orientation);
-        // Create a new TUMPoseEntry containing also the depth and RGB image filenames
-        associated_poses.emplace_back(
-            depth_timestamp, p, o, depth_images[i].filename, rgb_images[i].filename);
+        associated_poses.push_back(Eigen::Isometry3f::Identity());
+        associated_poses.back().translation() = p;
+        associated_poses.back().linear() = o.toRotationMatrix();
     }
     // Update the input vectors
     depth_images = output_depth_images;
     rgb_images = output_rgb_images;
     return associated_poses;
 }
-
-
-
-/** Generate a ground truth file from poses and write it in a temporary file.
- */
-std::string write_ground_truth_tmp(const std::vector<TUMPoseEntry>& poses)
-{
-    // Open a temporary file
-    const std::string tmp_filename = stdfs::temp_directory_path() / "tum_gt.txt";
-    std::ofstream fs(tmp_filename, std::ios::out);
-    if (!fs.good()) {
-        std::cerr << "Error: Could not write associated ground truth file " << tmp_filename << "\n";
-        return "";
-    }
-    // Write the header
-    fs << "# Association of rgb images, depth images and ground truth poses\n";
-    fs << "# ID timestamp rgb_filename depth_filename tx ty tz qx qy qz qw\n";
-    // Write each of the associated poses
-    for (size_t i = 0; i < poses.size(); ++i) {
-        fs << std::setw(6) << std::setfill('0') << i << " " << poses[i].string() << "\n";
-    }
-    return tmp_filename;
-}
-
 
 
 // TUMReader implementation
@@ -394,7 +371,7 @@ constexpr double se::TUMReader::max_interp_timestamp_dist_;
 
 
 
-se::TUMReader::TUMReader(const se::ReaderConfig& c) : se::Reader(c)
+se::TUMReader::TUMReader(const se::Reader::Config& c) : se::Reader(c)
 {
     inverse_scale_ = (c.inverse_scale != 0) ? c.inverse_scale : tum_inverse_scale_;
 
@@ -421,22 +398,11 @@ se::TUMReader::TUMReader(const se::ReaderConfig& c) : se::Reader(c)
             status_ = se::ReaderStatus::error;
             return;
         }
-        // Interpolate the ground truth poses at the depth image timestamps
-        const std::vector<TUMPoseEntry> associated_gt_poses =
+
+        associated_gt_poses_ =
             interpolate_poses(depth_images, rgb_images, gt_poses, max_interp_timestamp_dist_);
-        if (associated_gt_poses.empty()) {
+        if (associated_gt_poses_.empty()) {
             std::cerr << "Error: Could not associate any ground truth poses to depth images\n";
-            status_ = se::ReaderStatus::error;
-            return;
-        }
-        // Generate the associated ground truth file
-        const std::string generated_filename = write_ground_truth_tmp(associated_gt_poses);
-        // Close the original ground truth file and open the generated one
-        ground_truth_fs_.close();
-        ground_truth_fs_.open(generated_filename, std::ios::in);
-        if (!ground_truth_fs_.good()) {
-            std::cerr << "Error: Could not read generated ground truth file " << generated_filename
-                      << "\n";
             status_ = se::ReaderStatus::error;
             return;
         }
@@ -469,7 +435,7 @@ se::TUMReader::TUMReader(const se::ReaderConfig& c) : se::Reader(c)
 
         depth_image_res_ = Eigen::Vector2i(image_data.cols, image_data.rows);
     }
-    // Set the RGBA image resolution to that of the first RGBA image.
+    // Set the Colour image resolution to that of the first colour image.
     if (!rgb_filenames_.empty()) {
         const std::string first_rgb_filename = sequence_path_ + "/" + rgb_filenames_[0];
 
@@ -480,8 +446,28 @@ se::TUMReader::TUMReader(const se::ReaderConfig& c) : se::Reader(c)
             status_ = se::ReaderStatus::error;
             return;
         }
-        rgba_image_res_ = Eigen::Vector2i(image_data.cols, image_data.rows);
+        colour_image_res_ = Eigen::Vector2i(image_data.cols, image_data.rows);
     }
+    has_colour_ = true;
+}
+
+
+se::ReaderStatus se::TUMReader::nextPose(Eigen::Isometry3f& T_WB)
+{
+    const Eigen::Quaternionf orientation(associated_gt_poses_[frame_].linear());
+    // Ensure the quaternion represents a valid orientation
+    if (std::abs(orientation.norm() - 1.0f) > 1e-3) {
+        if (verbose_ >= 1) {
+            std::cerr << "Warning: Expected unit quaternion but got " << orientation.x() << " "
+                      << orientation.y() << " " << orientation.z() << " " << orientation.w()
+                      << " (x,y,z,w) with norm " << orientation.norm() << "\n";
+        }
+        return se::ReaderStatus::skip;
+    }
+
+    T_WB = associated_gt_poses_[frame_];
+
+    return se::ReaderStatus::ok;
 }
 
 
@@ -537,7 +523,7 @@ se::ReaderStatus se::TUMReader::nextDepth(se::Image<float>& depth_image)
 
 
 
-se::ReaderStatus se::TUMReader::nextRGBA(se::Image<uint32_t>& rgba_image)
+se::ReaderStatus se::TUMReader::nextColour(se::Image<RGBA>& colour_image)
 {
     if (frame_ >= num_frames_) {
         return se::ReaderStatus::error;
@@ -550,19 +536,19 @@ se::ReaderStatus se::TUMReader::nextRGBA(se::Image<uint32_t>& rgba_image)
         return se::ReaderStatus::error;
     }
 
-    cv::Mat rgba_data;
-    cv::cvtColor(image_data, rgba_data, cv::COLOR_BGR2RGBA);
+    cv::Mat colour_data;
+    cv::cvtColor(image_data, colour_data, cv::COLOR_BGR2RGBA);
 
-    assert(rgba_image_res_.x() == static_cast<int>(rgba_data.cols));
-    assert(rgba_image_res_.y() == static_cast<int>(rgba_data.rows));
+    assert(colour_image_res_.x() == static_cast<int>(colour_data.cols));
+    assert(colour_image_res_.y() == static_cast<int>(colour_data.rows));
     // Resize the output image if needed.
-    if ((rgba_image.width() != rgba_image_res_.x())
-        || (rgba_image.height() != rgba_image_res_.y())) {
-        rgba_image = se::Image<uint32_t>(rgba_image_res_.x(), rgba_image_res_.y());
+    if ((colour_image.width() != colour_image_res_.x())
+        || (colour_image.height() != colour_image_res_.y())) {
+        colour_image = se::Image<RGBA>(colour_image_res_.x(), colour_image_res_.y());
     }
 
-    cv::Mat wrapper_mat(rgba_data.rows, rgba_data.cols, CV_8UC4, rgba_image.data());
-    rgba_data.copyTo(wrapper_mat);
+    cv::Mat wrapper_mat(colour_data.rows, colour_data.cols, CV_8UC4, colour_image.data());
+    colour_data.copyTo(wrapper_mat);
 
     return se::ReaderStatus::ok;
 }

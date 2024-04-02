@@ -360,7 +360,7 @@ struct PerfStats {
                   const Type type = COUNT,
                   const bool detailed = false);
 
-    double sampleT_WB(const Eigen::Matrix4f& T_WB, const bool detailed = false);
+    double sampleT_WB(const Eigen::Isometry3f& T_WB, const bool detailed = false);
 
     /**
      * \brief

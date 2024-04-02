@@ -89,72 +89,6 @@ bool in(const Scalar v, const Scalar a, const Scalar b)
 
 
 
-static inline Eigen::Vector3f to_translation(const Eigen::Matrix4f& T)
-{
-    return T.topRightCorner<3, 1>();
-}
-
-
-
-static inline Eigen::Matrix3f to_rotation(const Eigen::Matrix4f& T)
-{
-    return T.topLeftCorner<3, 3>();
-}
-
-
-
-static inline Eigen::Matrix4f to_transformation(const Eigen::Vector3f& t)
-{
-    Eigen::Matrix4f T = Eigen::Matrix4f::Identity();
-    T.topRightCorner<3, 1>() = t;
-    return T;
-}
-
-
-
-static inline Eigen::Matrix4f to_transformation(const Eigen::Matrix3f& R)
-{
-    Eigen::Matrix4f T = Eigen::Matrix4f::Identity();
-    T.topLeftCorner<3, 3>() = R;
-    return T;
-}
-
-
-
-static inline Eigen::Matrix4f to_transformation(const Eigen::Matrix3f& R, const Eigen::Vector3f& t)
-{
-    Eigen::Matrix4f T = Eigen::Matrix4f::Identity();
-    T.topLeftCorner<3, 3>() = R;
-    T.topRightCorner<3, 1>() = t;
-    return T;
-}
-
-
-
-static inline Eigen::Vector3f to_inverse_translation(const Eigen::Matrix4f& T)
-{
-    return -T.topLeftCorner<3, 3>().transpose() * T.topRightCorner<3, 1>();
-}
-
-
-
-static inline Eigen::Matrix3f to_inverse_rotation(const Eigen::Matrix4f& T)
-{
-    return T.topLeftCorner<3, 3>().transpose();
-}
-
-
-
-static inline Eigen::Matrix4f to_inverse_transformation(const Eigen::Matrix4f& T)
-{
-    Eigen::Matrix4f T_inv = Eigen::Matrix4f::Identity();
-    T_inv.topLeftCorner<3, 3>() = T.topLeftCorner<3, 3>().transpose();
-    T_inv.topRightCorner<3, 1>() = -T.topLeftCorner<3, 3>().transpose() * T.topRightCorner<3, 1>();
-    return T_inv;
-}
-
-
-
 static inline Eigen::Vector3f
 plane_normal(const Eigen::Vector3f& p1, const Eigen::Vector3f& p2, const Eigen::Vector3f& p3)
 {
@@ -163,52 +97,6 @@ plane_normal(const Eigen::Vector3f& p1, const Eigen::Vector3f& p2, const Eigen::
     const Eigen::Vector3f t2 = p3 - p2;
     // Unit normal vector
     return t1.cross(t2).normalized();
-}
-
-
-
-template<typename T>
-T median(std::vector<T>& data)
-{
-    if (!data.empty()) {
-        std::sort(data.begin(), data.end());
-        // Compute both the quotient and remainder in one go
-        const std::ldiv_t result = std::ldiv(data.size(), 2);
-        const size_t mid_idx = result.quot;
-        if (result.rem == 0) {
-            return (data[mid_idx - 1] + data[mid_idx]) / 2;
-        }
-        else {
-            return data[mid_idx];
-        }
-    }
-    else {
-        return T();
-    }
-}
-
-
-
-template<typename T>
-T almost_median(std::vector<T>& data)
-{
-    if (!data.empty()) {
-        std::sort(data.begin(), data.end());
-        const size_t mid_idx = data.size() / 2;
-        return data[mid_idx];
-    }
-    else {
-        return T();
-    }
-}
-
-
-
-template<typename T>
-T median(const std::vector<T>& data)
-{
-    std::vector<T> v(data);
-    return median(v);
 }
 
 

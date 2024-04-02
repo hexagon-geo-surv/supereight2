@@ -10,6 +10,7 @@
 #define SE_RAYCASTER_HPP
 
 #include <optional>
+#include <se/common/rgba.hpp>
 
 #include "se/common/colour_utils.hpp"
 #include "se/common/math_util.hpp"
@@ -55,11 +56,11 @@ void raycast_volume(const MapT& map,
                     se::Image<Eigen::Vector3f>& surface_point_cloud_W,
                     se::Image<Eigen::Vector3f>& surface_normals_W,
                     se::Image<int8_t>& surface_scale,
-                    const Eigen::Matrix4f& T_WS,
+                    const Eigen::Isometry3f& T_WS,
                     const SensorT& sensor);
 
-void render_volume_kernel(uint32_t* volume_RGBA_image_data,
-                          const Eigen::Vector2i& volume_RGBA_image_res,
+void render_volume_kernel(RGBA* volume_image_data,
+                          const Eigen::Vector2i& volume_image_res,
                           const Eigen::Vector3f& light_W,
                           const Eigen::Vector3f& ambient_W,
                           const se::Image<Eigen::Vector3f>& surface_point_cloud_W,

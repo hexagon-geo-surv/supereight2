@@ -13,26 +13,8 @@
 #include "se/common/yaml.hpp"
 
 namespace se {
-FieldDataConfig<Field::Occupancy>::FieldDataConfig() :
-        k_sigma(0.052f),
-        sigma_min_factor(1.5f),
-        sigma_max_factor(6.f),
-        k_tau(0.026f),
-        tau_min_factor(6.f),
-        tau_max_factor(16.f),
-        log_odd_min(-5.015),
-        log_odd_max(5.015),
-        fs_integr_scale(1),
-        uncertainty_model(UncertaintyModel::Linear)
-{
-    max_weight =
-        std::floor(std::fabs(FieldData<Field::Occupancy>::min_occupancy / (0.97f * log_odd_min)));
-}
 
-
-
-FieldDataConfig<Field::Occupancy>::FieldDataConfig(const std::string& yaml_file) :
-        FieldDataConfig<Field::Occupancy>::FieldDataConfig()
+void FieldData<Field::Occupancy>::Config::readYaml(const std::string& yaml_file)
 {
     // Open the file for reading.
     cv::FileStorage fs;
@@ -83,7 +65,7 @@ FieldDataConfig<Field::Occupancy>::FieldDataConfig(const std::string& yaml_file)
 
 
 
-std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::Occupancy>& c)
+std::ostream& operator<<(std::ostream& os, const FieldData<Field::Occupancy>::Config& c)
 {
     os << str_utils::value_to_pretty_str(c.k_sigma, "k_sigma") << "\n";
     os << str_utils::value_to_pretty_str(c.sigma_min_factor, "sigma_min_factor") << "\n";
@@ -104,14 +86,7 @@ std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::Occu
 
 
 
-FieldDataConfig<Field::TSDF>::FieldDataConfig() : truncation_boundary_factor(8), max_weight(100)
-{
-}
-
-
-
-FieldDataConfig<Field::TSDF>::FieldDataConfig(const std::string& yaml_file) :
-        FieldDataConfig<Field::TSDF>::FieldDataConfig()
+void FieldData<Field::TSDF>::Config::readYaml(const std::string& yaml_file)
 {
     // Open the file for reading.
     cv::FileStorage fs;
@@ -141,7 +116,7 @@ FieldDataConfig<Field::TSDF>::FieldDataConfig(const std::string& yaml_file) :
 
 
 
-std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::TSDF>& c)
+std::ostream& operator<<(std::ostream& os, const FieldData<Field::TSDF>::Config& c)
 {
     os << str_utils::value_to_pretty_str(c.truncation_boundary_factor, "truncation_boundary_factor")
        << "x\n";
@@ -151,22 +126,16 @@ std::ostream& operator<<(std::ostream& os, const FieldDataConfig<se::Field::TSDF
 
 
 
-ColourDataConfig<se::Colour::On>::ColourDataConfig()
+void ColourData<se::Colour::On>::Config::readYaml(const std::string& /* yaml_file */)
 {
     // TODO Implement when colour fusion is added.
 }
 
 
 
-ColourDataConfig<se::Colour::On>::ColourDataConfig(const std::string& /* yaml_file */) :
-        ColourDataConfig<se::Colour::On>::ColourDataConfig()
-{
-    // TODO Implement when colour fusion is added.
-}
-
-
-
-std::ostream& operator<<(std::ostream& os, const ColourDataConfig<se::Colour::On>& /* c */)
+template<>
+std::ostream& operator<< <se::Colour::On>(std::ostream& os,
+                                          const ColourData<se::Colour::On>::Config& /* c */)
 {
     // TODO Implement when colour fusion is added.
     return os;
@@ -174,22 +143,16 @@ std::ostream& operator<<(std::ostream& os, const ColourDataConfig<se::Colour::On
 
 
 
-SemanticDataConfig<se::Semantics::On>::SemanticDataConfig()
+void SemanticData<se::Semantics::On>::Config::readYaml(const std::string& /* yaml_file */)
 {
     // TODO Implement when semantics fusion is added.
 }
 
 
 
-SemanticDataConfig<se::Semantics::On>::SemanticDataConfig(const std::string& /* yaml_file */) :
-        SemanticDataConfig<se::Semantics::On>::SemanticDataConfig()
-{
-    // TODO Implement when semantics fusion is added.
-}
-
-
-
-std::ostream& operator<<(std::ostream& os, const SemanticDataConfig<se::Semantics::On>& /* c */)
+template<>
+std::ostream& operator<< <se::Semantics::On>(std::ostream& os,
+                                             const SemanticData<se::Semantics::On>::Config& /* c */)
 {
     // TODO Implement when semantics fusion is added.
     return os;
