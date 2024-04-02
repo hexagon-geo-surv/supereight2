@@ -501,10 +501,10 @@ raycast(MapT& map,
                 if (f_tt <= 0.1 && f_tt >= -0.5f) {
                     std::optional<se::field_t> field_value = [&]() -> std::optional<se::field_t> {
                         if constexpr (MapT::res_ == se::Res::Single) {
-                            return map.template getFieldInterp(point_W);
+                            return map.getFieldInterp(point_W);
                         }
                         else {
-                            return map.template getFieldInterp(point_W, scale_tt);
+                            return map.getFieldInterp(point_W, scale_tt);
                         }
                     }();
                     if (field_value) {
@@ -577,7 +577,7 @@ void raycast_volume(const MapT& map,
                 surface_point_cloud_W[idx] = surface_intersection_W->head<3>();
                 // Set surface normal
                 const std::optional<Eigen::Vector3f> surface_normal_W =
-                    map.template getFieldGrad(surface_intersection_W->head<3>());
+                    map.getFieldGrad(surface_intersection_W->head<3>());
                 if (surface_normal_W) {
                     // Invert surface normals for TSDF representations.
                     surface_normals_W[idx] = (MapT::DataType::invert_normals)
