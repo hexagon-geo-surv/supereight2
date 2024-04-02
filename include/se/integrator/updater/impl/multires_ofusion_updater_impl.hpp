@@ -137,8 +137,8 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
                     updated_octants_.insert(octant_ptr);
                 }
 
-                if (node_data.observed
-                    && get_field(node_data) <= 0.95 * MapType::DataType::min_occupancy) {
+                if (node_data.field.observed
+                    && get_field(node_data) <= 0.95 * MapType::DataType::FieldType::min_occupancy) {
                     auto* node_ptr = static_cast<NodeType*>(octant_ptr);
                     if (track_updated_octants_) {
                         for (int i = 0; i < 8; i++) {
@@ -190,9 +190,9 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                                         block_ptr->getMaxScale());
 
     // The minimum integration scale (change to last if data has already been integrated)
-    const int min_integration_scale =
-        ((block_ptr->getMinScale() == -1
-          || block_ptr->getMaxData().occupancy < 0.95 * map_.getDataConfig().field.log_odd_min))
+    const int min_integration_scale = ((block_ptr->getMinScale() == -1
+                                        || block_ptr->getMaxData().field.occupancy
+                                            < 0.95 * map_.getDataConfig().field.log_odd_min))
         ? map_.getDataConfig().field.fs_integr_scale
         : std::max(0, last_scale - 1);
     const int max_integration_scale = (block_ptr->getMinScale() == -1)
@@ -247,10 +247,11 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                                         auto& buffer_data = block_ptr->bufferData(
                                             buffer_idx); ///<< Fetch value from buffer.
 
-                                        buffer_data.occupancy = parent_data.occupancy;
-                                        buffer_data.weight =
-                                            parent_data.weight; // (parent_data.y > 0) ? 1 : 0;
-                                        buffer_data.observed =
+                                        buffer_data.field.occupancy = parent_data.field.occupancy;
+                                        buffer_data.field.weight =
+                                            parent_data.field
+                                                .weight; // (parent_data.y > 0) ? 1 : 0;
+                                        buffer_data.field.observed =
                                             false; ///<< Set falls such that the observe count can work properly
 
                                     } // i
@@ -353,10 +354,10 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                                         block_ptr->getMaxScale());
 
     // The minimum integration scale (change to last if data has already been integrated)
-    const int min_integration_scale =
-        (low_variance
-         && (block_ptr->getMinScale() == -1
-             || block_ptr->getMaxData().occupancy < 0.95 * map_.getDataConfig().field.log_odd_min))
+    const int min_integration_scale = (low_variance
+                                       && (block_ptr->getMinScale() == -1
+                                           || block_ptr->getMaxData().field.occupancy
+                                               < 0.95 * map_.getDataConfig().field.log_odd_min))
         ? map_.getDataConfig().field.fs_integr_scale
         : std::max(0, last_scale - 1);
     const int max_integration_scale = (block_ptr->getMinScale() == -1)
@@ -411,10 +412,11 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                                         auto& buffer_data = block_ptr->bufferData(
                                             buffer_idx); ///<< Fetch value from buffer.
 
-                                        buffer_data.occupancy = parent_data.occupancy;
-                                        buffer_data.weight =
-                                            parent_data.weight; // (parent_data.y > 0) ? 1 : 0;
-                                        buffer_data.observed =
+                                        buffer_data.field.occupancy = parent_data.field.occupancy;
+                                        buffer_data.field.weight =
+                                            parent_data.field
+                                                .weight; // (parent_data.y > 0) ? 1 : 0;
+                                        buffer_data.field.observed =
                                             false; ///<< Set falls such that the observe count can work properly
 
                                     } // i
@@ -581,7 +583,8 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
     if (node_ptr->isLeaf()) {
         typename NodeType::DataType node_data = node_ptr->getData();
         // Update the node data to free since we don't need to update at a finer level.
-        node_data.update(map_.getDataConfig().log_odd_min, map_.getDataConfig().max_weight);
+        node_data.field.update(map_.getDataConfig().field.log_odd_min,
+                               map_.getDataConfig().field.max_weight);
         node_ptr->setData(node_data);
         node_ptr->setMinData(node_data);
 #pragma omp critical(node_lock)

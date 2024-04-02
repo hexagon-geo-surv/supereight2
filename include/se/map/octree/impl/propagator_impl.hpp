@@ -45,7 +45,7 @@ void propagateBlockUp(const OctreeT& /* octree */,
 
                     size_t sample_count = 0;
                     DataType data_tmp;
-                    data_tmp.tsdf = 0.f;
+                    data_tmp.field.tsdf = 0.f;
 
                     for (int k = 0; k < parent_stride; k += child_stride) {
                         for (int j = 0; j < parent_stride; j += child_stride) {

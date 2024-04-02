@@ -807,10 +807,10 @@ void BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::res
 template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
 void BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::initCurrCout()
 {
-    if (init_data_.observed) {
+    if (init_data_.field.observed) {
         int size_at_scale = BlockSize >> curr_scale_;
         int num_voxels_at_scale = math::cu(size_at_scale);
-        curr_integr_count_ = init_data_.weight;
+        curr_integr_count_ = init_data_.field.weight;
         curr_observed_count_ = num_voxels_at_scale;
     }
     else {
@@ -919,8 +919,8 @@ bool BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::swi
         int missed_observed_count = 0;
         for (int voxel_idx = 0; voxel_idx < num_voxels_at_buffer_scale; voxel_idx++) {
             DataType& data = buffer_data_[voxel_idx];
-            if (data.weight > 0 && !data.observed) {
-                data.observed = true;
+            if (data.field.weight > 0 && !data.field.observed) {
+                data.field.observed = true;
                 buffer_observed_count_++;
                 missed_observed_count++;
             }

@@ -251,9 +251,10 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
                     ? static_cast<BlockType*>(octant_ptr)->getMaxData()
                     : static_cast<NodeType*>(octant_ptr)->getData();
 
-                if (child_data
-                        .observed // Check if the child is fully observed (i.e. all children are observed) // TODO: incooperate MAX occupancy
-                    && get_field(child_data) <= 0.95 * MapType::DataType::min_occupancy) {
+                // Check if the child is fully observed (i.e. all children are observed) // TODO: incooperate MAX occupancy
+                if (child_data.field.observed
+                    && get_field(child_data)
+                        <= 0.95 * MapType::DataType::FieldType::min_occupancy) {
                     return;
                 }
             }
@@ -450,9 +451,10 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
                     ? static_cast<BlockType*>(octant_ptr)->getMaxData()
                     : static_cast<NodeType*>(octant_ptr)->getData();
 
-                if (child_data
-                        .observed // Check if the child is fully observed (i.e. all children are observed) // TODO: incooperate MAX occupancy
-                    && get_field(child_data) <= 0.95 * MapType::DataType::min_occupancy) {
+                // Check if the child is fully observed (i.e. all children are observed) // TODO: incooperate MAX occupancy
+                if (child_data.field.observed
+                    && get_field(child_data)
+                        <= 0.95 * MapType::DataType::FieldType::min_occupancy) {
                     return;
                 }
             }

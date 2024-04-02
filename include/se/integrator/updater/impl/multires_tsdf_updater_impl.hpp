@@ -62,7 +62,7 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
             auto parent_down_funct = [](const OctreeType& /* octree */,
                                         OctantBase* /* octant_ptr */,
                                         typename BlockType::DataUnion& data_union) {
-                data_union.prop_data.delta_tsdf = data_union.data.tsdf;
+                data_union.prop_data.delta_tsdf = data_union.data.field.tsdf;
                 data_union.prop_data.delta_weight = 0;
             };
 
@@ -71,14 +71,15 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
                                         typename BlockType::DataUnion& child_data_union,
                                         typename BlockType::DataUnion& parent_data_union) {
                 field_t delta_tsdf =
-                    parent_data_union.data.tsdf - parent_data_union.prop_data.delta_tsdf;
+                    parent_data_union.data.field.tsdf - parent_data_union.prop_data.delta_tsdf;
 
-                if (child_data_union.data.weight != 0) {
-                    child_data_union.data.tsdf =
-                        std::max(child_data_union.data.tsdf + delta_tsdf, field_t(-1));
-                    child_data_union.data.weight = fminf(
-                        child_data_union.data.weight + parent_data_union.prop_data.delta_weight,
-                        map_.getDataConfig().field.max_weight);
+                if (child_data_union.data.field.weight != 0) {
+                    child_data_union.data.field.tsdf =
+                        std::max(child_data_union.data.field.tsdf + delta_tsdf, field_t(-1));
+                    child_data_union.data.field.weight =
+                        fminf(child_data_union.data.field.weight
+                                  + parent_data_union.prop_data.delta_weight,
+                              map_.getDataConfig().field.max_weight);
                     ;
                     child_data_union.prop_data.delta_weight =
                         parent_data_union.prop_data.delta_weight;
@@ -91,10 +92,10 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
                         octree, child_sample_coord_f, child_data_union.scale, child_scale_returned);
 
                     if (interp_field_value) {
-                        child_data_union.data.tsdf = *interp_field_value;
-                        child_data_union.data.weight = parent_data_union.data.weight;
+                        child_data_union.data.field.tsdf = *interp_field_value;
+                        child_data_union.data.field.weight = parent_data_union.data.field.weight;
 
-                        child_data_union.prop_data.delta_tsdf = child_data_union.data.tsdf;
+                        child_data_union.prop_data.delta_tsdf = child_data_union.data.field.tsdf;
                         child_data_union.prop_data.delta_weight = 0;
                     }
                 }
@@ -147,9 +148,9 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
 
                     typename BlockType::DataUnion data_union =
                         block_ptr->getDataUnion(voxel_coord, block_ptr->getCurrentScale());
-                    data_union.data.update(sdf_value,
-                                           config_.truncation_boundary,
-                                           map_.getDataConfig().field.max_weight);
+                    data_union.data.field.update(sdf_value,
+                                                 config_.truncation_boundary,
+                                                 map_.getDataConfig().field.max_weight);
                     data_union.prop_data.delta_weight++;
                     block_ptr->setDataUnion(data_union);
                 } // k
@@ -161,11 +162,11 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
                                   typename BlockType::DataType& data_tmp,
                                   const int sample_count) {
             if (sample_count != 0) {
-                data_tmp.tsdf /= sample_count;
-                data_tmp.weight /= sample_count;
-                parent_data_union.data.tsdf = data_tmp.tsdf;
-                parent_data_union.prop_data.delta_tsdf = data_tmp.tsdf;
-                parent_data_union.data.weight = ceil(data_tmp.weight);
+                data_tmp.field.tsdf /= sample_count;
+                data_tmp.field.weight /= sample_count;
+                parent_data_union.data.field.tsdf = data_tmp.field.tsdf;
+                parent_data_union.prop_data.delta_tsdf = data_tmp.field.tsdf;
+                parent_data_union.data.field.weight = ceil(data_tmp.field.weight);
                 parent_data_union.prop_data.delta_weight = 0;
             }
             else {
@@ -176,9 +177,9 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
 
         auto child_up_funct = [](typename BlockType::DataUnion& child_data_union,
                                  typename BlockType::DataType& data_tmp) {
-            if (child_data_union.data.weight != 0) {
-                data_tmp.tsdf += child_data_union.data.tsdf;
-                data_tmp.weight += child_data_union.data.weight;
+            if (child_data_union.data.field.weight != 0) {
+                data_tmp.field.tsdf += child_data_union.data.field.tsdf;
+                data_tmp.field.weight += child_data_union.data.field.weight;
                 return 1;
             }
             return 0;

@@ -54,11 +54,11 @@ class OccupancyIntegrator : public ::testing::Test {
         std::stringstream failure_message;
         failure_message << "for node (" << node.getCoord().transpose() << ") with size "
                         << node.getSize();
-        if (min_data.observed) {
+        if (min_data.field.observed) {
             EXPECT_LE(se::get_field(node.getMinData()), se::get_field(min_data))
                 << failure_message.str();
         }
-        if (max_data.observed) {
+        if (max_data.field.observed) {
             EXPECT_GE(se::get_field(node.getMaxData()), se::get_field(max_data))
                 << failure_message.str();
         }
@@ -80,11 +80,11 @@ class OccupancyIntegrator : public ::testing::Test {
                     std::stringstream failure_message;
                     failure_message << "for block (" << parent_coord.transpose() << ") at scale "
                                     << scale;
-                    if (child_min_data.observed) {
+                    if (child_min_data.field.observed) {
                         EXPECT_LE(se::get_field(parent_min_data), se::get_field(child_min_data))
                             << failure_message.str();
                     }
-                    if (child_max_data.observed) {
+                    if (child_max_data.field.observed) {
                         EXPECT_GE(se::get_field(parent_max_data), se::get_field(child_max_data))
                             << failure_message.str();
                     }

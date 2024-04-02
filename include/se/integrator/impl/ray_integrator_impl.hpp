@@ -318,8 +318,8 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
                 }
 
                 // If all nodes free space, delete children and just leave coarser resolution
-                if (node_data.observed
-                    && get_field(node_data) <= 0.95 * MapType::DataType::min_occupancy) {
+                if (node_data.field.observed
+                    && get_field(node_data) <= 0.95 * MapType::DataType::FieldType::min_occupancy) {
                     auto* node_ptr = static_cast<NodeType*>(octant_ptr);
                     if (track_updated_octants_) {
                         for (int i = 0; i < 8; i++) {

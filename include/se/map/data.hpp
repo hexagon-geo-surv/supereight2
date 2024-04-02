@@ -17,11 +17,19 @@
 namespace se {
 
 template<Field FldT = Field::TSDF, Colour ColB = Colour::Off, Semantics SemB = Semantics::Off>
-struct Data : public FieldData<FldT>, ColourData<ColB>, SemanticData<SemB> {
+struct Data {
+    typedef FieldData<FldT> FieldType;
+    typedef ColourData<ColB> ColourType;
+    typedef SemanticData<SemB> SemanticType;
+
+    FieldType field;
+    ColourType colour;
+    SemanticType semantic;
+
     struct Config {
-        typename FieldData<FldT>::Config field;
-        typename ColourData<ColB>::Config colour;
-        typename SemanticData<SemB>::Config semantic;
+        typename FieldType::Config field;
+        typename ColourType::Config colour;
+        typename SemanticType::Config semantic;
 
         /** Reads the struct members from the "data" node of a YAML file. Members not present in the
          * YAML file aren't modified.
@@ -37,6 +45,8 @@ struct Data : public FieldData<FldT>, ColourData<ColB>, SemanticData<SemB> {
     static constexpr Field fld_ = FldT;
     static constexpr Colour col_ = ColB;
     static constexpr Semantics sem_ = SemB;
+    static constexpr bool invert_normals = FieldData<FldT>::invert_normals;
+    static constexpr field_t surface_boundary = FieldData<FldT>::surface_boundary;
 };
 
 template<Field FldT, Colour ColB, Semantics SemB>
@@ -86,13 +96,13 @@ inline bool is_valid(const Data<FldT, ColB, SemB>& data);
 template<Colour ColB, Semantics SemB>
 inline bool is_valid(const Data<Field::TSDF, ColB, SemB>& data)
 {
-    return data.weight != Data<Field::TSDF, ColB, SemB>{}.weight;
+    return data.field.weight != Data<Field::TSDF, ColB, SemB>{}.field.weight;
 }
 
 template<Colour ColB, Semantics SemB>
 inline bool is_valid(const Data<Field::Occupancy, ColB, SemB>& data)
 {
-    return data.weight != Data<Field::Occupancy, ColB, SemB>{}.weight;
+    return data.field.weight != Data<Field::Occupancy, ColB, SemB>{}.field.weight;
 }
 
 
@@ -102,13 +112,13 @@ inline field_t get_field(const Data<FldT, ColB, SemB>& data);
 template<Colour ColB, Semantics SemB>
 inline field_t get_field(const Data<Field::TSDF, ColB, SemB>& data)
 {
-    return data.tsdf;
+    return data.field.tsdf;
 }
 
 template<Colour ColB, Semantics SemB>
 inline field_t get_field(const Data<Field::Occupancy, ColB, SemB>& data)
 {
-    return data.occupancy * data.weight;
+    return data.field.occupancy * data.field.weight;
 }
 
 

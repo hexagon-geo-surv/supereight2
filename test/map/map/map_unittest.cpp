@@ -170,8 +170,8 @@ TEST(Map, Interpolation)
         EXPECT_EQ(coord_ought, coord_is);
         for (size_t voxel_idx = 0; voxel_idx < block_ptr->size_cu; voxel_idx++) {
             DataType data;
-            data.tsdf = i;
-            data.weight = 1;
+            data.field.tsdf = i;
+            data.field.weight = 1;
             block_ptr->setData(voxel_idx, data);
         }
     }

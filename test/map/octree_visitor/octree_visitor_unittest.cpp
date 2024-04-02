@@ -67,8 +67,8 @@ TEST(VisitorTSDFSingleRes, Interpolation)
         EXPECT_EQ(coord_ought, coord_is);
         for (size_t voxel_idx = 0; voxel_idx < block_ptr_0->size_cu; voxel_idx++) {
             BlockType0::DataType data;
-            data.tsdf = i;
-            data.weight = 1;
+            data.field.tsdf = i;
+            data.field.weight = 1;
             block_ptr_0->setData(voxel_idx, data);
         }
     }
@@ -159,8 +159,8 @@ TEST(VisitorTSDFMultiRes, Interpolation)
         for (size_t voxel_idx = block_ptr_0->size_cu; voxel_idx < block_ptr_0->size_cu + 64;
              voxel_idx++) {
             BlockType0::DataType data;
-            data.tsdf = i;
-            data.weight = 1;
+            data.field.tsdf = i;
+            data.field.weight = 1;
             block_ptr_0->setData(voxel_idx, data);
         }
     }

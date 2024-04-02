@@ -48,13 +48,13 @@ TEST(MeshingTest, EqualScaleNeighbour)
                     Eigen::Vector3i voxel_coord = block_coord + Eigen::Vector3i(x, y, z);
                     typename OctreeType::DataType data;
                     if (x < block_size / 2) {
-                        data.tsdf = 1;
-                        data.weight = 1;
+                        data.field.tsdf = 1;
+                        data.field.weight = 1;
                         block_ptr->setData(voxel_coord, data);
                     }
                     else {
-                        data.tsdf = -1;
-                        data.weight = 1;
+                        data.field.tsdf = -1;
+                        data.field.weight = 1;
                         block_ptr->setData(voxel_coord, data);
                     }
                 }
@@ -113,13 +113,13 @@ TEST(MeshingTest, EqualScaleNeighbour2)
                     Eigen::Vector3i voxel_coord = block_coord + Eigen::Vector3i(x, y, z);
                     typename OctreeType::DataType data;
                     if (x < block_size / 2) {
-                        data.tsdf = 1;
-                        data.weight = 1;
+                        data.field.tsdf = 1;
+                        data.field.weight = 1;
                         block_ptr->setData(voxel_coord, data);
                     }
                     else {
-                        data.tsdf = -1;
-                        data.weight = 1;
+                        data.field.tsdf = -1;
+                        data.field.weight = 1;
                         block_ptr->setData(voxel_coord, data);
                     }
                 }

@@ -38,8 +38,8 @@ bool update_voxel(DataT& data,
         return false;
     }
 
-    const bool newly_observed = !data.observed;
-    data.field.update(sample_value, config.max_weight);
+    const bool newly_observed = !data.field.observed;
+    data.field.update(sample_value, config.field.max_weight);
     return newly_observed;
 }
 
@@ -47,8 +47,8 @@ bool update_voxel(DataT& data,
 template<typename DataT, typename ConfigT>
 bool free_voxel(DataT& voxel_data, const ConfigT config)
 {
-    const bool newly_observed = !voxel_data.observed;
-    voxel_data.field.update(config.log_odd_min, config.max_weight);
+    const bool newly_observed = !voxel_data.field.observed;
+    voxel_data.field.update(config.field.log_odd_min, config.field.max_weight);
     return newly_observed;
 }
 
@@ -86,11 +86,11 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr, const 
             ? static_cast<const BlockT*>(child_ptr)->getMinData()
             : static_cast<const NodeT*>(child_ptr)->getMinData();
         // Only consider children with at least 1 integration.
-        if (child_min_data.weight > 0) {
+        if (child_min_data.field.weight > 0) {
             const field_t occupancy = get_field(child_min_data);
             if (occupancy < min_occupancy) {
-                min_mean_occupancy = child_min_data.occupancy;
-                min_weight = child_min_data.weight;
+                min_mean_occupancy = child_min_data.field.occupancy;
+                min_weight = child_min_data.field.weight;
                 min_occupancy = occupancy;
                 min_data_count++;
             }
@@ -100,26 +100,26 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr, const 
             ? static_cast<const BlockT*>(child_ptr)->getMaxData()
             : static_cast<const NodeT*>(child_ptr)->getMaxData();
         // Only consider children with at least 1 integration.
-        if (child_max_data.weight > 0) {
+        if (child_max_data.field.weight > 0) {
             const field_t occupancy = get_field(child_max_data);
             if (occupancy > max_occupancy) {
-                max_mean_occupancy = child_max_data.occupancy;
-                max_weight = child_max_data.weight;
+                max_mean_occupancy = child_max_data.field.occupancy;
+                max_weight = child_max_data.field.weight;
                 max_occupancy = occupancy;
                 max_data_count++;
             }
         }
-        assert(child_min_data.observed == child_max_data.observed);
-        if (child_max_data.observed == true) {
+        assert(child_min_data.field.observed == child_max_data.field.observed);
+        if (child_max_data.field.observed == true) {
             observed_count++;
         }
     }
     if (min_data_count > 0) {
         typename NodeT::DataType node_min_data = node.getMinData();
-        node_min_data.occupancy = min_mean_occupancy; // TODO: Need to check update?
-        node_min_data.weight = min_weight;
+        node_min_data.field.occupancy = min_mean_occupancy; // TODO: Need to check update?
+        node_min_data.field.weight = min_weight;
         if (observed_count == 8) {
-            node_min_data.observed = true;
+            node_min_data.field.observed = true;
         }
         node.setMinData(node_min_data);
     }
@@ -127,10 +127,10 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr, const 
     typename NodeT::DataType node_data = node.getData();
 
     if (max_data_count > 0) {
-        node_data.occupancy = max_mean_occupancy; // TODO: Need to check update?
-        node_data.weight = max_weight;
+        node_data.field.occupancy = max_mean_occupancy; // TODO: Need to check update?
+        node_data.field.weight = max_weight;
         if (observed_count == 8) {
-            node_data.observed = true;
+            node_data.field.observed = true;
         }
         node.setData(node_data);
     }
@@ -207,27 +207,27 @@ void propagate_block_to_scale(se::OctantBase* octant_ptr, int desired_scale)
                                 + (2 * z + k) * size_at_child_scale_sq;
                             const auto& child_data = data_at_child_scale[child_data_idx];
 
-                            if (child_data.weight > 0) {
+                            if (child_data.field.weight > 0) {
                                 // Update mean
                                 data_count++;
-                                mean_occupancy += child_data.occupancy;
-                                mean_weight += child_data.weight;
+                                mean_occupancy += child_data.field.occupancy;
+                                mean_weight += child_data.field.weight;
 
                                 const field_t occupancy = get_field(child_data);
 
                                 if (occupancy > max_occupancy) {
                                     // Update max
-                                    max_mean_occupancy = child_data.occupancy;
-                                    max_weight = child_data.weight;
+                                    max_mean_occupancy = child_data.field.occupancy;
+                                    max_weight = child_data.field.weight;
                                     max_occupancy = occupancy;
                                 }
                                 else if (occupancy < min_occupancy) {
-                                    min_mean_occupancy = child_data.occupancy;
-                                    min_weight = child_data.weight;
+                                    min_mean_occupancy = child_data.field.occupancy;
+                                    min_weight = child_data.field.weight;
                                     min_occupancy = occupancy;
                                 }
                             }
-                            if (child_data.observed) {
+                            if (child_data.field.observed) {
                                 observed_count++;
                             }
 
@@ -237,18 +237,18 @@ void propagate_block_to_scale(se::OctantBase* octant_ptr, int desired_scale)
                 }         // k
 
                 if (data_count > 0) {
-                    parent_data.occupancy = mean_occupancy / data_count;
-                    parent_data.weight = ceil((float) mean_weight) / data_count;
-                    parent_data.observed = false;
+                    parent_data.field.occupancy = mean_occupancy / data_count;
+                    parent_data.field.weight = ceil((float) mean_weight) / data_count;
+                    parent_data.field.observed = false;
 
-                    parent_min_data.occupancy = min_mean_occupancy;
-                    parent_min_data.weight = min_weight;
-                    parent_max_data.occupancy = max_mean_occupancy;
-                    parent_max_data.weight = max_weight;
+                    parent_min_data.field.occupancy = min_mean_occupancy;
+                    parent_min_data.field.weight = min_weight;
+                    parent_max_data.field.occupancy = max_mean_occupancy;
+                    parent_max_data.field.weight = max_weight;
                     if (observed_count == 8) {
-                        parent_max_data.observed = true;
-                        parent_min_data.observed = true;
-                        //parent_data.observed = true;
+                        parent_max_data.field.observed = true;
+                        parent_min_data.field.observed = true;
+                        //parent_data.field.observed = true;
                         // ToDo: why original SE sets only max data to observed=true?
                     }
                 }
@@ -310,28 +310,28 @@ void propagate_block_to_scale(se::OctantBase* octant_ptr, int desired_scale)
                                 const auto& child_max_data =
                                     max_data_at_child_scale[child_data_idx];
 
-                                if (child_max_data.weight > 0) {
+                                if (child_max_data.field.weight > 0) {
                                     // Update mean
                                     data_count++;
-                                    mean_occupancy += child_data.occupancy;
-                                    mean_weight += child_data.weight;
+                                    mean_occupancy += child_data.field.occupancy;
+                                    mean_weight += child_data.field.weight;
 
                                     const field_t child_max_occupancy = get_field(child_max_data);
                                     if (child_max_occupancy > max_occupancy) {
                                         // Update max
-                                        max_mean_occupancy = child_max_data.occupancy;
-                                        max_weight = child_max_data.weight;
+                                        max_mean_occupancy = child_max_data.field.occupancy;
+                                        max_weight = child_max_data.field.weight;
                                         max_occupancy = child_max_occupancy;
                                     }
                                     const field_t child_min_occupancy = get_field(child_min_data);
                                     if (child_min_occupancy < min_occupancy) {
                                         // Update min
-                                        min_mean_occupancy = child_min_data.occupancy;
-                                        min_weight = child_min_data.weight;
+                                        min_mean_occupancy = child_min_data.field.occupancy;
+                                        min_weight = child_min_data.field.weight;
                                         min_occupancy = child_min_occupancy;
                                     }
                                 }
-                                if (child_max_data.observed) {
+                                if (child_max_data.field.observed) {
                                     observed_count++;
                                 }
 
@@ -340,19 +340,19 @@ void propagate_block_to_scale(se::OctantBase* octant_ptr, int desired_scale)
                     }         // k
 
                     if (data_count > 0) {
-                        parent_data.occupancy = mean_occupancy / data_count;
-                        parent_data.weight = ceil((float) mean_weight) / data_count;
-                        parent_data.observed = false;
+                        parent_data.field.occupancy = mean_occupancy / data_count;
+                        parent_data.field.weight = ceil((float) mean_weight) / data_count;
+                        parent_data.field.observed = false;
                         // block.setData(parent_data_idx,parent_data); ToDo: check but this should not be needed
 
-                        parent_min_data.occupancy = min_mean_occupancy;
-                        parent_min_data.weight = min_weight;
-                        parent_max_data.occupancy = max_mean_occupancy;
-                        parent_max_data.weight = max_weight;
+                        parent_min_data.field.occupancy = min_mean_occupancy;
+                        parent_min_data.field.weight = min_weight;
+                        parent_max_data.field.occupancy = max_mean_occupancy;
+                        parent_max_data.field.weight = max_weight;
                         if (observed_count == 8) {
-                            parent_max_data.observed = true;
-                            parent_min_data.observed = true;
-                            //parent_data.observed = true;
+                            parent_max_data.field.observed = true;
+                            parent_min_data.field.observed = true;
+                            //parent_data.field.observed = true;
                             // ToDo: why original SE sets only max data to observed=true?
                         }
                     }
@@ -411,9 +411,9 @@ void propagate_block_down_to_scale(se::OctantBase* octant_ptr, int desired_scale
                                     + (2 * z + k) * size_at_child_scale_sq;
                                 auto& child_data = data_at_child_scale[child_data_idx];
 
-                                child_data.weight = parent_data.weight;
-                                child_data.occupancy = parent_data.occupancy;
-                                child_data.observed = false;
+                                child_data.field.weight = parent_data.field.weight;
+                                child_data.field.occupancy = parent_data.field.occupancy;
+                                child_data.field.observed = false;
                                 // block.setData(child_data_idx,child_data); ToDo: check but this should not be needed
 
                             } // i

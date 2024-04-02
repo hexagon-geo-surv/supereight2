@@ -74,7 +74,7 @@ class NodeMultiRes<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
     const DataType& getData() const
     {
         static const DataType default_data = DataType();
-        return (data_.observed && underlying()->isLeaf()) ? data_ : default_data;
+        return (data_.field.observed && underlying()->isLeaf()) ? data_ : default_data;
     }
 
     const DataType& getMinData() const

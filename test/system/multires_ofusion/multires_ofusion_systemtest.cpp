@@ -174,19 +174,19 @@ TEST(MultiResOFusionSystemTest, GetField)
 
     map.voxelToPoint(voxel_coord_unknown_1, point_W);
     data = map.getData(point_W);
-    EXPECT_EQ(se::OccupancyData().occupancy, data.occupancy);
+    EXPECT_EQ(se::OccupancyData().field.occupancy, data.field.occupancy);
 
     map.voxelToPoint(voxel_coord_unknown_2, point_W);
     data = map.getData(point_W);
-    EXPECT_EQ(se::OccupancyData().occupancy, data.occupancy);
+    EXPECT_EQ(se::OccupancyData().field.occupancy, data.field.occupancy);
 
     map.voxelToPoint(voxel_coord_free_1, point_W);
     data = map.getData(point_W);
-    EXPECT_FLOAT_EQ(-5.015, data.occupancy);
+    EXPECT_FLOAT_EQ(-5.015, data.field.occupancy);
 
     map.voxelToPoint(voxel_coord_free_2, point_W);
     data = map.getData(point_W);
-    EXPECT_FLOAT_EQ(-5.015, data.occupancy);
+    EXPECT_FLOAT_EQ(-5.015, data.field.occupancy);
 }
 
 
