@@ -348,7 +348,6 @@ TEST(MultiResOFusionSystemTest, Raycasting)
     // Read the configuration
     const std::string config_filename(my_argv[1]);
     se::Config<se::OccupancyMap<se::Res::Multi>, se::PinholeCamera> config(config_filename);
-    std::cout << config;
 
     // Output files in a temporary directory.
     config.app.mesh_path = std::string(tmp + "/meshes");
