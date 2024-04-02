@@ -49,7 +49,8 @@ int main(int argc, char** argv)
         se::Image<se::RGBA> output_colour_img(processed_img_res.x(), processed_img_res.y());
         se::Image<se::RGBA> output_depth_img(processed_img_res.x(), processed_img_res.y());
         se::Image<se::RGBA> output_tracking_img(processed_img_res.x(), processed_img_res.y());
-        se::Image<se::RGBA> output_volume_img(processed_img_res.x(), processed_img_res.y());
+        se::Image<se::RGBA> scale_render(processed_img_res.x(), processed_img_res.y());
+        se::Image<se::RGBA> colour_render(processed_img_res.x(), processed_img_res.y());
 
         // ========= Map INITIALIZATION  =========
         // Setup the single-res TSDF map w/ default block size of 8 voxels
@@ -68,11 +69,14 @@ int main(int argc, char** argv)
         if (!reader) {
             return EXIT_FAILURE;
         }
+        const bool has_colour = MapType::DataType::col_ == se::Colour::On && reader->hasColour();
 
         // Setup input, processed and output imgs
         Eigen::Isometry3f T_WB = Eigen::Isometry3f::Identity(); //< Body to world transformation
         Eigen::Isometry3f T_BS = sensor.T_BS;                   //< Sensor to body transformation
         Eigen::Isometry3f T_WS = T_WB * T_BS;                   //< Sensor to world transformation
+        // TODO: use the correct T_SSc depending on the dataset
+        const Eigen::Isometry3f T_SSc = Eigen::Isometry3f::Identity();
 
         // ========= Tracker & Pose INITIALIZATION  =========
         se::Tracker tracker(map, sensor, config.tracker);
@@ -131,7 +135,18 @@ int main(int argc, char** argv)
             // Integrate depth for a given sensor, depth image, pose and frame number
             TICK("integration")
             if (frame % config.app.integration_rate == 0) {
-                integrator.integrateDepth(sensor, processed_depth_img, T_WS, frame);
+                if (has_colour) {
+                    integrator.integrateDepth(sensor,
+                                              processed_depth_img,
+                                              T_WS,
+                                              sensor,
+                                              processed_colour_img,
+                                              T_SSc,
+                                              frame);
+                }
+                else {
+                    integrator.integrateDepth(sensor, processed_depth_img, T_WS, frame);
+                }
             }
             TOCK("integration")
 
@@ -159,11 +174,18 @@ int main(int argc, char** argv)
                                             output_depth_img.data());
                 tracker.renderTrackingResult(output_tracking_img.data());
                 if (frame % config.app.rendering_rate == 0) {
-                    se::raycaster::render_volume_scale(output_volume_img,
+                    se::raycaster::render_volume_scale(scale_render,
                                                        surface_point_cloud_W,
                                                        surface_normals_W,
                                                        surface_scale,
                                                        T_WS.translation());
+                    if (has_colour) {
+                        se::raycaster::render_volume_colour(colour_render,
+                                                            surface_point_cloud_W,
+                                                            surface_normals_W,
+                                                            surface_colour,
+                                                            T_WS.translation());
+                    }
                 }
             }
             TOCK("render")
@@ -181,10 +203,12 @@ int main(int argc, char** argv)
                 images.emplace_back(res, CV_8UC4, output_depth_img.data());
                 labels.emplace_back(config.app.enable_ground_truth ? "TRACKING OFF" : "TRACKING");
                 images.emplace_back(res, CV_8UC4, output_tracking_img.data());
-                labels.emplace_back("RENDER");
-                images.emplace_back(res, CV_8UC4, output_volume_img.data());
+                labels.emplace_back(has_colour ? "COLOUR RENDER" : "NO COLOUR");
+                images.emplace_back(res, CV_8UC4, colour_render.data());
+                labels.emplace_back("SCALE RENDER");
+                images.emplace_back(res, CV_8UC4, scale_render.data());
                 // Combine all the images into one, overlay the labels and show it.
-                cv::Mat render = se::montage(2, 2, images, labels);
+                cv::Mat render = se::montage(3, 2, images, labels);
                 drawit(reinterpret_cast<se::RGBA*>(render.data),
                        Eigen::Vector2i(render.cols, render.rows));
             }
