@@ -31,15 +31,15 @@ std::ostream& operator<<(std::ostream& os, const typename ColourData<ColB>::Conf
 
 template<>
 struct ColourData<Colour::On> {
+    colour_t colour;
+    std::uint8_t weight = 0;
+
     struct Config {
         /** Reads the struct members from the "data" node of a YAML file. Members not present in the
          * YAML file aren't modified.
          */
         void readYaml(const std::string& yaml_file);
     };
-
-    colour_t colour;
-    std::uint8_t colour_weight = 0;
 };
 
 template<>
