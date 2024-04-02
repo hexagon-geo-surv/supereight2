@@ -65,7 +65,10 @@ std::ostream& operator<<(std::ostream& os, const typename Data<FldT, ColB, SemB>
 ///////////////////
 
 template<Field FldT = Field::TSDF, Colour ColB = Colour::Off, Semantics SemB = Semantics::Off>
-struct DeltaData : public FieldDeltaData<FldT>, ColourDeltaData<ColB> {
+struct DeltaData {
+    FieldDeltaData<FldT> field;
+    ColourDeltaData<ColB> colour;
+
     static constexpr Field fld_ = FldT;
     static constexpr Colour col_ = ColB;
     static constexpr Semantics sem_ = SemB;

@@ -62,27 +62,27 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
             auto parent_down_funct = [](const OctreeType& /* octree */,
                                         OctantBase* /* octant_ptr */,
                                         typename BlockType::DataUnion& data_union) {
-                data_union.prop_data.delta_tsdf = data_union.data.field.tsdf;
-                data_union.prop_data.delta_weight = 0;
+                data_union.prop_data.field.delta_tsdf = data_union.data.field.tsdf;
+                data_union.prop_data.field.delta_weight = 0;
             };
 
             auto child_down_funct = [&](const OctreeType& octree,
                                         OctantBase* /* octant_ptr */,
                                         typename BlockType::DataUnion& child_data_union,
                                         typename BlockType::DataUnion& parent_data_union) {
-                field_t delta_tsdf =
-                    parent_data_union.data.field.tsdf - parent_data_union.prop_data.delta_tsdf;
+                field_t delta_tsdf = parent_data_union.data.field.tsdf
+                    - parent_data_union.prop_data.field.delta_tsdf;
 
                 if (child_data_union.data.field.weight != 0) {
                     child_data_union.data.field.tsdf =
                         std::max(child_data_union.data.field.tsdf + delta_tsdf, field_t(-1));
                     child_data_union.data.field.weight =
                         fminf(child_data_union.data.field.weight
-                                  + parent_data_union.prop_data.delta_weight,
+                                  + parent_data_union.prop_data.field.delta_weight,
                               map_.getDataConfig().field.max_weight);
                     ;
-                    child_data_union.prop_data.delta_weight =
-                        parent_data_union.prop_data.delta_weight;
+                    child_data_union.prop_data.field.delta_weight =
+                        parent_data_union.prop_data.field.delta_weight;
                 }
                 else {
                     const Eigen::Vector3f child_sample_coord_f =
@@ -95,8 +95,9 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
                         child_data_union.data.field.tsdf = *interp_field_value;
                         child_data_union.data.field.weight = parent_data_union.data.field.weight;
 
-                        child_data_union.prop_data.delta_tsdf = child_data_union.data.field.tsdf;
-                        child_data_union.prop_data.delta_weight = 0;
+                        child_data_union.prop_data.field.delta_tsdf =
+                            child_data_union.data.field.tsdf;
+                        child_data_union.prop_data.field.delta_weight = 0;
                     }
                 }
             };
@@ -151,7 +152,7 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
                     data_union.data.field.update(sdf_value,
                                                  config_.truncation_boundary,
                                                  map_.getDataConfig().field.max_weight);
-                    data_union.prop_data.delta_weight++;
+                    data_union.prop_data.field.delta_weight++;
                     block_ptr->setDataUnion(data_union);
                 } // k
             }     // j
@@ -165,9 +166,9 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
                 data_tmp.field.tsdf /= sample_count;
                 data_tmp.field.weight /= sample_count;
                 parent_data_union.data.field.tsdf = data_tmp.field.tsdf;
-                parent_data_union.prop_data.delta_tsdf = data_tmp.field.tsdf;
+                parent_data_union.prop_data.field.delta_tsdf = data_tmp.field.tsdf;
                 parent_data_union.data.field.weight = ceil(data_tmp.field.weight);
-                parent_data_union.prop_data.delta_weight = 0;
+                parent_data_union.prop_data.field.delta_weight = 0;
             }
             else {
                 parent_data_union.data = typename BlockType::DataType();
