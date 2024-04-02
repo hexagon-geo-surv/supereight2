@@ -92,16 +92,6 @@ class Image {
 
 
 
-static inline void convert_to_output_rgba_img(const se::Image<RGBA>& input_rgba_img,
-                                              RGBA* output_rgba_img_data)
-{
-    memcpy(output_rgba_img_data,
-           input_rgba_img.data(),
-           input_rgba_img.width() * input_rgba_img.height() * sizeof(RGBA));
-}
-
-
-
 static inline void convert_to_output_depth_img(const se::Image<float>& input_depth_img,
                                                RGBA* output_depth_img_data)
 {
