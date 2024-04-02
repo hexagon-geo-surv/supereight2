@@ -143,13 +143,13 @@ se::ReaderStatus se::RAWReader::nextColour(se::Image<RGBA>& colour_image)
     if ((colour_image.width() != size.x()) || (colour_image.height() != size.y())) {
         colour_image = se::Image<RGBA>(size.x(), size.y());
     }
-    // Read the whole image into a buffer.
-    const size_t image_size = colour_image.size();
-    std::vector<uint8_t> buffer(3 * image_size);
-    if (!raw_fs_.read(reinterpret_cast<char*>(buffer.data()), image_size * 3 * sizeof(uint8_t))) {
+    // Read the whole image.
+    se::Image<se::RGB> rgb_image(colour_image.width(), colour_image.height());
+    if (!raw_fs_.read(reinterpret_cast<char*>(rgb_image.data()),
+                      rgb_image.size() * sizeof(se::RGB))) {
         return se::ReaderStatus::error;
     }
-    // Convert the RGB image in the buffer to colour.
-    rgb_to_rgba(buffer.data(), reinterpret_cast<uint32_t*>(colour_image.data()), image_size);
+    // Convert the RGB image to RGBA.
+    se::image::rgb_to_rgba(rgb_image, colour_image);
     return se::ReaderStatus::ok;
 }

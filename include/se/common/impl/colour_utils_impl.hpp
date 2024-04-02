@@ -91,31 +91,6 @@ static inline uint32_t blend(const uint32_t rgba_1, const uint32_t rgba_2, const
 
 
 
-static inline void rgb_to_rgba(const uint8_t* rgb, uint32_t* rgba, size_t num_pixels)
-{
-#pragma omp parallel for
-    for (size_t p = 0; p < num_pixels; ++p) {
-        const uint8_t r = rgb[3 * p + 0];
-        const uint8_t g = rgb[3 * p + 1];
-        const uint8_t b = rgb[3 * p + 2];
-        rgba[p] = pack_rgba(r, g, b, 0xFF);
-    }
-}
-
-
-
-static inline void rgba_to_rgb(const uint32_t* rgba, uint8_t* rgb, size_t num_pixels)
-{
-#pragma omp parallel for
-    for (size_t p = 0; p < num_pixels; ++p) {
-        rgb[3 * p + 0] = r_from_rgba(rgba[p]);
-        rgb[3 * p + 1] = g_from_rgba(rgba[p]);
-        rgb[3 * p + 2] = b_from_rgba(rgba[p]);
-    }
-}
-
-
-
 const Eigen::Vector3f& scale_colour(const int scale)
 {
     assert(scale >= 0);

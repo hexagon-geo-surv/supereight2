@@ -164,14 +164,6 @@ static inline uint32_t blend(const uint32_t rgba_1, const uint32_t rgba_2, const
 
 
 
-static inline void rgb_to_rgba(const uint8_t* rgb, uint32_t* rgba, size_t num_pixels);
-
-
-
-static inline void rgba_to_rgb(const uint32_t* rgba, uint8_t* rgb, size_t num_pixels);
-
-
-
 /**
  * Convert a depth image to an RGBA image to allow visualizing it.
  * The depth image is scaled using the minimum and maximum depth values to

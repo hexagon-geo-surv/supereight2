@@ -11,6 +11,7 @@
 
 #include <cassert>
 #include <memory>
+#include <se/common/rgb.hpp>
 #include <se/common/rgba.hpp>
 
 #include "se/common/colour_utils.hpp"
@@ -134,6 +135,10 @@ namespace image {
  */
 template<typename T>
 void remap(const Image<T>& input, Image<T>& output, const Image<size_t>& map);
+
+void rgb_to_rgba(const Image<RGB>& rgb, Image<RGBA>& rgba);
+
+void rgba_to_rgb(const Image<RGBA>& rgba, Image<RGB>& rgb);
 
 } // namespace image
 

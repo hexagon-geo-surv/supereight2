@@ -221,9 +221,9 @@ se::ReaderStatus se::OpenNIReader::nextColour(se::Image<RGBA>& colour_image)
         colour_image = se::Image<RGBA>(colour_image_res_.x(), colour_image_res_.y());
     }
 
-    se::rgb_to_rgba(rgb_image_.get(),
-                    reinterpret_cast<uint32_t*>(colour_image.data()),
-                    colour_image_res_.prod());
+    const se::Image<se::RGB> rgb_image(
+        colour_image.width(), colour_image.height(), reinterpret_cast<se::RGB*>(rgb_image_.get()));
+    se::image::rgb_to_rgba(rgb_image, colour_image);
 
     return se::ReaderStatus::ok;
 }
