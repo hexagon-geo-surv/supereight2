@@ -369,12 +369,12 @@ TEST(MultiResOFusionSystemTest, Raycasting)
     // Setup input images
     const Eigen::Vector2i input_img_res(config.sensor.width, config.sensor.height);
     se::Image<float> input_depth_img(input_img_res.x(), input_img_res.y());
-    se::Image<se::RGBA> input_colour_img(input_img_res.x(), input_img_res.y());
+    se::Image<se::RGB> input_colour_img(input_img_res.x(), input_img_res.y());
 
     // Setup processed images
     const Eigen::Vector2i processed_img_res = input_img_res / config.app.sensor_downsampling_factor;
     se::Image<float> processed_depth_img(processed_img_res.x(), processed_img_res.y());
-    se::Image<se::RGBA> processed_colour_img(processed_img_res.x(), processed_img_res.y());
+    se::Image<se::RGB> processed_colour_img(processed_img_res.x(), processed_img_res.y());
 
     // Setup output images / renders
     se::Image<se::RGBA> output_colour_img(processed_img_res.x(), processed_img_res.y());
@@ -414,7 +414,7 @@ TEST(MultiResOFusionSystemTest, Raycasting)
         map, surface_point_cloud_W, surface_normals_W, surface_scale, T_WS, sensor);
 
     const Eigen::Vector3f ambient{0.1, 0.1, 0.1};
-    convert_to_output_rgba_img(processed_colour_img, output_colour_img.data());
+    se::image::rgb_to_rgba(processed_colour_img, output_colour_img);
     convert_to_output_depth_img(processed_depth_img, output_depth_img.data());
     se::raycaster::render_volume_kernel(output_volume_img.data(),
                                         processed_img_res,

@@ -239,7 +239,7 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image, Eigen::Isom
 
 
 
-se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image, se::Image<RGBA>& colour_image)
+se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image, se::Image<RGB>& colour_image)
 {
     return nextDataImpl(depth_image, &colour_image, nullptr);
 }
@@ -247,7 +247,7 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image, se::Image<R
 
 
 se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
-                                      se::Image<RGBA>& colour_image,
+                                      se::Image<RGB>& colour_image,
                                       Eigen::Isometry3f& T_WB)
 {
     return nextDataImpl(depth_image, &colour_image, &T_WB);
@@ -381,10 +381,10 @@ se::ReaderStatus se::Reader::nextPose(Eigen::Isometry3f& T_WB)
 
 
 
-se::ReaderStatus se::Reader::nextColour(se::Image<se::RGBA>& colour_image)
+se::ReaderStatus se::Reader::nextColour(se::Image<se::RGB>& colour_image)
 {
     // Set to a default-initialized (opaque black) image.
-    colour_image = se::Image<RGBA>(colour_image_res_.x(), colour_image_res_.y(), RGBA());
+    colour_image = se::Image<RGB>(colour_image_res_.x(), colour_image_res_.y(), RGB());
     return se::ReaderStatus::ok;
 }
 
@@ -541,7 +541,7 @@ se::ReaderStatus se::Reader::nextRayBatch(
 
 
 se::ReaderStatus se::Reader::nextDataImpl(se::Image<float>& depth_image,
-                                          se::Image<se::RGBA>* colour_image,
+                                          se::Image<se::RGB>* colour_image,
                                           Eigen::Isometry3f* T_WB)
 {
     if (!good()) {

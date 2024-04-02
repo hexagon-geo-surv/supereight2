@@ -187,7 +187,7 @@ class Reader {
      * \param[out] colour_image  The next colour image.
      * \return An appropriate status code.
      */
-    ReaderStatus nextData(Image<float>& depth_image, Image<RGBA>& colour_image);
+    ReaderStatus nextData(Image<float>& depth_image, Image<RGB>& colour_image);
 
 
     /** Read the next ray and ground truth pose.
@@ -224,7 +224,7 @@ class Reader {
      * \return An appropriate status code.
      */
     ReaderStatus
-    nextData(Image<float>& depth_image, Image<RGBA>& colour_image, Eigen::Isometry3f& T_WB);
+    nextData(Image<float>& depth_image, Image<RGB>& colour_image, Eigen::Isometry3f& T_WB);
 
     /** Read the ground truth pose at the provided frame number.
      * Each line in the ground truth file should correspond to a single
@@ -362,7 +362,7 @@ class Reader {
     /** Read the next colour image into \p colour_image. Sets \p colour_image to opaque black if no
      * colour data is available.
      */
-    virtual ReaderStatus nextColour(Image<RGBA>& colour_image);
+    virtual ReaderStatus nextColour(Image<RGB>& colour_image);
 
 
     private:
@@ -404,7 +404,7 @@ class Reader {
     virtual ReaderStatus nextDepth(Image<float>& depth_image) = 0;
 
     ReaderStatus
-    nextDataImpl(Image<float>& depth_image, Image<RGBA>* colour_image, Eigen::Isometry3f* T_WB);
+    nextDataImpl(Image<float>& depth_image, Image<RGB>* colour_image, Eigen::Isometry3f* T_WB);
 };
 
 std::ostream& operator<<(std::ostream& os, const Reader::Config& c);

@@ -46,13 +46,13 @@ int main(int argc, char** argv)
         // Setup input images
         const Eigen::Vector2i input_img_res(config.sensor.width, config.sensor.height);
         se::Image<float> input_depth_img(input_img_res.x(), input_img_res.y());
-        se::Image<se::RGBA> input_colour_img(input_img_res.x(), input_img_res.y());
+        se::Image<se::RGB> input_colour_img(input_img_res.x(), input_img_res.y());
 
         // Setup processed images
         const Eigen::Vector2i processed_img_res =
             input_img_res / config.app.sensor_downsampling_factor;
         se::Image<float> processed_depth_img(processed_img_res.x(), processed_img_res.y());
-        se::Image<se::RGBA> processed_colour_img(processed_img_res.x(), processed_img_res.y());
+        se::Image<se::RGB> processed_colour_img(processed_img_res.x(), processed_img_res.y());
 
         // Setup output images / renders
         se::Image<se::RGBA> output_colour_img(processed_img_res.x(), processed_img_res.y());
@@ -156,7 +156,7 @@ int main(int argc, char** argv)
             TICK("render")
             if (config.app.enable_rendering) {
                 const Eigen::Vector3f ambient{0.1, 0.1, 0.1};
-                convert_to_output_rgba_img(processed_colour_img, output_colour_img.data());
+                se::image::rgb_to_rgba(processed_colour_img, output_colour_img);
                 convert_to_output_depth_img(processed_depth_img,
                                             sensor.near_plane,
                                             sensor.far_plane,

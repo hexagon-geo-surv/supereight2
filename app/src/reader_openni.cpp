@@ -9,6 +9,7 @@
 
 #include "reader_openni.hpp"
 
+#include <algorithm>
 #include <iostream>
 
 #include "se/common/image_utils.hpp"
@@ -213,18 +214,16 @@ se::ReaderStatus se::OpenNIReader::nextDepth(se::Image<float>& depth_image)
 
 
 
-se::ReaderStatus se::OpenNIReader::nextColour(se::Image<RGBA>& colour_image)
+se::ReaderStatus se::OpenNIReader::nextColour(se::Image<RGB>& colour_image)
 {
     // Resize the output image if needed.
     if ((colour_image.width() != colour_image_res_.x())
         || (colour_image.height() != colour_image_res_.y())) {
-        colour_image = se::Image<RGBA>(colour_image_res_.x(), colour_image_res_.y());
+        colour_image = se::Image<RGB>(colour_image_res_.x(), colour_image_res_.y());
     }
-
-    const se::Image<se::RGB> rgb_image(
-        colour_image.width(), colour_image.height(), reinterpret_cast<se::RGB*>(rgb_image_.get()));
-    se::image::rgb_to_rgba(rgb_image, colour_image);
-
+    std::copy(rgb_image_.get(),
+              rgb_image_.get() + colour_image_res_.prod(),
+              reinterpret_cast<uint8_t*>(colour_image.data()));
     return se::ReaderStatus::ok;
 }
 
@@ -269,7 +268,7 @@ se::ReaderStatus se::OpenNIReader::nextDepth(se::Image<float>&)
 
 
 
-se::ReaderStatus se::OpenNIReader::nextColour(se::Image<RGBA>&)
+se::ReaderStatus se::OpenNIReader::nextColour(se::Image<RGB>&)
 {
     return se::ReaderStatus::error;
 }

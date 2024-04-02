@@ -73,7 +73,7 @@ class TUMReader : public Reader {
 
     ReaderStatus nextDepth(Image<float>& depth_image);
 
-    ReaderStatus nextColour(Image<RGBA>& colour_image);
+    ReaderStatus nextColour(Image<RGB>& colour_image);
 };
 
 

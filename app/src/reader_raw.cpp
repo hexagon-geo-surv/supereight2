@@ -130,7 +130,7 @@ se::ReaderStatus se::RAWReader::nextDepth(se::Image<float>& depth_image)
 
 
 
-se::ReaderStatus se::RAWReader::nextColour(se::Image<RGBA>& colour_image)
+se::ReaderStatus se::RAWReader::nextColour(se::Image<RGB>& colour_image)
 {
     // Seek to the appropriate place in the file.
     raw_fs_.seekg(frame_ * (depth_total_size_ + colour_total_size_) + depth_total_size_);
@@ -141,15 +141,12 @@ se::ReaderStatus se::RAWReader::nextColour(se::Image<RGBA>& colour_image)
     }
     // Resize the output image if needed.
     if ((colour_image.width() != size.x()) || (colour_image.height() != size.y())) {
-        colour_image = se::Image<RGBA>(size.x(), size.y());
+        colour_image = se::Image<RGB>(size.x(), size.y());
     }
     // Read the whole image.
-    se::Image<se::RGB> rgb_image(colour_image.width(), colour_image.height());
-    if (!raw_fs_.read(reinterpret_cast<char*>(rgb_image.data()),
-                      rgb_image.size() * sizeof(se::RGB))) {
+    if (!raw_fs_.read(reinterpret_cast<char*>(colour_image.data()),
+                      colour_image.size() * sizeof(se::RGB))) {
         return se::ReaderStatus::error;
     }
-    // Convert the RGB image to RGBA.
-    se::image::rgb_to_rgba(rgb_image, colour_image);
     return se::ReaderStatus::ok;
 }
