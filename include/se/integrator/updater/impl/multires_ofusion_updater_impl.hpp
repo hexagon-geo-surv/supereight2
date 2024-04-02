@@ -580,7 +580,8 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
 
     if (node_ptr->isLeaf()) {
         typename NodeType::DataType node_data = node_ptr->getData();
-        updater::free_node(node_data, map_.getDataConfig());
+        // Update the node data to free since we don't need to update at a finer level.
+        node_data.update(map_.getDataConfig().log_odd_min, map_.getDataConfig().max_weight);
         node_ptr->setData(node_data);
         node_ptr->setMinData(node_data);
 #pragma omp critical(node_lock)
