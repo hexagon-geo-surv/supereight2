@@ -31,10 +31,15 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Upd
         T_WS_(T_WS),
         colour_sensor_(colour_sensor),
         colour_img_(colour_img),
-        T_SSc_(T_SSc),
+        has_colour_(colour_sensor_ && colour_img_ && T_SSc),
         frame_(frame),
         config_(map)
 {
+    if constexpr (MapType::col_ == Colour::On) {
+        if (has_colour_) {
+            T_ScS_ = T_SSc->inverse();
+        }
+    }
 }
 
 
@@ -80,6 +85,10 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
                                         typename BlockType::DataUnion& data_union) {
                 data_union.past_data.field.tsdf = data_union.data.field.tsdf;
                 data_union.past_data.field.weight = 0;
+                if constexpr (MapType::col_ == Colour::On) {
+                    data_union.past_data.colour.colour = data_union.data.colour.colour;
+                    data_union.past_data.colour.weight = 0;
+                }
             };
 
             // Update or initialize the child data using the parent data.
@@ -112,6 +121,18 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
                         child_data_union.data.field.weight = parent_data_union.data.field.weight;
                         child_data_union.past_data.field.tsdf = child_data_union.data.field.tsdf;
                         child_data_union.past_data.field.weight = 0;
+                        // Whether interpolation succeeds depends only on the field data.
+                        if constexpr (MapType::col_ == Colour::On) {
+                            const auto interp_colour_value = visitor::getColourInterp(
+                                octree, child_sample_coord_f, child_data_union.scale);
+                            assert(interp_colour_value);
+                            child_data_union.data.colour.colour = *interp_colour_value;
+                            child_data_union.data.colour.weight =
+                                parent_data_union.data.field.weight;
+                            child_data_union.past_data.colour.colour =
+                                child_data_union.data.colour.colour;
+                            child_data_union.past_data.colour.weight = 0;
+                        }
                     }
                 }
             };
@@ -155,10 +176,40 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
 
                     typename BlockType::DataUnion data_union =
                         block.getDataUnion(voxel_coord, block.getCurrentScale());
-                    data_union.data.field.update(sdf_value,
-                                                 config_.truncation_boundary,
-                                                 map_.getDataConfig().field.max_weight);
+                    const bool field_updated =
+                        data_union.data.field.update(sdf_value,
+                                                     config_.truncation_boundary,
+                                                     map_.getDataConfig().field.max_weight);
                     data_union.past_data.field.weight++;
+
+                    // Compute the coordinates of the depth hit in the depth sensor frame S if data
+                    // other than depth needs to be integrated.
+                    Eigen::Vector3f hit_S;
+                    if constexpr (MapType::col_ == Colour::On || MapType::sem_ == Semantics::On) {
+                        if (has_colour_ && field_updated) {
+                            sensor_.model.backProject(depth_pixel_f, &hit_S);
+                            hit_S.array() *= depth_value;
+                        }
+                    }
+
+                    // Update the colour data if possible and only if the field was updated, that is
+                    // if we have corresponding depth information.
+                    if constexpr (MapType::col_ == Colour::On) {
+                        if (has_colour_ && field_updated) {
+                            // Project the depth hit onto the colour image.
+                            const Eigen::Vector3f hit_Sc = T_ScS_ * hit_S;
+                            Eigen::Vector2f colour_pixel_f;
+                            if (colour_sensor_->model.project(hit_Sc, &colour_pixel_f)
+                                == srl::projection::ProjectionStatus::Successful) {
+                                const Eigen::Vector2i colour_pixel =
+                                    se::round_pixel(colour_pixel_f);
+                                data_union.data.colour.update(
+                                    (*colour_img_)(colour_pixel.x(), colour_pixel.y()),
+                                    map_.getDataConfig().field.max_weight);
+                            }
+                        }
+                    }
+
                     block.setDataUnion(data_union);
                 }
             }
