@@ -37,10 +37,10 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
     const Eigen::Isometry3f T_SW = T_WS_.inverse();
 
 #pragma omp parallel for
-    for (unsigned int i = 0; i < block_ptrs.size(); i++) {
-        BlockType* block_ptr = static_cast<BlockType*>(block_ptrs[i]);
-        block_ptr->setTimeStamp(frame_);
-        Eigen::Vector3i block_coord = block_ptr->getCoord();
+    for (size_t i = 0; i < block_ptrs.size(); i++) {
+        auto& block = *static_cast<BlockType*>(block_ptrs[i]);
+        block.setTimeStamp(frame_);
+        Eigen::Vector3i block_coord = block.getCoord();
         Eigen::Vector3f point_base_W;
         map_.voxelToPoint(block_coord, point_base_W);
         const Eigen::Vector3f point_base_S = T_SW * point_base_W;
@@ -76,7 +76,7 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
                     const float m = sensor_.measurementFromPoint(point_S);
                     const field_t sdf_value = (depth_value - m) / m * point_S.norm();
 
-                    DataType& data = block_ptr->getData(voxel_coord);
+                    DataType& data = block.getData(voxel_coord);
                     data.field.update(sdf_value,
                                       config_.truncation_boundary,
                                       map_.getDataConfig().field.max_weight);
