@@ -32,12 +32,17 @@ Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
         T_SW_(T_WS.inverse()),
         colour_sensor_(colour_sensor),
         colour_img_(colour_img),
-        T_SSc_(T_SSc),
+        has_colour_(colour_sensor_ && colour_img_ && T_SSc),
         frame_(frame),
         map_res_(map.getRes()),
         config_(map),
         node_set_(octree_.getBlockDepth())
 {
+    if constexpr (MapType::col_ == Colour::On) {
+        if (has_colour_) {
+            T_ScS_ = T_SSc->inverse();
+        }
+    }
 }
 
 
@@ -279,6 +284,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                     auto& buffer_data = block_ptr->bufferData(buffer_idx);
                     block_ptr->incrBufferObservedCount(
                         updater::free_voxel(buffer_data, map_.getDataConfig()));
+                    // We don't update colour or semantics in free space.
                 } // x
             }     // y
         }         // z
@@ -305,6 +311,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                 auto& voxel_data = block_ptr->currData(voxel_idx);
                 block_ptr->incrCurrObservedCount(
                     updater::free_voxel(voxel_data, map_.getDataConfig()));
+                // We don't update colour or semantics in free space.
             } // x
         }     // y
     }         // z
@@ -484,6 +491,36 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                             (sample_point_C_m - depth_value) * (range / sample_point_C_m);
                         block_ptr->incrBufferObservedCount(updater::update_voxel(
                             buffer_data, range_diff, tau, three_sigma, map_.getDataConfig()));
+                        const bool field_updated = range_diff < tau;
+
+                        // Compute the coordinates of the depth hit in the depth sensor frame S if
+                        // data other than depth needs to be integrated.
+                        Eigen::Vector3f hit_S;
+                        if constexpr (MapType::col_ == Colour::On
+                                      || MapType::sem_ == Semantics::On) {
+                            if (has_colour_ && field_updated) {
+                                sensor_.model.backProject(depth_pixel_f, &hit_S);
+                                hit_S.array() *= depth_value;
+                            }
+                        }
+
+                        // Update the colour data if possible and only if the field was updated,
+                        // that is if we have corresponding depth information.
+                        if constexpr (MapType::col_ == Colour::On) {
+                            if (has_colour_ && field_updated) {
+                                // Project the depth hit onto the colour image.
+                                const Eigen::Vector3f hit_Sc = T_ScS_ * hit_S;
+                                Eigen::Vector2f colour_pixel_f;
+                                if (colour_sensor_->model.project(hit_Sc, &colour_pixel_f)
+                                    == srl::projection::ProjectionStatus::Successful) {
+                                    const Eigen::Vector2i colour_pixel =
+                                        se::round_pixel(colour_pixel_f);
+                                    buffer_data.colour.update(
+                                        (*colour_img_)(colour_pixel.x(), colour_pixel.y()),
+                                        map_.getDataConfig().field.max_weight);
+                                }
+                            }
+                        }
                     }
                 } // x
             }     // y
@@ -548,6 +585,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                 if (low_variance) {
                     block_ptr->incrCurrObservedCount(
                         updater::free_voxel(voxel_data, map_.getDataConfig()));
+                    // We don't update colour or semantics in free space.
                 }
                 else {
                     const float sample_point_C_m = sensor_.measurementFromPoint(sample_point_C);
@@ -556,6 +594,35 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                         (sample_point_C_m - depth_value) * (range / sample_point_C_m);
                     block_ptr->incrCurrObservedCount(updater::update_voxel(
                         voxel_data, range_diff, tau, three_sigma, map_.getDataConfig()));
+                    const bool field_updated = range_diff < tau;
+
+                    // Compute the coordinates of the depth hit in the depth sensor frame S if
+                    // data other than depth needs to be integrated.
+                    Eigen::Vector3f hit_S;
+                    if constexpr (MapType::col_ == Colour::On || MapType::sem_ == Semantics::On) {
+                        if (has_colour_ && field_updated) {
+                            sensor_.model.backProject(depth_pixel_f, &hit_S);
+                            hit_S.array() *= depth_value;
+                        }
+                    }
+
+                    // Update the colour data if possible and only if the field was updated,
+                    // that is if we have corresponding depth information.
+                    if constexpr (MapType::col_ == Colour::On) {
+                        if (has_colour_ && field_updated) {
+                            // Project the depth hit onto the colour image.
+                            const Eigen::Vector3f hit_Sc = T_ScS_ * hit_S;
+                            Eigen::Vector2f colour_pixel_f;
+                            if (colour_sensor_->model.project(hit_Sc, &colour_pixel_f)
+                                == srl::projection::ProjectionStatus::Successful) {
+                                const Eigen::Vector2i colour_pixel =
+                                    se::round_pixel(colour_pixel_f);
+                                voxel_data.colour.update(
+                                    (*colour_img_)(colour_pixel.x(), colour_pixel.y()),
+                                    map_.getDataConfig().field.max_weight);
+                            }
+                        }
+                    }
                 }
             } // x
         }     // y
@@ -581,6 +648,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
         // Update the node data to free since we don't need to update at a finer level.
         node_data.field.update(map_.getDataConfig().field.log_odd_min,
                                map_.getDataConfig().field.max_weight);
+        // We don't update colour or semantics in free space.
         node_ptr->setData(node_data);
         node_ptr->setMinData(node_data);
 #pragma omp critical(node_lock)

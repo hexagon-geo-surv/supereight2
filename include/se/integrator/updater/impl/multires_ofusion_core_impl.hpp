@@ -81,6 +81,7 @@ bool free_voxel(DataT& voxel_data, const ConfigT config)
 {
     const bool newly_observed = !voxel_data.field.observed;
     voxel_data.field.update(config.field.log_odd_min, config.field.max_weight);
+    // We don't update colour or semantics in free space.
     return newly_observed;
 }
 
