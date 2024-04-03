@@ -61,7 +61,9 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
         block.setMinScale(block.getMinScale() < 0 ? curr_scale
                                                   : std::min(block.getMinScale(), curr_scale));
 
+        // Down-propagate the block data to the new, finer scale.
         if (curr_scale < last_curr_scale) {
+            // Reset the parent delta data after it has been down-propagated to all its children.
             auto parent_down_funct = [](const OctreeType& /* octree */,
                                         OctantBase* /* octant_ptr */,
                                         typename BlockType::DataUnion& data_union) {
@@ -69,35 +71,35 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
                 data_union.prop_data.field.delta_weight = 0;
             };
 
+            // Update or initialize the child data using the parent data.
             auto child_down_funct = [&](const OctreeType& octree,
                                         OctantBase* /* octant_ptr */,
                                         typename BlockType::DataUnion& child_data_union,
-                                        typename BlockType::DataUnion& parent_data_union) {
-                field_t delta_tsdf = parent_data_union.data.field.tsdf
-                    - parent_data_union.prop_data.field.delta_tsdf;
-
-                if (child_data_union.data.field.weight != 0) {
+                                        const typename BlockType::DataUnion& parent_data_union) {
+                if (is_valid(child_data_union.data)) {
+                    // Perform a delta update on the child using the parent data.
+                    const field_t delta_tsdf = parent_data_union.data.field.tsdf
+                        - parent_data_union.prop_data.field.delta_tsdf;
                     child_data_union.data.field.tsdf =
                         std::max(child_data_union.data.field.tsdf + delta_tsdf, field_t(-1));
                     child_data_union.data.field.weight =
                         fminf(child_data_union.data.field.weight
                                   + parent_data_union.prop_data.field.delta_weight,
                               map_.getDataConfig().field.max_weight);
-                    ;
                     child_data_union.prop_data.field.delta_weight =
                         parent_data_union.prop_data.field.delta_weight;
                 }
                 else {
+                    // This child hasn't been observed before, initialize to the interpolated field
+                    // value.
                     const Eigen::Vector3f child_sample_coord_f =
                         get_sample_coord(child_data_union.coord, 1 << child_data_union.scale);
-                    int child_scale_returned;
-                    auto interp_field_value = visitor::getFieldInterp(
-                        octree, child_sample_coord_f, child_data_union.scale, child_scale_returned);
-
+                    int _;
+                    const auto interp_field_value = visitor::getFieldInterp(
+                        octree, child_sample_coord_f, child_data_union.scale, _);
                     if (interp_field_value) {
                         child_data_union.data.field.tsdf = *interp_field_value;
                         child_data_union.data.field.weight = parent_data_union.data.field.weight;
-
                         child_data_union.prop_data.field.delta_tsdf =
                             child_data_union.data.field.tsdf;
                         child_data_union.prop_data.field.delta_weight = 0;
@@ -153,16 +155,16 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
             }
         }
 
-
+        // Set the parent data to the mean of the valid child data.
         auto parent_up_funct = [](typename BlockType::DataUnion& parent_data_union,
-                                  typename BlockType::DataType& data_tmp,
+                                  typename BlockType::DataType& child_data_sum,
                                   const int sample_count) {
-            if (sample_count != 0) {
-                data_tmp.field.tsdf /= sample_count;
-                data_tmp.field.weight /= sample_count;
-                parent_data_union.data.field.tsdf = data_tmp.field.tsdf;
-                parent_data_union.prop_data.field.delta_tsdf = data_tmp.field.tsdf;
-                parent_data_union.data.field.weight = ceil(data_tmp.field.weight);
+            if (sample_count > 0) {
+                child_data_sum.field.tsdf /= sample_count;
+                child_data_sum.field.weight /= sample_count;
+                parent_data_union.data.field.tsdf = child_data_sum.field.tsdf;
+                parent_data_union.prop_data.field.delta_tsdf = child_data_sum.field.tsdf;
+                parent_data_union.data.field.weight = ceil(child_data_sum.field.weight);
                 parent_data_union.prop_data.field.delta_weight = 0;
             }
             else {
@@ -171,16 +173,18 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
             }
         };
 
+        // Accumulate the valid child data.
         auto child_up_funct = [](typename BlockType::DataUnion& child_data_union,
-                                 typename BlockType::DataType& data_tmp) {
-            if (child_data_union.data.field.weight != 0) {
-                data_tmp.field.tsdf += child_data_union.data.field.tsdf;
-                data_tmp.field.weight += child_data_union.data.field.weight;
+                                 typename BlockType::DataType& child_data_sum) {
+            if (is_valid(child_data_union.data)) {
+                child_data_sum.field.tsdf += child_data_union.data.field.tsdf;
+                child_data_sum.field.weight += child_data_union.data.field.weight;
                 return 1;
             }
             return 0;
         };
 
+        // Up-propagate the block data to the coarser scales.
         propagator::propagateBlockUp(octree, &block, curr_scale, child_up_funct, parent_up_funct);
     }
 
