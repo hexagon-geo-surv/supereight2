@@ -32,7 +32,6 @@ template<Colour ColB, Semantics SemB, typename DerivedT>
 class NodeMultiRes<Data<Field::TSDF, ColB, SemB>, DerivedT> {
     public:
     typedef Data<Field::TSDF, ColB, SemB> DataType;
-    typedef DeltaData<Field::TSDF, ColB, SemB> PropDataType;
 
     NodeMultiRes(const DataType&)
     {

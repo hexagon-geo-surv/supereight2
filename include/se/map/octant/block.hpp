@@ -257,7 +257,6 @@ template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
 class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
     public:
     typedef Data<Field::Occupancy, ColB, SemB> DataType;
-    typedef DeltaData<Field::Occupancy, ColB, SemB> PropDataType;
 
     BlockMultiRes(const DataType init_data = DataType());
 
