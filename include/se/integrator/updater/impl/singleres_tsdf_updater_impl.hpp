@@ -40,7 +40,7 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
     for (size_t i = 0; i < block_ptrs.size(); i++) {
         auto& block = *static_cast<BlockType*>(block_ptrs[i]);
         block.setTimeStamp(frame_);
-        Eigen::Vector3i block_coord = block.getCoord();
+        const Eigen::Vector3i block_coord = block.getCoord();
         Eigen::Vector3f point_base_W;
         map_.voxelToPoint(block_coord, point_base_W);
         const Eigen::Vector3f point_base_S = T_SW * point_base_W;
@@ -50,10 +50,10 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
             for (unsigned int j = 0; j < block_size; ++j) {
                 for (unsigned int k = 0; k < block_size; ++k) {
                     // Set voxel coordinates
-                    Eigen::Vector3i voxel_coord = block_coord + Eigen::Vector3i(i, j, k);
+                    const Eigen::Vector3i voxel_coord = block_coord + Eigen::Vector3i(i, j, k);
 
                     // Set sample point in camera frame
-                    Eigen::Vector3f point_S =
+                    const Eigen::Vector3f point_S =
                         point_base_S + point_delta_matrix_S * Eigen::Vector3f(i, j, k);
 
                     if (point_S.norm() > sensor_.farDist(point_S)) {
