@@ -33,6 +33,9 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
     std::vector<OctantBase*>& block_ptrs)
 {
     const Eigen::Isometry3f T_SW = T_WS_.inverse();
+    // Transformation from the octree frame v (in voxels) to the sensor frame S (in meters).
+    const Eigen::Affine3f T_Sv = T_SW * map_.getTWM() * Eigen::Scaling(map_.getRes())
+        * Eigen::Translation3f(sample_offset_frac);
     const Octree<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>& octree = map_.getOctree();
 
 #pragma omp parallel for
@@ -112,20 +115,12 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
         block.setCurrentScale(curr_scale);
         const int stride = 1 << curr_scale;
 
-        Eigen::Vector3f point_base_W;
-        map_.voxelToPoint(block_coord, stride, point_base_W);
-        const Eigen::Vector3f point_base_S = T_SW * point_base_W;
-        const Eigen::Matrix3f point_delta_matrix_S = T_SW.linear() * map_.getRes();
-
         for (int x = 0; x < BlockType::getSize(); x += stride) {
             for (int y = 0; y < BlockType::getSize(); y += stride) {
                 for (int z = 0; z < BlockType::getSize(); z += stride) {
-                    // Set voxel coordinates
                     const Eigen::Vector3i voxel_coord = block_coord + Eigen::Vector3i(x, y, z);
-
-                    // Set sample point in camera frame
-                    const Eigen::Vector3f point_S =
-                        point_base_S + point_delta_matrix_S * Eigen::Vector3f(x, y, z);
+                    // Compute the coordinates of the voxel sample position in the sensor frame.
+                    const Eigen::Vector3f point_S = T_Sv * voxel_coord.cast<float>();
 
                     if (point_S.norm() > sensor_.farDist(point_S)) {
                         continue;
