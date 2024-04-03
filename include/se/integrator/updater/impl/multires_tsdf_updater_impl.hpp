@@ -37,26 +37,25 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
     const Octree<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>& octree = map_.getOctree();
 
 #pragma omp parallel for
-    for (unsigned int i = 0; i < block_ptrs.size(); i++) {
-        BlockType* block_ptr = static_cast<BlockType*>(block_ptrs[i]);
-        block_ptr->setTimeStamp(frame_);
-        Eigen::Vector3i block_coord = block_ptr->getCoord();
+    for (size_t i = 0; i < block_ptrs.size(); i++) {
+        auto& block = *static_cast<BlockType*>(block_ptrs[i]);
+        block.setTimeStamp(frame_);
+        Eigen::Vector3i block_coord = block.getCoord();
         Eigen::Vector3f block_centre_point_W;
-        map_.voxelToPoint(block_coord, block_ptr->getSize(), block_centre_point_W);
+        map_.voxelToPoint(block_coord, block.getSize(), block_centre_point_W);
         const Eigen::Vector3f block_centre_point_S = T_SW * block_centre_point_W;
-        const int last_curr_scale = block_ptr->getCurrentScale();
+        const int last_curr_scale = block.getCurrentScale();
         const int lower_curr_scale_limit = last_curr_scale - 1;
 
         const int curr_scale = std::max(sensor_.computeIntegrationScale(block_centre_point_S,
                                                                         map_.getRes(),
                                                                         last_curr_scale,
-                                                                        block_ptr->getMinScale(),
-                                                                        block_ptr->getMaxScale()),
+                                                                        block.getMinScale(),
+                                                                        block.getMaxScale()),
                                         lower_curr_scale_limit);
 
-        block_ptr->setMinScale(block_ptr->getMinScale() < 0
-                                   ? curr_scale
-                                   : std::min(block_ptr->getMinScale(), curr_scale));
+        block.setMinScale(block.getMinScale() < 0 ? curr_scale
+                                                  : std::min(block.getMinScale(), curr_scale));
 
         if (curr_scale < last_curr_scale) {
             auto parent_down_funct = [](const OctreeType& /* octree */,
@@ -103,13 +102,13 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
             };
 
             propagator::propagateBlockDown(octree,
-                                           static_cast<OctantBase*>(block_ptr),
+                                           static_cast<OctantBase*>(&block),
                                            curr_scale,
                                            child_down_funct,
                                            parent_down_funct);
         }
 
-        block_ptr->setCurrentScale(curr_scale);
+        block.setCurrentScale(curr_scale);
         const int stride = 1 << curr_scale;
 
         Eigen::Vector3f point_base_W;
@@ -148,12 +147,12 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
                     const field_t sdf_value = (depth_value - m) / m * point_S.norm();
 
                     typename BlockType::DataUnion data_union =
-                        block_ptr->getDataUnion(voxel_coord, block_ptr->getCurrentScale());
+                        block.getDataUnion(voxel_coord, block.getCurrentScale());
                     data_union.data.field.update(sdf_value,
                                                  config_.truncation_boundary,
                                                  map_.getDataConfig().field.max_weight);
                     data_union.prop_data.field.delta_weight++;
-                    block_ptr->setDataUnion(data_union);
+                    block.setDataUnion(data_union);
                 } // k
             }     // j
         }         // i
@@ -186,11 +185,7 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
             return 0;
         };
 
-        propagator::propagateBlockUp(octree,
-                                     static_cast<OctantBase*>(block_ptr),
-                                     curr_scale,
-                                     child_up_funct,
-                                     parent_up_funct);
+        propagator::propagateBlockUp(octree, &block, curr_scale, child_up_funct, parent_up_funct);
     }
 
     propagator::propagateTimeStampToRoot(block_ptrs);
