@@ -33,7 +33,6 @@ template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
 void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::operator()(
     std::vector<OctantBase*>& block_ptrs)
 {
-    unsigned int block_size = BlockType::getSize();
     const Eigen::Isometry3f T_SW = T_WS_.inverse();
 
 #pragma omp parallel for
@@ -46,9 +45,9 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
         const Eigen::Vector3f point_base_S = T_SW * point_base_W;
         const Eigen::Matrix3f point_delta_matrix_S = T_SW.linear() * map_.getRes();
 
-        for (unsigned int i = 0; i < block_size; ++i) {
-            for (unsigned int j = 0; j < block_size; ++j) {
-                for (unsigned int k = 0; k < block_size; ++k) {
+        for (int i = 0; i < BlockType::getSize(); ++i) {
+            for (int j = 0; j < BlockType::getSize(); ++j) {
+                for (int k = 0; k < BlockType::getSize(); ++k) {
                     // Set voxel coordinates
                     const Eigen::Vector3i voxel_coord = block_coord + Eigen::Vector3i(i, j, k);
 
