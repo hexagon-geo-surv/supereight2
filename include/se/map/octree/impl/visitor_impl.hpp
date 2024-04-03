@@ -1025,45 +1025,8 @@ template<typename OctreeT>
 typename std::enable_if_t<OctreeT::res_ == Res::Single, std::optional<field_t>>
 getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 {
-    typename OctreeT::DataType neighbour_data[8] = {};
-
-    const unsigned int octree_size = octree.getSize();
-
-    Eigen::Vector3f factor;
-
-    const int stride = 1; // Single-res
-    const Eigen::Vector3f scaled_voxel_coord_f = 1.f / stride * voxel_coord_f - sample_offset_frac;
-    factor = math::fracf(scaled_voxel_coord_f);
-    const Eigen::Vector3i base_coord = stride * scaled_voxel_coord_f.template cast<int>();
-
-    if ((base_coord.array() < 0).any()
-        || ((base_coord + Eigen::Vector3i::Constant(stride)).array() >= octree_size).any()) {
-        return std::nullopt;
-    }
-
-    detail::get_neighbours(octree, base_coord, neighbour_data);
-
-    for (int n = 0; n < 8; n++) //< 8 neighbours
-    {
-        if (!is_valid(neighbour_data[n])) {
-            return std::nullopt;
-        }
-    }
-
-    return (((get_field(neighbour_data[0]) * (1 - factor.x())
-              + get_field(neighbour_data[1]) * factor.x())
-                 * (1 - factor.y())
-             + (get_field(neighbour_data[2]) * (1 - factor.x())
-                + get_field(neighbour_data[3]) * factor.x())
-                 * factor.y())
-                * (1 - factor.z())
-            + ((get_field(neighbour_data[4]) * (1 - factor.x())
-                + get_field(neighbour_data[5]) * factor.x())
-                   * (1 - factor.y())
-               + (get_field(neighbour_data[6]) * (1 - factor.x())
-                  + get_field(neighbour_data[7]) * factor.x())
-                   * factor.y())
-                * factor.z());
+    return getInterp(
+        octree, voxel_coord_f, [](const typename OctreeT::DataType& d) { return get_field(d); });
 }
 
 
@@ -1077,71 +1040,12 @@ getFieldInterp(const OctreeT& octree,
                const int scale_desired,
                int& scale_returned)
 {
-    typename OctreeT::DataType init_data;
-    typename OctreeT::DataType neighbour_data[8] = {};
-
-    const unsigned int octree_size = octree.getSize();
-
-    OctantBase* octant_ptr =
-        fetcher::template leaf<OctreeT>(voxel_coord_f.cast<int>(), octree.getRoot());
-
-    if (!octant_ptr) {
-        return std::nullopt;
-    }
-
-    typedef typename OctreeT::NodeType NodeType;
-    typedef typename OctreeT::BlockType BlockType;
-    // XXX: Setting the scale to 0 for Nodes to reuse the Block code is an ugly hack.
-    const int init_scale = (octant_ptr->isBlock())
-        ? std::max(static_cast<BlockType*>(octant_ptr)->getCurrentScale(), scale_desired)
-        : 0;
-
-    for (int scale = init_scale; scale <= BlockType::getMaxScale(); scale++) {
-        // Reset the neighbours. Assigning {} only works during initialization
-        std::fill(std::begin(neighbour_data), std::end(neighbour_data), init_data);
-
-        Eigen::Vector3f factor;
-        const int stride = 1 << scale; // Multi-res
-        const Eigen::Vector3f scaled_voxel_coord_f =
-            1.f / stride * voxel_coord_f - sample_offset_frac;
-        factor = math::fracf(scaled_voxel_coord_f);
-        const Eigen::Vector3i base_coord = stride * scaled_voxel_coord_f.template cast<int>();
-        if ((base_coord.array() < 0).any()
-            || ((base_coord + Eigen::Vector3i::Constant(stride)).array() >= octree_size).any()) {
-            return std::nullopt;
-        }
-
-        if (!detail::get_neighbours(octree, base_coord, scale, neighbour_data)) {
-            continue;
-        }
-
-        for (int n = 0; n < 8; n++) //< 8 neighbours
-        {
-            if (!is_valid(neighbour_data[n])) {
-                return std::nullopt;
-            }
-        }
-
-        // Return the correct scale in the case of Nodes.
-        scale_returned = octant_ptr->isBlock()
-            ? scale
-            : math::log2_const(static_cast<NodeType*>(octant_ptr)->getSize());
-        return (((get_field(neighbour_data[0]) * (1 - factor.x())
-                  + get_field(neighbour_data[1]) * factor.x())
-                     * (1 - factor.y())
-                 + (get_field(neighbour_data[2]) * (1 - factor.x())
-                    + get_field(neighbour_data[3]) * factor.x())
-                     * factor.y())
-                    * (1 - factor.z())
-                + ((get_field(neighbour_data[4]) * (1 - factor.x())
-                    + get_field(neighbour_data[5]) * factor.x())
-                       * (1 - factor.y())
-                   + (get_field(neighbour_data[6]) * (1 - factor.x())
-                      + get_field(neighbour_data[7]) * factor.x())
-                       * factor.y())
-                    * factor.z());
-    }
-    return std::nullopt;
+    return getInterp(
+        octree,
+        voxel_coord_f,
+        [](const typename OctreeT::DataType& d) { return get_field(d); },
+        scale_desired,
+        scale_returned);
 }
 
 
