@@ -882,6 +882,143 @@ getField(const OctreeT& octree,
 
 
 
+template<typename OctreeT, typename GetF>
+typename std::enable_if_t<OctreeT::res_ == Res::Multi,
+                          std::optional<std::invoke_result_t<GetF, typename OctreeT::DataType>>>
+getInterp(const OctreeT& octree,
+          const Eigen::Vector3f& voxel_coord_f,
+          GetF get,
+          const int desired_scale,
+          int& returned_scale)
+{
+    typedef typename OctreeT::NodeType NodeType;
+    typedef typename OctreeT::BlockType BlockType;
+
+    // Interpolate in a multi-resolution octree.
+
+    // Get the leaf octant containing the query point.
+    const OctantBase* const octant_ptr =
+        fetcher::template leaf<OctreeT>(voxel_coord_f.cast<int>(), octree.getRoot());
+    if (!octant_ptr) {
+        return std::nullopt;
+    }
+
+    // XXX: Setting the scale to 0 for Nodes to reuse the Block code is an ugly hack.
+    const int init_scale = octant_ptr->isBlock()
+        ? std::max(static_cast<const BlockType*>(octant_ptr)->getCurrentScale(), desired_scale)
+        : 0;
+
+    for (int scale = init_scale; scale <= BlockType::getMaxScale(); scale++) {
+        // Subtract the sample offset to get the coordinates of the voxel nearest to the origin out
+        // of the 8 voxels nearest to the query point.
+        const int stride = 1 << scale;
+        const Eigen::Vector3f base_coord_f = 1.0f / stride * voxel_coord_f - sample_offset_frac;
+        const Eigen::Vector3i base_coord = stride * base_coord_f.template cast<int>();
+        if (!octree.aabb().contains(base_coord)) {
+            return std::nullopt;
+        }
+
+        // Gather the data of the 8 voxels nearest to the query point.
+        typename OctreeT::DataType data[8] = {};
+        if (!detail::get_neighbours(octree, base_coord, scale, data)) {
+            continue;
+        }
+        for (const auto& d : data) {
+            if (!is_valid(d)) {
+                return std::nullopt;
+            }
+        }
+
+        // Return the correct scale in the case of Nodes.
+        returned_scale = octant_ptr->isBlock()
+            ? scale
+            : octantops::size_to_scale(static_cast<const NodeType*>(octant_ptr)->getSize());
+        // Perform trilinear interpolation.
+        // https://en.wikipedia.org/wiki/Trilinear_interpolation#Method
+        const Eigen::Vector3f t = math::fracf(base_coord_f);
+        const Eigen::Vector3f tc = Eigen::Vector3f::Ones() - t;
+        return ((get(data[0]) * tc.x() + get(data[1]) * t.x()) * tc.y()
+                + (get(data[2]) * tc.x() + get(data[3]) * t.x()) * t.y())
+            * tc.z()
+            + ((get(data[4]) * tc.x() + get(data[5]) * t.x()) * tc.y()
+               + (get(data[6]) * tc.x() + get(data[7]) * t.x()) * t.y())
+            * t.z();
+    }
+    return std::nullopt;
+}
+
+
+
+template<typename OctreeT, typename GetF>
+typename std::enable_if_t<OctreeT::res_ == Res::Multi,
+                          std::optional<std::invoke_result_t<GetF, typename OctreeT::DataType>>>
+getInterp(const OctreeT& octree,
+          const Eigen::Vector3f& voxel_coord_f,
+          GetF get,
+          int& returned_scale)
+{
+    return getInterp(octree, voxel_coord_f, get, 0, returned_scale);
+}
+
+
+
+template<typename OctreeT, typename GetF>
+std::optional<std::invoke_result_t<GetF, typename OctreeT::DataType>>
+getInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, GetF get)
+{
+    // Use the multi-res implementation if needed.
+    if constexpr (OctreeT::res_ == Res::Multi) {
+        int _;
+        return getInterp(octree, voxel_coord_f, get, 0, _);
+    }
+
+    // Interpolate in a single-resolution octree.
+
+    // Subtract the sample offset to get the coordinates of the voxel nearest to the origin out of
+    // the 8 voxels nearest to the query point.
+    const Eigen::Vector3f base_coord_f = voxel_coord_f - sample_offset_frac;
+    const Eigen::Vector3i base_coord = base_coord_f.template cast<int>();
+    // The following top-down view shows the bottom 4 out of the 8 voxels nearest to voxel_coord_f
+    // to clarify why the above computation is made.
+    //   ┌───────┬───────┐
+    //   │       │       │  Legend
+    //   │   .   │   .   │  . voxel sample point
+    //   │       │  O    │  O voxel_coord_f
+    // 1 ├───────┼───────┤  X base_coord_f
+    //   │      X│       │  # base_coord
+    //   │   .   │   .   │
+    //   │       │       │
+    // 0 #───────┴───────┘
+    //   0       1
+    if (!octree.aabb().contains(base_coord)) {
+        return std::nullopt;
+    }
+
+    // Gather the data of the 8 voxels nearest to the query point.
+    typename OctreeT::DataType data[8] = {};
+    if (!detail::get_neighbours(octree, base_coord, data)) {
+        return std::nullopt;
+    }
+    for (const auto& d : data) {
+        if (!is_valid(d)) {
+            return std::nullopt;
+        }
+    }
+
+    // Perform trilinear interpolation.
+    // https://en.wikipedia.org/wiki/Trilinear_interpolation#Method
+    const Eigen::Vector3f t = math::fracf(base_coord_f);
+    const Eigen::Vector3f tc = Eigen::Vector3f::Ones() - t;
+    return ((get(data[0]) * tc.x() + get(data[1]) * t.x()) * tc.y()
+            + (get(data[2]) * tc.x() + get(data[3]) * t.x()) * t.y())
+        * tc.z()
+        + ((get(data[4]) * tc.x() + get(data[5]) * t.x()) * tc.y()
+           + (get(data[6]) * tc.x() + get(data[7]) * t.x()) * t.y())
+        * t.z();
+}
+
+
+
 /// Single-res get field interp functions
 
 template<typename OctreeT>

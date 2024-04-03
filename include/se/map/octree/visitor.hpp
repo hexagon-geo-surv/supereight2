@@ -213,6 +213,57 @@ getField(const OctreeT& octree,
 
 
 
+/** Interpolate a member of se::Octree::DataType at the supplied voxel coordinates and desired
+ * scale. The scale the member is interpolated at may be coarser than \p desired_scale and is
+ * written in \p returned_scale.
+ *
+ * \param[in] octree          The multi-resolution octree containing the data.
+ * \param[in] voxel_coord_f   The voxel coordinates the member will be interpolated at. The
+ *                            coordinates may have a fractional part.
+ * \param[in] get             A functor with the following prototype, returning the member of type
+ *                            `T` to be interpolated:
+ *                            \code{.cpp}
+ *                            template<typename OctreeT>
+ *                            T get(const typename OctreeT::DataType& data);
+ *                            \endcode
+ *                            Type `T` must implement the following operators:
+ *                            \code{.cpp}
+ *                            T operator+(const T& a, const T& b);
+ *                            T operator*(const T& a, const float b);
+ *                            \endcode
+ * \param[in]  desired_scale  The finest scale the member should be interpolated at.
+ * \param[out] returned_scale The actual scale the member was interpolated at. Not less than \p
+ *                            desired_scale. Not modified if `std::nullopt` is returned.
+ * \return The interpolated member if the data is valid, `std::nullopt` otherwise.
+ */
+template<typename OctreeT, typename GetF>
+typename std::enable_if_t<OctreeT::res_ == Res::Multi,
+                          std::optional<std::invoke_result_t<GetF, typename OctreeT::DataType>>>
+getInterp(const OctreeT& octree,
+          const Eigen::Vector3f& voxel_coord_f,
+          GetF get,
+          const int desired_scale,
+          int& returned_scale);
+
+/** \overload */
+template<typename OctreeT, typename GetF>
+typename std::enable_if_t<OctreeT::res_ == Res::Multi,
+                          std::optional<std::invoke_result_t<GetF, typename OctreeT::DataType>>>
+getInterp(const OctreeT& octree,
+          const Eigen::Vector3f& voxel_coord_f,
+          GetF get,
+          int& returned_scale);
+
+/** \overload
+ * \details This overload works for both single- and multi-resolution octrees. In the case of a
+ * multi-resolution octree the member is interpolated at the finest possible scale.
+ */
+template<typename OctreeT, typename GetF>
+std::optional<std::invoke_result_t<GetF, typename OctreeT::DataType>>
+getInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, GetF get);
+
+
+
 /// Single-res get field interpolation functions
 
 /**
