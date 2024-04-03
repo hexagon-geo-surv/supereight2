@@ -45,15 +45,15 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
         const Eigen::Vector3f point_base_S = T_SW * point_base_W;
         const Eigen::Matrix3f point_delta_matrix_S = T_SW.linear() * map_.getRes();
 
-        for (int i = 0; i < BlockType::getSize(); ++i) {
-            for (int j = 0; j < BlockType::getSize(); ++j) {
-                for (int k = 0; k < BlockType::getSize(); ++k) {
+        for (int x = 0; x < BlockType::getSize(); ++x) {
+            for (int y = 0; y < BlockType::getSize(); ++y) {
+                for (int z = 0; z < BlockType::getSize(); ++z) {
                     // Set voxel coordinates
-                    const Eigen::Vector3i voxel_coord = block_coord + Eigen::Vector3i(i, j, k);
+                    const Eigen::Vector3i voxel_coord = block_coord + Eigen::Vector3i(x, y, z);
 
                     // Set sample point in camera frame
                     const Eigen::Vector3f point_S =
-                        point_base_S + point_delta_matrix_S * Eigen::Vector3f(i, j, k);
+                        point_base_S + point_delta_matrix_S * Eigen::Vector3f(x, y, z);
 
                     if (point_S.norm() > sensor_.farDist(point_S)) {
                         continue;
@@ -79,9 +79,9 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
                     data.field.update(sdf_value,
                                       config_.truncation_boundary,
                                       map_.getDataConfig().field.max_weight);
-                } // k
-            }     // j
-        }         // i
+                }
+            }
+        }
     }
 
     propagator::propagateTimeStampToRoot(block_ptrs);
