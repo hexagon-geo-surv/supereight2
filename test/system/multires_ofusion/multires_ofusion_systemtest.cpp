@@ -33,7 +33,7 @@ int main(int argc, char** argv)
     }
 
     // Create a temporary directory for all the tests.
-    tmp = stdfs::temp_directory_path() / stdfs::path("supereight_test_results");
+    tmp = (stdfs::temp_directory_path() / stdfs::path("supereight_test_results")).string();
     stdfs::create_directories(tmp);
 
     return RUN_ALL_TESTS();

@@ -18,7 +18,14 @@ if(TBB_tbb_FOUND)
 endif()
 
 # Compiler options
-set(SE_PRIVATE_CXX_FLAGS -Wall -Wextra -Wpedantic -Wno-unknown-pragmas)
+set(SE_PRIVATE_CXX_FLAGS 
+# Clang/GCC:
+"$<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:-Wall -Wextra -Wpedantic -Wno-unknown-pragmas>"
+# MSVC:
+"$<$<CXX_COMPILER_ID:MSVC>:/W3>")
+if(WIN32)
+    set(SE_PRIVATE_CXX_FLAGS "${SE_PRIVATE_CXX_FLAGS};-openmp:experimental;-DM_PI=3.14159265358979323846")
+endif(WIN32)
 
 # Compile the dependencies
 add_subdirectory(third_party)
@@ -55,13 +62,16 @@ target_include_directories(${LIB_NAME}
 )
 target_link_libraries(${LIB_NAME}
     PUBLIC
-      m
       Eigen3::Eigen
       Boost::boost
       ${OpenCV_LIBS}
       ${TBB_IMPORTED_TARGETS}
       SRL::Projection
 )
+if(LINUX)
+    target_link_libraries(${LIB_NAME} PUBLIC m)
+endif()
+
 # Find OpenMP, warn if disabled.
 if(SE_OPENMP)
     find_package(OpenMP)

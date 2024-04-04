@@ -89,7 +89,7 @@ TEST(Map, aabbOccupancy)
 TEST(Map, aabb_ray)
 {
     // Temporary directory for test results
-    const std::string tmp_ = stdfs::temp_directory_path() / stdfs::path("supereight_test_results");
+    const std::string tmp_ = (stdfs::temp_directory_path() / stdfs::path("supereight_test_results")).string();
 
     /**
    * Create plane wall example
@@ -183,7 +183,7 @@ TEST(Map, aabb_ray)
 TEST(Map, aabb_ray_batch)
 {
     // Temporary directory for test results
-    const std::string tmp_ = stdfs::temp_directory_path() / stdfs::path("supereight_test_results");
+    const std::string tmp_ = (stdfs::temp_directory_path() / stdfs::path("supereight_test_results")).string();
 
     /**
    * Create plane wall example

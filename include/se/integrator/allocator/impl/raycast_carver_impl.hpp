@@ -68,10 +68,14 @@ std::vector<se::OctantBase*> RaycastCarver<MapT, SensorT>::operator()()
 
     const Eigen::Vector3f t_WS = T_WS_.translation();
 
-#pragma omp declare reduction (merge : std::set<se::key_t> : omp_out.insert(omp_in.begin(), omp_in.end()))
     std::set<se::key_t> voxel_key_set;
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
+#pragma omp parallel for
+#else
+#pragma omp declare reduction (merge : std::set<se::key_t> : omp_out.insert(omp_in.begin(), omp_in.end()))
 #pragma omp parallel for reduction(merge : voxel_key_set)
+#endif
     for (int x = 0; x < depth_img_.width(); ++x) {
         for (int y = 0; y < depth_img_.height(); ++y) {
             const Eigen::Vector2i pixel(x, y);
@@ -102,7 +106,13 @@ std::vector<se::OctantBase*> RaycastCarver<MapT, SensorT>::operator()()
                     if (octant_ptr == nullptr) {
                         se::key_t voxel_key;
                         se::keyops::encode_key(voxel_coord, octree_.max_block_scale, voxel_key);
-                        voxel_key_set.insert(voxel_key);
+
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
+#pragma omp critical
+#endif
+                        {
+                            voxel_key_set.insert(voxel_key);
+                        }
                     }
                 }
                 ray_pos_W += step;

@@ -61,7 +61,7 @@ class DepthImageIO : public ::testing::Test {
     const size_t depth_f_size_bytes_ = sizeof(float) * num_pixels_;
     const Eigen::Vector2i depth_image_res_ =
         Eigen::Vector2i(depth_image_width_, depth_image_height_);
-    const std::string tmp_ = stdfs::temp_directory_path() / stdfs::path("supereight_test_results");
+    const std::string tmp_ = (stdfs::temp_directory_path() / stdfs::path("supereight_test_results")).string();
 
     public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW

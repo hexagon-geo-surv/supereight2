@@ -122,7 +122,7 @@ se::ReaderStatus se::RAWReader::nextDepth(se::Image<float>& depth_image)
     }
     // Scale the data from millimetres to metres.
 #pragma omp parallel for
-    for (size_t p = 0; p < image_size; ++p) {
+    for (int p = 0; p < static_cast<int>(image_size); ++p) {
         depth_image[p] = buffer.data()[p] / 1000.0f;
     }
     return se::ReaderStatus::ok;

@@ -224,7 +224,7 @@ std::vector<InteriorNetPoseEntry> read_interiornet_ground_truth(const std::strin
 std::string write_ground_truth_tmp(const std::vector<InteriorNetPoseEntry>& poses)
 {
     // Open a temporary file
-    const std::string tmp_filename = stdfs::temp_directory_path() / "tum_gt.txt";
+    const std::string tmp_filename = (stdfs::temp_directory_path() / "tum_gt.txt").string();
     std::ofstream fs(tmp_filename, std::ios::out);
     if (!fs.good()) {
         std::cerr << "Error: Could not write associated ground truth file " << tmp_filename << "\n";

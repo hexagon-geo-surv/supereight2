@@ -65,10 +65,10 @@ void AppConfig::readYaml(const std::string& filename)
     se::yaml::subnode_as_string(node, "log_file", log_file);
 
     const stdfs::path dataset_dir = stdfs::path(filename).parent_path();
-    mesh_path = process_path(mesh_path, dataset_dir);
-    slice_path = process_path(slice_path, dataset_dir);
-    structure_path = process_path(structure_path, dataset_dir);
-    log_file = process_path(log_file, dataset_dir);
+    mesh_path = process_path(mesh_path, dataset_dir.string());
+    slice_path = process_path(slice_path, dataset_dir.string());
+    structure_path = process_path(structure_path, dataset_dir.string());
+    log_file = process_path(log_file, dataset_dir.string());
 }
 
 

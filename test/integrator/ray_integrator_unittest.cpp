@@ -76,7 +76,7 @@ static void expect_valid_scale_data(const BlockType& block,
 TEST(RayIntegrator, SingleRay)
 {
     // Temporary directory for test results
-    const std::string tmp_ = stdfs::temp_directory_path() / stdfs::path("supereight_test_results");
+    const std::string tmp_ = (stdfs::temp_directory_path() / stdfs::path("supereight_test_results")).string();
     stdfs::create_directories(tmp_);
 
     // Create simple test ray, straight line
@@ -158,7 +158,7 @@ TEST(RayIntegrator, SingleRay)
 TEST(RayIntegrator, Propagation)
 {
     // Temporary directory for test results
-    const std::string tmp_ = stdfs::temp_directory_path() / stdfs::path("supereight_test_results");
+    const std::string tmp_ = (stdfs::temp_directory_path() / stdfs::path("supereight_test_results")).string();
     stdfs::create_directories(tmp_);
 
     /**

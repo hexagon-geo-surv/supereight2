@@ -73,11 +73,11 @@ foreach(APP_CONFIG ${SE_APP_CONFIG})
   # app.
   set(INPUT_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
   set(GENERATED_MAIN "${CMAKE_CURRENT_BINARY_DIR}/main_${FIELD_LC}_${RES_LC}_${SENSOR_LC}.cpp")
-  add_custom_command(
-    OUTPUT  ${GENERATED_MAIN}
-    COMMAND sed -e "s/se::TSDF/se::${FIELD}/g" -e "s/se::Res::Single/se::Res::${RES}/g" -e "s/se::PinholeCamera/se::${SENSOR}/g" ${INPUT_MAIN} > ${GENERATED_MAIN}
-    DEPENDS ${INPUT_MAIN}
-  )
+  file(READ ${INPUT_MAIN} FILE_CONTENT)
+  string(REPLACE "se::TSDF" "se::${FIELD}" FILE_CONTENT "${FILE_CONTENT}")
+  string(REPLACE "se::Res::Single" "se::Res::${RES}" FILE_CONTENT "${FILE_CONTENT}")
+  string(REPLACE "se::PinholeCamera" "se::${SENSOR}" FILE_CONTENT "${FILE_CONTENT}")
+  file(WRITE ${GENERATED_MAIN} "${FILE_CONTENT}")
 
   # Compile the app using the generated file.
   set(EXE_NAME "supereight_${FIELD_LC}_${RES_LC}_${SENSOR_LC}")
@@ -107,8 +107,8 @@ endforeach()
 
 # build ray interface
 add_executable(supereight_occupancy_multi_leicalidar_ray src/main_leica_lidar.cpp)
+target_compile_options(supereight_occupancy_multi_leicalidar_ray PRIVATE ${SE_PRIVATE_CXX_FLAGS})
 target_include_directories(supereight_occupancy_multi_leicalidar_ray BEFORE PRIVATE include)
 target_link_libraries(supereight_occupancy_multi_leicalidar_ray PRIVATE SRL::Supereight2 ${LIB_NAME})
 # Allow handling large files in 32-bit systems
 target_compile_definitions(supereight_occupancy_multi_leicalidar_ray PRIVATE _FILE_OFFSET_BITS=64)
-

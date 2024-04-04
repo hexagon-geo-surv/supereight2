@@ -22,12 +22,8 @@ namespace isosurface {
 /** Mesh the surface between occupied and free space. This is what's typically wanted when meshing.
  * The mesh faces are oriented away from occupied space.
  */
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
 template<typename T>
 static constexpr auto occupied = [](const T data[8]) -> std::uint8_t {
-#else
-static constexpr auto occupied = [](const auto data[8]) -> std::uint8_t {
-#endif
     // A face should be meshed if there are no unknown vertices (not valid) and if there is at least
     // 1 occupied vertex (valid and inside).
     std::uint8_t edge_index = 0;
@@ -45,12 +41,8 @@ static constexpr auto occupied = [](const auto data[8]) -> std::uint8_t {
 /** Mesh the surface between free and occupied or unknown space. This will create a mesh that
  * encloses all free space in the map. The mesh faces are oriented away from free space.
  */
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
 template<typename T>
 static constexpr auto free = [](const T data[8]) -> std::uint8_t {
-#else
-static constexpr auto free = [](const auto data[8]) -> std::uint8_t {
-#endif
     // A face should be meshed if there is at least 1 free vertex (valid and not inside). Since both
     // the boundaries between free and unknown, and free and occupied are needed there's no early
     // exit on invalid data.
@@ -66,12 +58,8 @@ static constexpr auto free = [](const auto data[8]) -> std::uint8_t {
 /** Mesh the surface between free and unknown space, also known as frontiers. The mesh faces are
  * oriented towards unknown space.
  */
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
 template<typename T>
 static constexpr auto frontier = [](const T data[8]) -> std::uint8_t {
-#else
-static constexpr auto frontier = [](const auto data[8]) -> std::uint8_t {
-#endif
     // Frontiers are the boundaries between free and unknown space. This means there should be at
     // least 1 free vertex (valid and not inside) and at least 1 unknown vertex (not valid) for a
     // face to be meshed.
@@ -841,7 +829,7 @@ void marching_cube_kernel(OctreeT& octree,
     const int octree_size = octree.getSize();
 
 #pragma omp parallel for
-    for (size_t block_idx = 0; block_idx < block_ptrs.size(); block_idx++) {
+    for (int block_idx = 0; block_idx < block_ptrs.size(); block_idx++) {
         const BlockType* block_ptr = block_ptrs[block_idx];
 
         const Eigen::Vector3i& start_coord = block_ptr->getCoord();
@@ -852,7 +840,7 @@ void marching_cube_kernel(OctreeT& octree,
             for (int y = start_coord.y(); y < last_coord.y(); y++) {
                 for (int z = start_coord.z(); z < last_coord.z(); z++) {
                     const uint8_t edge_pattern_idx =
-                        meshing::compute_index(octree, block_ptr, x, y, z, isosurface::occupied);
+                        meshing::compute_index(octree, block_ptr, x, y, z, isosurface::occupied<OctreeT::DataType>);
                     const int* edges = triTable[edge_pattern_idx];
                     for (unsigned int e = 0; edges[e] != -1 && e < 16; e += 3) {
                         Eigen::Vector3f vertex_0 = interp_vertexes(octree, x, y, z, edges[e]);
@@ -895,7 +883,7 @@ void dual_marching_cube_kernel(OctreeT& octree,
     const int octree_size = octree.getSize();
 
 #pragma omp parallel for
-    for (size_t block_idx = 0; block_idx < block_ptrs.size(); block_idx++) {
+    for (int block_idx = 0; block_idx < block_ptrs.size(); block_idx++) {
         const BlockType* block_ptr = block_ptrs[block_idx];
         const int voxel_scale = block_ptr->getCurrentScale();
         const int voxel_stride = 1 << voxel_scale;
@@ -926,7 +914,7 @@ void dual_marching_cube_kernel(OctreeT& octree,
                                                 edge_pattern_idx,
                                                 data,
                                                 dual_corner_coords_f,
-                                                isosurface::occupied);
+                                                isosurface::occupied<OctreeT::DataType>);
                     const int* edges = triTable[edge_pattern_idx];
                     for (unsigned int e = 0; edges[e] != -1 && e < 16; e += 3) {
                         Eigen::Vector3f vertex_0 =

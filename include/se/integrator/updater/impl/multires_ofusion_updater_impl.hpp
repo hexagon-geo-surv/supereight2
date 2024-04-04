@@ -45,7 +45,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
     TICK("fusion-nodes")
 #pragma omp parallel for
-    for (unsigned int i = 0; i < allocation_list.node_list.size(); ++i) {
+    for (int i = 0; i < allocation_list.node_list.size(); ++i) {
         auto node_ptr = static_cast<NodeType*>(allocation_list.node_list[i]);
         const int depth = octree_.getMaxScale() - std::log2(node_ptr->getSize());
         freeNodeRecurse(allocation_list.node_list[i], depth);
@@ -54,7 +54,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
     TICK("fusion-blocks")
 #pragma omp parallel for
-    for (unsigned int i = 0; i < allocation_list.block_list.size(); ++i) {
+    for (int i = 0; i < allocation_list.block_list.size(); ++i) {
         updateBlock(allocation_list.block_list[i],
                     allocation_list.variance_state_list[i] == VarianceState::Constant,
                     allocation_list.projects_inside_list[i]);
@@ -68,11 +68,11 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
     TICK("propagation-blocks")
 #pragma omp parallel for
-    for (unsigned int i = 0; i < allocation_list.block_list.size(); ++i) {
+    for (int i = 0; i < allocation_list.block_list.size(); ++i) {
         updater::propagate_block_to_coarsest_scale<BlockType>(allocation_list.block_list[i]);
     }
 #pragma omp parallel for
-    for (unsigned int i = 0; i < freed_block_list_.size(); ++i) {
+    for (int i = 0; i < freed_block_list_.size(); ++i) {
         updater::propagate_block_to_coarsest_scale<BlockType>(freed_block_list_[i]);
     }
     TOCK("propagation-blocks")
@@ -223,16 +223,16 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
             if (recommended_scale < last_scale) {
                 const int parent_scale = last_scale;
-                const unsigned int size_at_parent_scale_li = block_size >> parent_scale;
+                const int size_at_parent_scale_li = block_size >> parent_scale;
                 const unsigned int size_at_parent_scale_sq = math::sq(size_at_parent_scale_li);
 
                 const unsigned int size_at_buffer_scale_li = size_at_parent_scale_li << 1;
                 const unsigned int size_at_buffer_scale_sq = math::sq(size_at_buffer_scale_li);
 
-                for (unsigned int z = 0; z < size_at_parent_scale_li; z++) {
-                    for (unsigned int y = 0; y < size_at_parent_scale_li; y++) {
+                for (int z = 0; z < size_at_parent_scale_li; z++) {
+                    for (int y = 0; y < size_at_parent_scale_li; y++) {
 #pragma omp simd // TODO: MOVE UP
-                        for (unsigned int x = 0; x < size_at_parent_scale_li; x++) {
+                        for (int x = 0; x < size_at_parent_scale_li; x++) {
                             const int parent_idx =
                                 x + y * size_at_parent_scale_li + z * size_at_parent_scale_sq;
                             const auto& parent_data =

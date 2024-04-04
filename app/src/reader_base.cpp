@@ -149,11 +149,11 @@ void se::Reader::Config::readYaml(const std::string& filename)
     const stdfs::path dataset_dir = stdfs::path(filename).parent_path();
     const stdfs::path sequence_path_p(sequence_path);
     if (sequence_path_p.is_relative()) {
-        sequence_path = dataset_dir / sequence_path_p;
+        sequence_path = (dataset_dir / sequence_path_p).string();
     }
     const stdfs::path ground_truth_file_p(ground_truth_file);
     if (!ground_truth_file_p.empty() && ground_truth_file_p.is_relative()) {
-        ground_truth_file = dataset_dir / ground_truth_file_p;
+        ground_truth_file = (dataset_dir / ground_truth_file_p).string();
     }
 }
 
