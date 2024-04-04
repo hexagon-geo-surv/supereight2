@@ -109,6 +109,47 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getMinData(const Eigen::Vector3f& 
 
 
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
+template<typename GetF, Safe SafeB, Res ResTDummy>
+typename std::enable_if_t<ResTDummy == Res::Multi,
+                          std::optional<std::invoke_result_t<
+                              GetF,
+                              typename Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::DataType>>>
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getInterp(const Eigen::Vector3f& point_W,
+                                                        GetF get,
+                                                        int& returned_scale) const
+{
+    Eigen::Vector3f voxel_coord_f;
+    const bool is_inside = pointToVoxel<SafeB>(point_W, voxel_coord_f);
+    if constexpr (SafeB == Safe::On) {
+        if (!is_inside) {
+            return std::nullopt;
+        }
+    }
+    return se::visitor::getInterp(octree_, voxel_coord_f, get, 0, returned_scale);
+}
+
+
+
+template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
+template<Safe SafeB, typename GetF>
+std::optional<
+    std::invoke_result_t<GetF, typename Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::DataType>>
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getInterp(const Eigen::Vector3f& point_W,
+                                                        GetF get) const
+{
+    Eigen::Vector3f voxel_coord_f;
+    const bool is_inside = pointToVoxel<SafeB>(point_W, voxel_coord_f);
+    if constexpr (SafeB == Safe::On) {
+        if (!is_inside) {
+            return std::nullopt;
+        }
+    }
+    return se::visitor::getInterp(octree_, voxel_coord_f, get);
+}
+
+
+
+template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 template<Safe SafeB>
 std::optional<se::field_t>
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getFieldInterp(const Eigen::Vector3f& point_W) const

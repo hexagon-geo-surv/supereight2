@@ -206,6 +206,38 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
         return se::visitor::getMaxData(octree_, voxel_coord, scale_desired);
     }
 
+    /** Interpolate a member of #DataType at the supplied voxel coordinates and the finest possible
+     * scale.
+     *
+     * \param[in] point_W         The coordinates in metres of the point in the world frame W the
+     *                            member will be interpolated at.
+     * \param[in] get             A functor with the following prototype, returning the member of
+     *                            type `T` to be interpolated:
+     *                            \code{.cpp}
+     *                            template<typename OctreeT>
+     *                            T get(const typename OctreeT::DataType& data);
+     *                            \endcode
+     *                            Type `T` must implement the following operators:
+     *                            \code{.cpp}
+     *                            T operator+(const T& a, const T& b);
+     *                            T operator*(const T& a, const float b);
+     *                            \endcode
+     * \param[out] returned_scale The scale the member was interpolated at. Not modified if
+     *                            `std::nullopt` is returned.
+     * \return The interpolated member if the data is valid, `std::nullopt` otherwise.
+     */
+    template<typename GetF, Safe SafeB = Safe::Off, Res ResTDummy = ResT>
+    typename std::enable_if_t<ResTDummy == Res::Multi,
+                              std::optional<std::invoke_result_t<GetF, DataType>>>
+    getInterp(const Eigen::Vector3f& point_W, GetF get, int& returned_scale) const;
+
+    /** \overload
+     * \details This overload works for both single- and multi-resolution maps. In the case of a
+     * multi-resolution map the member is interpolated at the finest possible scale.
+     */
+    template<Safe SafeB = Safe::Off, typename GetF>
+    std::optional<std::invoke_result_t<GetF, DataType>> getInterp(const Eigen::Vector3f& point_W,
+                                                                  GetF get) const;
 
     /**
      * \brief Get the interpolated field value at the provided coordinates.
