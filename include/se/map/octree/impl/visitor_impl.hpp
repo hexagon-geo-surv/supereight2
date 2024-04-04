@@ -1019,52 +1019,37 @@ getInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, GetF get)
 
 
 
-/// Single-res get field interp functions
-
-template<typename OctreeT>
-typename std::enable_if_t<OctreeT::res_ == Res::Single, std::optional<field_t>>
-getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
-{
-    return getInterp(
-        octree, voxel_coord_f, [](const typename OctreeT::DataType& d) { return get_field(d); });
-}
-
-
-
-/// Multi-res get field interp functions
-
 template<typename OctreeT>
 typename std::enable_if_t<OctreeT::res_ == Res::Multi, std::optional<field_t>>
 getFieldInterp(const OctreeT& octree,
                const Eigen::Vector3f& voxel_coord_f,
-               const int scale_desired,
-               int& scale_returned)
+               const int desired_scale,
+               int& returned_scale)
 {
     return getInterp(
         octree,
         voxel_coord_f,
         [](const typename OctreeT::DataType& d) { return get_field(d); },
-        scale_desired,
-        scale_returned);
+        desired_scale,
+        returned_scale);
 }
 
 
 
 template<typename OctreeT>
 typename std::enable_if_t<OctreeT::res_ == Res::Multi, std::optional<field_t>>
-getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, int& scale_returned)
+getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, int& returned_scale)
 {
-    return getFieldInterp(octree, voxel_coord_f, 0, scale_returned);
+    return getFieldInterp(octree, voxel_coord_f, 0, returned_scale);
 }
 
 
 
 template<typename OctreeT>
-typename std::enable_if_t<OctreeT::res_ == Res::Multi, std::optional<field_t>>
-getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
+std::optional<field_t> getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 {
-    int scale_dummy;
-    return getFieldInterp(octree, voxel_coord_f, 0, scale_dummy);
+    return getInterp(
+        octree, voxel_coord_f, [](const typename OctreeT::DataType& d) { return get_field(d); });
 }
 
 
