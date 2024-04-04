@@ -45,7 +45,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
     TICK("fusion-nodes")
 #pragma omp parallel for
-    for (int i = 0; i < allocation_list.node_list.size(); ++i) {
+    for (int i = 0; i < static_cast<int>(allocation_list.node_list.size()); ++i) {
         auto node_ptr = static_cast<NodeType*>(allocation_list.node_list[i]);
         const int depth = octree_.getMaxScale() - std::log2(node_ptr->getSize());
         freeNodeRecurse(allocation_list.node_list[i], depth);
@@ -54,7 +54,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
     TICK("fusion-blocks")
 #pragma omp parallel for
-    for (int i = 0; i < allocation_list.block_list.size(); ++i) {
+    for (int i = 0; i < static_cast<int>(allocation_list.block_list.size()); ++i) {
         updateBlock(allocation_list.block_list[i],
                     allocation_list.variance_state_list[i] == VarianceState::Constant,
                     allocation_list.projects_inside_list[i]);
@@ -68,11 +68,11 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
     TICK("propagation-blocks")
 #pragma omp parallel for
-    for (int i = 0; i < allocation_list.block_list.size(); ++i) {
+    for (int i = 0; i < static_cast<int>(allocation_list.block_list.size()); ++i) {
         updater::propagate_block_to_coarsest_scale<BlockType>(allocation_list.block_list[i]);
     }
 #pragma omp parallel for
-    for (int i = 0; i < freed_block_list_.size(); ++i) {
+    for (int i = 0; i < static_cast<int>(freed_block_list_.size()); ++i) {
         updater::propagate_block_to_coarsest_scale<BlockType>(freed_block_list_[i]);
     }
     TOCK("propagation-blocks")

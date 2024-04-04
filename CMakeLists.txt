@@ -20,7 +20,7 @@ endif()
 # Compiler options
 set(SE_PRIVATE_CXX_FLAGS 
 # Clang/GCC:
-"$<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:-Wall -Wextra -Wpedantic -Wno-unknown-pragmas>"
+"$<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:-Wall;-Wextra;-Wpedantic;-Wno-unknown-pragmas>"
 # MSVC:
 "$<$<CXX_COMPILER_ID:MSVC>:/W3>")
 if(WIN32)

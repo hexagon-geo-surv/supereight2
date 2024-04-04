@@ -128,7 +128,7 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
                    SensorT>::propagateBlocksToCoarsestScale()
 {
 #pragma omp parallel for num_threads(3)
-    for (int i = 0; i < updated_blocks_vector_.size(); i++) {
+    for (int i = 0; i < static_cast<int>(updated_blocks_vector_.size()); i++) {
         se::ray_integrator::propagate_block_to_coarsest_scale<BlockType>(updated_blocks_vector_[i]);
     }
 }

@@ -39,7 +39,7 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT
     auto valid_predicate = [&](float depth_value) { return depth_value >= sensor_.near_plane; };
 
 #pragma omp parallel for
-    for (int i = 0; i < block_ptrs.size(); i++) {
+    for (int i = 0; i < static_cast<int>(block_ptrs.size()); i++) {
         BlockType* block_ptr = static_cast<BlockType*>(block_ptrs[i]);
         block_ptr->setTimeStamp(frame_);
         Eigen::Vector3i block_coord = block_ptr->getCoord();
