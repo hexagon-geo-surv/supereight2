@@ -16,7 +16,7 @@ void remap(const Image<T>& input, Image<T>& output, const Image<size_t>& map)
     assert((output.width() == map.width()) && "The output and map have the same width");
     assert((output.height() == map.height()) && "The output and map have the same height");
 #pragma omp parallel for
-    for (int i = 0; i < output.size(); i++) {
+    for (int i = 0; i < static_cast<int>(output.size()); i++) {
         assert((map[i] < input.size()) && "The map must contain valid indices into the input");
         output[i] = input[map[i]];
     }
