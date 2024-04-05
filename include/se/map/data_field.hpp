@@ -55,6 +55,9 @@ struct FieldData<Field::Occupancy> {
     static constexpr field_t min_occupancy = -100;
     static constexpr field_t max_occupancy = 100;
 
+    /** Return whether the field data has been updated at least once. */
+    bool valid() const;
+
     /** Perform a weighted average log-odds occupancy update and set the data to observed, while
      * ensuring the weight doesn't exceed \p max_weight. Return whether the data was updated.
      */
@@ -79,6 +82,9 @@ struct FieldData<Field::TSDF> {
     weight_t weight = 0;
     static constexpr bool invert_normals = true;
     static constexpr field_t surface_boundary = 0;
+
+    /** Return whether the field data has been updated at least once. */
+    bool valid() const;
 
     /** Perform a weighted average TSDF update by truncating the SDF value \p sdf within \p
      * truncation_boundary, while ensuring the weight doesn't exceed \p max_weight. Return whether

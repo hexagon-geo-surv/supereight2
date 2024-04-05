@@ -94,19 +94,11 @@ inline void set_invalid(Data<Field::Occupancy, ColB, SemB>& data)
 
 
 template<Field FldT, Colour ColB, Semantics SemB>
-inline bool is_valid(const Data<FldT, ColB, SemB>& data);
-
-template<Colour ColB, Semantics SemB>
-inline bool is_valid(const Data<Field::TSDF, ColB, SemB>& data)
+inline bool is_valid(const Data<FldT, ColB, SemB>& data)
 {
-    return data.field.weight != Data<Field::TSDF, ColB, SemB>{}.field.weight;
+    return data.field.valid();
 }
 
-template<Colour ColB, Semantics SemB>
-inline bool is_valid(const Data<Field::Occupancy, ColB, SemB>& data)
-{
-    return data.field.weight != Data<Field::Occupancy, ColB, SemB>{}.field.weight;
-}
 
 
 template<Field FldT, Colour ColB, Semantics SemB>

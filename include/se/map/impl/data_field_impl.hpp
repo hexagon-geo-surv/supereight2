@@ -9,6 +9,13 @@
 
 namespace se {
 
+inline bool FieldData<Field::Occupancy>::valid() const
+{
+    return weight != FieldData<Field::Occupancy>{}.weight;
+}
+
+
+
 inline bool FieldData<Field::Occupancy>::update(const field_t occupancy_, const weight_t max_weight)
 {
     // Avoid overflow if max_weight is equal to the maximum value of weight_t.
@@ -18,6 +25,13 @@ inline bool FieldData<Field::Occupancy>::update(const field_t occupancy_, const 
     occupancy = (occupancy * (weight - weight_t(1)) + occupancy_) / weight;
     observed = true;
     return true;
+}
+
+
+
+inline bool FieldData<Field::TSDF>::valid() const
+{
+    return weight != FieldData<Field::TSDF>{}.weight;
 }
 
 
