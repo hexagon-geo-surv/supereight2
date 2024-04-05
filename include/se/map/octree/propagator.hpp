@@ -30,20 +30,17 @@ namespace propagator {
  * \brief Propagate the block values from the current scale to a lower target scale.
  *
  * \tparam OctreeT
- * \tparam ChildF
- * \tparam ParentF
- * \param[in] octree        The octree containing the block
- * \param[in] octant_ptr    The pointer to the blocks octant base
- * \param[in] init_scale    The scale to start the propagation from (usually current scale)
- * \param[in] child_funct   The function for the child update
- * \param[in] parent_funct  The function for the parent update
+ * \tparam AggregateF
+ * \param[in] octree                   The octree containing the block
+ * \param[in] octant_ptr               The pointer to the blocks octant base
+ * \param[in] init_scale               The scale to start the propagation from (usually current scale)
+ * \param[in] aggregate_children_funct The function aggregating the child data into the parent data.
  */
-template<typename OctreeT, typename ChildF, typename ParentF>
+template<typename OctreeT, typename AggregateF>
 void propagateBlockUp(const OctreeT& /* octree */,
                       se::OctantBase* octant_ptr,
                       const int init_scale,
-                      ChildF child_funct,
-                      ParentF parent_funct);
+                      AggregateF aggregate_children_funct);
 
 /**
  * \brief Propagate the block values from the current scale to a lower target scale.

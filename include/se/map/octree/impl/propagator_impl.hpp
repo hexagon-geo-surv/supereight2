@@ -14,12 +14,11 @@ namespace propagator {
 
 
 
-template<typename OctreeT, typename ChildF, typename ParentF>
+template<typename OctreeT, typename AggregateF>
 void propagateBlockUp(const OctreeT& /* octree */,
                       se::OctantBase* octant_ptr,
                       const int init_scale,
-                      ChildF child_funct,
-                      ParentF parent_funct)
+                      AggregateF aggregate_children_funct)
 {
     typedef typename OctreeT::BlockType BlockType;
     typedef typename BlockType::DataType DataType;
@@ -43,18 +42,16 @@ void propagateBlockUp(const OctreeT& /* octree */,
                 for (int x = 0; x < block_size; x += parent_stride) {
                     const Eigen::Vector3i parent_coord = block_coord + Eigen::Vector3i(x, y, z);
 
-                    size_t sample_count = 0;
-                    DataType data_tmp;
-                    data_tmp.field.tsdf = 0.f;
+                    int child_idx = 0;
+                    std::array<DataType, 8> child_data;
 
                     for (int k = 0; k < parent_stride; k += child_stride) {
                         for (int j = 0; j < parent_stride; j += child_stride) {
                             for (int i = 0; i < parent_stride; i += child_stride) {
                                 const Eigen::Vector3i child_coord =
                                     parent_coord + Eigen::Vector3i(i, j, k);
-                                DataUnionType child_data_union =
-                                    block_ptr->getDataUnion(child_coord, child_scale);
-                                sample_count += child_funct(child_data_union, data_tmp);
+                                child_data[child_idx++] =
+                                    block_ptr->getData(child_coord, child_scale);
                             } // i
                         }     // j
                     }         // k
@@ -62,7 +59,7 @@ void propagateBlockUp(const OctreeT& /* octree */,
                     DataUnionType parent_data_union =
                         block_ptr->getDataUnion(parent_coord, child_scale + 1);
 
-                    parent_funct(parent_data_union, data_tmp, sample_count);
+                    aggregate_children_funct(parent_data_union, child_data);
 
                     block_ptr->setDataUnion(parent_data_union);
                 } // x

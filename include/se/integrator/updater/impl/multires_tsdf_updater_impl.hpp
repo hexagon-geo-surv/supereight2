@@ -155,37 +155,22 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
             }
         }
 
-        // Set the parent data to the mean of the valid child data.
-        auto parent_up_funct = [](typename BlockType::DataUnion& parent_data_union,
-                                  typename BlockType::DataType& child_data_sum,
-                                  const int sample_count) {
-            if (sample_count > 0) {
-                child_data_sum.field.tsdf /= sample_count;
-                child_data_sum.field.weight /= sample_count;
-                parent_data_union.data.field.tsdf = child_data_sum.field.tsdf;
-                parent_data_union.prop_data.field.delta_tsdf = child_data_sum.field.tsdf;
-                parent_data_union.data.field.weight = ceil(child_data_sum.field.weight);
-                parent_data_union.prop_data.field.delta_weight = 0;
-            }
-            else {
-                parent_data_union.data = typename BlockType::DataType();
-                parent_data_union.prop_data = typename BlockType::PropDataType();
-            }
-        };
-
-        // Accumulate the valid child data.
-        auto child_up_funct = [](typename BlockType::DataUnion& child_data_union,
-                                 typename BlockType::DataType& child_data_sum) {
-            if (is_valid(child_data_union.data)) {
-                child_data_sum.field.tsdf += child_data_union.data.field.tsdf;
-                child_data_sum.field.weight += child_data_union.data.field.weight;
-                return 1;
-            }
-            return 0;
-        };
-
-        // Up-propagate the block data to the coarser scales.
-        propagator::propagateBlockUp(octree, &block, curr_scale, child_up_funct, parent_up_funct);
+        // Up-propagate the block data to the coarser scales by setting the parent data to the mean
+        // of the valid child data.
+        auto aggregate_children_funct =
+            [](typename BlockType::DataUnion& parent_data_union,
+               const std::array<typename BlockType::DataType, 8>& child_data) {
+                const int valid_children = data::up_prop_mean(parent_data_union.data, child_data);
+                if (valid_children > 0) {
+                    parent_data_union.prop_data.field.delta_tsdf =
+                        parent_data_union.data.field.tsdf;
+                    parent_data_union.prop_data.field.delta_weight = 0;
+                }
+                else {
+                    parent_data_union.prop_data = typename BlockType::PropDataType();
+                }
+            };
+        propagator::propagateBlockUp(octree, &block, curr_scale, aggregate_children_funct);
     }
 
     propagator::propagateTimeStampToRoot(block_ptrs);
