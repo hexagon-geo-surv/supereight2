@@ -8,6 +8,9 @@
 #ifndef SE_DATA_HPP
 #define SE_DATA_HPP
 
+#include <array>
+#include <se/common/bounded_vector.hpp>
+
 #include "data_colour.hpp"
 #include "data_field.hpp"
 #include "data_semantics.hpp"
@@ -75,6 +78,31 @@ struct DeltaData {
 };
 
 
+
+namespace data {
+
+/** Up-propagate the mean of the valid \p child_data into \p parent_data and return the number of
+ * children with valid data.
+ */
+template<Field FldT, Colour ColB, Semantics SemB>
+int up_prop_mean(Data<FldT, ColB, SemB>& parent_data,
+                 const std::array<Data<FldT, ColB, SemB>, 8>& child_data);
+
+/** Up-propagate the minimum of the valid \p child_data into \p parent_data and return the number of
+ * children with valid data.
+ */
+template<Field FldT, Colour ColB, Semantics SemB>
+int up_prop_min(Data<FldT, ColB, SemB>& parent_min_data,
+                const std::array<Data<FldT, ColB, SemB>, 8>& child_min_data);
+
+/** Up-propagate the maximum of the valid \p child_data into \p parent_data and return the number of
+ * children with valid data.
+ */
+template<Field FldT, Colour ColB, Semantics SemB>
+int up_prop_max(Data<FldT, ColB, SemB>& parent_max_data,
+                const std::array<Data<FldT, ColB, SemB>, 8>& child_max_data);
+
+} // namespace data
 
 template<Field FldT, Colour ColB, Semantics SemB>
 inline void set_invalid(Data<FldT, ColB, SemB>& data);
@@ -148,5 +176,7 @@ typedef Data<Field::TSDF, Colour::Off, Semantics::On> TSDFSemData;
 typedef Data<Field::TSDF, Colour::On, Semantics::On> TSDFColSemData;
 
 } // namespace se
+
+#include "impl/data_impl.hpp"
 
 #endif // SE_DATA_HPP
