@@ -27,6 +27,33 @@ inline bool ColourData<Colour::On>::update(const colour_t colour_, const std::ui
     return true;
 }
 
+
+
+inline void
+ColourData<Colour::On>::setToMean(const BoundedVector<ColourData<Colour::On>, 8>& child_data)
+{
+    static_assert(sizeof(colour_t::r) < sizeof(int));
+    static_assert(sizeof(colour_t::g) < sizeof(int));
+    static_assert(sizeof(colour_t::b) < sizeof(int));
+    static_assert(std::is_floating_point_v<weight_t>,
+                  "The code must be modified to avoid overflows for non-floating-point weight_t.");
+    const int n = child_data.size();
+    int r_sum = 0;
+    int g_sum = 0;
+    int b_sum = 0;
+    weight_t weight_sum(0);
+    for (const auto d : child_data) {
+        r_sum += d.colour.r;
+        g_sum += d.colour.g;
+        b_sum += d.colour.b;
+        weight_sum += d.weight;
+    }
+    colour.r = r_sum / n;
+    colour.g = g_sum / n;
+    colour.b = b_sum / n;
+    weight = std::ceil(weight_sum / n);
+}
+
 } // namespace se
 
 #endif // SE_DATA_COLOUR_IMPL_HPP

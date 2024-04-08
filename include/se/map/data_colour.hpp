@@ -8,6 +8,8 @@
 #ifndef SE_DATA_COLOUR_HPP
 #define SE_DATA_COLOUR_HPP
 
+#include <se/common/bounded_vector.hpp>
+
 #include "utils/setup_util.hpp"
 #include "utils/type_util.hpp"
 
@@ -45,6 +47,9 @@ struct ColourData<Colour::On> {
      * exceed \p max_weight. Return whether the data was updated.
      */
     bool update(const colour_t colour, const std::uint8_t max_weight);
+
+    /** Set to the mean of the data in \p child_data. */
+    void setToMean(const BoundedVector<ColourData, 8>& child_data);
 };
 
 template<>
