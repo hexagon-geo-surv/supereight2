@@ -19,13 +19,13 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
              SensorT>::VolumeCarver(MapType& map,
                                     const SensorT& sensor,
                                     const se::Image<float>& depth_img,
-                                    const Eigen::Matrix4f& T_WS,
+                                    const Eigen::Isometry3f& T_WS,
                                     const int frame) :
         map_(map),
         octree_(map.getOctree()),
         sensor_(sensor),
         depth_pooling_img_(depth_img),
-        T_SW_(se::math::to_inverse_transformation(T_WS)),
+        T_SW_(T_WS.inverse()),
         frame_(frame),
         map_res_(map.getRes()),
         config_(map),
@@ -83,11 +83,11 @@ template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
 bool VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
                   SensorT>::cameraInNode(const Eigen::Vector3i& node_coord,
                                          const int node_size,
-                                         const Eigen::Matrix4f& T_WS)
+                                         const Eigen::Isometry3f& T_WS)
 {
     assert(node_size > 0);
     Eigen::Vector3f voxel_coord_f;
-    map_.pointToVoxel(se::math::to_translation(T_WS), voxel_coord_f);
+    map_.pointToVoxel(T_WS.translation(), voxel_coord_f);
     if (voxel_coord_f.x() >= node_coord.x() && voxel_coord_f.x() <= node_coord.x() + node_size
         && voxel_coord_f.y() >= node_coord.y() && voxel_coord_f.y() <= node_coord.y() + node_size
         && voxel_coord_f.z() >= node_coord.z() && voxel_coord_f.z() <= node_coord.z() + node_size) {
@@ -149,7 +149,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
     Eigen::Vector3f node_centre_point_W;
     map_.voxelToPoint(octant_coord, octant_size, node_centre_point_W);
 
-    const Eigen::Vector3f node_centre_point_S = (T_SW_ * node_centre_point_W.homogeneous()).head(3);
+    const Eigen::Vector3f node_centre_point_S = T_SW_ * node_centre_point_W;
 
     // Extend and reduce the depth by the sphere radius covering the entire cube
     const float approx_depth_value_max =
@@ -167,8 +167,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
     /// CHANGE: USE voxelToCornerPoints(...)
     Eigen::Matrix<float, 3, 8> node_corner_points_W;
     map_.voxelToCornerPoints(octant_coord, octant_size, node_corner_points_W);
-    Eigen::Matrix<float, 3, 8> node_corner_points_S =
-        (T_SW_ * node_corner_points_W.colwise().homogeneous()).topRows(3);
+    Eigen::Matrix<float, 3, 8> node_corner_points_S = T_SW_ * node_corner_points_W;
 
     Eigen::VectorXi node_corners_infront(8);
     node_corners_infront << 1, 1, 1, 1, 1, 1, 1, 1;
@@ -203,8 +202,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
     if (octant_depth < octree_.getBlockDepth() + 1) {
         if (num_node_corners_infront < 8) {
             /// CASE 1 (CAMERA IN NODE):
-            if (cameraInNode(
-                    octant_coord, octant_size, se::math::to_inverse_transformation(T_SW_))) {
+            if (cameraInNode(octant_coord, octant_size, T_SW_.inverse())) {
                 should_split = true;
                 /// CASE 2 (FRUSTUM BOUNDARY): Node partly behind the camera and crosses the the frustum boundary
             }
@@ -346,7 +344,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
     Eigen::Vector3f node_centre_point_W;
     map_.voxelToPoint(octant_coord, octant_size, node_centre_point_W);
 
-    const Eigen::Vector3f node_centre_point_S = (T_SW_ * node_centre_point_W.homogeneous()).head(3);
+    const Eigen::Vector3f node_centre_point_S = T_SW_ * node_centre_point_W;
 
     // Extend and reduce the depth by the sphere radius covering the entire cube
     const float approx_depth_value_max =
@@ -369,7 +367,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
 
     if (octant_depth < octree_.getBlockDepth() + 1) {
         /// CASE 1 (CAMERA IN NODE):
-        if (cameraInNode(octant_coord, octant_size, se::math::to_inverse_transformation(T_SW_))) {
+        if (cameraInNode(octant_coord, octant_size, T_SW_.inverse())) {
             should_split = true;
             /// CASE 2 (FRUSTUM BOUNDARY): Node partly behind the camera and crosses the the frustum boundary
         }
@@ -377,8 +375,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
             // Compute the 8 corners of the node to be evaluated
             Eigen::Matrix<float, 3, 8> node_corner_points_W;
             map_.voxelToCornerPoints(octant_coord, octant_size, node_corner_points_W);
-            Eigen::Matrix<float, 3, 8> node_corner_points_S =
-                (T_SW_ * node_corner_points_W.colwise().homogeneous()).topRows(3);
+            Eigen::Matrix<float, 3, 8> node_corner_points_S = T_SW_ * node_corner_points_W;
 
             // Project the 8 corners into the image plane
             Eigen::Matrix2Xf proj_node_corner_pixels_f(2, 8);

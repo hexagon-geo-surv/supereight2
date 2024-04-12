@@ -32,11 +32,11 @@ namespace se {
  */
 class OpenNIReader : public Reader {
     public:
-    /** Construct an OpenNIReader from a ReaderConfig.
+    /** Construct an OpenNIReader from a Config.
      *
      * \param[in] c The configuration struct to use.
      */
-    OpenNIReader(const ReaderConfig& c);
+    OpenNIReader(const Config& c);
 
     ~OpenNIReader();
 
@@ -86,7 +86,7 @@ class OpenNIReader : public Reader {
 
     ReaderStatus nextDepth(Image<float>& depth_image);
 
-    ReaderStatus nextRGBA(Image<uint32_t>& rgba_image);
+    ReaderStatus nextColour(Image<RGBA>& colour_image);
 };
 
 } // namespace se

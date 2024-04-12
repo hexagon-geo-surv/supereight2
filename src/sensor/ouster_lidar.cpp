@@ -10,10 +10,10 @@
 
 
 
-void se::OusterLidarConfig::readYaml(const std::string& filename)
+void se::OusterLidar::Config::readYaml(const std::string& filename)
 {
     // Read the base class members.
-    SensorBaseConfig::readYaml(filename);
+    SensorBase<OusterLidar>::Config::readYaml(filename);
 
     // Open the file for reading.
     cv::FileStorage fs;
@@ -38,9 +38,9 @@ void se::OusterLidarConfig::readYaml(const std::string& filename)
 
 
 
-std::ostream& se::operator<<(std::ostream& os, const se::OusterLidarConfig& c)
+std::ostream& se::operator<<(std::ostream& os, const se::OusterLidar::Config& c)
 {
-    os << static_cast<const se::SensorBaseConfig&>(c);
+    operator<< <OusterLidar>(os, static_cast<const SensorBase<OusterLidar>::Config&>(c));
     os << str_utils::eigen_vector_to_pretty_str(c.beam_azimuth_angles, "beam_azimuth_angles")
        << " degrees\n";
     os << str_utils::eigen_vector_to_pretty_str(c.beam_elevation_angles, "beam_elevation_angles")
@@ -50,7 +50,7 @@ std::ostream& se::operator<<(std::ostream& os, const se::OusterLidarConfig& c)
 
 
 
-se::OusterLidar::OusterLidar(const OusterLidarConfig& c) :
+se::OusterLidar::OusterLidar(const Config& c) :
         se::SensorBase<se::OusterLidar>(c),
         model(c.width, c.height, c.beam_azimuth_angles, c.beam_elevation_angles)
 {
@@ -80,7 +80,7 @@ se::OusterLidar::OusterLidar(const OusterLidarConfig& c) :
 
 
 
-se::OusterLidar::OusterLidar(const OusterLidarConfig& c, const float dsf) :
+se::OusterLidar::OusterLidar(const Config& c, const float dsf) :
         se::SensorBase<se::OusterLidar>(c),
         model(c.width / dsf, c.height / dsf, c.beam_azimuth_angles, c.beam_elevation_angles)
 {

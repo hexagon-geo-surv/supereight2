@@ -28,11 +28,17 @@ namespace se {
  */
 class TUMReader : public Reader {
     public:
-    /** Construct a TUMReader from a ReaderConfig.
+    /** Construct a TUMReader from a Config.
      *
      * \param[in] c The configuration struct to use.
      */
-    TUMReader(const ReaderConfig& c);
+    TUMReader(const Config& c);
+
+    /**
+     * Obtain the nextPose from the TUM RGBD dataset format
+     * \param[in] T_WB Transformation from camera frame to world frame
+    */
+    ReaderStatus nextPose(Eigen::Isometry3f& T_WB);
 
 
     /** Restart reading from the beginning. */
@@ -62,9 +68,12 @@ class TUMReader : public Reader {
 
     std::vector<std::string> rgb_filenames_;
 
+    std::vector<Eigen::Isometry3f, Eigen::aligned_allocator<Eigen::Isometry3f>>
+        associated_gt_poses_;
+
     ReaderStatus nextDepth(Image<float>& depth_image);
 
-    ReaderStatus nextRGBA(Image<uint32_t>& rgba_image);
+    ReaderStatus nextColour(Image<RGBA>& colour_image);
 };
 
 

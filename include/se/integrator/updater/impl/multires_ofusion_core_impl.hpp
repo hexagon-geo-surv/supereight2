@@ -47,24 +47,6 @@ float compute_tau(const field_t depth_value,
 
 namespace updater {
 
-
-
-template<typename DataT>
-bool weighted_mean_update(DataT& data, const field_t sample_value, const weight_t max_weight)
-{
-    data.occupancy = (data.occupancy * data.weight + sample_value) / (data.weight + 1);
-    data.weight = std::min((data.weight + 1), max_weight);
-    if (data.observed) {
-        return false;
-    }
-    else {
-        data.observed = true;
-        return true;
-    }
-}
-
-
-
 template<typename DataT, typename ConfigT>
 bool update_voxel(DataT& data,
                   const float range_diff,
@@ -89,15 +71,9 @@ bool update_voxel(DataT& data,
         return false;
     }
 
-    return weighted_mean_update(data, sample_value, config.max_weight);
-}
-
-
-
-template<typename DataT, typename ConfigT>
-void free_node(DataT& node_data, const ConfigT config)
-{
-    weighted_mean_update(node_data, config.log_odd_min, config.max_weight);
+    const bool newly_observed = !data.observed;
+    data.update(sample_value, config.max_weight);
+    return newly_observed;
 }
 
 
@@ -105,7 +81,9 @@ void free_node(DataT& node_data, const ConfigT config)
 template<typename DataT, typename ConfigT>
 bool free_voxel(DataT& voxel_data, const ConfigT config)
 {
-    return weighted_mean_update(voxel_data, config.log_odd_min, config.max_weight);
+    const bool newly_observed = !voxel_data.observed;
+    voxel_data.update(config.log_odd_min, config.max_weight);
+    return newly_observed;
 }
 
 

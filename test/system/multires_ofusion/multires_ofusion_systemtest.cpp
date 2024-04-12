@@ -44,7 +44,7 @@ int main(int argc, char** argv)
 TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
 {
     const std::string config_filename(my_argv[1]);
-    se::Config<se::OccupancyDataConfig, se::PinholeCameraConfig> config(config_filename);
+    se::Config<se::OccupancyMap<se::Res::Multi>, se::PinholeCamera> config(config_filename);
     se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
 
     // Output files in a temporary directory.
@@ -65,7 +65,7 @@ TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
     se::Image<float> processed_depth_img(processed_img_res.x(), processed_img_res.y());
 
     // Set pose to identity
-    Eigen::Matrix4f T_WS = Eigen::Matrix4f::Identity();
+    const Eigen::Isometry3f T_WS = Eigen::Isometry3f::Identity();
 
     // Set depth image
     for (int y = 0; y < input_img_res.y(); y++) {
@@ -86,7 +86,7 @@ TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
     map.saveFieldSlices(config.app.slice_path + "/test-field-interp-slice-x.vtk",
                         config.app.slice_path + "/test-field-interp-slice-y.vtk",
                         config.app.slice_path + "/test-field-interp-slice-z.vtk",
-                        se::math::to_translation(T_WS));
+                        T_WS.translation());
     map.saveStructure(config.app.structure_path + "/test-field-interp-structure_"
                       + std::to_string(max_frame) + ".ply");
 
@@ -117,7 +117,7 @@ TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
 TEST(MultiResOFusionSystemTest, GetField)
 {
     const std::string config_filename(my_argv[1]);
-    se::Config<se::OccupancyDataConfig, se::PinholeCameraConfig> config(config_filename);
+    se::Config<se::OccupancyMap<se::Res::Multi>, se::PinholeCamera> config(config_filename);
     se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
 
     // Output files in a temporary directory.
@@ -138,7 +138,7 @@ TEST(MultiResOFusionSystemTest, GetField)
     se::Image<float> processed_depth_img(processed_img_res.x(), processed_img_res.y());
 
     // Set pose to identity
-    Eigen::Matrix4f T_WS = Eigen::Matrix4f::Identity();
+    const Eigen::Isometry3f T_WS = Eigen::Isometry3f::Identity();
 
     // Set depth image
     for (int y = 0; y < input_img_res.y(); y++) {
@@ -167,7 +167,7 @@ TEST(MultiResOFusionSystemTest, GetField)
     map.saveFieldSlices(config.app.slice_path + "/test-field-slice-x.vtk",
                         config.app.slice_path + "/test-field-slice-y.vtk",
                         config.app.slice_path + "/test-field-slice-z.vtk",
-                        se::math::to_translation(T_WS));
+                        T_WS.translation());
 
     map.saveStructure(config.app.structure_path + "/test-field-structure_"
                       + std::to_string(max_frame) + ".ply");
@@ -194,7 +194,7 @@ TEST(MultiResOFusionSystemTest, GetField)
 TEST(MultiResOFusionSystemTest, GetMaxField)
 {
     const std::string config_filename(my_argv[1]);
-    se::Config<se::OccupancyDataConfig, se::PinholeCameraConfig> config(config_filename);
+    se::Config<se::OccupancyMap<se::Res::Multi>, se::PinholeCamera> config(config_filename);
     se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
 
     // Output files in a temporary directory.
@@ -215,7 +215,7 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
     se::Image<float> processed_depth_img(processed_img_res.x(), processed_img_res.y());
 
     // Set pose to identity
-    Eigen::Matrix4f T_WS = Eigen::Matrix4f::Identity();
+    const Eigen::Isometry3f T_WS = Eigen::Isometry3f::Identity();
 
     // Set depth image
     for (int y = 0; y < input_img_res.y(); y++) {
@@ -245,12 +245,12 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
     map.saveFieldSlices(config.app.slice_path + "/test-max-field-slice-field-x.vtk",
                         config.app.slice_path + "/test-max-field-slice-field-y.vtk",
                         config.app.slice_path + "/test-max-field-slice-field-z.vtk",
-                        se::math::to_translation(T_WS));
+                        T_WS.translation());
 
     map.saveScaleSlices(config.app.slice_path + "/test-max-field-slice-scale-x.vtk",
                         config.app.slice_path + "/test-max-field-slice-scale-y.vtk",
                         config.app.slice_path + "/test-max-field-slice-scale-z.vtk",
-                        se::math::to_translation(T_WS));
+                        T_WS.translation());
 
 
 
@@ -262,7 +262,7 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
                                    + std::to_string(scale) + "-y.vtk",
                                config.app.slice_path + "/test-max-field-slice-max-field-scale-"
                                    + std::to_string(scale) + "-z.vtk",
-                               se::math::to_translation(T_WS),
+                               T_WS.translation(),
                                scale);
     }
 
@@ -275,7 +275,7 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
 TEST(MultiResOFusionSystemTest, DeleteChildren)
 {
     const std::string config_filename(my_argv[1]);
-    se::Config<se::OccupancyDataConfig, se::PinholeCameraConfig> config(config_filename);
+    se::Config<se::OccupancyMap<se::Res::Multi>, se::PinholeCamera::Config> config(config_filename);
     se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
 
     // Output files in a temporary directory.
@@ -297,7 +297,7 @@ TEST(MultiResOFusionSystemTest, DeleteChildren)
     se::Image<float> processed_depth_img(processed_img_res.x(), processed_img_res.y());
 
     // Set pose to identity
-    Eigen::Matrix4f T_WS = Eigen::Matrix4f::Identity();
+    const Eigen::Isometry3f T_WS = Eigen::Isometry3f::Identity();
 
     // Set depth image
     for (int y = 0; y < input_img_res.y(); y++) {
@@ -334,7 +334,7 @@ TEST(MultiResOFusionSystemTest, DeleteChildren)
             config.app.slice_path + "/test-delete-child-slice-" + std::to_string(frame) + "-x.vtk",
             config.app.slice_path + "/test-delete-child-slice-" + std::to_string(frame) + "-y.vtk",
             config.app.slice_path + "/test-delete-child-slice-" + std::to_string(frame) + "-z.vtk",
-            se::math::to_translation(T_WS));
+            T_WS.translation());
 
         map.saveStructure(config.app.structure_path + "/test-delete-child-structure_"
                           + std::to_string(frame) + ".ply");
@@ -347,8 +347,7 @@ TEST(MultiResOFusionSystemTest, Raycasting)
 {
     // Read the configuration
     const std::string config_filename(my_argv[1]);
-    se::Config<se::OccupancyDataConfig, se::PinholeCameraConfig> config(config_filename);
-    std::cout << config;
+    se::Config<se::OccupancyMap<se::Res::Multi>, se::PinholeCamera> config(config_filename);
 
     // Output files in a temporary directory.
     config.app.mesh_path = std::string(tmp + "/meshes");
@@ -370,28 +369,29 @@ TEST(MultiResOFusionSystemTest, Raycasting)
     // Setup input images
     const Eigen::Vector2i input_img_res(config.sensor.width, config.sensor.height);
     se::Image<float> input_depth_img(input_img_res.x(), input_img_res.y());
-    se::Image<uint32_t> input_rgba_img(input_img_res.x(), input_img_res.y());
+    se::Image<se::RGBA> input_colour_img(input_img_res.x(), input_img_res.y());
 
     // Setup processed images
     const Eigen::Vector2i processed_img_res = input_img_res / config.app.sensor_downsampling_factor;
     se::Image<float> processed_depth_img(processed_img_res.x(), processed_img_res.y());
-    se::Image<uint32_t> processed_rgba_img(processed_img_res.x(), processed_img_res.y());
+    se::Image<se::RGBA> processed_colour_img(processed_img_res.x(), processed_img_res.y());
 
     // Setup output images / renders
-    uint32_t* output_rgba_img_data = new uint32_t[processed_img_res.x() * processed_img_res.y()];
-    uint32_t* output_depth_img_data = new uint32_t[processed_img_res.x() * processed_img_res.y()];
-    uint32_t* output_tracking_img_data =
-        new uint32_t[processed_img_res.x() * processed_img_res.y()];
-    uint32_t* output_volume_img_data = new uint32_t[processed_img_res.x() * processed_img_res.y()];
+    std::unique_ptr<se::RGBA[]> output_colour_img_data(
+        new se::RGBA[processed_img_res.x() * processed_img_res.y()]);
+    std::unique_ptr<se::RGBA[]> output_depth_img_data(
+        new se::RGBA[processed_img_res.x() * processed_img_res.y()]);
+    std::unique_ptr<se::RGBA[]> output_tracking_img_data(
+        new se::RGBA[processed_img_res.x() * processed_img_res.y()]);
+    std::unique_ptr<se::RGBA[]> output_volume_img_data(
+        new se::RGBA[processed_img_res.x() * processed_img_res.y()]);
 
     // Create a pinhole camera and downsample the intrinsics
     const se::PinholeCamera sensor(config.sensor, config.app.sensor_downsampling_factor);
 
     // ========= READER INITIALIZATION  =========
-    se::Reader* reader = nullptr;
-    reader = se::create_reader(config.reader);
-
-    if (reader == nullptr) {
+    std::unique_ptr<se::Reader> reader(se::create_reader(config.reader));
+    if (!reader) {
         exit(EXIT_FAILURE);
     }
 
@@ -403,12 +403,13 @@ TEST(MultiResOFusionSystemTest, Raycasting)
     se::Image<Eigen::Vector3f> surface_normals_W(processed_img_res.x(), processed_img_res.y());
     se::Image<int8_t> surface_scale(processed_img_res.x(), processed_img_res.y());
 
-    Eigen::Matrix4f T_WS;
-    reader->nextData(input_depth_img, input_rgba_img, T_WS);
+    Eigen::Isometry3f T_WS;
+    reader->nextData(input_depth_img, input_colour_img, T_WS);
 
     // Preprocess depth
-    se::preprocessor::downsample_depth(input_depth_img, processed_depth_img);
-    se::preprocessor::downsample_rgba(input_rgba_img, processed_rgba_img);
+    const se::Image<size_t> downsample_map =
+        se::preprocessor::downsample_depth(input_depth_img, processed_depth_img);
+    se::image::remap(input_colour_img, processed_colour_img, downsample_map);
 
     se::MapIntegrator integrator(map);
     integrator.integrateDepth(sensor, processed_depth_img, T_WS, frame);
@@ -417,11 +418,11 @@ TEST(MultiResOFusionSystemTest, Raycasting)
         map, surface_point_cloud_W, surface_normals_W, surface_scale, T_WS, sensor);
 
     const Eigen::Vector3f ambient{0.1, 0.1, 0.1};
-    convert_to_output_rgba_img(processed_rgba_img, output_rgba_img_data);
-    convert_to_output_depth_img(processed_depth_img, output_depth_img_data);
-    se::raycaster::render_volume_kernel(output_volume_img_data,
+    convert_to_output_rgba_img(processed_colour_img, output_colour_img_data.get());
+    convert_to_output_depth_img(processed_depth_img, output_depth_img_data.get());
+    se::raycaster::render_volume_kernel(output_volume_img_data.get(),
                                         processed_img_res,
-                                        se::math::to_translation(T_WS),
+                                        T_WS.translation(),
                                         ambient,
                                         surface_point_cloud_W,
                                         surface_normals_W,
@@ -437,18 +438,13 @@ TEST(MultiResOFusionSystemTest, Raycasting)
         config.app.slice_path + "/test-raycasting-slice-field-" + std::to_string(frame) + "-x.vtk",
         config.app.slice_path + "/test-raycasting-slice-field-" + std::to_string(frame) + "-y.vtk",
         config.app.slice_path + "/test-raycasting-slice-field-" + std::to_string(frame) + "-z.vtk",
-        se::math::to_translation(T_WS));
+        T_WS.translation());
     map.saveMesh(config.app.mesh_path + "/test-raycasting-mesh_" + std::to_string(frame) + ".ply");
     map.saveMesh(config.app.mesh_path + "/test-raycasting-mesh_" + std::to_string(frame) + ".vtk");
     map.saveMesh(config.app.mesh_path + "/test-raycasting-mesh_" + std::to_string(frame) + ".obj");
 
     cv::Mat depth_cv_image(
-        processed_img_res.y(), processed_img_res.x(), CV_8UC4, output_volume_img_data);
+        processed_img_res.y(), processed_img_res.x(), CV_8UC4, output_volume_img_data.get());
     cv::cvtColor(depth_cv_image, depth_cv_image, cv::COLOR_RGBA2BGRA);
     cv::imwrite((config.app.mesh_path + "/test-raycasting-img.png").c_str(), depth_cv_image);
-
-    delete[] output_rgba_img_data;
-    delete[] output_depth_img_data;
-    delete[] output_tracking_img_data;
-    delete[] output_volume_img_data;
 }

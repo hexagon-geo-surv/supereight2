@@ -11,19 +11,6 @@ namespace se {
 namespace ray_integrator {
 
 /**
- * \brief Update the weighted mean log-odd octant occupancy and set the octant to observed.
- *
- * \param[in,out] data     The data in the octant.
- * \param[in] sample_value The sample occupancy to be integrated.
- *
- * \return True(ToDo: /false if the voxel has been observed the first time)
- */
-template<typename DataT>
-bool weighted_mean_update(DataT& data,
-                          const se::field_t sample_value,
-                          const se::weight_t max_weight);
-
-/**
  * \brief Update a field with a new measurement, a weighting of 1 is considered for the new measurement.
  *
  * \param[in]     range_diff  The range difference between the voxel sample point and the depth value of the reprojection.
@@ -39,17 +26,6 @@ bool update_voxel(DataT& data,
                   const float tau,
                   const float three_sigma,
                   const ConfigT config);
-
-/**
- * \brief Reduce the node data by the minimum log-odd occupancy update per iteration.
- *        This function can be used to faster update a octant if it's know that it is in free space.
- *        The aim is to increase computation time by avoiding to compute the sample value from scratch.
- *
- * \param[in,out] node_data The reference to the node data.
- */
-template<typename DataT, typename ConfigT>
-void free_node(DataT& node_data, const ConfigT config);
-
 
 /**
  * \brief Reduce the node data by the minimum log-odd occupancy update per iteration.

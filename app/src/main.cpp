@@ -24,7 +24,7 @@ int main(int argc, char** argv)
 
         // ========= Config & I/O INITIALIZATION  =========
         const std::string config_filename = argv[1];
-        const se::Config<se::TSDFDataConfig, se::PinholeCameraConfig> config(config_filename);
+        const se::Config<se::TSDFMap<se::Res::Single>, se::PinholeCamera> config(config_filename);
         std::cout << config;
 
         // Create the mesh output directory
@@ -46,23 +46,23 @@ int main(int argc, char** argv)
         // Setup input images
         const Eigen::Vector2i input_img_res(config.sensor.width, config.sensor.height);
         se::Image<float> input_depth_img(input_img_res.x(), input_img_res.y());
-        se::Image<uint32_t> input_rgba_img(input_img_res.x(), input_img_res.y());
+        se::Image<se::RGBA> input_colour_img(input_img_res.x(), input_img_res.y());
 
         // Setup processed images
         const Eigen::Vector2i processed_img_res =
             input_img_res / config.app.sensor_downsampling_factor;
         se::Image<float> processed_depth_img(processed_img_res.x(), processed_img_res.y());
-        se::Image<uint32_t> processed_rgba_img(processed_img_res.x(), processed_img_res.y());
+        se::Image<se::RGBA> processed_colour_img(processed_img_res.x(), processed_img_res.y());
 
         // Setup output images / renders
-        std::unique_ptr<uint32_t[]> output_rgba_img_data(
-            new uint32_t[processed_img_res.x() * processed_img_res.y()]);
-        std::unique_ptr<uint32_t[]> output_depth_img_data(
-            new uint32_t[processed_img_res.x() * processed_img_res.y()]);
-        std::unique_ptr<uint32_t[]> output_tracking_img_data(
-            new uint32_t[processed_img_res.x() * processed_img_res.y()]);
-        std::unique_ptr<uint32_t[]> output_volume_img_data(
-            new uint32_t[processed_img_res.x() * processed_img_res.y()]);
+        std::unique_ptr<se::RGBA[]> output_colour_img_data(
+            new se::RGBA[processed_img_res.x() * processed_img_res.y()]);
+        std::unique_ptr<se::RGBA[]> output_depth_img_data(
+            new se::RGBA[processed_img_res.x() * processed_img_res.y()]);
+        std::unique_ptr<se::RGBA[]> output_tracking_img_data(
+            new se::RGBA[processed_img_res.x() * processed_img_res.y()]);
+        std::unique_ptr<se::RGBA[]> output_volume_img_data(
+            new se::RGBA[processed_img_res.x() * processed_img_res.y()]);
 
         // ========= Map INITIALIZATION  =========
         // Setup the single-res TSDF map w/ default block size of 8 voxels
@@ -83,9 +83,9 @@ int main(int argc, char** argv)
         }
 
         // Setup input, processed and output imgs
-        Eigen::Matrix4f T_WB = Eigen::Matrix4f::Identity(); //< Body to world transformation
-        Eigen::Matrix4f T_BS = sensor.T_BS;                 //< Sensor to body transformation
-        Eigen::Matrix4f T_WS = T_WB * T_BS;                 //< Sensor to world transformation
+        Eigen::Isometry3f T_WB = Eigen::Isometry3f::Identity(); //< Body to world transformation
+        Eigen::Isometry3f T_BS = sensor.T_BS;                   //< Sensor to body transformation
+        Eigen::Isometry3f T_WS = T_WB * T_BS;                   //< Sensor to world transformation
 
         // ========= Tracker & Pose INITIALIZATION  =========
         se::Tracker tracker(map, sensor, config.tracker);
@@ -110,11 +110,11 @@ int main(int argc, char** argv)
             TICK("read")
             se::ReaderStatus read_ok = se::ReaderStatus::ok;
             if (config.app.enable_ground_truth || frame == 1) {
-                read_ok = reader->nextData(input_depth_img, input_rgba_img, T_WB);
+                read_ok = reader->nextData(input_depth_img, input_colour_img, T_WB);
                 T_WS = T_WB * T_BS;
             }
             else {
-                read_ok = reader->nextData(input_depth_img, input_rgba_img);
+                read_ok = reader->nextData(input_depth_img, input_colour_img);
             }
             if (read_ok != se::ReaderStatus::ok) {
                 break;
@@ -123,11 +123,12 @@ int main(int argc, char** argv)
 
             // Preprocess depth
             TICK("ds-depth")
-            se::preprocessor::downsample_depth(input_depth_img, processed_depth_img);
+            const se::Image<size_t> downsample_map =
+                se::preprocessor::downsample_depth(input_depth_img, processed_depth_img);
             TOCK("ds-depth")
-            TICK("ds-rgba")
-            se::preprocessor::downsample_rgba(input_rgba_img, processed_rgba_img);
-            TOCK("ds-rgba")
+            TICK("ds-colour")
+            se::image::remap(input_colour_img, processed_colour_img, downsample_map);
+            TOCK("ds-colour")
 
             // Track pose (if enabled)
             // Initial pose (frame == 0) is initialised with the identity matrix
@@ -154,12 +155,12 @@ int main(int argc, char** argv)
             }
             TOCK("raycast")
 
-            // Convert rgba, depth and render the volume (if enabled)
+            // Convert colour, depth and render the volume (if enabled)
             // The volume is only rendered at the set rendering rate
             TICK("render")
             if (config.app.enable_rendering) {
                 const Eigen::Vector3f ambient{0.1, 0.1, 0.1};
-                convert_to_output_rgba_img(processed_rgba_img, output_rgba_img_data.get());
+                convert_to_output_rgba_img(processed_colour_img, output_colour_img_data.get());
                 convert_to_output_depth_img(processed_depth_img,
                                             sensor.near_plane,
                                             sensor.far_plane,
@@ -168,7 +169,7 @@ int main(int argc, char** argv)
                 if (frame % config.app.rendering_rate == 0) {
                     se::raycaster::render_volume_kernel(output_volume_img_data.get(),
                                                         processed_img_res,
-                                                        se::math::to_translation(T_WS),
+                                                        T_WS.translation(),
                                                         ambient,
                                                         surface_point_cloud_W,
                                                         surface_normals_W,
@@ -177,7 +178,7 @@ int main(int argc, char** argv)
             }
             TOCK("render")
 
-            // Visualise rgba, depth, tracking data and the volume render (if enabled)
+            // Visualise colour, depth, tracking data and the volume render (if enabled)
             TICK("draw")
             if (config.app.enable_gui) {
                 // Create vectors of images and labels.
@@ -185,7 +186,7 @@ int main(int argc, char** argv)
                 std::vector<cv::Mat> images;
                 std::vector<std::string> labels;
                 labels.emplace_back("INPUT RGB");
-                images.emplace_back(res, CV_8UC4, output_rgba_img_data.get());
+                images.emplace_back(res, CV_8UC4, output_colour_img_data.get());
                 labels.emplace_back("INPUT DEPTH");
                 images.emplace_back(res, CV_8UC4, output_depth_img_data.get());
                 labels.emplace_back(config.app.enable_ground_truth ? "TRACKING OFF" : "TRACKING");
@@ -194,7 +195,7 @@ int main(int argc, char** argv)
                 images.emplace_back(res, CV_8UC4, output_volume_img_data.get());
                 // Combine all the images into one, overlay the labels and show it.
                 cv::Mat render = se::montage(2, 2, images, labels);
-                drawit(reinterpret_cast<uint32_t*>(render.data),
+                drawit(reinterpret_cast<se::RGBA*>(render.data),
                        Eigen::Vector2i(render.cols, render.rows));
             }
             TOCK("draw")
@@ -213,7 +214,7 @@ int main(int argc, char** argv)
                         config.app.slice_path + "/slice_x_" + std::to_string(frame) + ".vtk",
                         config.app.slice_path + "/slice_y_" + std::to_string(frame) + ".vtk",
                         config.app.slice_path + "/slice_z_" + std::to_string(frame) + ".vtk",
-                        se::math::to_translation(T_WS));
+                        T_WS.translation());
                 }
                 if (!config.app.structure_path.empty()) {
                     map.saveStructure(config.app.structure_path + "/struct_" + std::to_string(frame)
@@ -222,7 +223,7 @@ int main(int argc, char** argv)
             }
 
             se::perfstats.sample("memory usage",
-                                 se::system::memory_usage_self() / 1024.0 / 1024.0,
+                                 se::system::memory_usage_self() / (1024.0 * 1024.0),
                                  PerfStats::MEMORY);
             se::perfstats.writeToFilestream();
         }

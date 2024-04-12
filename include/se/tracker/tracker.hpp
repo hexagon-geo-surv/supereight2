@@ -10,6 +10,8 @@
 #ifndef SE_TRACKER_HPP
 #define SE_TRACKER_HPP
 
+#include <se/common/rgba.hpp>
+
 #include "se/common/math_util.hpp"
 #include "se/map/preprocessor.hpp"
 #include "se/map/raycaster.hpp"
@@ -97,7 +99,7 @@ class Tracker {
      *
      * \return The tracking success.
      */
-    bool track(const se::Image<float>& depth_img, Eigen::Matrix4f& T_WS);
+    bool track(const se::Image<float>& depth_img, Eigen::Isometry3f& T_WS);
 
     /**
      * \brief Track the current pose using ICP.
@@ -110,11 +112,11 @@ class Tracker {
      * \return The tracking success.
      */
     bool track(const se::Image<float>& depth_img,
-               Eigen::Matrix4f& T_WS,
+               Eigen::Isometry3f& T_WS,
                se::Image<Eigen::Vector3f>& surface_point_cloud_W,
                se::Image<Eigen::Vector3f>& surface_normals_W);
 
-    void renderTrackingResult(uint32_t* tracking_img_data);
+    void renderTrackingResult(RGBA* tracking_img_data);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -135,17 +137,17 @@ class Tracker {
                      const se::Image<Eigen::Vector3f>& input_normals_S,
                      const se::Image<Eigen::Vector3f>& surface_point_cloud_M_ref,
                      const se::Image<Eigen::Vector3f>& surface_normals_M_ref,
-                     const Eigen::Matrix4f& T_WS,
-                     const Eigen::Matrix4f& T_WS_ref,
+                     const Eigen::Isometry3f& T_WS,
+                     const Eigen::Isometry3f& T_WS_ref,
                      const float dist_threshold,
                      const float normal_threshold);
 
-    bool updatePoseKernel(Eigen::Matrix4f& T_WS,
+    bool updatePoseKernel(Eigen::Isometry3f& T_WS,
                           const float* reduction_output_data,
                           const float icp_threshold);
 
-    bool checkPoseKernel(Eigen::Matrix4f& T_WS,
-                         Eigen::Matrix4f& previous_T_WS,
+    bool checkPoseKernel(Eigen::Isometry3f& T_WS,
+                         Eigen::Isometry3f& previous_T_WS,
                          const float* reduction_output_data,
                          const Eigen::Vector2i& reduction_output_res,
                          const float track_threshold);

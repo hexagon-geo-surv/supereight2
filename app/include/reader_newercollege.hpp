@@ -27,11 +27,11 @@ namespace se {
  */
 class NewerCollegeReader : public Reader {
     public:
-    /** Construct an NewerCollegeReader from a ReaderConfig.
+    /** Construct an NewerCollegeReader from a Config.
      *
      * \param[in] c The configuration struct to use.
      */
-    NewerCollegeReader(const ReaderConfig& c);
+    NewerCollegeReader(const Config& c);
 
     /** Restart reading from the beginning. */
     void restart();
@@ -48,8 +48,6 @@ class NewerCollegeReader : public Reader {
     std::vector<std::string> scan_filenames_;
 
     ReaderStatus nextDepth(Image<float>& depth_image);
-
-    ReaderStatus nextRGBA(Image<uint32_t>& rgba_image);
 
     static constexpr int8_t pixel_offset[64] = {
         0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,  12, 18, 0,  6,

@@ -16,9 +16,9 @@ namespace fetcher {
 
 template<typename MapT, typename SensorT>
 inline std::vector<se::OctantBase*>
-frustum(MapT& map, const SensorT& sensor, const Eigen::Matrix4f& T_WS)
+frustum(MapT& map, const SensorT& sensor, const Eigen::Isometry3f& T_WS)
 {
-    const Eigen::Matrix4f T_SM = se::math::to_inverse_transformation(T_WS);
+    const Eigen::Isometry3f T_SM = T_WS.inverse();
     // Loop over all allocated Blocks.
     std::vector<se::OctantBase*> fetched_block_ptrs;
 
@@ -39,7 +39,7 @@ template<typename MapT, typename SensorT>
 RaycastCarver<MapT, SensorT>::RaycastCarver(MapT& map,
                                             const SensorT& sensor,
                                             const se::Image<float>& depth_img,
-                                            const Eigen::Matrix4f& T_WS,
+                                            const Eigen::Isometry3f& T_WS,
                                             const int /* frame */) :
         map_(map),
         octree_(map_.getOctree()),
@@ -66,7 +66,7 @@ std::vector<se::OctantBase*> RaycastCarver<MapT, SensorT>::operator()()
 
     const int num_steps = ceil(band_ / (2 * map_.getRes()));
 
-    const Eigen::Vector3f t_WS = T_WS_.topRightCorner<3, 1>();
+    const Eigen::Vector3f t_WS = T_WS_.translation();
 
 #pragma omp declare reduction (merge : std::set<se::key_t> : omp_out.insert(omp_in.begin(), omp_in.end()))
     std::set<se::key_t> voxel_key_set;
@@ -85,8 +85,7 @@ std::vector<se::OctantBase*> RaycastCarver<MapT, SensorT>::operator()()
             Eigen::Vector3f ray_dir_C;
             const Eigen::Vector2f pixel_f = pixel.cast<float>();
             sensor_.model.backProject(pixel_f, &ray_dir_C);
-            const Eigen::Vector3f point_W =
-                (T_WS_ * (depth_value * ray_dir_C).homogeneous()).template head<3>();
+            const Eigen::Vector3f point_W = T_WS_ * (depth_value * ray_dir_C);
 
             const Eigen::Vector3f reverse_ray_dir_W = (t_WS - point_W).normalized();
 

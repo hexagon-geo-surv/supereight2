@@ -55,6 +55,8 @@ inline double PerfStats::Stats::mergeIter(const std::vector<double>& iter_data_v
         return maxIter(iter_data_vec);
     case VOLTAGE:
         return maxIter(iter_data_vec);
+    case VOLUME:
+        return maxIter(iter_data_vec);
     default:
         // { BOOL, DISTANCE, DOUBLE, FRAME, INT, ORIENTATION, POSITION, TIME, UNDEFINED }
         return lastIter(iter_data_vec);
@@ -158,6 +160,8 @@ inline double PerfStats::Stats::merge() const
         return max();
     case VOLTAGE:
         return max();
+    case VOLUME:
+        return max();
     default:
         // { BOOL, DISTANCE, DOUBLE, FRAME, INT, ORIENTATION, POSITION, TIME, UNDEFINED }
         return last();
@@ -197,6 +201,8 @@ inline std::string PerfStats::Stats::unitString()
         return "(MB)";
     case ORIENTATION:
         return "(-)";
+    case PERCENTAGE:
+        return "(%)";
     case POSITION:
         return "(m)";
     case POWER:
@@ -205,6 +211,8 @@ inline std::string PerfStats::Stats::unitString()
         return "(s)";
     case VOLTAGE:
         return "(V)";
+    case VOLUME:
+        return "(m³)";
     default: // { UNDEFINED }
         return "(?)";
     }
@@ -433,10 +441,10 @@ PerfStats::sample(const std::string& key, const double value, const Type type, c
 
 
 
-inline double PerfStats::sampleT_WB(const Eigen::Matrix4f& T_WB, const bool detailed)
+inline double PerfStats::sampleT_WB(const Eigen::Isometry3f& T_WB, const bool detailed)
 {
-    const Eigen::Vector3f t_WS = T_WB.topRightCorner<3, 1>();
-    const Eigen::Quaternionf q_WS(T_WB.topLeftCorner<3, 3>());
+    const Eigen::Vector3f t_WS = T_WB.translation();
+    const Eigen::Quaternionf q_WS(T_WB.linear());
     sample("tx", t_WS.x(), POSITION, detailed);
     sample("ty", t_WS.y(), POSITION, detailed);
     sample("tz", t_WS.z(), POSITION, detailed);

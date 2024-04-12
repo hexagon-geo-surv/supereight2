@@ -34,14 +34,12 @@ add_library(${LIB_NAME} STATIC
     "src/common/yaml.cpp"
     "src/map/data.cpp"
     "src/map/io/mesh_io.cpp"
-    "src/map/map.cpp"
     "src/map/octant.cpp"
     "src/map/preprocessor.cpp"
     "src/map/raycaster.cpp"
     "src/sensor/leica_lidar.cpp"
     "src/sensor/ouster_lidar.cpp"
     "src/sensor/pinhole_camera.cpp"
-    "src/sensor/sensor.cpp"
     "src/tracker/tracker.cpp"
 )
 configure_file("include/se/supereight_config.hpp.in" "include/se/supereight_config.hpp" @ONLY)

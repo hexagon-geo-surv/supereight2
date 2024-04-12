@@ -10,6 +10,7 @@
 
 #include <Eigen/StdVector>
 #include <cstdint>
+#include <se/common/rgb.hpp>
 
 EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector2f)
 EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector3f)
@@ -54,7 +55,7 @@ typedef se::field_t weight_t; ///< The type of the field type weight
 
 typedef int timestamp_t; ///< The type of the time stamp
 
-typedef uint32_t rgba_t; ///< The type of the colour
+typedef RGB colour_t; ///< The type of the colour
 
 typedef uint8_t semantics_t; ///< The type of the semantic class
 

@@ -10,7 +10,7 @@
 
 int save_point_cloud_vtk(se::Image<Eigen::Vector3f>& point_cloud,
                          const std::string& filename,
-                         const Eigen::Matrix4f& T_WC)
+                         const Eigen::Isometry3f& T_WC)
 {
     // Open the file for writing.
     std::ofstream file(filename.c_str());
@@ -27,7 +27,7 @@ int save_point_cloud_vtk(se::Image<Eigen::Vector3f>& point_cloud,
 
     // Write the point data.
     for (size_t i = 0; i < point_cloud.size(); ++i) {
-        const Eigen::Vector3f point_W = (T_WC * point_cloud[i].homogeneous()).head<3>();
+        const Eigen::Vector3f point_W = T_WC * point_cloud[i];
         file << point_W.x() << " " << point_W.y() << " " << point_W.z() << "\n";
     }
 

@@ -13,19 +13,37 @@
 
 namespace se {
 
-// Defaults
-static constexpr rgba_t dflt_rgba = 0xFFFFFFFF; // White
-static constexpr rgba_t dflt_delta_rgba = 0;
-
 // Colour data
 template<Colour ColB>
 struct ColourData {
+    struct Config {
+        void readYaml(const std::string& /* yaml_file */)
+        {
+        }
+    };
 };
+
+template<Colour ColB>
+std::ostream& operator<<(std::ostream& os, const typename ColourData<ColB>::Config& /* c */)
+{
+    return os;
+}
 
 template<>
 struct ColourData<Colour::On> {
-    rgba_t rgba = dflt_rgba;
+    struct Config {
+        /** Reads the struct members from the "data" node of a YAML file. Members not present in the
+         * YAML file aren't modified.
+         */
+        void readYaml(const std::string& yaml_file);
+    };
+
+    colour_t colour;
+    std::uint8_t colour_weight = 0;
 };
+
+template<>
+std::ostream& operator<< <Colour::On>(std::ostream& os, const ColourData<Colour::On>::Config& c);
 
 ///////////////////
 /// DELTA DATA  ///
@@ -33,50 +51,13 @@ struct ColourData<Colour::On> {
 
 // Colour data
 template<Colour ColB>
-struct ColourDeltaData {
-};
+struct ColourDeltaData {};
 
 template<>
 struct ColourDeltaData<Colour::On> {
-    rgba_t delta_rgba = dflt_delta_rgba;
+    colour_t delta_colour;
+    std::uint8_t delta_colour_weight = 0;
 };
-
-
-
-///////////////////
-/// DATA CONFIG ///
-///////////////////
-
-// Colour data
-template<Colour ColB>
-struct ColourDataConfig {
-    ColourDataConfig()
-    {
-    }
-    ColourDataConfig(const std::string& /* yaml_file */)
-    {
-    }
-};
-
-template<Colour ColB>
-std::ostream& operator<<(std::ostream& os, const ColourDataConfig<ColB>& /* c */)
-{
-    return os;
-}
-
-template<>
-struct ColourDataConfig<Colour::On> {
-    /** Initializes the config to some sensible defaults.
-     */
-    ColourDataConfig();
-
-    /** Initializes the config from a YAML file. Data not present in the YAML file will be
-     * initialized as in ColourDataConfig<se::Colour::On>::ColourDataConfig().
-     */
-    ColourDataConfig(const std::string& yaml_file);
-};
-
-std::ostream& operator<<(std::ostream& os, const ColourDataConfig<Colour::On>& c);
 
 } // namespace se
 

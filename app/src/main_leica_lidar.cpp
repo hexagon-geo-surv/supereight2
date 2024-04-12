@@ -1,6 +1,7 @@
 /*
  * SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
  * SPDX-FileCopyrightText: 2022-2024 Simon Boche
+ * SPDX-FileCopyrightText: 2024 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -11,6 +12,7 @@
 #include "montage.hpp"
 #include "reader.hpp"
 #include "se/common/filesystem.hpp"
+#include "se/common/system_utils.hpp"
 
 int main(int argc, char** argv)
 {
@@ -22,7 +24,7 @@ int main(int argc, char** argv)
 
         // ========= Config & I/O INITIALIZATION  =========
         const std::string config_filename = argv[1];
-        const se::Config<se::OccupancyDataConfig, se::LeicaLidarConfig> config(config_filename);
+        const se::Config<se::OccupancyMap<se::Res::Multi>, se::LeicaLidar> config(config_filename);
         std::cout << config;
 
         // Create the mesh output directory
@@ -42,8 +44,8 @@ int main(int argc, char** argv)
         se::perfstats.setFilestream(&log_file_stream);
 
         // Setup input ray / pose batch
-        std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
-                    Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>
+        std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
+                    Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>
             ray_pose_batch;
 
         // ========= Map INITIALIZATION  =========
@@ -59,17 +61,15 @@ int main(int argc, char** argv)
         const se::LeicaLidar sensor(config.sensor, config.app.sensor_downsampling_factor);
 
         // ========= READER INITIALIZATION  =========
-        se::Reader* reader = nullptr;
-        reader = se::create_reader(config.reader);
-
-        if (reader == nullptr) {
+        std::unique_ptr<se::Reader> reader(se::create_reader(config.reader));
+        if (!reader) {
             return EXIT_FAILURE;
         }
 
         // Setup input, processed and output imgs
-        Eigen::Matrix4f T_WB = Eigen::Matrix4f::Identity(); //< Body to world transformation
-        Eigen::Matrix4f T_BS = sensor.T_BS;                 //< Sensor to body transformation
-        Eigen::Matrix4f T_WS = T_WB * T_BS;                 //< Sensor to world transformation
+        Eigen::Isometry3f T_WB = Eigen::Isometry3f::Identity(); //< Body to world transformation
+        Eigen::Isometry3f T_BS = sensor.T_BS;                   //< Sensor to body transformation
+        Eigen::Isometry3f T_WS = T_WB * T_BS;                   //< Sensor to world transformation
 
         // ========= Tracker & Pose INITIALIZATION  =========
         se::Tracker tracker(map, sensor, config.tracker);
@@ -80,7 +80,7 @@ int main(int argc, char** argv)
         se::MapIntegrator integrator(map);
 
         int frame = 0;
-        while (frame != config.app.max_frames) { // ToDo: check does not make sense
+        while (frame != config.app.max_frames) {
             se::perfstats.setIter(frame++);
 
             TICK("total")
@@ -99,46 +99,37 @@ int main(int argc, char** argv)
 
             // Integrate depth for a given sensor, depth image, pose and frame number
             TICK("integration")
-            integrator.integrateRayBatch(sensor, ray_pose_batch, frame);
+            if (frame % config.app.integration_rate == 0) {
+                integrator.integrateRayBatch(sensor, ray_pose_batch, frame);
+            }
             TOCK("integration")
-            if (config.app.meshing_rate > 0 && frame % config.app.meshing_rate == 0) {
-                if (!config.app.structure_path.empty()) {
-                    map.saveStructure(config.app.structure_path + "/struct_" + std::to_string(frame)
-                                      + ".ply");
+
+            // Save logs, mesh, slices and struct (if enabled)
+            TOCK("total")
+            const bool last_frame =
+                frame == config.app.max_frames || static_cast<size_t>(frame) == reader->numFrames();
+            if ((config.app.meshing_rate > 0 && frame % config.app.meshing_rate == 0)
+                || last_frame) {
+                if (!config.app.mesh_path.empty()) {
+                    map.saveMesh(config.app.mesh_path + "/mesh_" + std::to_string(frame) + ".ply");
                 }
                 if (!config.app.slice_path.empty()) {
                     map.saveFieldSlices(
                         config.app.slice_path + "/slice_x_" + std::to_string(frame) + ".vtk",
                         config.app.slice_path + "/slice_y_" + std::to_string(frame) + ".vtk",
                         config.app.slice_path + "/slice_z_" + std::to_string(frame) + ".vtk",
-                        Eigen::Vector3f(-4.65, -3.2, -0.7));
+                        T_WS.translation());
                 }
-                if (!config.app.mesh_path.empty()) {
-                    map.saveMesh(config.app.mesh_path + "/mesh_" + std::to_string(frame) + ".ply");
-                    map.saveMeshVoxel(config.app.mesh_path + "/voxel_mesh_" + std::to_string(frame)
+                if (!config.app.structure_path.empty()) {
+                    map.saveStructure(config.app.structure_path + "/struct_" + std::to_string(frame)
                                       + ".ply");
                 }
             }
 
-            TOCK("total")
-
+            se::perfstats.sample("memory usage",
+                                 se::system::memory_usage_self() / (1024.0 * 1024.0),
+                                 PerfStats::MEMORY);
             se::perfstats.writeToFilestream();
-        }
-
-        // Final Meshes / Slices
-        if (!config.app.structure_path.empty()) {
-            map.saveStructure(config.app.structure_path + "/struct_" + std::to_string(frame)
-                              + ".ply");
-        }
-        if (!config.app.mesh_path.empty()) {
-            map.saveMeshVoxel(config.app.mesh_path + "/mesh_" + std::to_string(frame) + ".ply");
-        }
-        if (!config.app.slice_path.empty()) {
-            map.saveFieldSlices(
-                config.app.slice_path + "/slice_x_" + std::to_string(frame) + ".vtk",
-                config.app.slice_path + "/slice_y_" + std::to_string(frame) + ".vtk",
-                config.app.slice_path + "/slice_z_" + std::to_string(frame) + ".vtk",
-                Eigen::Vector3f(-4.65, -3.2, -0.7));
         }
 
         return 0;

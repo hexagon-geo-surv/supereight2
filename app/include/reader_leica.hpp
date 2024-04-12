@@ -26,11 +26,11 @@ namespace se {
  */
 class LeicaReader : public Reader {
     public:
-    /** Construct a LeicaReader from a ReaderConfig.
+    /** Construct a LeicaReader from a Config.
      *
      * \param[in] c The configuration struct to use.
      */
-    LeicaReader(const ReaderConfig& c);
+    LeicaReader(const Config& c);
 
     /** Restart reading from the beginning. */
     void restart();
@@ -62,15 +62,15 @@ class LeicaReader : public Reader {
 
     ReaderStatus nextRay(Eigen::Vector3f& ray_measurement);
 
-    ReaderStatus nextPose(Eigen::Matrix4f& T_WB);
+    ReaderStatus nextPose(Eigen::Isometry3f& T_WB);
 
-    ReaderStatus
-    nextRayBatch(const float batch_interval,
-                 std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
-                             Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>&
-                     rayPoseBatch);
+    ReaderStatus nextRayBatch(
+        const float batch_interval,
+        std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
+                    Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
+            rayPoseBatch);
 
-    ReaderStatus nextRGBA(Image<uint32_t>& rgba_image);
+    ReaderStatus nextColour(Image<RGBA>& colour_image);
 
     /** Return the filenames of LIDAR scans in PCD formatin the supplied directory.
      * LIDAR scans are considered those whose name conforms to the pattern

@@ -9,7 +9,7 @@
 
 
 
-uint32_t gray_to_rgba(double h)
+se::RGBA gray_to_rgba(double h)
 {
     constexpr double v = 0.75;
     double r = 0, g = 0, b = 0;
@@ -60,12 +60,15 @@ uint32_t gray_to_rgba(double h)
             break;
         }
     }
-    return se::pack_rgba(r * 255, g * 255, b * 255, 255);
+    return se::RGBA{static_cast<std::uint8_t>(r * 0xFF),
+                    static_cast<std::uint8_t>(g * 0xFF),
+                    static_cast<std::uint8_t>(b * 0xFF),
+                    0xFF};
 }
 
 
 
-void se::depth_to_rgba(uint32_t* depth_RGBA_image_data,
+void se::depth_to_rgba(se::RGBA* depth_RGBA_image_data,
                        const float* depth_image_data,
                        const Eigen::Vector2i& depth_image_res,
                        const float min_depth,
@@ -79,13 +82,13 @@ void se::depth_to_rgba(uint32_t* depth_RGBA_image_data,
             const int pixel_idx = x + row_offset;
             const float depth = depth_image_data[pixel_idx];
             if (depth <= 0.0f || std::isnan(depth)) {
-                depth_RGBA_image_data[pixel_idx] = 0xFF000000; // Black
+                depth_RGBA_image_data[pixel_idx] = {0x00, 0x00, 0x00, 0xFF}; // Black
             }
             else if (depth < min_depth) {
-                depth_RGBA_image_data[pixel_idx] = 0xFF808080; // Gray
+                depth_RGBA_image_data[pixel_idx] = {0x80, 0x80, 0x80, 0xFF}; // Gray
             }
             else if (depth > max_depth) {
-                depth_RGBA_image_data[pixel_idx] = 0xFFFFFFFF; // White
+                depth_RGBA_image_data[pixel_idx] = {0xFF, 0xFF, 0xFF, 0xFF}; // White
             }
             else {
                 const float normalized_depth = (depth - min_depth) * inv_depth_range;

@@ -15,6 +15,7 @@
 #include "se/common/eigen_utils.hpp"
 #include "se/common/math_util.hpp"
 #include "se/common/str_utils.hpp"
+#include "se/common/yaml.hpp"
 #include "se/map/algorithms/marching_cube.hpp"
 #include "se/map/algorithms/structure_meshing.hpp"
 #include "se/map/data.hpp"
@@ -28,31 +29,6 @@
 
 namespace se {
 
-struct MapConfig {
-    /** The dimensions of the map in metres.
-     */
-    Eigen::Vector3f dim = Eigen::Vector3f::Constant(10.0f);
-
-    /** The resolution of map voxels in metres.
-     */
-    float res = 0.1f;
-
-    /** The transformation from the world frame W to the map frame M.
-     */
-    Eigen::Matrix4f T_MW = math::to_transformation((dim / 2).eval());
-
-    /** Reads the struct members from the "map" node of a YAML file. Members not present in the YAML
-     * file aren't modified.
-     */
-    void readYaml(const std::string& yaml_file);
-
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-};
-
-std::ostream& operator<<(std::ostream& os, const MapConfig& c);
-
-
-
 // Forward Declaration
 template<typename DataT = se::Data<Field::TSDF, Colour::Off, Semantics::Off>,
          Res ResT = Res::Single,
@@ -65,8 +41,29 @@ template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
     public:
     typedef Data<FldT, ColB, SemB> DataType;
-    typedef DataConfig<FldT, ColB, SemB> DataConfigType;
+    typedef typename Data<FldT, ColB, SemB>::Config DataConfigType;
     typedef se::Octree<DataType, ResT, BlockSize> OctreeType;
+
+    struct Config {
+        /** The dimensions of the map in metres.
+         */
+        Eigen::Vector3f dim = Eigen::Vector3f::Constant(10.0f);
+
+        /** The resolution of map voxels in metres.
+         */
+        float res = 0.1f;
+
+        /** The transformation from the world frame W to the map frame M.
+         */
+        Eigen::Isometry3f T_MW = Eigen::Isometry3f(Eigen::Translation3f(dim / 2));
+
+        /** Reads the struct members from the "map" node of a YAML file. Members not present in the YAML
+         * file aren't modified.
+         */
+        void readYaml(const std::string& yaml_file);
+
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    };
 
     /**
      * \brief The map constructor.
@@ -79,7 +76,8 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      */
     Map(const Eigen::Vector3f& dim,
         const float res,
-        const DataConfig<FldT, ColB, SemB>& data_config = DataConfig<FldT, ColB, SemB>());
+        const typename Data<FldT, ColB, SemB>::Config& data_config =
+            typename Data<FldT, ColB, SemB>::Config());
 
     /**
      * \brief The map constructor.
@@ -87,8 +85,17 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \param map_config          The configuration file for the map (e.g. map dimension, resolution and origin)
      * \param data_config         The configuration file for the data
      */
-    Map(const MapConfig& map_config,
-        const DataConfig<FldT, ColB, SemB>& data_config = DataConfig<FldT, ColB, SemB>());
+    Map(const Config& map_config,
+        const typename Data<FldT, ColB, SemB>::Config& data_config =
+            typename Data<FldT, ColB, SemB>::Config());
+
+    /** The copy constructor is explicitly deleted.
+     */
+    Map(const Map&) = delete;
+
+    /** The copy assignment operator is explicitly deleted.
+     */
+    Map& operator=(const Map&) = delete;
 
     /**
      * \brief Verify if a point is inside the map.
@@ -103,7 +110,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      *
      * \return T_MW
      */
-    const Eigen::Matrix4f& getTMW() const
+    const Eigen::Isometry3f& getTMW() const
     {
         return T_MW_;
     };
@@ -113,50 +120,10 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      *
      * \return T_WM
      */
-    const Eigen::Matrix4f& getTWM() const
+    const Eigen::Isometry3f& getTWM() const
     {
         return T_WM_;
     };
-
-    /**
-     * \brief Get the translation from world to map frame
-     *
-     * \return t_MW
-     */
-    Eigen::Vector3f gettMW() const
-    {
-        return se::math::to_translation(T_MW_);
-    }
-
-    /**
-     * \brief Get the translation from map to world frame
-     *
-     * \return t_WM
-     */
-    Eigen::Vector3f gettWM() const
-    {
-        return se::math::to_translation(T_WM_);
-    }
-
-    /**
-     * \brief Get the rotation from world to map frame
-     *
-     * \return R_MW
-     */
-    Eigen::Matrix3f getRMW() const
-    {
-        return se::math::to_rotation(T_MW_);
-    }
-
-    /**
-     * \brief Get the rotation from map to world frame
-     *
-     * \return R_WM
-     */
-    Eigen::Matrix3f getRWM() const
-    {
-        return se::math::to_rotation(T_WM_);
-    }
 
     /**
      * \brief Get the dimensions of the map in [meter] (length x width x height)
@@ -374,7 +341,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \return Zero on success and non-zero on error.
      */
     int saveStructure(const std::string& filename,
-                      const Eigen::Matrix4f& T_WM = Eigen::Matrix4f::Identity()) const;
+                      const Eigen::Isometry3f& T_WM = Eigen::Isometry3f::Identity()) const;
 
     /**
      * \brief Create a mesh in the world frame in units of metres and save it to a file.
@@ -386,7 +353,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \return Zero on success and non-zero on error.
      */
     int saveMesh(const std::string& filename,
-                 const Eigen::Matrix4f& T_OW = Eigen::Matrix4f::Identity()) const;
+                 const Eigen::Isometry3f& T_OW = Eigen::Isometry3f::Identity()) const;
 
     /**
      * \brief Create a mesh in the map frame in units of voxel and save it to a file.
@@ -549,8 +516,8 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
     OctreeType octree_;
     const float resolution_;          ///< The resolution of the map
     const Eigen::Vector3f dimension_; ///< The dimensions of the map
-    const Eigen::Matrix4f T_MW_;      ///< The transformation from world to map frame
-    const Eigen::Matrix4f T_WM_;      ///< The transformation from map to world frame
+    const Eigen::Isometry3f T_MW_;    ///< The transformation from world to map frame
+    const Eigen::Isometry3f T_WM_;    ///< The transformation from map to world frame
 
     const Eigen::Vector3f lb_M_; ///< The lower map bound
     const Eigen::Vector3f ub_M_; ///< The upper map bound
@@ -563,6 +530,9 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
     /** The eight relative unit corner offsets */
     static const Eigen::Matrix<float, 3, 8> corner_rel_steps_;
 };
+
+template<typename MapT>
+std::ostream& operator<<(std::ostream& os, const typename MapT::Config& c);
 
 //// Full alias template for alternative setup
 template<se::Field FldT = se::Field::TSDF,

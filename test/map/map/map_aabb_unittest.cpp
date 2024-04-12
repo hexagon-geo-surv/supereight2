@@ -15,8 +15,8 @@ se::PinholeCamera generate_sensor()
 {
     constexpr int width = 100;
     constexpr int height = width;
-    const Eigen::Matrix4f T_BS =
-        (Eigen::Matrix4f() << 0, 0, 1, 0, -1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1).finished();
+    const Eigen::Isometry3f T_BS(Eigen::AngleAxisf(M_PI / 2, Eigen::Vector3f::UnitY())
+                                 * Eigen::AngleAxisf(-M_PI / 2, Eigen::Vector3f::UnitZ()));
     return se::PinholeCamera(
         {{width, height, 0.1f, 10.0f, T_BS}, 100.0f, 100.0f, width / 2 - 0.5f, height / 2 - 0.5f});
 }
@@ -26,7 +26,7 @@ void integrate_wall(MapT& map, const se::PinholeCamera& sensor, float depth_valu
 {
     const se::Image<float> depth(
         sensor.model.imageWidth(), sensor.model.imageHeight(), depth_value);
-    const Eigen::Matrix4f T_WB = Eigen::Matrix4f::Identity();
+    const Eigen::Isometry3f T_WB = Eigen::Isometry3f::Identity();
     se::MapIntegrator integrator_stsdf(map);
     integrator_stsdf.integrateDepth(sensor, depth, T_WB * sensor.T_BS, 0);
 }
@@ -136,19 +136,19 @@ TEST(Map, aabb_ray)
 
 
     // ========= Sensor INITIALIZATION  =========
-    se::LeicaLidarConfig sensorConfig;
+    se::LeicaLidar::Config sensorConfig;
     sensorConfig.width = 1;  // To satisfy assert
     sensorConfig.height = 1; // To satisfy assert
     sensorConfig.near_plane = 0.6f;
     sensorConfig.far_plane = 30.0f;
-    sensorConfig.T_BS = Eigen::Matrix4f::Identity();
+    sensorConfig.T_BS = Eigen::Isometry3f::Identity();
     sensorConfig.elevation_resolution_angle_ = static_cast<float>(elevation_res);
     sensorConfig.azimuth_resolution_angle_ = static_cast<float>(azimuth_res);
 
     const se::LeicaLidar sensor(sensorConfig);
 
     // Setup input, processed and output imgs
-    Eigen::Matrix4f T_WS = Eigen::Matrix4f::Identity();
+    Eigen::Isometry3f T_WS = Eigen::Isometry3f::Identity();
 
     // ========= Integrator INITIALIZATION  =========
     se::MapIntegrator integrator(map);
@@ -200,8 +200,8 @@ TEST(Map, aabb_ray_batch)
     // distance of plane wall [m]
     float d = 10.0f;
 
-    std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
-                Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>
+    std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
+                Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>
         rayBatch;
     size_t num_points_elevation = std::floor((elevation_max - elevation_min) / elevation_res);
     size_t num_points_azimuth = std::floor((azimuth_max - azimuth_min) / azimuth_res);
@@ -215,8 +215,8 @@ TEST(Map, aabb_ray_batch)
         for (size_t j = 0; j < num_points_azimuth; j++) {
             y = d * tan(azimuth_angle * deg_to_rad);
             // save point
-            rayBatch.push_back(std::pair<Eigen::Matrix4f, Eigen::Vector3f>(
-                Eigen::Matrix4f::Identity(), Eigen::Vector3f(x, y, z)));
+            rayBatch.push_back(std::pair<Eigen::Isometry3f, Eigen::Vector3f>(
+                Eigen::Isometry3f::Identity(), Eigen::Vector3f(x, y, z)));
             // increase azimuth angle
             azimuth_angle += azimuth_res;
         }
@@ -233,16 +233,16 @@ TEST(Map, aabb_ray_batch)
 
 
     // ========= Sensor INITIALIZATION  =========
-    se::LeicaLidarConfig sensorConfig;
+    se::LeicaLidar::Config sensorConfig;
     sensorConfig.width = 1;  // To satisfy assert
     sensorConfig.height = 1; // To satisfy assert
     sensorConfig.near_plane = 0.6f;
     sensorConfig.far_plane = 30.0f;
-    sensorConfig.T_BS = Eigen::Matrix4f::Identity();
+    sensorConfig.T_BS = Eigen::Isometry3f::Identity();
     sensorConfig.elevation_resolution_angle_ = static_cast<float>(elevation_res);
     sensorConfig.azimuth_resolution_angle_ = static_cast<float>(azimuth_res);
 
-    //se::LeicaLidarConfig sensorConfig(se_config.sensor);
+    //se::LeicaLidar::Config sensorConfig(se_config.sensor);
     const se::LeicaLidar sensor(sensorConfig);
 
     // ========= Integrator INITIALIZATION  =========
@@ -277,8 +277,8 @@ TEST(Map, aabb_ray_batch)
         for (size_t j = 0; j < num_points_azimuth; j++) {
             y = d * tan(azimuth_angle * deg_to_rad);
             // save point
-            rayBatch.push_back(std::pair<Eigen::Matrix4f, Eigen::Vector3f>(
-                Eigen::Matrix4f::Identity(), Eigen::Vector3f(x, y, z)));
+            rayBatch.push_back(std::pair<Eigen::Isometry3f, Eigen::Vector3f>(
+                Eigen::Isometry3f::Identity(), Eigen::Vector3f(x, y, z)));
             // increase azimuth angle
             azimuth_angle += azimuth_res;
         }

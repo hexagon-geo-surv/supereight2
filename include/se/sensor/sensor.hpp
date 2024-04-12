@@ -14,6 +14,7 @@
 #include "se/common/image_utils.hpp"
 #include "se/common/math_util.hpp"
 #include "se/common/projection.hpp"
+#include "se/common/str_utils.hpp"
 #include "se/common/yaml.hpp"
 #include "se/image/image.hpp"
 
@@ -21,73 +22,52 @@
 
 namespace se {
 
-struct SensorBaseConfig {
-    /** The width of images produced by the sensor in pixels.
-     */
-    int width = 0;
-
-    /** The height of images produced by the sensor in pixels.
-     */
-    int height = 0;
-
-    /** The sensor's near plane in metres. Avoid setting to 0 since numerical issues may arise.
-     */
-    float near_plane = 0.01f;
-
-    /** The sensor's far plane in metres. Avoid setting to infinity since performance may degrade
-     * significantly, for example with depth images containing really large erroneous measurements.
-     */
-    float far_plane = 10.0f;
-
-    /** The transformation from the sensor frame S to the body frame B.
-     */
-    Eigen::Matrix4f T_BS = Eigen::Matrix4f::Identity();
-
-    /** The pixel-size to voxel-size ratio in physical coordinates for computing the integration scale.
-     *  See SensorBase::computeIntegrationScale()
-     *  Thresholds defining the resolution scale in ascending order.
-     *  pixel/voxel < pixel_voxel_ratio_per_scale[0] -> scale = 0
-     *  pixel/voxel < pixel_voxel_ratio_per_scale[1] -> scale = 1
-     *  ...
-     */
-    std::vector<float> pixel_voxel_ratio_per_scale = {1.5f, 3.0f, 6.0f};
-
-    /** Reads the struct members from the "sensor" node of a YAML file. Members not present in the
-     * YAML file aren't modified.
-     */
-    void readYaml(const std::string& filename);
-
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-};
-
-std::ostream& operator<<(std::ostream& os, const SensorBaseConfig& c);
-
-
-
 template<typename DerivedT>
 class SensorBase {
     public:
+    struct Config {
+        /** The width of images produced by the sensor in pixels.
+         */
+        int width = 0;
+
+        /** The height of images produced by the sensor in pixels.
+         */
+        int height = 0;
+
+        /** The sensor's near plane in metres. Avoid setting to 0 since numerical issues may arise.
+         */
+        float near_plane = 0.01f;
+
+        /** The sensor's far plane in metres. Avoid setting to infinity since performance may degrade
+         * significantly, for example with depth images containing really large erroneous measurements.
+         */
+        float far_plane = 10.0f;
+
+        /** The transformation from the sensor frame S to the body frame B.
+         */
+        Eigen::Isometry3f T_BS = Eigen::Isometry3f::Identity();
+
+        /** The pixel-size to voxel-size ratio in physical coordinates for computing the integration scale.
+         *  See SensorBase::computeIntegrationScale()
+         *  Thresholds defining the resolution scale in ascending order.
+         *  pixel/voxel < pixel_voxel_ratio_per_scale[0] -> scale = 0
+         *  pixel/voxel < pixel_voxel_ratio_per_scale[1] -> scale = 1
+         *  ...
+         */
+        std::vector<float> pixel_voxel_ratio_per_scale = {1.5f, 3.0f, 6.0f};
+
+        /** Reads the struct members from the "sensor" node of a YAML file. Members not present in the
+         * YAML file aren't modified.
+         */
+        void readYaml(const std::string& filename);
+
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    };
+
     template<typename ConfigT>
     SensorBase(const ConfigT& c);
 
     SensorBase(const DerivedT& d);
-
-    /**
-     * \brief Project a point in sensor frame to its image value.
-     *
-     * \tparam ValidPredicate
-     * \param[in]  point_S          The point to project to the image
-     * \param[in]  img              The image to get the value from
-     * \param[out] img_value        The image value the point projects to
-     * \param[in]  valid_predicate  The lambda function verifying if the value is valid (e.g. infront of far dist)
-     *
-     * \return True if the image value is valid, false otherwise
-     */
-    template<typename ValidPredicate>
-    bool projectToPixelValue(const Eigen::Vector3f& point_S,
-                             const se::Image<float>& img,
-                             float& img_value,
-                             ValidPredicate valid_predicate) const;
 
     /**
      * \brief Get the image value for a given pixel coordindate.
@@ -210,7 +190,7 @@ class SensorBase {
     bool left_hand_frame;
     float near_plane;
     float far_plane;
-    Eigen::Matrix4f T_BS;
+    Eigen::Isometry3f T_BS;
     std::vector<float> pixel_voxel_ratio_per_scale;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -224,7 +204,8 @@ class SensorBase {
     const DerivedT* underlying() const;
 };
 
-
+template<typename DerivedT>
+std::ostream& operator<<(std::ostream& os, const typename SensorBase<DerivedT>::Config& c);
 
 } // namespace se
 

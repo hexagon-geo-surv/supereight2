@@ -40,7 +40,7 @@ template<typename MapT, typename SensorT>
 std::vector<se::OctantBase*> frustum(MapT& map,
                                      SensorT& sensor,
                                      const se::Image<float>& depth_img,
-                                     const Eigen::Matrix4f& T_WS,
+                                     const Eigen::Isometry3f& T_WS,
                                      const float band);
 
 } // namespace allocator
@@ -63,7 +63,7 @@ namespace fetcher {
  */
 template<typename MapT, typename SensorT>
 inline std::vector<se::OctantBase*>
-frustum(MapT& map, const SensorT& sensor, const Eigen::Matrix4f& T_WS);
+frustum(MapT& map, const SensorT& sensor, const Eigen::Isometry3f& T_WS);
 } // namespace fetcher
 
 
@@ -94,7 +94,7 @@ class MapIntegrator {
     template<typename SensorT>
     void integrateDepth(const SensorT& sensor,
                         const se::Image<float>& depth_img,
-                        const Eigen::Matrix4f& T_WS,
+                        const Eigen::Isometry3f& T_WS,
                         const unsigned int frame);
 
     /** Same as se::MapIntegrator::integrateDepth() but also stores pointers to the octants updated
@@ -103,7 +103,7 @@ class MapIntegrator {
     template<typename SensorT>
     void integrateDepth(const SensorT& sensor,
                         const se::Image<float>& depth_img,
-                        const Eigen::Matrix4f& T_WS,
+                        const Eigen::Isometry3f& T_WS,
                         const unsigned int frame,
                         std::vector<const OctantBase*>& updated_octants);
 
@@ -119,7 +119,7 @@ class MapIntegrator {
     template<typename SensorT>
     void integrateRay(const SensorT& sensor,
                       const Eigen::Vector3f& ray_S,
-                      const Eigen::Matrix4f& T_WS,
+                      const Eigen::Isometry3f& T_WS,
                       const unsigned int frame);
 
     /** Same as se::MapIntegrator::integrateRay() but also stores pointers to the octants updated
@@ -128,7 +128,7 @@ class MapIntegrator {
     template<typename SensorT>
     void integrateRay(const SensorT& sensor,
                       const Eigen::Vector3f& ray_S,
-                      const Eigen::Matrix4f& T_WS,
+                      const Eigen::Isometry3f& T_WS,
                       const unsigned int frame,
                       std::vector<const OctantBase*>& updated_octants);
 
@@ -146,8 +146,8 @@ class MapIntegrator {
     template<typename SensorT>
     void integrateRayBatch(
         const SensorT& sensor,
-        const std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
-                          Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>&
+        const std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
+                          Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
             rayPoseBatch,
         const unsigned int frame);
 
@@ -157,8 +157,8 @@ class MapIntegrator {
     template<typename SensorT>
     void integrateRayBatch(
         const SensorT& sensor,
-        const std::vector<std::pair<Eigen::Matrix4f, Eigen::Vector3f>,
-                          Eigen::aligned_allocator<std::pair<Eigen::Matrix4f, Eigen::Vector3f>>>&
+        const std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
+                          Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
             rayPoseBatch,
         const unsigned int frame,
         std::vector<const OctantBase*>& updated_octants);

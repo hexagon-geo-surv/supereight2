@@ -12,40 +12,36 @@
 
 namespace se {
 
-struct PinholeCameraConfig : public SensorBaseConfig {
-    /** The sensor's horizontal focal length in pixels.
-     */
-    float fx = std::numeric_limits<float>::quiet_NaN();
-
-    /** The sensor's vertical focal length in pixels.
-     */
-    float fy = std::numeric_limits<float>::quiet_NaN();
-
-    /** The sensor's optical centre horizontal coordinate in pixels.
-     */
-    float cx = std::numeric_limits<float>::quiet_NaN();
-
-    /** The sensor's optical centre vertical coordinate in pixels.
-     */
-    float cy = std::numeric_limits<float>::quiet_NaN();
-
-    /** Reads the struct members from the "sensor" node of a YAML file. Members not present in the
-     * YAML file aren't modified.
-     */
-    void readYaml(const std::string& filename);
-
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-};
-
-std::ostream& operator<<(std::ostream& os, const PinholeCameraConfig& c);
-
-
-
 class PinholeCamera : public SensorBase<PinholeCamera> {
     public:
-    PinholeCamera(const PinholeCameraConfig& config);
+    struct Config : public SensorBase<PinholeCamera>::Config {
+        /** The sensor's horizontal focal length in pixels.
+         */
+        float fx = std::numeric_limits<float>::quiet_NaN();
 
-    PinholeCamera(const PinholeCameraConfig& config, const float downsampling_factor);
+        /** The sensor's vertical focal length in pixels.
+         */
+        float fy = std::numeric_limits<float>::quiet_NaN();
+
+        /** The sensor's optical centre horizontal coordinate in pixels.
+         */
+        float cx = std::numeric_limits<float>::quiet_NaN();
+
+        /** The sensor's optical centre vertical coordinate in pixels.
+         */
+        float cy = std::numeric_limits<float>::quiet_NaN();
+
+        /** Reads the struct members from the "sensor" node of a YAML file. Members not present in the
+         * YAML file aren't modified.
+         */
+        void readYaml(const std::string& filename);
+
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    };
+
+    PinholeCamera(const Config& config);
+
+    PinholeCamera(const Config& config, const float downsampling_factor);
 
     PinholeCamera(const PinholeCamera& pinhole_camera, const float downsampling_factor);
 
@@ -91,7 +87,7 @@ class PinholeCamera : public SensorBase<PinholeCamera> {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
-
+std::ostream& operator<<(std::ostream& os, const PinholeCamera::Config& c);
 
 } // namespace se
 

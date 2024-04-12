@@ -48,7 +48,7 @@ class Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, Sensor
     Updater(MapType& map,
             const SensorT& sensor,
             const Image<float>& depth_img,
-            const Eigen::Matrix4f& T_WS,
+            const Eigen::Isometry3f& T_WS,
             const int frame);
 
 
@@ -58,12 +58,10 @@ class Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, Sensor
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     private:
-    void updateVoxel(DataType& data, const field_t sdf_value);
-
     MapType& map_;
     const SensorT& sensor_;
     const Image<float>& depth_img_;
-    const Eigen::Matrix4f& T_WS_;
+    const Eigen::Isometry3f& T_WS_;
     const int frame_;
     const UpdaterConfig config_;
 };
