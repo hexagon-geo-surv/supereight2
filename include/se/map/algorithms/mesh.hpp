@@ -58,17 +58,22 @@ struct Vertex
     Eigen::Vector3f position;
     std::optional<Eigen::Vector3f> normal;
     std::optional<std::array<std::uint8_t, 3>> color;
+
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
-struct VertexIndexMesh
+template<int NumFaceVertices = 3>
+class VertexIndexMesh
 {
+public:
+    static constexpr int num_face_vertices = NumFaceVertices;
     std::vector<Vertex> vertices;
     std::vector<size_t> indices;    // triangles
 
     void merge(const VertexIndexMesh& other);
-};
 
-static inline void compute_normals(VertexIndexMesh& mesh);
+    void compute_normals();
+};
 
 } // namespace mesh
 } // namespace se

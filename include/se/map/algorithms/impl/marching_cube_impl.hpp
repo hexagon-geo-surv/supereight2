@@ -819,7 +819,7 @@ namespace algorithms {
 
 
 template<typename OctreeT>
-void marching_cube_kernel(OctreeT& octree,
+void marching_cube_kernel(const OctreeT& octree,
                           std::vector<const typename OctreeT::BlockType*>& block_ptrs,
                           TriangleMesh& triangles)
 {
@@ -873,7 +873,7 @@ void marching_cube_kernel(OctreeT& octree,
 
 
 template<typename OctreeT>
-void dual_marching_cube_kernel(OctreeT& octree,
+void dual_marching_cube_kernel(const OctreeT& octree,
                                std::vector<const typename OctreeT::BlockType*>& block_ptrs,
                                TriangleMesh& triangles)
 {
@@ -953,7 +953,7 @@ void dual_marching_cube_kernel(OctreeT& octree,
 }
 
 inline
-uint64_t unique_edge_id(Eigen::Vector3i& v0, Eigen::Vector3i& v1)
+uint64_t unique_edge_id(const Eigen::Vector3i& v0, const Eigen::Vector3i& v1)
 {
     if(v0.y()==v1.y() && v0.z()==v1.z())
     {
@@ -980,15 +980,16 @@ uint64_t unique_edge_id(Eigen::Vector3i& v0, Eigen::Vector3i& v1)
 }
 
 template<typename OctreeT>
-void dual_marching_cube_kernel(OctreeT& octree,
-                               std::vector<const typename OctreeT::BlockType*>& block_ptrs,
-                               std::vector<std::shared_ptr<meshing::VertexIndexMesh>>& block_meshes)
+std::vector<meshing::VertexIndexMesh<3>>
+dual_marching_cube_kernel(const OctreeT& octree,
+                          std::vector<const typename OctreeT::BlockType*>& block_ptrs)
 {
     using namespace meshing;
     typedef typename OctreeT::BlockType BlockType;
 
     const int block_size = OctreeT::BlockType::getSize();
     const int octree_size = octree.getSize();
+    std::vector<meshing::VertexIndexMesh<3>> block_meshes;
 
 #pragma omp parallel for
     for (size_t block_idx = 0; block_idx < block_ptrs.size(); block_idx++) {
@@ -1001,7 +1002,8 @@ void dual_marching_cube_kernel(OctreeT& octree,
                 .cwiseMin(Eigen::Vector3i::Constant(octree_size - 1));
 
         Eigen::Vector3f vertex_0, vertex_1, vertex_2;
-        auto block_mesh = std::make_shared<VertexIndexMesh>();
+
+        meshing::VertexIndexMesh<3> block_mesh;
         std::map<uint64_t, size_t> edge_vertex_map;        
 
         for (int x = start_coord.x(); x <= last_coord.x(); x += voxel_stride) {
@@ -1066,22 +1068,22 @@ void dual_marching_cube_kernel(OctreeT& octree,
 
 
                         if(it_0 == edge_vertex_map.end()){
-                            it_0 = edge_vertex_map.insert(it_0, {edge_id_0, block_mesh->vertices.size()});
-                            block_mesh->vertices.push_back(vertex_0);
+                            it_0 = edge_vertex_map.insert(it_0, {edge_id_0, block_mesh.vertices.size()});
+                            block_mesh.vertices.push_back(vertex_0);
                         }
-                        block_mesh->indices.push_back(it_0->second);
+                        block_mesh.indices.push_back(it_0->second);
 
                         if(it_1 == edge_vertex_map.end()){
-                            it_1 = edge_vertex_map.insert(it_1, {edge_id_1, block_mesh->vertices.size()});
-                            block_mesh->vertices.push_back(vertex_1);
+                            it_1 = edge_vertex_map.insert(it_1, {edge_id_1, block_mesh.vertices.size()});
+                            block_mesh.vertices.push_back(vertex_1);
                         }
-                        block_mesh->indices.push_back(it_1->second);
+                        block_mesh.indices.push_back(it_1->second);
 
                         if(it_2 == edge_vertex_map.end()){
-                            it_2 = edge_vertex_map.insert(it_2, {edge_id_2, block_mesh->vertices.size()});
-                            block_mesh->vertices.push_back(vertex_2);
+                            it_2 = edge_vertex_map.insert(it_2, {edge_id_2, block_mesh.vertices.size()});
+                            block_mesh.vertices.push_back(vertex_2);
                         }
-                        block_mesh->indices.push_back(it_2->second);
+                        block_mesh.indices.push_back(it_2->second);
                     } // edges
 
                 } // z
@@ -1089,23 +1091,23 @@ void dual_marching_cube_kernel(OctreeT& octree,
         }         // x
 #pragma omp critical
         {
-            block_meshes.push_back(block_mesh);
-        };
+            block_meshes.emplace_back(block_mesh);
+        }
     } // block_ptr_itr
+    return block_meshes;
 }
 
 
 
 template<typename OctreeT>
-std::shared_ptr<meshing::VertexIndexMesh>
-dual_marching_cube_kernel(OctreeT& octree, std::vector<const typename OctreeT::BlockType*>& block_ptrs)
+meshing::VertexIndexMesh<3>
+dual_marching_cube(const OctreeT& octree, std::vector<const typename OctreeT::BlockType*>& block_ptrs)
 {
-    std::vector<std::shared_ptr<meshing::VertexIndexMesh>> block_meshes;
-    dual_marching_cube_kernel(octree, block_ptrs, block_meshes);
+    auto block_meshes = dual_marching_cube_kernel(octree, block_ptrs);
 
-    auto mesh = std::make_shared<meshing::VertexIndexMesh>();
+    meshing::VertexIndexMesh<3> mesh;
     for(const auto& block_mesh : block_meshes){
-        mesh->merge(*block_mesh);
+        mesh.merge(block_mesh);
     }
 
     return mesh;
@@ -1114,15 +1116,15 @@ dual_marching_cube_kernel(OctreeT& octree, std::vector<const typename OctreeT::B
 
 
 template<typename OctreeT>
-void marching_cube(OctreeT& octree, TriangleMesh& triangles)
+void marching_cube(const OctreeT& octree, TriangleMesh& triangles)
 {
     TICK("primal-marching-cube")
     typedef typename OctreeT::BlockType BlockType;
 
     TICK("marching-cube-create-block-list")
     std::vector<const BlockType*> block_ptrs;
-    for (auto block_ptr_itr = se::BlocksIterator<OctreeT>(&octree);
-         block_ptr_itr != se::BlocksIterator<OctreeT>();
+    for (auto block_ptr_itr = se::BlocksIterator<const OctreeT>(&octree);
+         block_ptr_itr != se::BlocksIterator<const OctreeT>();
          ++block_ptr_itr) {
         block_ptrs.push_back(static_cast<const BlockType*>(*block_ptr_itr));
     }
@@ -1136,7 +1138,7 @@ void marching_cube(OctreeT& octree, TriangleMesh& triangles)
 
 
 template<typename OctreeT>
-void marching_cube(OctreeT& octree, TriangleMesh& triangles, const int time_stamp)
+void marching_cube(const OctreeT& octree, TriangleMesh& triangles, const int time_stamp)
 {
     TICK("primal-marching-cube")
     typedef typename OctreeT::BlockType BlockType;
@@ -1157,14 +1159,14 @@ void marching_cube(OctreeT& octree, TriangleMesh& triangles, const int time_stam
 
 
 template<typename OctreeT>
-void dual_marching_cube(OctreeT& octree, TriangleMesh& triangles)
+void dual_marching_cube(const OctreeT& octree, TriangleMesh& triangles)
 {
     TICK("dual-marching-cube")
     typedef typename OctreeT::BlockType BlockType;
 
     std::vector<const BlockType*> block_ptrs;
-    for (auto block_ptr_itr = se::BlocksIterator<OctreeT>(&octree);
-         block_ptr_itr != se::BlocksIterator<OctreeT>();
+    for (auto block_ptr_itr = se::BlocksIterator<const OctreeT>(&octree);
+         block_ptr_itr != se::BlocksIterator<const OctreeT>();
          ++block_ptr_itr) {
         block_ptrs.push_back(static_cast<const BlockType*>(*block_ptr_itr));
     }
@@ -1177,20 +1179,19 @@ void dual_marching_cube(OctreeT& octree, TriangleMesh& triangles)
 
 
 template<typename OctreeT>
-std::shared_ptr<meshing::VertexIndexMesh> dual_marching_cube(OctreeT& octree)
+meshing::VertexIndexMesh<3> dual_marching_cube(const OctreeT& octree)
 {
     TICK("dual-marching-cube")
     typedef typename OctreeT::BlockType BlockType;
 
     std::vector<const BlockType*> block_ptrs;
-    for (auto block_ptr_itr = se::BlocksIterator<OctreeT>(&octree);
-         block_ptr_itr != se::BlocksIterator<OctreeT>();
+    for (auto block_ptr_itr = se::BlocksIterator<const OctreeT>(&octree);
+         block_ptr_itr != se::BlocksIterator<const OctreeT>();
          ++block_ptr_itr) {
         block_ptrs.push_back(static_cast<const BlockType*>(*block_ptr_itr));
     }
-
     
-    return se::algorithms::dual_marching_cube_kernel(octree, block_ptrs);
+    return se::algorithms::dual_marching_cube(octree, block_ptrs);
 
     TOCK("dual-marching-cube")
 }
@@ -1198,7 +1199,7 @@ std::shared_ptr<meshing::VertexIndexMesh> dual_marching_cube(OctreeT& octree)
 
 
 template<typename OctreeT>
-void dual_marching_cube(OctreeT& octree, TriangleMesh& triangles, const int time_stamp)
+void dual_marching_cube(const OctreeT& octree, TriangleMesh& triangles, const int time_stamp)
 {
     TICK("dual-marching-cube")
     typedef typename OctreeT::BlockType BlockType;

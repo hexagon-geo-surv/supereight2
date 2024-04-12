@@ -161,27 +161,27 @@ inline bool checkVertex(const Eigen::Vector3f& vertex_M, const float dim);
 namespace algorithms {
 
 template<typename OctreeT>
-void marching_cube_kernel(OctreeT& octree,
+void marching_cube_kernel(const OctreeT& octree,
                           std::vector<const typename OctreeT::BlockType*>& block_ptrs,
                           TriangleMesh& triangles);
 
 template<typename OctreeT>
-void dual_marching_cube_kernel(OctreeT& octree,
+void dual_marching_cube_kernel(const OctreeT& octree,
                                std::vector<const typename OctreeT::BlockType*>& block_ptrs,
                                TriangleMesh& triangles);
 
 template<typename OctreeT>
-void dual_marching_cube_kernel(OctreeT& octree,
-                               std::vector<const typename OctreeT::BlockType*>& block_ptrs,
-                               std::vector<std::shared_ptr<meshing::VertexIndexMesh>>& mesh);
+std::vector<meshing::VertexIndexMesh<3>>
+dual_marching_cube_kernel(const OctreeT& octree,
+                          std::vector<const typename OctreeT::BlockType*>& block_ptrs);
 
 template<typename OctreeT>
-std::shared_ptr<meshing::VertexIndexMesh>
-dual_marching_cube_kernel(OctreeT& octree, std::vector<const typename OctreeT::BlockType*>& block_ptrs);
+meshing::VertexIndexMesh<3>
+dual_marching_cube(const OctreeT& octree, std::vector<const typename OctreeT::BlockType*>& block_ptrs);
 
 template<typename OctreeT>
-std::shared_ptr<meshing::VertexIndexMesh>
-dual_marching_cube(OctreeT& octree);
+meshing::VertexIndexMesh<3>
+dual_marching_cube(const OctreeT& octree);
 
 
 /**
@@ -192,7 +192,7 @@ dual_marching_cube(OctreeT& octree);
  * \param[out] triangles    The extracted mesh
  */
 template<typename OctreeT>
-void marching_cube(OctreeT& octree, TriangleMesh& triangles);
+void marching_cube(const OctreeT& octree, TriangleMesh& triangles);
 
 /**
  * \brief Generate the triangle mesh using a primal grid marching cube algorithm.
@@ -204,7 +204,7 @@ void marching_cube(OctreeT& octree, TriangleMesh& triangles);
  * \param[in]  frame        The lower frame threshold of voxel values to consider
  */
 template<typename OctreeT>
-void marching_cube(OctreeT& octree, TriangleMesh& triangles, const int frame);
+void marching_cube(const OctreeT& octree, TriangleMesh& triangles, const int frame);
 
 /**
  * \brief Generate the triangle mesh using a dual grid marching cube algorithm.
@@ -214,7 +214,7 @@ void marching_cube(OctreeT& octree, TriangleMesh& triangles, const int frame);
  * \param[out] triangles    The extracted mesh
  */
 template<typename OctreeT>
-void dual_marching_cube(OctreeT& octree, TriangleMesh& triangles);
+void dual_marching_cube(const OctreeT& octree, TriangleMesh& triangles);
 
 /**
  * \brief Generate the triangle mesh using a dual grid marching cube algorithm.
@@ -226,7 +226,7 @@ void dual_marching_cube(OctreeT& octree, TriangleMesh& triangles);
  * \param[in]  frame        The lower frame threshold of voxel values to consider
  */
 template<typename OctreeT>
-void dual_marching_cube(OctreeT& octree, TriangleMesh& triangles, const int frame);
+void dual_marching_cube(const OctreeT& octree, TriangleMesh& triangles, const int frame);
 
 } // namespace algorithms
 } // namespace se
