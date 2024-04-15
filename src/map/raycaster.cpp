@@ -78,23 +78,23 @@ void render_volume(se::Image<RGBA>& render,
     assert(render.height() == surface_scale.height());
 #pragma omp parallel for
     for (size_t pixel_idx = 0; pixel_idx < render.size(); pixel_idx++) {
-        const Eigen::Vector3f surface_point_W = surface_points_W[pixel_idx];
-        const Eigen::Vector3f surface_normal_W = surface_normals_W[pixel_idx];
-
+        RGBA colour;
+        const Eigen::Vector3f& surface_normal_W = surface_normals_W[pixel_idx];
         if (surface_normal_W != math::g_invalid_normal && surface_normal_W.norm() > 0.f) {
-            const Eigen::Vector3f diff = (surface_point_W - light_source_W).normalized();
-            const Eigen::Vector3f dir =
-                Eigen::Vector3f::Constant(std::max(surface_normal_W.normalized().dot(diff), 0.f));
-            Eigen::Vector3f col = dir + ambient_light;
-            se::eigen::clamp(col, Eigen::Vector3f::Zero(), Eigen::Vector3f::Ones());
+            const Eigen::Vector3f& surface_point_W = surface_points_W[pixel_idx];
+            const Eigen::Vector3f light_dir_W = (surface_point_W - light_source_W).normalized();
+            assert(surface_normal_W.isApprox(surface_normal_W.normalized()));
+            // The intensity must be 0 if the light is opposite the surface (negative dot product).
+            const float intensity = std::max(surface_normal_W.dot(light_dir_W), 0.0f);
             const RGB rgb = scale_colour(surface_scale[pixel_idx]);
-            col = col.cwiseProduct(Eigen::Vector3f(rgb.r, rgb.g, rgb.b));
-            const Eigen::Matrix<std::uint8_t, 3, 1> rgb8 = col.cast<std::uint8_t>();
-            render[pixel_idx] = {rgb8.x(), rgb8.y(), rgb8.z(), 0xFF};
+            const Eigen::Vector3f diffuse = intensity * Eigen::Vector3f(rgb.r, rgb.g, rgb.b);
+            Eigen::Vector3f col = diffuse + 255.0f * ambient_light;
+            se::eigen::clamp(col, Eigen::Vector3f::Zero(), Eigen::Vector3f::Constant(255.0f));
+            colour.r = col.x();
+            colour.g = col.y();
+            colour.b = col.z();
         }
-        else {
-            render[pixel_idx] = {0x00, 0x00, 0x00, 0xFF};
-        }
+        render[pixel_idx] = colour;
     }
 }
 
