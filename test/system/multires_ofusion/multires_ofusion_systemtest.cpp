@@ -416,13 +416,13 @@ TEST(MultiResOFusionSystemTest, Raycasting)
     const Eigen::Vector3f ambient{0.1, 0.1, 0.1};
     se::image::rgb_to_rgba(processed_colour_img, output_colour_img);
     convert_to_output_depth_img(processed_depth_img, output_depth_img.data());
-    se::raycaster::render_volume_kernel(output_volume_img.data(),
-                                        processed_img_res,
-                                        T_WS.translation(),
-                                        ambient,
-                                        surface_point_cloud_W,
-                                        surface_normals_W,
-                                        surface_scale);
+    se::raycaster::render_volume(output_volume_img.data(),
+                                 processed_img_res,
+                                 T_WS.translation(),
+                                 ambient,
+                                 surface_point_cloud_W,
+                                 surface_normals_W,
+                                 surface_scale);
 
     map.saveStructure(config.app.structure_path + "/test-raycasting-structure_"
                       + std::to_string(frame) + ".ply");
