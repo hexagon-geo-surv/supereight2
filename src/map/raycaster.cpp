@@ -89,8 +89,8 @@ void render_volume_kernel(RGBA* volume_image_data,
                     std::max(surface_normal_M.normalized().dot(diff), 0.f));
                 Eigen::Vector3f col = dir + ambient_M;
                 se::eigen::clamp(col, Eigen::Vector3f::Zero(), Eigen::Vector3f::Ones());
-
-                col = col.cwiseProduct(scale_colour(surface_scale(x, y)));
+                const RGB rgb = scale_colour(surface_scale[pixel_idx]);
+                col = col.cwiseProduct(Eigen::Vector3f(rgb.r, rgb.g, rgb.b));
                 const Eigen::Matrix<std::uint8_t, 3, 1> rgb8 = col.cast<std::uint8_t>();
                 volume_image_data[pixel_idx] = {rgb8.x(), rgb8.y(), rgb8.z(), 0xFF};
             }

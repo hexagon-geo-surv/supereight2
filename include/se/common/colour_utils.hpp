@@ -10,6 +10,7 @@
 
 #include <Eigen/Core>
 #include <cstdint>
+#include <se/common/rgb.hpp>
 #include <se/common/rgba.hpp>
 #include <vector>
 
@@ -20,15 +21,14 @@ namespace colours {
 /**
  * The colours used for the various integration scales.
  */
-static const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> scale = {
-    {102, 194, 165},
-    {252, 141, 98},
-    {141, 160, 203},
-    {231, 138, 195},
-    {166, 216, 84},
-    {255, 217, 47},
-    {229, 196, 148},
-    {179, 179, 179}};
+static const std::vector<RGB> scale = {{102, 194, 165},
+                                       {252, 141, 98},
+                                       {141, 160, 203},
+                                       {231, 138, 195},
+                                       {166, 216, 84},
+                                       {255, 217, 47},
+                                       {229, 196, 148},
+                                       {179, 179, 179}};
 } // namespace colours
 
 /**
@@ -186,7 +186,7 @@ void depth_to_rgba(RGBA* depth_RGBA_image_data,
  * If the scale is greater or equal to the number of colours in se::colours::scale then the last
  * colour will be returned.
  */
-static inline const Eigen::Vector3f& scale_colour(const int scale);
+static inline const RGB scale_colour(const int scale);
 
 } // namespace se
 

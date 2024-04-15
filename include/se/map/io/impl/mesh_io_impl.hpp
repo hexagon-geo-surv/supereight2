@@ -83,8 +83,8 @@ int save_mesh_vtk(const Mesh<FaceT>& mesh_M,
     // Write the face scale colours.
     file << "COLOR_SCALARS scale_colour 3\n";
     for (const auto& face : mesh_M) {
-        const Eigen::Vector3f rgb = scale_colour(face.max_vertex_scale) / 255.0f;
-        file << rgb.x() << " " << rgb.y() << " " << rgb.z() << "\n";
+        const RGB rgb = scale_colour(face.max_vertex_scale);
+        file << rgb.r / 255.0f << " " << rgb.g / 255.0f << " " << rgb.b / 255.0f << "\n";
     }
     file << "\n";
 
@@ -139,8 +139,9 @@ int save_mesh_ply(const Mesh<FaceT>& mesh_M,
             file << " " << FaceT::num_vertexes * f + v;
         }
         // Write the face scale colour.
-        const Eigen::Vector3i rgb = scale_colour(mesh_M[f].max_vertex_scale).template cast<int>();
-        file << " " << rgb.x() << " " << rgb.y() << " " << rgb.z() << "\n";
+        const RGB rgb = scale_colour(mesh_M[f].max_vertex_scale);
+        file << " " << static_cast<int>(rgb.r) << " " << static_cast<int>(rgb.g) << " "
+             << static_cast<int>(rgb.b) << "\n";
     }
 
     file.close();

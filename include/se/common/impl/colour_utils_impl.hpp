@@ -91,7 +91,7 @@ static inline uint32_t blend(const uint32_t rgba_1, const uint32_t rgba_2, const
 
 
 
-const Eigen::Vector3f& scale_colour(const int scale)
+const RGB scale_colour(const int scale)
 {
     assert(scale >= 0);
     if (static_cast<size_t>(scale) < colours::scale.size()) {
