@@ -10,6 +10,7 @@
 #define SE_RAYCASTER_HPP
 
 #include <optional>
+#include <se/common/rgb.hpp>
 #include <se/common/rgba.hpp>
 
 #include "se/common/colour_utils.hpp"
@@ -64,7 +65,7 @@ void render_volume(se::Image<RGBA>& render,
                    const se::Image<Eigen::Vector3f>& surface_normals_W,
                    const se::Image<int8_t>& surface_scale,
                    const Eigen::Vector3f& light_source_W = Eigen::Vector3f::Zero(),
-                   const Eigen::Vector3f& ambient_light = Eigen::Vector3f::Constant(0.1));
+                   const RGB ambient_light = RGB{0x1A, 0x1A, 0x1A});
 
 
 

@@ -68,7 +68,7 @@ void render_volume(se::Image<RGBA>& render,
                    const se::Image<Eigen::Vector3f>& surface_normals_W,
                    const se::Image<int8_t>& surface_scale,
                    const Eigen::Vector3f& light_source_W,
-                   const Eigen::Vector3f& ambient_light)
+                   const RGB ambient_light)
 {
     assert(render.width() == surface_points_W.width());
     assert(render.height() == surface_points_W.height());
@@ -76,6 +76,7 @@ void render_volume(se::Image<RGBA>& render,
     assert(render.height() == surface_normals_W.height());
     assert(render.width() == surface_scale.width());
     assert(render.height() == surface_scale.height());
+    const Eigen::Vector3f ambient_light_f(ambient_light.r, ambient_light.g, ambient_light.b);
 #pragma omp parallel for
     for (size_t pixel_idx = 0; pixel_idx < render.size(); pixel_idx++) {
         RGBA colour;
@@ -88,7 +89,7 @@ void render_volume(se::Image<RGBA>& render,
             const float intensity = std::max(surface_normal_W.dot(light_dir_W), 0.0f);
             const RGB rgb = scale_colour(surface_scale[pixel_idx]);
             const Eigen::Vector3f diffuse = intensity * Eigen::Vector3f(rgb.r, rgb.g, rgb.b);
-            Eigen::Vector3f col = diffuse + 255.0f * ambient_light;
+            Eigen::Vector3f col = diffuse + ambient_light_f;
             se::eigen::clamp(col, Eigen::Vector3f::Zero(), Eigen::Vector3f::Constant(255.0f));
             colour.r = col.x();
             colour.g = col.y();
