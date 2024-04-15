@@ -16,8 +16,11 @@ inline bool ColourData<Colour::On>::update(const colour_t colour_, const std::ui
         weight++;
     }
     // The following code relies on the implicit conversion to int or larger (if weight_t is an
-    // integral type) or float or larger (if weight_t is a floating-point type) to avoid overflows.
+    // integral type) or to float or larger (if weight_t is a floating-point type) in order to avoid
+    // overflows.
     static_assert(sizeof(colour_t::r) < sizeof(int));
+    static_assert(sizeof(colour_t::g) < sizeof(int));
+    static_assert(sizeof(colour_t::b) < sizeof(int));
     colour.r = (colour.r * (weight - weight_t(1)) + colour_.r) / weight;
     colour.g = (colour.g * (weight - weight_t(1)) + colour_.g) / weight;
     colour.b = (colour.b * (weight - weight_t(1)) + colour_.b) / weight;
