@@ -3,6 +3,7 @@
 
 cmake_minimum_required(VERSION 3.10...3.16)
 
+add_subdirectory(common)
 add_subdirectory(common/bounded_vector)
 add_subdirectory(common/image_utils)
 add_subdirectory(common/str_utils)
