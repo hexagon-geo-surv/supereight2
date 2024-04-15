@@ -64,11 +64,11 @@ void point_cloud_to_normal(se::Image<Eigen::Vector3f>& normals,
 
 
 void render_volume(se::Image<RGBA>& render,
-                   const Eigen::Vector3f& light_M,
-                   const Eigen::Vector3f& ambient_M,
                    const se::Image<Eigen::Vector3f>& surface_point_cloud_M,
                    const se::Image<Eigen::Vector3f>& surface_normals_M,
-                   const se::Image<int8_t>& surface_scale)
+                   const se::Image<int8_t>& surface_scale,
+                   const Eigen::Vector3f& light_M,
+                   const Eigen::Vector3f& ambient_M)
 {
     assert(render.width() == surface_point_cloud_M.width());
     assert(render.height() == surface_point_cloud_M.height());

@@ -155,7 +155,6 @@ int main(int argc, char** argv)
             // The volume is only rendered at the set rendering rate
             TICK("render")
             if (config.app.enable_rendering) {
-                const Eigen::Vector3f ambient{0.1, 0.1, 0.1};
                 se::image::rgb_to_rgba(processed_colour_img, output_colour_img);
                 convert_to_output_depth_img(processed_depth_img,
                                             sensor.near_plane,
@@ -164,11 +163,10 @@ int main(int argc, char** argv)
                 tracker.renderTrackingResult(output_tracking_img.data());
                 if (frame % config.app.rendering_rate == 0) {
                     se::raycaster::render_volume(output_volume_img,
-                                                 T_WS.translation(),
-                                                 ambient,
                                                  surface_point_cloud_W,
                                                  surface_normals_W,
-                                                 surface_scale);
+                                                 surface_scale,
+                                                 T_WS.translation());
                 }
             }
             TOCK("render")
