@@ -64,28 +64,28 @@ void point_cloud_to_normal(se::Image<Eigen::Vector3f>& normals,
 
 
 void render_volume(se::Image<RGBA>& render,
-                   const se::Image<Eigen::Vector3f>& surface_point_cloud_M,
-                   const se::Image<Eigen::Vector3f>& surface_normals_M,
+                   const se::Image<Eigen::Vector3f>& surface_points_W,
+                   const se::Image<Eigen::Vector3f>& surface_normals_W,
                    const se::Image<int8_t>& surface_scale,
-                   const Eigen::Vector3f& light_M,
-                   const Eigen::Vector3f& ambient_M)
+                   const Eigen::Vector3f& light_source_W,
+                   const Eigen::Vector3f& ambient_light)
 {
-    assert(render.width() == surface_point_cloud_M.width());
-    assert(render.height() == surface_point_cloud_M.height());
-    assert(render.width() == surface_normals_M.width());
-    assert(render.height() == surface_normals_M.height());
+    assert(render.width() == surface_points_W.width());
+    assert(render.height() == surface_points_W.height());
+    assert(render.width() == surface_normals_W.width());
+    assert(render.height() == surface_normals_W.height());
     assert(render.width() == surface_scale.width());
     assert(render.height() == surface_scale.height());
 #pragma omp parallel for
     for (size_t pixel_idx = 0; pixel_idx < render.size(); pixel_idx++) {
-        const Eigen::Vector3f surface_point_M = surface_point_cloud_M[pixel_idx];
-        const Eigen::Vector3f surface_normal_M = surface_normals_M[pixel_idx];
+        const Eigen::Vector3f surface_point_W = surface_points_W[pixel_idx];
+        const Eigen::Vector3f surface_normal_W = surface_normals_W[pixel_idx];
 
-        if (surface_normal_M != math::g_invalid_normal && surface_normal_M.norm() > 0.f) {
-            const Eigen::Vector3f diff = (surface_point_M - light_M).normalized();
+        if (surface_normal_W != math::g_invalid_normal && surface_normal_W.norm() > 0.f) {
+            const Eigen::Vector3f diff = (surface_point_W - light_source_W).normalized();
             const Eigen::Vector3f dir =
-                Eigen::Vector3f::Constant(std::max(surface_normal_M.normalized().dot(diff), 0.f));
-            Eigen::Vector3f col = dir + ambient_M;
+                Eigen::Vector3f::Constant(std::max(surface_normal_W.normalized().dot(diff), 0.f));
+            Eigen::Vector3f col = dir + ambient_light;
             se::eigen::clamp(col, Eigen::Vector3f::Zero(), Eigen::Vector3f::Ones());
             const RGB rgb = scale_colour(surface_scale[pixel_idx]);
             col = col.cwiseProduct(Eigen::Vector3f(rgb.r, rgb.g, rgb.b));

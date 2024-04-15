@@ -60,11 +60,11 @@ void raycast_volume(const MapT& map,
                     const SensorT& sensor);
 
 void render_volume(se::Image<RGBA>& render,
-                   const se::Image<Eigen::Vector3f>& surface_point_cloud_W,
+                   const se::Image<Eigen::Vector3f>& surface_points_W,
                    const se::Image<Eigen::Vector3f>& surface_normals_W,
                    const se::Image<int8_t>& surface_scale,
-                   const Eigen::Vector3f& light_W = Eigen::Vector3f::Zero(),
-                   const Eigen::Vector3f& ambient_W = Eigen::Vector3f::Constant(0.1));
+                   const Eigen::Vector3f& light_source_W = Eigen::Vector3f::Zero(),
+                   const Eigen::Vector3f& ambient_light = Eigen::Vector3f::Constant(0.1));
 
 
 
