@@ -63,42 +63,39 @@ void point_cloud_to_normal(se::Image<Eigen::Vector3f>& normals,
 
 
 
-void render_volume(RGBA* volume_image_data,
-                   const Eigen::Vector2i& volume_image_res,
+void render_volume(se::Image<RGBA>& render,
                    const Eigen::Vector3f& light_M,
                    const Eigen::Vector3f& ambient_M,
                    const se::Image<Eigen::Vector3f>& surface_point_cloud_M,
                    const se::Image<Eigen::Vector3f>& surface_normals_M,
                    const se::Image<int8_t>& surface_scale)
 {
-    const int h = volume_image_res.y(); // clang complains if this is inside the for loop
-    const int w = volume_image_res.x(); // clang complains if this is inside the for loop
-
+    assert(render.width() == surface_point_cloud_M.width());
+    assert(render.height() == surface_point_cloud_M.height());
+    assert(render.width() == surface_normals_M.width());
+    assert(render.height() == surface_normals_M.height());
+    assert(render.width() == surface_scale.width());
+    assert(render.height() == surface_scale.height());
 #pragma omp parallel for
-    for (int y = 0; y < h; y++) {
-#pragma omp simd
-        for (int x = 0; x < w; x++) {
-            const size_t pixel_idx = x + w * y;
+    for (size_t pixel_idx = 0; pixel_idx < render.size(); pixel_idx++) {
+        const Eigen::Vector3f surface_point_M = surface_point_cloud_M[pixel_idx];
+        const Eigen::Vector3f surface_normal_M = surface_normals_M[pixel_idx];
 
-            const Eigen::Vector3f surface_point_M = surface_point_cloud_M[pixel_idx];
-            const Eigen::Vector3f surface_normal_M = surface_normals_M[pixel_idx];
-
-            if (surface_normal_M != math::g_invalid_normal && surface_normal_M.norm() > 0.f) {
-                const Eigen::Vector3f diff = (surface_point_M - light_M).normalized();
-                const Eigen::Vector3f dir = Eigen::Vector3f::Constant(
-                    std::max(surface_normal_M.normalized().dot(diff), 0.f));
-                Eigen::Vector3f col = dir + ambient_M;
-                se::eigen::clamp(col, Eigen::Vector3f::Zero(), Eigen::Vector3f::Ones());
-                const RGB rgb = scale_colour(surface_scale[pixel_idx]);
-                col = col.cwiseProduct(Eigen::Vector3f(rgb.r, rgb.g, rgb.b));
-                const Eigen::Matrix<std::uint8_t, 3, 1> rgb8 = col.cast<std::uint8_t>();
-                volume_image_data[pixel_idx] = {rgb8.x(), rgb8.y(), rgb8.z(), 0xFF};
-            }
-            else {
-                volume_image_data[pixel_idx] = {0x00, 0x00, 0x00, 0xFF};
-            }
-        } // x
-    }     // y
+        if (surface_normal_M != math::g_invalid_normal && surface_normal_M.norm() > 0.f) {
+            const Eigen::Vector3f diff = (surface_point_M - light_M).normalized();
+            const Eigen::Vector3f dir =
+                Eigen::Vector3f::Constant(std::max(surface_normal_M.normalized().dot(diff), 0.f));
+            Eigen::Vector3f col = dir + ambient_M;
+            se::eigen::clamp(col, Eigen::Vector3f::Zero(), Eigen::Vector3f::Ones());
+            const RGB rgb = scale_colour(surface_scale[pixel_idx]);
+            col = col.cwiseProduct(Eigen::Vector3f(rgb.r, rgb.g, rgb.b));
+            const Eigen::Matrix<std::uint8_t, 3, 1> rgb8 = col.cast<std::uint8_t>();
+            render[pixel_idx] = {rgb8.x(), rgb8.y(), rgb8.z(), 0xFF};
+        }
+        else {
+            render[pixel_idx] = {0x00, 0x00, 0x00, 0xFF};
+        }
+    }
 }
 
 } // namespace raycaster
