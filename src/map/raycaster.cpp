@@ -8,8 +8,6 @@
 
 #include "se/map/raycaster.hpp"
 
-#include <se/common/eigen_utils.hpp>
-
 namespace se {
 namespace raycaster {
 
@@ -70,33 +68,15 @@ void render_volume(se::Image<RGBA>& render,
                    const Eigen::Vector3f& light_source_W,
                    const RGB ambient_light)
 {
-    assert(render.width() == surface_points_W.width());
-    assert(render.height() == surface_points_W.height());
-    assert(render.width() == surface_normals_W.width());
-    assert(render.height() == surface_normals_W.height());
     assert(render.width() == surface_scale.width());
     assert(render.height() == surface_scale.height());
-    const Eigen::Vector3f ambient_light_f(ambient_light.r, ambient_light.g, ambient_light.b);
-#pragma omp parallel for
-    for (size_t pixel_idx = 0; pixel_idx < render.size(); pixel_idx++) {
-        RGBA colour;
-        const Eigen::Vector3f& surface_normal_W = surface_normals_W[pixel_idx];
-        if (surface_normal_W != math::g_invalid_normal && surface_normal_W.norm() > 0.f) {
-            const Eigen::Vector3f& surface_point_W = surface_points_W[pixel_idx];
-            const Eigen::Vector3f light_dir_W = (surface_point_W - light_source_W).normalized();
-            assert(surface_normal_W.isApprox(surface_normal_W.normalized()));
-            // The intensity must be 0 if the light is opposite the surface (negative dot product).
-            const float intensity = std::max(surface_normal_W.dot(light_dir_W), 0.0f);
-            const RGB rgb = scale_colour(surface_scale[pixel_idx]);
-            const Eigen::Vector3f diffuse = intensity * Eigen::Vector3f(rgb.r, rgb.g, rgb.b);
-            Eigen::Vector3f col = diffuse + ambient_light_f;
-            se::eigen::clamp(col, Eigen::Vector3f::Zero(), Eigen::Vector3f::Constant(255.0f));
-            colour.r = col.x();
-            colour.g = col.y();
-            colour.b = col.z();
-        }
-        render[pixel_idx] = colour;
-    }
+    return render_volume(
+        render,
+        surface_points_W,
+        surface_normals_W,
+        [&surface_scale](const size_t pixel_idx) { return scale_colour(surface_scale[pixel_idx]); },
+        light_source_W,
+        ambient_light);
 }
 
 } // namespace raycaster

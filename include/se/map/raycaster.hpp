@@ -10,6 +10,7 @@
 #define SE_RAYCASTER_HPP
 
 #include <optional>
+#include <se/common/eigen_utils.hpp>
 #include <se/common/rgb.hpp>
 #include <se/common/rgba.hpp>
 
@@ -60,14 +61,36 @@ void raycast_volume(const MapT& map,
                     const Eigen::Isometry3f& T_WS,
                     const SensorT& sensor);
 
+/** Render the surface represented by \p surface_points_W and \p surface_normals_W into \p render.
+ * The colour of each point is returned by the functor \p get_diffuse_colour which must have the
+ * following prototype:
+ * \code
+ * se::RGB get_diffuse_colour(const size_t pixel_index);
+ * \endcode
+ * where \p pixel_index is a linear index into \p surface_points_W.
+ *
+ * The scene is lit by a point light located at \p light_source_W and an ambient light with colour
+ * \p ambient_light.
+ *
+ * Uses [Gouraud shading](https://en.wikipedia.org/wiki/Gouraud_shading#Description) with a
+ * simplified
+ * [Phong reflection model](https://en.wikipedia.org/wiki/Phong_reflection_model#Description)
+ * containing only ambient and diffuse components (no specular component.
+ */
+template<typename GetDiffuseColourF>
+void render_volume(se::Image<RGBA>& render,
+                   const se::Image<Eigen::Vector3f>& surface_points_W,
+                   const se::Image<Eigen::Vector3f>& surface_normals_W,
+                   const GetDiffuseColourF get_diffuse_colour,
+                   const Eigen::Vector3f& light_source_W = Eigen::Vector3f::Zero(),
+                   const RGB ambient_light = RGB{0x1A, 0x1A, 0x1A});
+
 void render_volume(se::Image<RGBA>& render,
                    const se::Image<Eigen::Vector3f>& surface_points_W,
                    const se::Image<Eigen::Vector3f>& surface_normals_W,
                    const se::Image<int8_t>& surface_scale,
                    const Eigen::Vector3f& light_source_W = Eigen::Vector3f::Zero(),
                    const RGB ambient_light = RGB{0x1A, 0x1A, 0x1A});
-
-
 
 } // namespace raycaster
 } // namespace se
