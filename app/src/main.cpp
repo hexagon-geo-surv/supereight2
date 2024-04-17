@@ -162,11 +162,11 @@ int main(int argc, char** argv)
                                             output_depth_img.data());
                 tracker.renderTrackingResult(output_tracking_img.data());
                 if (frame % config.app.rendering_rate == 0) {
-                    se::raycaster::render_volume(output_volume_img,
-                                                 surface_point_cloud_W,
-                                                 surface_normals_W,
-                                                 surface_scale,
-                                                 T_WS.translation());
+                    se::raycaster::render_volume_scale(output_volume_img,
+                                                       surface_point_cloud_W,
+                                                       surface_normals_W,
+                                                       surface_scale,
+                                                       T_WS.translation());
                 }
             }
             TOCK("render")
