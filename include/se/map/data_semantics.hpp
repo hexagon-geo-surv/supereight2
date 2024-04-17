@@ -46,8 +46,8 @@ struct SemanticData<Semantics::On> {
 };
 
 template<>
-std::ostream& operator<< <Semantics::On>(std::ostream& os,
-                                         const SemanticData<Semantics::On>::Config& c);
+std::ostream& operator<<<Semantics::On>(std::ostream& os,
+                                        const SemanticData<Semantics::On>::Config& c);
 
 ///////////////////
 /// DELTA DATA  ///

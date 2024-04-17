@@ -17,7 +17,8 @@ enum class UncertaintyModel { Linear, Quadratic };
 
 template<Field FieldT>
 struct FieldData {
-    struct Config {};
+    struct Config {
+    };
 };
 
 template<>
@@ -93,7 +94,8 @@ std::ostream& operator<<(std::ostream& os, const FieldData<Field::TSDF>::Config&
 ///////////////////
 
 template<Field FieldT>
-struct FieldDeltaData {};
+struct FieldDeltaData {
+};
 
 template<>
 struct FieldDeltaData<Field::Occupancy> {

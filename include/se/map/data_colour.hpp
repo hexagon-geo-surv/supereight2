@@ -48,7 +48,7 @@ struct ColourData<Colour::On> {
 };
 
 template<>
-std::ostream& operator<< <Colour::On>(std::ostream& os, const ColourData<Colour::On>::Config& c);
+std::ostream& operator<<<Colour::On>(std::ostream& os, const ColourData<Colour::On>::Config& c);
 
 ///////////////////
 /// DELTA DATA  ///
@@ -56,7 +56,8 @@ std::ostream& operator<< <Colour::On>(std::ostream& os, const ColourData<Colour:
 
 // Colour data
 template<Colour ColB>
-struct ColourDeltaData {};
+struct ColourDeltaData {
+};
 
 // Use signed 16-bit integers to allow storing all possible deltas from unsigned 8-bit integers.
 template<>
