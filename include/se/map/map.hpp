@@ -206,8 +206,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
         return se::visitor::getMaxData(octree_, voxel_coord, scale_desired);
     }
 
-    /** Interpolate a member of #DataType at the supplied voxel coordinates and the finest possible
-     * scale.
+    /** Interpolate a member of #DataType at the supplied coordinates and the finest possible scale.
      *
      * \param[in] point_W         The coordinates in metres of the point in the world frame W the
      *                            member will be interpolated at.

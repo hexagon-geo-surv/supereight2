@@ -268,10 +268,10 @@ getInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, GetF get)
  * is interpolated at may be coarser than \p desired_scale and is written in \p returned_scale.
  *
  * \param[in] octree          The multi-resolution octree containing the data.
- * \param[in] voxel_coord_f   The voxel coordinates the member will be interpolated at. The
+ * \param[in] voxel_coord_f   The voxel coordinates the field will be interpolated at. The
  *                            coordinates may have a fractional part.
- * \param[in]  desired_scale  The finest scale the member should be interpolated at.
- * \param[out] returned_scale The actual scale the member was interpolated at. Not less than \p
+ * \param[in]  desired_scale  The finest scale the field should be interpolated at.
+ * \param[out] returned_scale The actual scale the field was interpolated at. Not less than \p
  *                            desired_scale. Not modified if `std::nullopt` is returned.
  *
  * \return The interpolated field value if the data is valid, `std::nullopt` otherwise.
