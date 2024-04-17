@@ -1030,6 +1030,35 @@ getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 
 
 
+template<typename OctreeT>
+typename std::enable_if_t<OctreeT::res_ == Res::Multi && OctreeT::col_ == Colour::On,
+                          std::optional<colour_t>>
+getColourInterp(const OctreeT& octree,
+                const Eigen::Vector3f& voxel_coord_f,
+                const int desired_scale,
+                int* returned_scale)
+{
+    return getInterp(
+        octree,
+        voxel_coord_f,
+        [](const typename OctreeT::DataType& d) { return d.colour.colour; },
+        desired_scale,
+        returned_scale);
+}
+
+
+
+template<typename OctreeT>
+typename std::enable_if_t<OctreeT::res_ == Res::Single && OctreeT::col_ == Colour::On,
+                          std::optional<colour_t>>
+getColourInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
+{
+    return getInterp(
+        octree, voxel_coord_f, [](const typename OctreeT::DataType& d) { return d.colour.colour; });
+}
+
+
+
 /// Single-res get field gradient functions
 
 template<typename OctreeT>
