@@ -96,6 +96,17 @@ void render_volume_scale(se::Image<RGBA>& render,
                          const Eigen::Vector3f& light_source_W = Eigen::Vector3f::Zero(),
                          const RGB ambient_light = RGB{0x1A, 0x1A, 0x1A});
 
+/** Render the surface represented by \p surface_points_W and \p surface_normals_W into \p render,
+ * coloured using the colours from \p surface_colour. Lighting is as in
+ * se::raycaster::render_volume().
+ */
+void render_volume_colour(se::Image<RGBA>& render,
+                          const se::Image<Eigen::Vector3f>& surface_points_W,
+                          const se::Image<Eigen::Vector3f>& surface_normals_W,
+                          const se::Image<RGB>& surface_colour,
+                          const Eigen::Vector3f& light_source_W = Eigen::Vector3f::Zero(),
+                          const RGB ambient_light = RGB{0x1A, 0x1A, 0x1A});
+
 } // namespace raycaster
 } // namespace se
 

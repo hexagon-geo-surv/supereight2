@@ -79,5 +79,25 @@ void render_volume_scale(se::Image<RGBA>& render,
         ambient_light);
 }
 
+
+
+void render_volume_colour(se::Image<RGBA>& render,
+                          const se::Image<Eigen::Vector3f>& surface_points_W,
+                          const se::Image<Eigen::Vector3f>& surface_normals_W,
+                          const se::Image<RGB>& surface_colour,
+                          const Eigen::Vector3f& light_source_W,
+                          const RGB ambient_light)
+{
+    assert(render.width() == surface_colour.width());
+    assert(render.height() == surface_colour.height());
+    return render_volume(
+        render,
+        surface_points_W,
+        surface_normals_W,
+        [&surface_colour](const size_t pixel_idx) { return surface_colour[pixel_idx]; },
+        light_source_W,
+        ambient_light);
+}
+
 } // namespace raycaster
 } // namespace se
