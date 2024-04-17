@@ -21,16 +21,10 @@ float compute_three_sigma(const field_t depth_value,
                           const ConfigT config)
 {
     if (config.field.uncertainty_model == UncertaintyModel::Linear) {
-        return 3
-            * std::clamp(config.field.k_sigma * depth_value,
-                         sigma_min,
-                         sigma_max); // Livingroom dataset
+        return 3 * std::clamp(config.field.k_sigma * depth_value, sigma_min, sigma_max);
     }
     else {
-        return 3
-            * std::clamp(config.field.k_sigma * math::sq(depth_value),
-                         sigma_min,
-                         sigma_max); // Cow and lady
+        return 3 * std::clamp(config.field.k_sigma * math::sq(depth_value), sigma_min, sigma_max);
     }
 }
 

@@ -63,7 +63,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
     TOCK("fusion-total")
 
-    /// Propagation
+    // Propagation
     TICK("propagation-total")
 
     TICK("propagation-blocks")
@@ -121,8 +121,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
         }
     }
 
-    for (int d = octree_.getBlockDepth() - 1; d > 0; d--) // TODO: block depth - 1?
-    {
+    for (int d = octree_.getBlockDepth() - 1; d > 0; d--) {
         std::set<OctantBase*>::iterator it;
         for (it = node_set_[d].begin(); it != node_set_[d].end(); ++it) {
             OctantBase* octant_ptr = *it;
@@ -177,7 +176,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
     map_.voxelToPoint(block_coord, block_size, block_centre_point_W);
     const Eigen::Vector3f block_centre_point_C = T_SW_ * block_centre_point_W;
 
-    /// Compute the integration scale
+    // Compute the integration scale
     // The last integration scale
     const int last_scale = (block_ptr->getMinScale() == -1) ? 0 : block_ptr->getCurrentScale();
 
@@ -205,7 +204,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
     int integration_scale = last_scale;
 
-    /// If no data has been integrated in the block before (block_ptr->getMinScale() == -1), use the computed integration scale.
+    // If no data has been integrated in the block before (block_ptr->getMinScale() == -1), use the computed integration scale.
     if (block_ptr->getMinScale() == -1) {
         // Make sure the block is allocated up to the integration scale
         integration_scale = recommended_scale;
@@ -214,10 +213,10 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
         block_ptr->initCurrCout();
         block_ptr->setInitData(DataType());
     }
-    else if (recommended_scale != last_scale) ///<< Potential double integration
+    else if (recommended_scale != last_scale) // Potential double integration
     {
         if (recommended_scale
-            != block_ptr->buffer_scale()) ///<< Start from scratch and initialise buffer
+            != block_ptr->buffer_scale()) // Start from scratch and initialise buffer
         {
             block_ptr->initBuffer(recommended_scale);
 
@@ -244,15 +243,12 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                                         const int buffer_idx = (2 * x + i)
                                             + (2 * y + j) * size_at_buffer_scale_li
                                             + (2 * z + k) * size_at_buffer_scale_sq;
-                                        auto& buffer_data = block_ptr->bufferData(
-                                            buffer_idx); ///<< Fetch value from buffer.
+                                        auto& buffer_data = block_ptr->bufferData(buffer_idx);
 
                                         buffer_data.field.occupancy = parent_data.field.occupancy;
-                                        buffer_data.field.weight =
-                                            parent_data.field
-                                                .weight; // (parent_data.y > 0) ? 1 : 0;
+                                        buffer_data.field.weight = parent_data.field.weight;
                                         buffer_data.field.observed =
-                                            false; ///<< Set falls such that the observe count can work properly
+                                            false; // Set falls such that the observe count can work properly
 
                                     } // i
                                 }     // j
@@ -264,7 +260,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
             }
         }
 
-        /// Integrate data into buffer.
+        // Integrate data into buffer.
         const unsigned int size_at_recommended_scale_li = BlockType::size >> recommended_scale;
         const unsigned int size_at_recommended_scale_sq = math::sq(size_at_recommended_scale_li);
 
@@ -274,8 +270,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                 for (unsigned int x = 0; x < size_at_recommended_scale_li; x++) {
                     const int buffer_idx =
                         x + y * size_at_recommended_scale_li + z * size_at_recommended_scale_sq;
-                    auto& buffer_data =
-                        block_ptr->bufferData(buffer_idx); /// \note pass by reference now.
+                    auto& buffer_data = block_ptr->bufferData(buffer_idx);
                     block_ptr->incrBufferObservedCount(
                         updater::free_voxel(buffer_data, map_.getDataConfig()));
                 } // x
@@ -299,10 +294,9 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
         for (unsigned int y = 0; y < size_at_integration_scale_li; y++) {
 #pragma omp simd // TODO: Move UP
             for (unsigned int x = 0; x < size_at_integration_scale_li; x++) {
-                // Update the voxel data based using the depth measurement
                 const int voxel_idx =
                     x + y * size_at_integration_scale_li + z * size_at_integration_scale_sq;
-                auto& voxel_data = block_ptr->currData(voxel_idx); /// \note pass by reference now.
+                auto& voxel_data = block_ptr->currData(voxel_idx);
                 block_ptr->incrCurrObservedCount(
                     updater::free_voxel(voxel_data, map_.getDataConfig()));
             } // x
@@ -341,7 +335,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
     float three_sigma = compute_three_sigma(
         block_point_C_m, config_.sigma_min, config_.sigma_max, map_.getDataConfig());
 
-    /// Compute the integration scale
+    // Compute the integration scale
     // The last integration scale
     const int last_scale = (block_ptr->getMinScale() == -1) ? 0 : block_ptr->getCurrentScale();
 
@@ -370,7 +364,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
     int integration_scale = last_scale;
 
-    /// If no data has been integrated in the block before (block_ptr->getMinScale() == -1), use the computed integration scale.
+    // If no data has been integrated in the block before (block_ptr->getMinScale() == -1), use the computed integration scale.
     if (block_ptr->getMinScale() == -1) {
         // Make sure the block is allocated up to the integration scale
         integration_scale = recommended_scale;
@@ -379,10 +373,10 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
         block_ptr->initCurrCout();
         block_ptr->setInitData(DataType());
     }
-    else if (recommended_scale != last_scale) ///<< Potential double integration
+    else if (recommended_scale != last_scale) // Potential double integration
     {
         if (recommended_scale
-            != block_ptr->buffer_scale()) ///<< Start from scratch and initialise buffer
+            != block_ptr->buffer_scale()) // Start from scratch and initialise buffer
         {
             block_ptr->initBuffer(recommended_scale);
 
@@ -409,15 +403,12 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                                         const int buffer_idx = (2 * x + i)
                                             + (2 * y + j) * size_at_buffer_scale_li
                                             + (2 * z + k) * size_at_buffer_scale_sq;
-                                        auto& buffer_data = block_ptr->bufferData(
-                                            buffer_idx); ///<< Fetch value from buffer.
+                                        auto& buffer_data = block_ptr->bufferData(buffer_idx);
 
                                         buffer_data.field.occupancy = parent_data.field.occupancy;
-                                        buffer_data.field.weight =
-                                            parent_data.field
-                                                .weight; // (parent_data.y > 0) ? 1 : 0;
+                                        buffer_data.field.weight = parent_data.field.weight;
                                         buffer_data.field.observed =
-                                            false; ///<< Set falls such that the observe count can work properly
+                                            false; // Set falls such that the observe count can work properly
 
                                     } // i
                                 }     // j
@@ -429,7 +420,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
             }
         }
 
-        /// Integrate data into buffer.
+        // Integrate data into buffer.
         const unsigned int recommended_stride = 1 << recommended_scale;
         const unsigned int size_at_recommended_scale_li = BlockType::size >> recommended_scale;
         const unsigned int size_at_recommended_scale_sq = math::sq(size_at_recommended_scale_li);
@@ -474,8 +465,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
                     const int buffer_idx =
                         x + y * size_at_recommended_scale_li + z * size_at_recommended_scale_sq;
-                    auto& buffer_data =
-                        block_ptr->bufferData(buffer_idx); /// \note pass by reference now.
+                    auto& buffer_data = block_ptr->bufferData(buffer_idx);
 
                     if (low_variance) {
                         block_ptr->incrBufferObservedCount(
@@ -548,7 +538,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                 // Update the voxel data based using the depth measurement
                 const int voxel_idx =
                     x + y * size_at_integration_scale_li + z * size_at_integration_scale_sq;
-                auto& voxel_data = block_ptr->currData(voxel_idx); /// \note pass by reference now.
+                auto& voxel_data = block_ptr->currData(voxel_idx);
                 if (low_variance) {
                     block_ptr->incrCurrObservedCount(
                         updater::free_voxel(voxel_data, map_.getDataConfig()));
