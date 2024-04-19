@@ -85,7 +85,7 @@ class BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT> {
     /** Contains data from a previous point in time which is used to compute changes over time for
      * delta down-propagation.
      */
-    typedef DeltaData<Field::TSDF, ColB, SemB> PastDataType;
+    typedef DataType PastDataType;
 
     BlockMultiRes(const DataType init_data = DataType());
 

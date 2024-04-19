@@ -78,8 +78,8 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
             auto parent_down_funct = [](const OctreeType& /* octree */,
                                         OctantBase* /* octant_ptr */,
                                         typename BlockType::DataUnion& data_union) {
-                data_union.past_data.field.delta_tsdf = data_union.data.field.tsdf;
-                data_union.past_data.field.delta_weight = 0;
+                data_union.past_data.field.tsdf = data_union.data.field.tsdf;
+                data_union.past_data.field.weight = 0;
             };
 
             // Update or initialize the child data using the parent data.
@@ -89,16 +89,16 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
                                         const typename BlockType::DataUnion& parent_data_union) {
                 if (is_valid(child_data_union.data)) {
                     // Perform a delta update on the child using the parent data.
-                    const field_t delta_tsdf = parent_data_union.data.field.tsdf
-                        - parent_data_union.past_data.field.delta_tsdf;
+                    const field_t delta_tsdf =
+                        parent_data_union.data.field.tsdf - parent_data_union.past_data.field.tsdf;
                     child_data_union.data.field.tsdf =
                         std::max(child_data_union.data.field.tsdf + delta_tsdf, field_t(-1));
                     child_data_union.data.field.weight =
                         fminf(child_data_union.data.field.weight
-                                  + parent_data_union.past_data.field.delta_weight,
+                                  + parent_data_union.past_data.field.weight,
                               map_.getDataConfig().field.max_weight);
-                    child_data_union.past_data.field.delta_weight =
-                        parent_data_union.past_data.field.delta_weight;
+                    child_data_union.past_data.field.weight =
+                        parent_data_union.past_data.field.weight;
                 }
                 else {
                     // This child hasn't been observed before, initialize to the interpolated field
@@ -111,9 +111,8 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
                     if (interp_field_value) {
                         child_data_union.data.field.tsdf = *interp_field_value;
                         child_data_union.data.field.weight = parent_data_union.data.field.weight;
-                        child_data_union.past_data.field.delta_tsdf =
-                            child_data_union.data.field.tsdf;
-                        child_data_union.past_data.field.delta_weight = 0;
+                        child_data_union.past_data.field.tsdf = child_data_union.data.field.tsdf;
+                        child_data_union.past_data.field.weight = 0;
                     }
                 }
             };
@@ -160,7 +159,7 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
                     data_union.data.field.update(sdf_value,
                                                  config_.truncation_boundary,
                                                  map_.getDataConfig().field.max_weight);
-                    data_union.past_data.field.delta_weight++;
+                    data_union.past_data.field.weight++;
                     block.setDataUnion(data_union);
                 }
             }
@@ -173,9 +172,8 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
                const std::array<typename BlockType::DataType, 8>& child_data) {
                 const int valid_children = data::up_prop_mean(parent_data_union.data, child_data);
                 if (valid_children > 0) {
-                    parent_data_union.past_data.field.delta_tsdf =
-                        parent_data_union.data.field.tsdf;
-                    parent_data_union.past_data.field.delta_weight = 0;
+                    parent_data_union.past_data.field.tsdf = parent_data_union.data.field.tsdf;
+                    parent_data_union.past_data.field.weight = 0;
                 }
                 else {
                     parent_data_union.past_data = typename BlockType::PastDataType();
