@@ -232,8 +232,10 @@ getField(const OctreeT& octree,
  *                            T operator*(const T& a, const float b);
  *                            \endcode
  * \param[in]  desired_scale  The finest scale the member should be interpolated at.
- * \param[out] returned_scale The actual scale the member was interpolated at. Not less than \p
- *                            desired_scale. Not modified if `std::nullopt` is returned.
+ * \param[out] returned_scale The actual scale the member was interpolated at will be stored into
+ *                            `*returned_scale` if `returned_scale` is non-null. `*returned_scale`
+ *                            is not modified if `std::nullopt` is returned. The value of
+ *                            `*returned_scale` will not be less than \p desired_scale.
  * \return The interpolated member if the data is valid, `std::nullopt` otherwise.
  */
 template<typename OctreeT, typename GetF>
@@ -242,24 +244,16 @@ typename std::enable_if_t<OctreeT::res_ == Res::Multi,
 getInterp(const OctreeT& octree,
           const Eigen::Vector3f& voxel_coord_f,
           GetF get,
-          const int desired_scale,
-          int& returned_scale);
-
-/** \overload */
-template<typename OctreeT, typename GetF>
-typename std::enable_if_t<OctreeT::res_ == Res::Multi,
-                          std::optional<std::invoke_result_t<GetF, typename OctreeT::DataType>>>
-getInterp(const OctreeT& octree,
-          const Eigen::Vector3f& voxel_coord_f,
-          GetF get,
-          int& returned_scale);
+          const int desired_scale = 0,
+          int* returned_scale = nullptr);
 
 /** \overload
- * \details This overload works for both single- and multi-resolution octrees. In the case of a
- * multi-resolution octree the member is interpolated at the finest possible scale.
+ * \details This overload works only for single-resolution octrees. The member is interpolated at
+ * scale 0, the finest and only scale.
  */
 template<typename OctreeT, typename GetF>
-std::optional<std::invoke_result_t<GetF, typename OctreeT::DataType>>
+typename std::enable_if_t<OctreeT::res_ == Res::Single,
+                          std::optional<std::invoke_result_t<GetF, typename OctreeT::DataType>>>
 getInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, GetF get);
 
 

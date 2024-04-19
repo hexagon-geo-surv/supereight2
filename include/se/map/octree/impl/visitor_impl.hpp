@@ -889,7 +889,7 @@ getInterp(const OctreeT& octree,
           const Eigen::Vector3f& voxel_coord_f,
           GetF get,
           const int desired_scale,
-          int& returned_scale)
+          int* returned_scale)
 {
     typedef typename OctreeT::NodeType NodeType;
     typedef typename OctreeT::BlockType BlockType;
@@ -929,10 +929,12 @@ getInterp(const OctreeT& octree,
             }
         }
 
-        // Return the correct scale in the case of Nodes.
-        returned_scale = octant_ptr->isBlock()
-            ? scale
-            : octantops::size_to_scale(static_cast<const NodeType*>(octant_ptr)->getSize());
+        if (returned_scale) {
+            // Return the correct scale in the case of Nodes.
+            *returned_scale = octant_ptr->isBlock()
+                ? scale
+                : octantops::size_to_scale(static_cast<const NodeType*>(octant_ptr)->getSize());
+        }
         // Perform trilinear interpolation.
         // https://en.wikipedia.org/wiki/Trilinear_interpolation#Method
         const Eigen::Vector3f t = math::fracf(base_coord_f);
@@ -950,28 +952,10 @@ getInterp(const OctreeT& octree,
 
 
 template<typename OctreeT, typename GetF>
-typename std::enable_if_t<OctreeT::res_ == Res::Multi,
+typename std::enable_if_t<OctreeT::res_ == Res::Single,
                           std::optional<std::invoke_result_t<GetF, typename OctreeT::DataType>>>
-getInterp(const OctreeT& octree,
-          const Eigen::Vector3f& voxel_coord_f,
-          GetF get,
-          int& returned_scale)
-{
-    return getInterp(octree, voxel_coord_f, get, 0, returned_scale);
-}
-
-
-
-template<typename OctreeT, typename GetF>
-std::optional<std::invoke_result_t<GetF, typename OctreeT::DataType>>
 getInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, GetF get)
 {
-    // Use the multi-res implementation if needed.
-    if constexpr (OctreeT::res_ == Res::Multi) {
-        int _;
-        return getInterp(octree, voxel_coord_f, get, 0, _);
-    }
-
     // Interpolate in a single-resolution octree.
 
     // Subtract the sample offset to get the coordinates of the voxel nearest to the origin out of
@@ -1031,7 +1015,7 @@ getFieldInterp(const OctreeT& octree,
         voxel_coord_f,
         [](const typename OctreeT::DataType& d) { return get_field(d); },
         desired_scale,
-        returned_scale);
+        &returned_scale);
 }
 
 

@@ -125,7 +125,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getInterp(const Eigen::Vector3f& p
             return std::nullopt;
         }
     }
-    return se::visitor::getInterp(octree_, voxel_coord_f, get, 0, returned_scale);
+    return se::visitor::getInterp(octree_, voxel_coord_f, get, 0, &returned_scale);
 }
 
 
