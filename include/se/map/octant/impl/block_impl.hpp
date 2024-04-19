@@ -215,12 +215,12 @@ BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getDataUnion(
     const int voxel_idx = getVoxelIdx(voxel_coord, scale);
     assert(voxel_idx >= 0);
     assert(static_cast<size_t>(voxel_idx) < block_data_.size());
-    assert(static_cast<size_t>(voxel_idx) < block_prop_data_.size());
+    assert(static_cast<size_t>(voxel_idx) < block_past_data_.size());
     DataUnion data_union;
     data_union.coord = voxel_coord;
     data_union.scale = scale;
     data_union.data = block_data_[voxel_idx];
-    data_union.prop_data = block_prop_data_[voxel_idx];
+    data_union.past_data = block_past_data_[voxel_idx];
     data_union.data_idx = voxel_idx;
     data_union.prop_data_idx = voxel_idx;
     return data_union;
@@ -237,12 +237,12 @@ BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getDataUnion(
     const int voxel_idx = getVoxelIdx(voxel_coord, scale);
     assert(voxel_idx >= 0);
     assert(static_cast<size_t>(voxel_idx) < block_data_.size());
-    assert(static_cast<size_t>(voxel_idx) < block_prop_data_.size());
+    assert(static_cast<size_t>(voxel_idx) < block_past_data_.size());
     DataUnion data_union;
     data_union.coord = voxel_coord;
     data_union.scale = scale;
     data_union.data = block_data_[voxel_idx];
-    data_union.prop_data = block_prop_data_[voxel_idx];
+    data_union.past_data = block_past_data_[voxel_idx];
     data_union.data_idx = voxel_idx;
     data_union.prop_data_idx = voxel_idx;
     return data_union;
@@ -290,9 +290,9 @@ void BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::setDataU
     assert(data_union.data_idx >= 0);
     assert(static_cast<size_t>(data_union.data_idx) < block_data_.size());
     assert(data_union.prop_data_idx >= 0);
-    assert(static_cast<size_t>(data_union.prop_data_idx) < block_prop_data_.size());
+    assert(static_cast<size_t>(data_union.prop_data_idx) < block_past_data_.size());
     block_data_[data_union.data_idx] = data_union.data;
-    block_prop_data_[data_union.prop_data_idx] = data_union.prop_data;
+    block_past_data_[data_union.prop_data_idx] = data_union.past_data;
 }
 
 

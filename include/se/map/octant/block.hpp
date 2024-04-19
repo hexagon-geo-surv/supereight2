@@ -81,7 +81,11 @@ template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
 class BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT> {
     public:
     typedef Data<Field::TSDF, ColB, SemB> DataType;
-    typedef DeltaData<Field::TSDF, ColB, SemB> PropDataType;
+
+    /** Contains data from a previous point in time which is used to compute changes over time for
+     * delta down-propagation.
+     */
+    typedef DeltaData<Field::TSDF, ColB, SemB> PastDataType;
 
     BlockMultiRes(const DataType init_data = DataType());
 
@@ -91,7 +95,7 @@ class BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT> {
         int scale;
 
         DataType data;
-        PropDataType prop_data;
+        PastDataType past_data;
 
         int data_idx;
         int prop_data_idx;
@@ -229,7 +233,7 @@ class BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT> {
 
 
     std::array<DataType, num_voxels_> block_data_;
-    std::array<PropDataType, num_voxels_> block_prop_data_;
+    std::array<PastDataType, num_voxels_> block_past_data_;
 
     int min_scale_;
     int curr_scale_;
