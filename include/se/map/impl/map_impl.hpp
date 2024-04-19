@@ -189,7 +189,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getFieldInterp(const Eigen::Vector
         }
     }
 
-    return se::visitor::getFieldInterp(octree_, voxel_coord_f, returned_scale);
+    return se::visitor::getFieldInterp(octree_, voxel_coord_f, 0, &returned_scale);
 }
 
 

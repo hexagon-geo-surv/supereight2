@@ -1008,29 +1008,21 @@ typename std::enable_if_t<OctreeT::res_ == Res::Multi, std::optional<field_t>>
 getFieldInterp(const OctreeT& octree,
                const Eigen::Vector3f& voxel_coord_f,
                const int desired_scale,
-               int& returned_scale)
+               int* returned_scale)
 {
     return getInterp(
         octree,
         voxel_coord_f,
         [](const typename OctreeT::DataType& d) { return get_field(d); },
         desired_scale,
-        &returned_scale);
+        returned_scale);
 }
 
 
 
 template<typename OctreeT>
-typename std::enable_if_t<OctreeT::res_ == Res::Multi, std::optional<field_t>>
-getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, int& returned_scale)
-{
-    return getFieldInterp(octree, voxel_coord_f, 0, returned_scale);
-}
-
-
-
-template<typename OctreeT>
-std::optional<field_t> getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
+typename std::enable_if_t<OctreeT::res_ == Res::Single, std::optional<field_t>>
+getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 {
     return getInterp(
         octree, voxel_coord_f, [](const typename OctreeT::DataType& d) { return get_field(d); });

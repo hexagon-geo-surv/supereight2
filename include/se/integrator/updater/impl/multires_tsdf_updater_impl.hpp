@@ -105,9 +105,8 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
                     // value.
                     const Eigen::Vector3f child_sample_coord_f =
                         get_sample_coord(child_data_union.coord, 1 << child_data_union.scale);
-                    int _;
                     const auto interp_field_value = visitor::getFieldInterp(
-                        octree, child_sample_coord_f, child_data_union.scale, _);
+                        octree, child_sample_coord_f, child_data_union.scale);
                     if (interp_field_value) {
                         child_data_union.data.field.tsdf = *interp_field_value;
                         child_data_union.data.field.weight = parent_data_union.data.field.weight;
