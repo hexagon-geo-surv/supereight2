@@ -63,22 +63,6 @@ std::ostream& operator<<(std::ostream& os, const typename Data<FldT, ColB, SemB>
 
 
 
-///////////////////
-/// DELTA DATA  ///
-///////////////////
-
-template<Field FldT = Field::TSDF, Colour ColB = Colour::Off, Semantics SemB = Semantics::Off>
-struct DeltaData {
-    FieldDeltaData<FldT> field;
-    ColourDeltaData<ColB> colour;
-
-    static constexpr Field fld_ = FldT;
-    static constexpr Colour col_ = ColB;
-    static constexpr Semantics sem_ = SemB;
-};
-
-
-
 namespace data {
 
 /** Up-propagate the mean of the valid \p child_data into \p parent_data and return the number of

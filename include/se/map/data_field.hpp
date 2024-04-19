@@ -95,26 +95,6 @@ struct FieldData<Field::TSDF> {
 
 std::ostream& operator<<(std::ostream& os, const FieldData<Field::TSDF>::Config& c);
 
-///////////////////
-/// DELTA DATA  ///
-///////////////////
-
-template<Field FieldT>
-struct FieldDeltaData {
-};
-
-template<>
-struct FieldDeltaData<Field::Occupancy> {
-    field_t delta_occupancy = 0;
-};
-
-template<>
-struct FieldDeltaData<Field::TSDF> {
-    field_t delta_tsdf = 0;
-    weight_t delta_weight = 0;
-};
-
-
 } // namespace se
 
 #include "impl/data_field_impl.hpp"

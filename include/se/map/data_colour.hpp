@@ -55,26 +55,6 @@ struct ColourData<Colour::On> {
 template<>
 std::ostream& operator<<<Colour::On>(std::ostream& os, const ColourData<Colour::On>::Config& c);
 
-///////////////////
-/// DELTA DATA  ///
-///////////////////
-
-// Colour data
-template<Colour ColB>
-struct ColourDeltaData {
-};
-
-// Use signed 16-bit integers to allow storing all possible deltas from unsigned 8-bit integers.
-template<>
-struct ColourDeltaData<Colour::On> {
-    struct {
-        std::int16_t r = 0;
-        std::int16_t g = 0;
-        std::int16_t b = 0;
-    } delta_colour;
-    std::int16_t delta_colour_weight = 0;
-};
-
 } // namespace se
 
 #include "impl/data_colour_impl.hpp"
