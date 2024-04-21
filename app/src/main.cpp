@@ -22,9 +22,11 @@ int main(int argc, char** argv)
             return 2;
         }
 
+        typedef se::TSDFMap<se::Res::Single> MapType;
+
         // ========= Config & I/O INITIALIZATION  =========
         const std::string config_filename = argv[1];
-        const se::Config<se::TSDFMap<se::Res::Single>, se::PinholeCamera> config(config_filename);
+        const se::Config<MapType, se::PinholeCamera> config(config_filename);
         std::cout << config;
 
         // Create the mesh output directory
@@ -65,7 +67,7 @@ int main(int argc, char** argv)
         // Custom way of setting up the same map:
         // se::Map<se::Data<se::Field::TSDF, se::Colour::Off, se::Semantics::Off>, se::Res::Single, 8>
         // See end of map.hpp and data.hpp for more details
-        se::TSDFMap<se::Res::Single> map(config.map, config.data);
+        MapType map(config.map, config.data);
 
         // ========= Sensor INITIALIZATION  =========
         // Create a pinhole camera and downsample the intrinsics
