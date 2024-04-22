@@ -9,6 +9,7 @@
 
 #include <cassert>
 #include <cstdint>
+#include <limits>
 #include <tuple>
 
 namespace se {
