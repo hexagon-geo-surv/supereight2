@@ -21,7 +21,7 @@ bool Tracker<MapT, SensorT>::track(const se::Image<float>& depth_img, Eigen::Iso
         depth_img.width(), depth_img.height(), Eigen::Vector3f::Zero());
     se::Image<Eigen::Vector3f> surface_normals_M(
         depth_img.width(), depth_img.height(), Eigen::Vector3f::Zero());
-    se::raycaster::raycast_volume(map_, surface_point_cloud_M, surface_normals_M, T_WS, sensor_);
+    se::raycaster::raycast_volume(map_, sensor_, T_WS, surface_point_cloud_M, surface_normals_M);
     return track(depth_img, T_WS, surface_point_cloud_M, surface_normals_M);
 }
 

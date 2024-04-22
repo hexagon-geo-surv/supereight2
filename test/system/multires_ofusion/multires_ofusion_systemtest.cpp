@@ -411,7 +411,7 @@ TEST(MultiResOFusionSystemTest, Raycasting)
     integrator.integrateDepth(sensor, processed_depth_img, T_WS, frame);
 
     se::raycaster::raycast_volume(
-        map, surface_point_cloud_W, surface_normals_W, surface_scale, T_WS, sensor);
+        map, sensor, T_WS, surface_point_cloud_W, surface_normals_W, surface_scale);
 
     se::image::rgb_to_rgba(processed_colour_img, output_colour_img);
     convert_to_output_depth_img(processed_depth_img, output_depth_img.data());

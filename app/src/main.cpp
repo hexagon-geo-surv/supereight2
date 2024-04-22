@@ -138,7 +138,7 @@ int main(int argc, char** argv)
             TICK("raycast")
             if (config.app.enable_rendering || !config.app.enable_ground_truth) {
                 se::raycaster::raycast_volume(
-                    map, surface_point_cloud_W, surface_normals_W, surface_scale, T_WS, sensor);
+                    map, sensor, T_WS, surface_point_cloud_W, surface_normals_W, surface_scale);
             }
             TOCK("raycast")
 

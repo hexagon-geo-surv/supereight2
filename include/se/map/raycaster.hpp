@@ -55,11 +55,11 @@ raycast(MapT& map,
 
 template<typename MapT, typename SensorT>
 void raycast_volume(const MapT& map,
+                    const SensorT& sensor,
+                    const Eigen::Isometry3f& T_WS,
                     se::Image<Eigen::Vector3f>& surface_point_cloud_W,
                     se::Image<Eigen::Vector3f>& surface_normals_W,
-                    se::Image<int8_t>& surface_scale,
-                    const Eigen::Isometry3f& T_WS,
-                    const SensorT& sensor);
+                    se::Image<int8_t>& surface_scale);
 
 /** Render the surface represented by \p surface_points_W and \p surface_normals_W into \p render.
  * The colour of each point is returned by the functor \p get_diffuse_colour which must have the

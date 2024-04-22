@@ -536,11 +536,11 @@ raycast(MapT& map,
 
 template<typename MapT, typename SensorT>
 void raycast_volume(const MapT& map,
+                    const SensorT& sensor,
+                    const Eigen::Isometry3f& T_WS,
                     se::Image<Eigen::Vector3f>& surface_point_cloud_W,
                     se::Image<Eigen::Vector3f>& surface_normals_W,
-                    se::Image<int8_t>& surface_scale,
-                    const Eigen::Isometry3f& T_WS,
-                    const SensorT& sensor)
+                    se::Image<int8_t>& surface_scale)
 {
     assert(surface_point_cloud_W.width() == surface_normals_W.width());
     assert(surface_point_cloud_W.height() == surface_normals_W.height());
