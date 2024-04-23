@@ -29,17 +29,6 @@ int main(int argc, char** argv)
         const se::Config<MapType, se::LeicaLidar> config(config_filename);
         std::cout << config;
 
-        // Create the mesh output directory
-        if (!config.app.mesh_path.empty()) {
-            stdfs::create_directories(config.app.mesh_path);
-        }
-        if (!config.app.slice_path.empty()) {
-            stdfs::create_directories(config.app.slice_path);
-        }
-        if (!config.app.structure_path.empty()) {
-            stdfs::create_directories(config.app.structure_path);
-        }
-
         // Setup log stream
         std::ofstream log_file_stream;
         log_file_stream.open(config.app.log_file);
@@ -113,9 +102,11 @@ int main(int argc, char** argv)
             if ((config.app.meshing_rate > 0 && frame % config.app.meshing_rate == 0)
                 || last_frame) {
                 if (!config.app.mesh_path.empty()) {
+                    stdfs::create_directories(config.app.mesh_path);
                     map.saveMesh(config.app.mesh_path + "/mesh_" + std::to_string(frame) + ".ply");
                 }
                 if (!config.app.slice_path.empty()) {
+                    stdfs::create_directories(config.app.slice_path);
                     map.saveFieldSlices(
                         config.app.slice_path + "/slice_x_" + std::to_string(frame) + ".vtk",
                         config.app.slice_path + "/slice_y_" + std::to_string(frame) + ".vtk",
@@ -123,6 +114,7 @@ int main(int argc, char** argv)
                         T_WS.translation());
                 }
                 if (!config.app.structure_path.empty()) {
+                    stdfs::create_directories(config.app.structure_path);
                     map.saveStructure(config.app.structure_path + "/struct_" + std::to_string(frame)
                                       + ".ply");
                 }
