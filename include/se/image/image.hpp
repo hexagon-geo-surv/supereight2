@@ -38,6 +38,14 @@ class Image {
         assert(width_ > 0 && height_ > 0);
     }
 
+    Image(const Image& other) = delete;
+
+    Image(Image&& other) = default;
+
+    Image& operator=(const Image& other) = delete;
+
+    Image& operator=(Image&& other) = default;
+
     T& operator[](std::size_t idx)
     {
         return data_ptr_[idx];
@@ -81,6 +89,20 @@ class Image {
     T* data()
     {
         return data_ptr_;
+    }
+
+    Image clone() const
+    {
+        if (data_) {
+            // Perform a deep copy of the owned data.
+            Image image_copy(width(), height());
+            std::copy(data(), data() + size(), image_copy.data());
+            return image_copy;
+        }
+        else {
+            // Wrap the non-owned data.
+            return Image(width(), height(), data());
+        }
     }
 
     private:
