@@ -22,14 +22,14 @@ template<typename T>
 class Image {
     public:
     Image(const unsigned w, const unsigned h) :
-            width_(w), height_(h), data_(new T[w * h]), data_ptr_(data_.get())
+            width_(w), height_(h), owned_data_(new T[w * h]), data_ptr_(owned_data_.get())
     {
         assert(width_ > 0 && height_ > 0);
     }
 
-    Image(const unsigned w, const unsigned h, const T& val) : Image(w, h)
+    Image(const unsigned w, const unsigned h, const T& value) : Image(w, h)
     {
-        std::fill(data_.get(), data_.get() + w * h, val);
+        std::fill(data(), data() + size(), value);
     }
 
     Image(const unsigned w, const unsigned h, T* raw_buffer) :
@@ -93,7 +93,7 @@ class Image {
 
     Image clone() const
     {
-        if (data_) {
+        if (owned_data_) {
             // Perform a deep copy of the owned data.
             Image image_copy(width(), height());
             std::copy(data(), data() + size(), image_copy.data());
@@ -108,7 +108,7 @@ class Image {
     private:
     int width_;
     int height_;
-    std::unique_ptr<T[]> data_;
+    std::unique_ptr<T[]> owned_data_;
     T* data_ptr_;
 };
 
