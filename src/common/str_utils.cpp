@@ -11,8 +11,8 @@
 
 #include "se/common/filesystem.hpp"
 
-// POSIX systems must have the unistd.h header.
-#if __has_include(<unistd.h>)
+// The wordexp.h header and wordexp() are part of POSIX.
+#if __has_include(<wordexp.h>)
 #    include <wordexp.h>
 #endif
 
@@ -186,9 +186,7 @@ std::string expand_user(const std::string& path)
 {
     // Return the path unchanged on errors or non-POSIX systems.
     std::string expanded_path(path);
-
-    // POSIX systems must have the unistd.h header.
-#if __has_include(<unistd.h>)
+#if __has_include(<wordexp.h>)
     wordexp_t expansion;
     if (wordexp(path.c_str(), &expansion, WRDE_NOCMD) == 0) {
         if (expansion.we_wordc >= 1) {
