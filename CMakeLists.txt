@@ -19,7 +19,8 @@ endif()
 find_library(MATH_LIB m)
 
 # Compiler options
-set(SE_PRIVATE_CXX_FLAGS -Wall -Wextra -Wpedantic -Wno-unknown-pragmas)
+set(SUPPORTED_COMPILER "$<OR:$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>")
+set(SE_PRIVATE_CXX_FLAGS "$<${SUPPORTED_COMPILER}:-Wall;-Wextra;-Wpedantic;-Wno-unknown-pragmas>")
 
 # Compile the dependencies
 add_subdirectory(third_party)
