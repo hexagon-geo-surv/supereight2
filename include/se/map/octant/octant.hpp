@@ -71,16 +71,6 @@ class OctantBase {
     }
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
-    protected:
-    template<typename DerT, typename DatT, int BS>
-    friend class BlockSingleRes;
-
-    template<typename DatT, int BS, typename DerT>
-    friend class BlockMultiRes;
-
-    template<typename DatT, typename DerT>
-    friend class NodeMultiRes;
 };
 
 } // namespace se
