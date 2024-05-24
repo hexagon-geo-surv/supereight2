@@ -161,7 +161,6 @@ void Octree<DataT, ResT, BlockSize>::deleteChildren(NodeType* parent_ptr)
         }
         parent_ptr->setChild(child_idx, nullptr);
     }
-    parent_ptr->clearChildrenMask();
 }
 
 
