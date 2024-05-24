@@ -14,9 +14,7 @@ namespace se {
 template<typename DataT, Res ResT>
 Node<DataT, ResT>::Node(const Eigen::Vector3i& coord, const int size, const DataT& init_data) :
         OctantBase(coord, false, nullptr),
-        std::conditional<ResT == Res::Single,
-                         NodeSingleRes<DataT>,
-                         NodeMultiRes<DataT, Node<DataT, ResT>>>::type(init_data),
+        NodeData<DataT, Node<DataT, ResT>>(init_data),
         size_(size)
 {
     assert(math::is_power_of_two(size));
@@ -34,9 +32,7 @@ Node<DataT, ResT>::Node(Node* parent_ptr, const int child_idx, const DataT& init
                                              (4 & child_idx) > 0),
                    false,
                    parent_ptr),
-        std::conditional<ResT == Res::Single,
-                         NodeSingleRes<DataT>,
-                         NodeMultiRes<DataT, Node<DataT, ResT>>>::type(init_data),
+        NodeData<DataT, Node<DataT, ResT>>(init_data),
         size_(parent_ptr->size_ >> 1)
 {
     assert(child_idx >= 0);

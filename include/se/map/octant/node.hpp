@@ -11,29 +11,24 @@
 
 namespace se {
 
-// Forward Declaration
-template<typename DataT, typename DerivedT>
-class NodeMultiRes {
-};
-
-
-
-template<Field FldT, Colour ColB, Semantics SemB, typename DerivedT>
-class NodeMultiRes<Data<FldT, ColB, SemB>, DerivedT> {
-};
-
-
-
-/**
- * \brief Multi-resolution data of a TSDF node.
- *        The node doesn't carry any data and returns the default data only.
+/** Contains se::Data stored in se::Node and appropriate methods. Partial template specilization is
+ * used so that se::Node doesn't contain unnecessary data.
+ *
+ * \warning This class shouldn't be used directly. Its methods are available through se::Node.
  */
-template<Colour ColB, Semantics SemB, typename DerivedT>
-class NodeMultiRes<Data<Field::TSDF, ColB, SemB>, DerivedT> {
-    public:
-    typedef Data<Field::TSDF, ColB, SemB> DataType;
+template<typename DataT, typename DerivedT>
+struct NodeData {
+};
 
-    NodeMultiRes(const DataType&)
+/** Specialization of se::NodeData containing no data.
+ *
+ * \warning This class shouldn't be used directly. Its methods are available through se::Node.
+ */
+template<Field FldT, Colour ColB, Semantics SemB, typename DerivedT>
+struct NodeData<Data<FldT, ColB, SemB>, DerivedT> {
+    typedef Data<FldT, ColB, SemB> DataType;
+
+    NodeData(const DataType&)
     {
     }
 
@@ -42,18 +37,17 @@ class NodeMultiRes<Data<Field::TSDF, ColB, SemB>, DerivedT> {
         static const DataType default_data = DataType();
         return default_data;
     }
-
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 
 
-/**
- * \brief Multi-resolution data of a Occupancy node.
+/** Specialization of se::NodeData for se::Field::Occupancy. It contains minimum and maximum
+ * up-propagated data.
+ *
+ * \warning This class shouldn't be used directly. Its methods are available through se::Node.
  */
 template<Colour ColB, Semantics SemB, typename DerivedT>
-class NodeMultiRes<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
-    public:
+struct NodeData<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
     typedef Data<Field::Occupancy, ColB, SemB> DataType;
 
     /**
@@ -61,7 +55,7 @@ class NodeMultiRes<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
      *
      * \param init_data   The initial data of the node.
      */
-    NodeMultiRes(const DataType& init_data)
+    NodeData(const DataType& init_data)
     {
         data_ = init_data;
         min_data_ = init_data;
@@ -126,28 +120,6 @@ class NodeMultiRes<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
 
 
 
-/**
- * \brief Single-resolution data of a node.
- *        The node doesn't carry any data and returns the default data only.
- */
-template<typename DataT>
-class NodeSingleRes {
-    public:
-    NodeSingleRes(const DataT&)
-    {
-    }
-
-    const DataT& getData() const
-    {
-        static const DataT default_data = DataT();
-        return default_data;
-    }
-
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-};
-
-
-
 /** An intermediate node of an se::Octree.
  *
  * An se::Node is never a leaf in TSDF octrees but may be a leaf in occupancy octrees.
@@ -156,10 +128,7 @@ class NodeSingleRes {
  * \tparam ResT  The value of se::Res for the octree.
  */
 template<typename DataT, Res ResT = Res::Single>
-class Node : public OctantBase,
-             public std::conditional<ResT == Res::Single,
-                                     NodeSingleRes<DataT>,
-                                     NodeMultiRes<DataT, Node<DataT, ResT>>>::type {
+class Node : public OctantBase, public NodeData<DataT, Node<DataT, ResT>> {
     public:
     typedef DataT DataType;
 
