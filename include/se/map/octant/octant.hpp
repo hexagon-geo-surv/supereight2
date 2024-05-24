@@ -38,14 +38,15 @@ class OctantBase {
     /** Whether the octant is a voxel block. */
     const bool is_block;
 
-    /**
-     * \brief Setup a octant via its parent
-     *
-     * \param is_block    The block state of the octant
-     * \param coord       The voxel coordinates of the octant
-     * \param parent_ptr  The pointer to the parent of the octant
+
+
+    /** Construct an octant giver its coordinates \p coord, whether it's a voxel block \p is_block
+     * and the pointer to its parent octant \p parent_ptr.
      */
-    OctantBase(const bool is_block, const Eigen::Vector3i& coord, OctantBase* parent_ptr = nullptr);
+    OctantBase(const Eigen::Vector3i& coord, const bool is_block, OctantBase* parent_ptr) :
+            parent_ptr_(parent_ptr), coord(coord), timestamp(-1), child_mask(0u), is_block(is_block)
+    {
+    }
 
     /**
      * \brief Get the parent pointer of the octant.

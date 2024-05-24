@@ -1017,12 +1017,12 @@ template<typename DataT, Res ResT, int BlockSize, typename PolicyT>
 Block<DataT, ResT, BlockSize, PolicyT>::Block(Node<DataT, ResT>* parent_ptr,
                                               const int child_idx,
                                               const DataT init_data) :
-        OctantBase(true,
-                   parent_ptr->coord
+        OctantBase(parent_ptr->coord
                        + BlockSize
                            * Eigen::Vector3i((1 & child_idx) > 0,
                                              (2 & child_idx) > 0,
                                              (4 & child_idx) > 0),
+                   true,
                    parent_ptr),
         std::conditional<
             ResT == Res::Single,

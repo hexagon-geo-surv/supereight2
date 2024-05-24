@@ -13,7 +13,7 @@ namespace se {
 
 template<typename DataT, Res ResT>
 Node<DataT, ResT>::Node(const Eigen::Vector3i& coord, const int size, const DataT& init_data) :
-        OctantBase(false, coord, nullptr),
+        OctantBase(coord, false, nullptr),
         std::conditional<ResT == Res::Single,
                          NodeSingleRes<DataT>,
                          NodeMultiRes<DataT, Node<DataT, ResT>>>::type(init_data),
@@ -27,12 +27,12 @@ Node<DataT, ResT>::Node(const Eigen::Vector3i& coord, const int size, const Data
 
 template<typename DataT, Res ResT>
 Node<DataT, ResT>::Node(Node* parent_ptr, const int child_idx, const DataT& init_data) :
-        OctantBase(false,
-                   parent_ptr->coord
+        OctantBase(parent_ptr->coord
                        + (parent_ptr->size_ >> 1)
                            * Eigen::Vector3i((1 & child_idx) > 0,
                                              (2 & child_idx) > 0,
                                              (4 & child_idx) > 0),
+                   false,
                    parent_ptr),
         std::conditional<ResT == Res::Single,
                          NodeSingleRes<DataT>,

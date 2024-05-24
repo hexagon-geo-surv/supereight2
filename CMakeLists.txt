@@ -37,7 +37,6 @@ add_library(${LIB_NAME} STATIC
     "src/image/image.cpp"
     "src/map/data.cpp"
     "src/map/io/mesh_io.cpp"
-    "src/map/octant.cpp"
     "src/map/preprocessor.cpp"
     "src/map/raycaster.cpp"
     "src/sensor/leica_lidar.cpp"
