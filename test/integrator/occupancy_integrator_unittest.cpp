@@ -44,10 +44,10 @@ class OccupancyIntegrator : public ::testing::Test {
 
     static void expect_valid_node_data(const NodeType& node, const se::OctantBase* const child)
     {
-        const DataType& min_data = child->isBlock()
+        const DataType& min_data = child->is_block
             ? static_cast<const BlockType*>(child)->getMinData()
             : static_cast<const NodeType*>(child)->getMinData();
-        const DataType& max_data = child->isBlock()
+        const DataType& max_data = child->is_block
             ? static_cast<const BlockType*>(child)->getMaxData()
             : static_cast<const NodeType*>(child)->getMaxData();
 
@@ -113,7 +113,7 @@ TEST_F(OccupancyIntegrator, propagation)
             const se::OctantBase* const child = node->getChild(child_idx);
             if (child) {
                 // Get the child min/max data and add it to the appropriate traversal queue.
-                if (child->isBlock()) {
+                if (child->is_block) {
                     blocks.push(static_cast<const BlockType*>(child));
                 }
                 else {

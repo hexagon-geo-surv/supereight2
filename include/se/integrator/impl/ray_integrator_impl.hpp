@@ -171,7 +171,7 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockS
         voxel_coord, 0, octant_ptr); // up to scale 0 meaning down to finest resolution
 
     /// (1.b) Check if block level is already reached
-    if (finest_octant_ptr->isBlock()) {
+    if (finest_octant_ptr->is_block) {
         /// ALREADY BLOCK-LEVEL -> DO update here
         /// (2.a) Determine Integration Scale
         // compute integration scale

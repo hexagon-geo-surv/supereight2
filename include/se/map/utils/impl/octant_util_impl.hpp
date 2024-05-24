@@ -79,7 +79,7 @@ inline int scale_to_size(const int scale)
 template<typename OctreeT>
 inline int octant_to_size(const se::OctantBase* octant_ptr)
 {
-    if (octant_ptr->isBlock()) {
+    if (octant_ptr->is_block) {
         typedef typename OctreeT::BlockType BlockType;
         const BlockType* block_ptr = static_cast<const BlockType*>(octant_ptr);
         return block_ptr->getSize();

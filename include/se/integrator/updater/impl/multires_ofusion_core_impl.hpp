@@ -91,7 +91,7 @@ template<typename NodeT, typename BlockT>
 typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr, const int frame)
 {
     assert(octant_ptr);
-    assert(!octant_ptr->isBlock());
+    assert(!octant_ptr->is_block);
 
     NodeT& node = *static_cast<NodeT*>(octant_ptr);
     node.timestamp = frame;
@@ -102,10 +102,10 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr, const 
     for (int child_idx = 0; child_idx < 8; child_idx++) {
         const OctantBase* const child_ptr = node.getChild(child_idx);
         if (child_ptr) {
-            child_min_data[child_idx] = child_ptr->isBlock()
+            child_min_data[child_idx] = child_ptr->is_block
                 ? static_cast<const BlockT*>(child_ptr)->getMinData()
                 : static_cast<const NodeT*>(child_ptr)->getMinData();
-            child_max_data[child_idx] = child_ptr->isBlock()
+            child_max_data[child_idx] = child_ptr->is_block
                 ? static_cast<const BlockT*>(child_ptr)->getMaxData()
                 : static_cast<const NodeT*>(child_ptr)->getMaxData();
         }
@@ -132,7 +132,7 @@ template<typename BlockT>
 void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
 {
     assert(octant_ptr);
-    assert(octant_ptr->isBlock());
+    assert(octant_ptr->is_block);
 
     typedef typename BlockT::DataType DataType;
 

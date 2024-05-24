@@ -175,7 +175,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
     OctantBase* octant_ptr)
 {
     assert(octant_ptr);
-    assert(octant_ptr->isBlock());
+    assert(octant_ptr->is_block);
 
     BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
 
@@ -328,7 +328,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
     bool project_inside)
 {
     assert(octant_ptr);
-    assert(octant_ptr->isBlock());
+    assert(octant_ptr->is_block);
 
     // Compute the point of the block centre in the sensor frame
     BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
@@ -638,7 +638,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
              SensorT>::freeNodeRecurse(OctantBase* octant_ptr, int depth)
 {
     assert(octant_ptr);
-    assert(!octant_ptr->isBlock());
+    assert(!octant_ptr->is_block);
     assert(depth >= 0);
 
     NodeType* node_ptr = static_cast<NodeType*>(octant_ptr);
@@ -660,7 +660,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
         for (int child_idx = 0; child_idx < 8; child_idx++) {
             OctantBase* child_ptr = node_ptr->getChild(child_idx);
             assert(child_ptr);
-            if (child_ptr->isBlock()) {
+            if (child_ptr->is_block) {
                 // Voxel block has a low variance. Update data at a minimum
                 // free space integration scale or finer/coarser (depending on later scale selection).
                 freeBlock(child_ptr); // TODO: Add to block_list?

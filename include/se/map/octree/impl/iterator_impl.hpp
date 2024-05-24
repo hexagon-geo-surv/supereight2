@@ -144,7 +144,7 @@ void BaseIterator<DerivedT>::nextData()
             }
         }
 
-        if (octant != nullptr && !octant->isBlock()) {
+        if (octant != nullptr && !octant->is_block) {
             // Non-leaf Node, push all children to the stack
             for (int child_idx = 0; child_idx < 8; child_idx++) {
                 se::OctantBase* child_ptr = static_cast<NodeType*>(octant)->getChild(child_idx);

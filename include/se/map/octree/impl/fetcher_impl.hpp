@@ -151,7 +151,7 @@ std::vector<const OctantBase*> face_neighbours(const OctantBase* const octant_pt
 {
     assert(octant_ptr);
     const Eigen::Vector3i& octant_coord = octant_ptr->coord;
-    const int octant_size = octant_ptr->isBlock()
+    const int octant_size = octant_ptr->is_block
         ? static_cast<const typename OctreeT::BlockType*>(octant_ptr)->getSize()
         : static_cast<const typename OctreeT::NodeType*>(octant_ptr)->getSize();
     const int octant_scale = octantops::size_to_scale(octant_size);

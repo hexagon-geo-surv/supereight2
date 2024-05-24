@@ -35,6 +35,9 @@ class OctantBase {
     /** The i-th bit of the mask must be set if the i-th child of the octant is allocated. */
     std::uint8_t child_mask;
 
+    /** Whether the octant is a voxel block. */
+    const bool is_block;
+
     /**
      * \brief Setup a octant via its parent
      *
@@ -43,16 +46,6 @@ class OctantBase {
      * \param parent_ptr  The pointer to the parent of the octant
      */
     OctantBase(const bool is_block, const Eigen::Vector3i& coord, OctantBase* parent_ptr = nullptr);
-
-    /**
-     * \brief Verify if an octant is a block.
-     *
-     * \return True if the octant is a block, false otherwise
-     */
-    bool isBlock() const
-    {
-        return is_block_;
-    }
 
     /**
      * \brief Get the parent pointer of the octant.
@@ -80,8 +73,6 @@ class OctantBase {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     protected:
-    const bool is_block_;
-
     template<typename DerT, typename DatT, int BS>
     friend class BlockSingleRes;
 

@@ -414,7 +414,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveScaleSlices(const std::string&
         if (!leaf_ptr) {
             return max_scale;
         }
-        else if (leaf_ptr->isBlock()) {
+        else if (leaf_ptr->is_block) {
             const typename OctreeType::BlockType* block_ptr =
                 static_cast<const typename OctreeType::BlockType*>(leaf_ptr);
             return block_ptr->getCurrentScale();

@@ -135,7 +135,7 @@ class NodesIterator : public BaseIterator<NodesIterator<OctreeT>> {
 
     bool isNext(se::OctantBase* octant_ptr)
     {
-        return !octant_ptr->isBlock();
+        return !octant_ptr->is_block;
     }
 
     protected:
@@ -158,7 +158,7 @@ class BlocksIterator : public BaseIterator<BlocksIterator<OctreeT>> {
 
     bool isNext(se::OctantBase* octant_ptr)
     {
-        return octant_ptr->isBlock();
+        return octant_ptr->is_block;
     }
 
     protected:
@@ -205,7 +205,7 @@ class UpdateIterator : public BaseIterator<UpdateIterator<OctreeT>> {
 
     bool isNext(se::OctantBase* octant_ptr)
     {
-        return octant_ptr->isBlock() && octant_ptr->timestamp >= time_stamp_;
+        return octant_ptr->is_block && octant_ptr->timestamp >= time_stamp_;
     }
 
     bool doIgnore(se::OctantBase* octant_ptr)
@@ -244,7 +244,7 @@ class FrustumIterator : public BaseIterator<FrustumIterator<MapT, SensorT>> {
     protected:
     bool isNext(se::OctantBase* octant_ptr)
     {
-        return octant_ptr->isBlock();
+        return octant_ptr->is_block;
     }
 
     bool doIgnore(se::OctantBase* octant_ptr)

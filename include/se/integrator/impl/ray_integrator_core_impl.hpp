@@ -58,7 +58,7 @@ template<typename NodeT, typename BlockT>
 typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr, const int frame)
 {
     assert(octant_ptr);
-    assert(!octant_ptr->isBlock());
+    assert(!octant_ptr->is_block);
 
     NodeT& node = *static_cast<NodeT*>(octant_ptr);
     node.timestamp = frame;
@@ -82,7 +82,7 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr, const 
             continue;
         }
 
-        const auto& child_min_data = (child_ptr->isBlock())
+        const auto& child_min_data = (child_ptr->is_block)
             ? static_cast<const BlockT*>(child_ptr)->getMinData()
             : static_cast<const NodeT*>(child_ptr)->getMinData();
         // Only consider children with at least 1 integration.
@@ -96,7 +96,7 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr, const 
             }
         }
 
-        const auto& child_max_data = child_ptr->isBlock()
+        const auto& child_max_data = child_ptr->is_block
             ? static_cast<const BlockT*>(child_ptr)->getMaxData()
             : static_cast<const NodeT*>(child_ptr)->getMaxData();
         // Only consider children with at least 1 integration.
@@ -141,7 +141,7 @@ template<typename BlockT>
 void propagate_block_to_coarsest_scale(se::OctantBase* octant_ptr)
 {
     assert(octant_ptr);
-    assert(octant_ptr->isBlock());
+    assert(octant_ptr->is_block);
     BlockT& block = *static_cast<BlockT*>(octant_ptr);
     if (block.getCurrentScale() == block.getMaxScale()) {
         return;
@@ -153,7 +153,7 @@ template<typename BlockT>
 void propagate_block_to_scale(se::OctantBase* octant_ptr, int desired_scale)
 {
     assert(octant_ptr);
-    assert(octant_ptr->isBlock());
+    assert(octant_ptr->is_block);
 
     typedef typename BlockT::DataType DataType;
 
@@ -367,7 +367,7 @@ template<typename BlockT>
 void propagate_block_down_to_scale(se::OctantBase* octant_ptr, int desired_scale)
 {
     assert(octant_ptr);
-    assert(octant_ptr->isBlock());
+    assert(octant_ptr->is_block);
 
     typedef typename BlockT::DataType DataType;
 

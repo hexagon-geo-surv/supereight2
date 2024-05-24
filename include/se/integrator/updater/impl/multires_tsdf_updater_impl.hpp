@@ -57,7 +57,7 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
 #pragma omp parallel for
     for (size_t i = 0; i < block_ptrs.size(); i++) {
         assert(block_ptrs[i]);
-        assert(block_ptrs[i]->isBlock());
+        assert(block_ptrs[i]->is_block);
         auto& block = *static_cast<BlockType*>(block_ptrs[i]);
         block.timestamp = frame_;
         const Eigen::Vector3i block_coord = block.coord;

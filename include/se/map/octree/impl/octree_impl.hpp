@@ -83,7 +83,7 @@ bool Octree<DataT, ResT, BlockSize>::allocate(NodeType* parent_ptr,
                                               OctantBase*& child_ptr)
 {
     assert(parent_ptr);
-    assert(!parent_ptr->isBlock());
+    assert(!parent_ptr->is_block);
 
     child_ptr = parent_ptr->getChild(child_idx);
     if (child_ptr) {
@@ -150,7 +150,7 @@ void Octree<DataT, ResT, BlockSize>::deleteChildren(NodeType* parent_ptr)
     for (int child_idx = 0; child_idx < 8; child_idx++) {
         OctantBase* child_ptr = parent_ptr->getChild(child_idx);
         if (child_ptr) {
-            if (child_ptr->isBlock()) {
+            if (child_ptr->is_block) {
                 memory_pool_.deleteBlock(static_cast<BlockType*>(child_ptr));
             }
             else {

@@ -247,7 +247,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
             /// CASE 1 (REDUNDANT DATA): Depth values in the bounding box are far away from the node or unknown (1).
             ///                          The node to be evaluated is free (2) and fully observed (3),
             if (variance_state != se::VarianceState::Gradient) {
-                typename OctreeType::DataType child_data = (octant_ptr->isBlock())
+                typename OctreeType::DataType child_data = (octant_ptr->is_block)
                     ? static_cast<BlockType*>(octant_ptr)->getMaxData()
                     : static_cast<NodeType*>(octant_ptr)->getData();
 
@@ -280,7 +280,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
 
     if (should_split) {
         // Returns a pointer to the according node if it has previously been allocated.
-        if (octant_ptr->isBlock()) { // Evaluate the node directly if it is a voxel block
+        if (octant_ptr->is_block) { // Evaluate the node directly if it is a voxel block
 #pragma omp critical(block_lock)
             { // Add voxel block to voxel block list for later update and up-propagation
                 allocation_list_.block_list.push_back(octant_ptr);
@@ -305,7 +305,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
     else {
         assert(octant_depth);
 
-        if (octant_ptr->isBlock()) {
+        if (octant_ptr->is_block) {
 #pragma omp critical(block_lock)
             { // Add node to node list for later up propagation (finest node for this branch)
                 allocation_list_.block_list.push_back(octant_ptr);
@@ -445,7 +445,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
             /// CASE 1 (REDUNDANT DATA): Depth values in the bounding box are far away from the node or unknown (1).
             ///                          The node to be evaluated is free (2) and fully observed (3)
             if (variance_state != se::VarianceState::Gradient) {
-                typename OctreeType::DataType child_data = (octant_ptr->isBlock())
+                typename OctreeType::DataType child_data = (octant_ptr->is_block)
                     ? static_cast<BlockType*>(octant_ptr)->getMaxData()
                     : static_cast<NodeType*>(octant_ptr)->getData();
 
@@ -483,7 +483,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
 
     if (should_split) {
         // Returns a pointer to the according node if it has previously been allocated.
-        if (octant_ptr->isBlock()) { // Evaluate the node directly if it is a voxel block
+        if (octant_ptr->is_block) { // Evaluate the node directly if it is a voxel block
 #pragma omp critical(block_lock)
             { // Add voxel block to voxel block list for later update and up-propagation
                 allocation_list_.block_list.push_back(octant_ptr);
@@ -508,7 +508,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
     else {
         assert(octant_depth);
 
-        if (octant_ptr->isBlock()) {
+        if (octant_ptr->is_block) {
 #pragma omp critical(block_lock)
             { // Add node to node list for later up propagation (finest node for this branch)
                 allocation_list_.block_list.push_back(octant_ptr);

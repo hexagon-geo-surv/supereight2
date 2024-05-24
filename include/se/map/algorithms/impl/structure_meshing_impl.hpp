@@ -23,7 +23,7 @@ QuadMesh octree_structure_mesh(OctreeT& octree, const bool only_leaves)
         }
         int node_size;
         int node_scale;
-        if (octant_ptr->isBlock()) {
+        if (octant_ptr->is_block) {
             node_size = static_cast<typename OctreeT::BlockType*>(octant_ptr)->getSize();
             node_scale = static_cast<typename OctreeT::BlockType*>(octant_ptr)->getCurrentScale();
         }

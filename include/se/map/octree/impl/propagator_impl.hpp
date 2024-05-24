@@ -25,7 +25,7 @@ void propagateBlockUp(const OctreeT& /* octree */,
     typedef typename BlockType::DataUnion DataUnionType;
 
     assert(octant_ptr);
-    assert((octant_ptr->isBlock()));
+    assert((octant_ptr->is_block));
     BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
     assert(init_scale >= block_ptr->getCurrentScale());
 
@@ -82,7 +82,7 @@ void propagateBlockDown(const OctreeT& octree,
     typedef typename BlockType::DataUnion DataUnionType;
 
     assert(octant_ptr);
-    assert((octant_ptr->isBlock()));
+    assert((octant_ptr->is_block));
     BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
     assert(target_scale <= block_ptr->getCurrentScale());
 

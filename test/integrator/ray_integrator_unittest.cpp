@@ -18,10 +18,10 @@ typedef se::Octree<DataType, se::Res::Multi, 8> OctreeType;
 
 static void expect_valid_node_data(const NodeType& node, const se::OctantBase* const child)
 {
-    const DataType& min_data = child->isBlock() ? static_cast<const BlockType*>(child)->getMinData()
+    const DataType& min_data = child->is_block ? static_cast<const BlockType*>(child)->getMinData()
                                                 : static_cast<const NodeType*>(child)->getMinData();
 
-    const DataType& max_data = child->isBlock() ? static_cast<const BlockType*>(child)->getMaxData()
+    const DataType& max_data = child->is_block ? static_cast<const BlockType*>(child)->getMaxData()
                                                 : static_cast<const NodeType*>(child)->getMaxData();
 
     std::stringstream failure_message;
@@ -125,7 +125,7 @@ TEST(RayIntegrator, SingleRay)
         /// Determine closest currently allocated octant
         const se::OctantBase* const finest_octant_ptr =
             se::fetcher::finest_octant<OctreeType>(voxel_coordinates, 0, map.getOctree().getRoot());
-        EXPECT_TRUE(finest_octant_ptr->isBlock());
+        EXPECT_TRUE(finest_octant_ptr->is_block);
 
         const OctreeType::BlockType* const block_ptr =
             static_cast<const OctreeType::BlockType*>(finest_octant_ptr);
@@ -245,7 +245,7 @@ TEST(RayIntegrator, Propagation)
             const se::OctantBase* const child = node->getChild(child_idx);
             if (child) {
                 // Get the child min/max data and add it to the appropriate traversal queue.
-                if (child->isBlock()) {
+                if (child->is_block) {
                     blocks.push(static_cast<const BlockType*>(child));
                 }
                 else {
