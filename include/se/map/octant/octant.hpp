@@ -16,9 +16,7 @@
 
 namespace se {
 
-/**
- * \brief This class only helps to dynamic cast the octant to the right type and builds the base of nodes and blocks.
- */
+/** The base class of all octants (se::Node and se::Block) in an se::Octree. */
 class OctantBase {
     /** Pointer to the parent octant. The parent pointer of the root octant is nullptr. */
     OctantBase* const parent_ptr_;
@@ -40,32 +38,28 @@ class OctantBase {
 
 
 
-    /** Construct an octant giver its coordinates \p coord, whether it's a voxel block \p is_block
-     * and the pointer to its parent octant \p parent_ptr.
+    /** Construct an octant given its coordinates (\p coord), whether it's a voxel block (\p
+     * is_block) and the pointer to its parent octant (\p parent_ptr). When constructing the root of
+     * an se::Octree \p parent_ptr must be nullptr.
      */
     OctantBase(const Eigen::Vector3i& coord, const bool is_block, OctantBase* parent_ptr) :
             parent_ptr_(parent_ptr), coord(coord), timestamp(-1), child_mask(0u), is_block(is_block)
     {
     }
 
-    /**
-     * \brief Get the parent pointer of the octant.
-     *
-     * \return The parent pointer of the octant
-     */
-    const OctantBase* parent() const
-    {
-        return parent_ptr_;
-    }
-
+    /** Return the pointer to the octant's parent. */
     OctantBase* parent()
     {
         return parent_ptr_;
     }
 
-    /**
-     * \brief Test if this octant is a leaf, i.e. it has no children.
-     */
+    /** Const version of se::OctantBase::parent(). */
+    const OctantBase* parent() const
+    {
+        return parent_ptr_;
+    }
+
+    /** Return whether the octant is a leaf, that is, whether it has no children. */
     bool isLeaf() const
     {
         return child_mask == 0u;
