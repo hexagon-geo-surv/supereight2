@@ -20,6 +20,9 @@ namespace se {
  * \brief This class only helps to dynamic cast the octant to the right type and builds the base of nodes and blocks.
  */
 class OctantBase {
+    /** Pointer to the parent octant. The parent pointer of the root octant is nullptr. */
+    OctantBase* const parent_ptr_;
+
     public:
     /**
      * \brief Setup a octant via its parent
@@ -115,10 +118,9 @@ class OctantBase {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     protected:
-    const Eigen::Vector3i coord_;  ///< The coordinates of the block (left, front , bottom corner)
-    timestamp_t time_stamp_;       ///< The frame of the last update
-    OctantBase* const parent_ptr_; ///< Every node/block (other than root) needs a parent
-    std::uint8_t children_mask_;   ///< The allocated children
+    const Eigen::Vector3i coord_; ///< The coordinates of the block (left, front , bottom corner)
+    timestamp_t time_stamp_;      ///< The frame of the last update
+    std::uint8_t children_mask_;  ///< The allocated children
     const bool is_block_;
 
     template<typename DerT, typename DatT, int BS>
