@@ -1,8 +1,8 @@
 /*
  * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
- * SPDX-FileCopyrightText: 2019-2023 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2019-2024 Smart Robotics Lab, Imperial College London, Technical University of Munich
  * SPDX-FileCopyrightText: 2019-2021 Nils Funk
- * SPDX-FileCopyrightText: 2019-2023 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2019-2024 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -89,26 +89,6 @@ class OctantBase {
         time_stamp_ = time_stamp;
     }
 
-    /**
-     * \brief Get the active state of an octant.
-     *
-     * \return The active state of the octant
-     */
-    bool getActive() const
-    {
-        return is_active_;
-    }
-
-    /**
-     * \brief Set the active state of an octant.
-     *
-     * \param[in] is_active   The active state of the octant
-     */
-    void setActive(bool is_active)
-    {
-        is_active_ = is_active;
-    }
-
     unsigned int getChildrenMask() const
     {
         return children_mask_;
@@ -139,7 +119,6 @@ class OctantBase {
     timestamp_t time_stamp_;       ///< The frame of the last update
     OctantBase* const parent_ptr_; ///< Every node/block (other than root) needs a parent
     std::uint8_t children_mask_;   ///< The allocated children
-    bool is_active_;               ///< The active state of the octant
     const bool is_block_;
 
     template<typename DerT, typename DatT, int BS>

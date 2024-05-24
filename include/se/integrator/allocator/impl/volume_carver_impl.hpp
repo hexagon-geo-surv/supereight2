@@ -281,7 +281,6 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
     if (should_split) {
         // Returns a pointer to the according node if it has previously been allocated.
         if (octant_ptr->isBlock()) { // Evaluate the node directly if it is a voxel block
-            octant_ptr->setActive(true);
 #pragma omp critical(block_lock)
             { // Add voxel block to voxel block list for later update and up-propagation
                 allocation_list_.block_list.push_back(octant_ptr);
@@ -485,7 +484,6 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
     if (should_split) {
         // Returns a pointer to the according node if it has previously been allocated.
         if (octant_ptr->isBlock()) { // Evaluate the node directly if it is a voxel block
-            octant_ptr->setActive(true);
 #pragma omp critical(block_lock)
             { // Add voxel block to voxel block list for later update and up-propagation
                 allocation_list_.block_list.push_back(octant_ptr);
