@@ -233,10 +233,10 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
     const Eigen::Vector3i block_coord = block_ptr->coord; /// < Coordinates of block to be updated
 
     // Set timestamp of the current block
-    timestamp_t previous_time_stamp = block_ptr->getTimeStamp();
+    timestamp_t previous_time_stamp = block_ptr->timestamp;
     const bool is_already_integrated = (previous_time_stamp == frame_);
     if (!is_already_integrated) {
-        block_ptr->setTimeStamp(frame_);
+        block_ptr->timestamp = frame_;
     }
 
 
@@ -304,7 +304,7 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
         std::set<se::OctantBase*>::iterator it;
         for (it = node_set_[d].begin(); it != node_set_[d].end(); ++it) {
             se::OctantBase* octant_ptr = *it;
-            if (octant_ptr->getTimeStamp() == frame_) {
+            if (octant_ptr->timestamp == frame_) {
                 continue;
             }
 

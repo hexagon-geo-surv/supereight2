@@ -61,7 +61,7 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr, const 
     assert(!octant_ptr->isBlock());
 
     NodeT& node = *static_cast<NodeT*>(octant_ptr);
-    node.setTimeStamp(frame);
+    node.timestamp = frame;
 
     field_t max_occupancy = std::numeric_limits<field_t>::lowest();
     field_t max_mean_occupancy = 0;

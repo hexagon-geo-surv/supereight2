@@ -29,6 +29,9 @@ class OctantBase {
      */
     const Eigen::Vector3i coord;
 
+    /** The frame the octant was last updated at. */
+    timestamp_t timestamp;
+
     /**
      * \brief Setup a octant via its parent
      *
@@ -63,30 +66,6 @@ class OctantBase {
         return parent_ptr_;
     }
 
-    /**
-     * \brief Get the time stamp of an octant.
-     *
-     * \note The time stamp is defined as an integer
-     *
-     * \return The time stamp of the octant
-     */
-    timestamp_t getTimeStamp() const
-    {
-        return time_stamp_;
-    }
-
-    /**
-     * \brief Set the time stamp of an octant.
-     *
-     * \note The time stamp is defined as an integer
-     *
-     * \param[in] time_stamp  The time stamp of the octant
-     */
-    void setTimeStamp(timestamp_t time_stamp)
-    {
-        time_stamp_ = time_stamp;
-    }
-
     unsigned int getChildrenMask() const
     {
         return children_mask_;
@@ -113,7 +92,6 @@ class OctantBase {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     protected:
-    timestamp_t time_stamp_;     ///< The frame of the last update
     std::uint8_t children_mask_; ///< The allocated children
     const bool is_block_;
 

@@ -94,7 +94,7 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr, const 
     assert(!octant_ptr->isBlock());
 
     NodeT& node = *static_cast<NodeT*>(octant_ptr);
-    node.setTimeStamp(frame);
+    node.timestamp = frame;
 
     // Gather the child minimum and maximum data.
     std::array<typename NodeT::DataType, 8> child_min_data;

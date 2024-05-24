@@ -59,7 +59,7 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
         assert(block_ptrs[i]);
         assert(block_ptrs[i]->isBlock());
         auto& block = *static_cast<BlockType*>(block_ptrs[i]);
-        block.setTimeStamp(frame_);
+        block.timestamp = frame_;
         const Eigen::Vector3i block_coord = block.coord;
         Eigen::Vector3f block_centre_point_W;
         map_.voxelToPoint(block_coord, block.getSize(), block_centre_point_W);

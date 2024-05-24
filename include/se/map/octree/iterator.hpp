@@ -205,12 +205,12 @@ class UpdateIterator : public BaseIterator<UpdateIterator<OctreeT>> {
 
     bool isNext(se::OctantBase* octant_ptr)
     {
-        return octant_ptr->isBlock() && octant_ptr->getTimeStamp() >= time_stamp_;
+        return octant_ptr->isBlock() && octant_ptr->timestamp >= time_stamp_;
     }
 
     bool doIgnore(se::OctantBase* octant_ptr)
     {
-        return octant_ptr->getTimeStamp() < time_stamp_;
+        return octant_ptr->timestamp < time_stamp_;
     }
 
     const timestamp_t time_stamp_;

@@ -136,7 +136,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
         std::set<OctantBase*>::iterator it;
         for (it = node_set_[d].begin(); it != node_set_[d].end(); ++it) {
             OctantBase* octant_ptr = *it;
-            if (octant_ptr->getTimeStamp() == frame_) {
+            if (octant_ptr->timestamp == frame_) {
                 continue;
             }
             if (octant_ptr->parent()) {

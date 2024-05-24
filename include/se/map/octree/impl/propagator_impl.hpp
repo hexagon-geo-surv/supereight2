@@ -161,8 +161,8 @@ void propagateToRoot(std::vector<se::OctantBase*>& octant_ptrs, PropagateF& prop
         se::OctantBase* parent_ptr = child_ptr->parent();
         assert(parent_ptr);
 
-        if (child_ptr->getTimeStamp() > parent_ptr->getTimeStamp()) {
-            parent_ptr->setTimeStamp(child_ptr->getTimeStamp());
+        if (child_ptr->timestamp > parent_ptr->timestamp) {
+            parent_ptr->timestamp = child_ptr->timestamp;
             child_ptrs.insert(parent_ptr);
         }
     } // block_ptrs
@@ -194,8 +194,8 @@ void propagateToRoot(std::vector<se::OctantBase*>& octant_ptrs, PropagateF& prop
 static inline void propagateTimeStampToRoot(std::vector<se::OctantBase*>& octant_ptrs)
 {
     auto time_step_prop = [](se::OctantBase* child_ptr, se::OctantBase* parent_ptr) {
-        if (child_ptr->getTimeStamp() > parent_ptr->getTimeStamp()) {
-            parent_ptr->setTimeStamp(child_ptr->getTimeStamp());
+        if (child_ptr->timestamp > parent_ptr->timestamp) {
+            parent_ptr->timestamp = child_ptr->timestamp;
         }
     };
 

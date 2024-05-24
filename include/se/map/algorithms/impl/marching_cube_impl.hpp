@@ -1188,7 +1188,7 @@ void marching_cube(const OctreeT& octree, TriangleMesh& triangles, const int tim
 
     std::vector<const BlockType*> block_ptrs;
     for (auto block_ptr_itr = se::UpdateIterator<OctreeT>(
-             &octree, std::max(((int) octree.getRoot()->getTimeStamp()) - time_stamp, 0));
+             &octree, std::max(((int) octree.getRoot()->timestamp) - time_stamp, 0));
          block_ptr_itr != se::UpdateIterator<OctreeT>();
          ++block_ptr_itr) {
         block_ptrs.push_back(static_cast<const BlockType*>(*block_ptr_itr));
@@ -1250,7 +1250,7 @@ void dual_marching_cube(const OctreeT& octree, TriangleMesh& triangles, const in
 
     std::vector<const BlockType*> block_ptrs;
     for (auto block_ptr_itr = se::UpdateIterator<OctreeT>(
-             &octree, std::max((octree.getRoot()->getTimeStamp()) - time_stamp, 0));
+             &octree, std::max((octree.getRoot()->timestamp) - time_stamp, 0));
          block_ptr_itr != se::UpdateIterator<OctreeT>();
          ++block_ptr_itr) {
         block_ptrs.push_back(static_cast<const BlockType*>(*block_ptr_itr));
