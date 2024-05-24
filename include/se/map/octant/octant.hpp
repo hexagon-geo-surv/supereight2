@@ -32,6 +32,9 @@ class OctantBase {
     /** The frame the octant was last updated at. */
     timestamp_t timestamp;
 
+    /** The i-th bit of the mask must be set if the i-th child of the octant is allocated. */
+    std::uint8_t child_mask;
+
     /**
      * \brief Setup a octant via its parent
      *
@@ -66,33 +69,17 @@ class OctantBase {
         return parent_ptr_;
     }
 
-    unsigned int getChildrenMask() const
-    {
-        return children_mask_;
-    }
-
-    /**
-     * \brief Clear the children mask.
-     *
-     * \warning Only use this function if all children pointer are 'nullptr's.
-     */
-    void clearChildrenMask()
-    {
-        children_mask_ = 0u;
-    }
-
     /**
      * \brief Test if this octant is a leaf, i.e. it has no children.
      */
     bool isLeaf() const
     {
-        return children_mask_ == 0u;
+        return child_mask == 0u;
     }
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     protected:
-    std::uint8_t children_mask_; ///< The allocated children
     const bool is_block_;
 
     template<typename DerT, typename DatT, int BS>

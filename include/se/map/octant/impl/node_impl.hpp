@@ -79,12 +79,12 @@ OctantBase* Node<DataT, ResT>::setChild(const int child_idx, OctantBase* child_p
 {
     assert(child_idx >= 0);
     assert(static_cast<size_t>(child_idx) < children_ptr_.size());
-    // Set or clear the corresponding bit in OctantBase::children_mask_.
+    // Set or clear the corresponding bit in OctantBase::child_mask.
     if (child_ptr) {
-        children_mask_ |= 1 << child_idx;
+        child_mask |= 1 << child_idx;
     }
     else {
-        children_mask_ &= ~(1 << child_idx);
+        child_mask &= ~(1 << child_idx);
     }
     std::swap(child_ptr, children_ptr_[child_idx]);
     return child_ptr;
