@@ -127,8 +127,8 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
 {
     for (const auto& octant_ptr : block_list) {
         BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
-        if (block_ptr->getParent()) {
-            node_set_[octree_.getBlockDepth() - 1].insert(block_ptr->getParent());
+        if (block_ptr->parent()) {
+            node_set_[octree_.getBlockDepth() - 1].insert(block_ptr->parent());
         }
     }
 
@@ -139,10 +139,10 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
             if (octant_ptr->getTimeStamp() == frame_) {
                 continue;
             }
-            if (octant_ptr->getParent()) {
+            if (octant_ptr->parent()) {
                 auto node_data =
                     updater::propagate_to_parent_node<NodeType, BlockType>(octant_ptr, frame_);
-                node_set_[d - 1].insert(octant_ptr->getParent());
+                node_set_[d - 1].insert(octant_ptr->parent());
                 if (track_updated_octants_) {
                     updated_octants_.insert(octant_ptr);
                 }
@@ -653,7 +653,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
         node_ptr->setMinData(node_data);
 #pragma omp critical(node_lock)
         { // Add node to node list for later up-propagation (finest node for this tree-branch)
-            node_set_[depth - 1].insert(node_ptr->getParent());
+            node_set_[depth - 1].insert(node_ptr->parent());
         }
     }
     else {
@@ -666,7 +666,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
                 freeBlock(child_ptr); // TODO: Add to block_list?
 #pragma omp critical(node_lock)
                 { // Add node to node list for later up-propagation (finest node for this tree-branch)
-                    node_set_[depth - 1].insert(child_ptr->getParent());
+                    node_set_[depth - 1].insert(child_ptr->parent());
                 }
 #pragma omp critical(block_lock)
                 { // Add node to node list for later up-propagation (finest node for this tree-branch)

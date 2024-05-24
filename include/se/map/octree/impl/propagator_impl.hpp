@@ -136,7 +136,7 @@ void propagateToRoot(std::vector<std::unordered_set<se::OctantBase*>> octant_ptr
              child_ptr_itr != child_ptrs_at_depth.end();
              ++child_ptr_itr) {
             se::OctantBase* child_ptr = *child_ptr_itr;
-            se::OctantBase* parent_ptr = child_ptr->getParent();
+            se::OctantBase* parent_ptr = child_ptr->parent();
             assert(parent_ptr);
 
             propagate_funct(child_ptr, parent_ptr);
@@ -158,7 +158,7 @@ void propagateToRoot(std::vector<se::OctantBase*>& octant_ptrs, PropagateF& prop
     std::unordered_set<se::OctantBase*> parent_ptrs;
 
     for (const auto& child_ptr : octant_ptrs) {
-        se::OctantBase* parent_ptr = child_ptr->getParent();
+        se::OctantBase* parent_ptr = child_ptr->parent();
         assert(parent_ptr);
 
         if (child_ptr->getTimeStamp() > parent_ptr->getTimeStamp()) {
@@ -173,7 +173,7 @@ void propagateToRoot(std::vector<se::OctantBase*>& octant_ptrs, PropagateF& prop
         for (child_ptr_itr = child_ptrs.begin(); child_ptr_itr != child_ptrs.end();
              ++child_ptr_itr) {
             se::OctantBase* child_ptr = *child_ptr_itr;
-            se::OctantBase* parent_ptr = child_ptr->getParent();
+            se::OctantBase* parent_ptr = child_ptr->parent();
 
             if (parent_ptr) {
                 propagate_funct(child_ptr, parent_ptr);

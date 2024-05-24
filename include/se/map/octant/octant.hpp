@@ -58,12 +58,12 @@ class OctantBase {
      *
      * \return The parent pointer of the octant
      */
-    const OctantBase* getParent() const
+    const OctantBase* parent() const
     {
         return parent_ptr_;
     }
 
-    OctantBase* getParent()
+    OctantBase* parent()
     {
         return parent_ptr_;
     }

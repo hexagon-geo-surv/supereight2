@@ -295,8 +295,8 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
     // Retrieving Parent Nodes for all updated blocks
     for (const auto& octant_ptr : updated_blocks_vector_) {
         BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
-        if (block_ptr->getParent()) {
-            node_set_[octree_.getBlockDepth() - 1].insert(block_ptr->getParent());
+        if (block_ptr->parent()) {
+            node_set_[octree_.getBlockDepth() - 1].insert(block_ptr->parent());
         }
     }
 
@@ -309,10 +309,10 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
                 continue;
             }
 
-            if (octant_ptr->getParent()) {
+            if (octant_ptr->parent()) {
                 auto node_data = ray_integrator::propagate_to_parent_node<NodeType, BlockType>(
                     octant_ptr, frame_);
-                node_set_[d - 1].insert(octant_ptr->getParent());
+                node_set_[d - 1].insert(octant_ptr->parent());
                 if (track_updated_octants_) {
                     updated_blocks_set_.insert(octant_ptr);
                 }
