@@ -25,7 +25,7 @@ static void expect_valid_node_data(const NodeType& node, const se::OctantBase* c
                                                 : static_cast<const NodeType*>(child)->getMaxData();
 
     std::stringstream failure_message;
-    failure_message << "for node (" << node.getCoord().transpose() << ") with size "
+    failure_message << "for node (" << node.coord.transpose() << ") with size "
                     << node.getSize();
     if (min_data.field.observed) {
         EXPECT_LE(se::get_field(node.getMinData()), se::get_field(min_data))
@@ -134,7 +134,7 @@ TEST(RayIntegrator, SingleRay)
 
 
         Eigen::Vector3f block_centre_point;
-        map.voxelToPoint(block_ptr->getCoord(), 8, block_centre_point);
+        map.voxelToPoint(block_ptr->coord, 8, block_centre_point);
 
         int computedIntegrationScale =
             sensor.computeIntegrationScale(block_centre_point, res, -1, -1, 3);
@@ -270,7 +270,7 @@ TEST(RayIntegrator, Propagation)
                 for (int y = 0; y < block->size; y += stride) {
                     for (int x = 0; x < block->size; x += stride) {
                         const Eigen::Vector3i voxel_coord =
-                            block->getCoord() + Eigen::Vector3i(x, y, z);
+                            block->coord + Eigen::Vector3i(x, y, z);
                         expect_valid_scale_data(*block, voxel_coord, scale);
                     }
                 }

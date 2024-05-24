@@ -166,7 +166,7 @@ TEST(Map, Interpolation)
         se::keyops::encode_key(block_coord, 0, voxel_key);
         block_ptr =
             static_cast<BlockType*>(se::allocator::block(voxel_key, octree, octree.getRoot()));
-        coord_is = block_ptr->getCoord();
+        coord_is = block_ptr->coord;
         EXPECT_EQ(coord_ought, coord_is);
         for (size_t voxel_idx = 0; voxel_idx < block_ptr->size_cu; voxel_idx++) {
             DataType data;

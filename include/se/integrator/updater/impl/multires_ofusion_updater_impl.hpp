@@ -181,7 +181,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
     // Compute the point of the block centre in the sensor frame
     const unsigned int block_size = BlockType::size;
-    const Eigen::Vector3i block_coord = block_ptr->getCoord();
+    const Eigen::Vector3i block_coord = block_ptr->coord;
     Eigen::Vector3f block_centre_point_W;
 
     map_.voxelToPoint(block_coord, block_size, block_centre_point_W);
@@ -333,7 +333,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
     // Compute the point of the block centre in the sensor frame
     BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
     const int block_size = BlockType::size;
-    const Eigen::Vector3i block_coord = block_ptr->getCoord();
+    const Eigen::Vector3i block_coord = block_ptr->coord;
 
     Eigen::Vector3f block_centre_point_W;
     map_.voxelToPoint(block_coord, block_size, block_centre_point_W);
@@ -438,7 +438,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
         const unsigned int size_at_recommended_scale_li = BlockType::size >> recommended_scale;
         const unsigned int size_at_recommended_scale_sq = math::sq(size_at_recommended_scale_li);
 
-        const Eigen::Vector3i voxel_coord_base = block_ptr->getCoord();
+        const Eigen::Vector3i voxel_coord_base = block_ptr->coord;
         Eigen::Vector3f sample_point_base_W;
         map_.voxelToPoint(voxel_coord_base, recommended_stride, sample_point_base_W);
         const Eigen::Vector3f sample_point_base_S = T_SW_ * sample_point_base_W;
@@ -540,7 +540,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
     const unsigned int size_at_integration_scale_li = BlockType::size >> integration_scale;
     const unsigned int size_at_integration_scale_sq = math::sq(size_at_integration_scale_li);
 
-    const Eigen::Vector3i voxel_coord_base = block_ptr->getCoord();
+    const Eigen::Vector3i voxel_coord_base = block_ptr->coord;
     Eigen::Vector3f sample_point_base_W;
     map_.voxelToPoint(voxel_coord_base, integration_stride, sample_point_base_W);
     const Eigen::Vector3f sample_point_base_S = T_SW_ * sample_point_base_W;

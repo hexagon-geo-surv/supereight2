@@ -96,7 +96,7 @@ bool Octree<DataT, ResT, BlockSize>::allocate(NodeType* parent_ptr,
         {
             child_ptr = memory_pool_.allocateBlock(parent_ptr, child_idx, init_data);
         }
-        aabbExtend(child_ptr->getCoord(), parent_ptr->getSize() / 2);
+        aabbExtend(child_ptr->coord, parent_ptr->getSize() / 2);
     }
     else {
 #pragma omp critical
@@ -138,7 +138,7 @@ void Octree<DataT, ResT, BlockSize>::allocateChildren(NodeType* parent_ptr)
     if (children_are_blocks) {
         // Blocks are always leaves and all of them have been allocated, extend the AABB to contain
         // their parent.
-        aabbExtend(parent_ptr->getCoord(), parent_ptr->getSize());
+        aabbExtend(parent_ptr->coord, parent_ptr->getSize());
     }
 }
 

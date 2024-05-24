@@ -150,7 +150,7 @@ std::vector<const OctantBase*> face_neighbours(const OctantBase* const octant_pt
                                                const OctreeT& octree)
 {
     assert(octant_ptr);
-    const Eigen::Vector3i& octant_coord = octant_ptr->getCoord();
+    const Eigen::Vector3i& octant_coord = octant_ptr->coord;
     const int octant_size = octant_ptr->isBlock()
         ? static_cast<const typename OctreeT::BlockType*>(octant_ptr)->getSize()
         : static_cast<const typename OctreeT::NodeType*>(octant_ptr)->getSize();
@@ -168,7 +168,7 @@ std::vector<const OctantBase*> face_neighbours(const OctantBase* const octant_pt
         if (neighbour) {
             // If the returned neighbour contains the octant it means that no neighbouring octant
             // has been allocated.
-            const Eigen::Vector3i& nc = neighbour->getCoord();
+            const Eigen::Vector3i& nc = neighbour->coord;
             if ((octant_coord.array() >= nc.array()).all()
                 && (octant_coord.array() < nc.array() + octant_size).all()) {
                 neighbour = nullptr;

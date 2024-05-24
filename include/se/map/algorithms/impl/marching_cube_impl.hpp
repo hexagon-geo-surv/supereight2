@@ -691,7 +691,7 @@ void gather_dual_data(const OctreeT& octree,
                       std::array<Eigen::Vector3f, 8>& dual_corner_coords_f,
                       std::array<Eigen::Vector3i, 8>& dual_corner_coords_i)
 {
-    const Eigen::Vector3i primal_corner_coord_rel = primal_corner_coord - block_ptr->getCoord();
+    const Eigen::Vector3i primal_corner_coord_rel = primal_corner_coord - block_ptr->coord;
 
     BoundedVector<int, 8> lower_priority_neighbours, higher_priority_neighbours;
     BoundedVector<BoundedVector<int, 8>, 8> neighbours;
@@ -848,7 +848,7 @@ void marching_cube_kernel(const OctreeT& octree,
     for (size_t block_idx = 0; block_idx < block_ptrs.size(); block_idx++) {
         const BlockType* block_ptr = block_ptrs[block_idx];
 
-        const Eigen::Vector3i& start_coord = block_ptr->getCoord();
+        const Eigen::Vector3i& start_coord = block_ptr->coord;
         const Eigen::Vector3i last_coord =
             (start_coord + Eigen::Vector3i::Constant(block_size))
                 .cwiseMin(Eigen::Vector3i::Constant(octree_size - 1));
@@ -903,7 +903,7 @@ void dual_marching_cube_kernel(const OctreeT& octree,
         const BlockType* block_ptr = block_ptrs[block_idx];
         const int voxel_scale = block_ptr->getCurrentScale();
         const int voxel_stride = 1 << voxel_scale;
-        const Eigen::Vector3i& start_coord = block_ptr->getCoord();
+        const Eigen::Vector3i& start_coord = block_ptr->coord;
         const Eigen::Vector3i last_coord =
             (start_coord + Eigen::Vector3i::Constant(block_size))
                 .cwiseMin(Eigen::Vector3i::Constant(octree_size - 1));
@@ -1017,7 +1017,7 @@ dual_marching_cube_kernel(const OctreeT& octree,
         const BlockType* block_ptr = block_ptrs[block_idx];
         const int voxel_scale = block_ptr->getCurrentScale();
         const int voxel_stride = 1 << voxel_scale;
-        const Eigen::Vector3i& start_coord = block_ptr->getCoord();
+        const Eigen::Vector3i& start_coord = block_ptr->coord;
         const Eigen::Vector3i last_coord =
             (start_coord + Eigen::Vector3i::Constant(block_size))
                 .cwiseMin(Eigen::Vector3i::Constant(octree_size - 1));

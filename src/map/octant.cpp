@@ -12,7 +12,7 @@ namespace se {
 
 OctantBase::OctantBase(const bool is_block, const Eigen::Vector3i& coord, OctantBase* parent_ptr) :
         parent_ptr_(parent_ptr),
-        coord_(coord),
+        coord(coord),
         time_stamp_(-1),
         children_mask_(0u),
         is_block_(is_block)

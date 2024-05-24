@@ -46,7 +46,7 @@ template<typename DerivedT, typename DataT, int BlockSize>
 const typename BlockSingleRes<DerivedT, DataT, BlockSize>::DataType&
 BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const Eigen::Vector3i& voxel_coord) const
 {
-    const Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord_;
+    const Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord;
     const int voxel_idx = voxel_offset.x() + voxel_offset.y() * underlying()->size
         + voxel_offset.z() * underlying()->size_sq;
     return getData(voxel_idx);
@@ -58,7 +58,7 @@ template<typename DerivedT, typename DataT, int BlockSize>
 typename BlockSingleRes<DerivedT, DataT, BlockSize>::DataType&
 BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const Eigen::Vector3i& voxel_coord)
 {
-    const Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord_;
+    const Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord;
     const int voxel_idx = voxel_offset.x() + voxel_offset.y() * underlying()->size
         + voxel_offset.z() * underlying()->size_sq;
     return getData(voxel_idx);
@@ -70,7 +70,7 @@ template<typename DerivedT, typename DataT, int BlockSize>
 void BlockSingleRes<DerivedT, DataT, BlockSize>::setData(const Eigen::Vector3i& voxel_coord,
                                                          const DataType& data)
 {
-    const Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord_;
+    const Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord;
     const int voxel_idx = voxel_offset.x() + voxel_offset.y() * underlying()->size
         + voxel_offset.z() * underlying()->size_sq;
     setData(voxel_idx, data);
@@ -107,7 +107,7 @@ int BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getVoxelI
 {
     assert(scale >= 0);
     assert(scale <= max_scale_);
-    const Eigen::Vector3i voxel_offset = (voxel_coord - underlying()->coord_) / (1 << scale);
+    const Eigen::Vector3i voxel_offset = (voxel_coord - underlying()->coord) / (1 << scale);
     const int size_at_scale = size_at_scales_[scale];
     return scale_offsets_[scale] + voxel_offset.x() + voxel_offset.y() * size_at_scale
         + voxel_offset.z() * math::sq(size_at_scale);
@@ -355,7 +355,7 @@ int BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getV
 {
     assert(scale >= 0);
     assert(scale <= max_scale_);
-    const Eigen::Vector3i voxel_offset = (voxel_coord - underlying()->coord_) / (1 << scale);
+    const Eigen::Vector3i voxel_offset = (voxel_coord - underlying()->coord) / (1 << scale);
     const int size_at_scale = BlockSize >> scale;
     return voxel_offset.x() + voxel_offset.y() * size_at_scale
         + voxel_offset.z() * math::sq(size_at_scale);
@@ -425,7 +425,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getData(
         return init_data_;
     }
     else {
-        Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord_;
+        Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord;
         voxel_offset = voxel_offset / (1 << scale);
         const int size_at_scale = BlockSize >> scale;
         return block_data_[max_scale_ - scale][voxel_offset.x() + voxel_offset.y() * size_at_scale
@@ -445,7 +445,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getData(
         return init_data_;
     }
     else {
-        Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord_;
+        Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord;
         voxel_offset = voxel_offset / (1 << scale);
         const int size_at_scale = BlockSize >> scale;
         return block_data_[max_scale_ - scale][voxel_offset.x() + voxel_offset.y() * size_at_scale
@@ -511,7 +511,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getMinDa
         return init_data_;
     }
     else {
-        Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord_;
+        Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord;
         voxel_offset = voxel_offset / (1 << scale);
         const int size_at_scale = BlockSize >> scale;
         return block_min_data_[max_scale_ - scale][voxel_offset.x()
@@ -532,7 +532,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getMinDa
         return init_data_;
     }
     else {
-        Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord_;
+        Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord;
         voxel_offset = voxel_offset / (1 << scale);
         const int size_at_scale = BlockSize >> scale;
         return block_min_data_[max_scale_ - scale][voxel_offset.x()
@@ -599,7 +599,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getMaxDa
         return init_data_;
     }
     else {
-        Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord_;
+        Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord;
         voxel_offset = voxel_offset / (1 << scale);
         const int size_at_scale = BlockSize >> scale;
         return block_max_data_[max_scale_ - scale][voxel_offset.x()
@@ -620,7 +620,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getMaxDa
         return init_data_;
     }
     else {
-        Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord_;
+        Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord;
         voxel_offset = voxel_offset / (1 << scale);
         const int size_at_scale = BlockSize >> scale;
         return block_max_data_[max_scale_ - scale][voxel_offset.x()
@@ -1018,7 +1018,7 @@ Block<DataT, ResT, BlockSize, PolicyT>::Block(Node<DataT, ResT>* parent_ptr,
                                               const int child_idx,
                                               const DataT init_data) :
         OctantBase(true,
-                   parent_ptr->getCoord()
+                   parent_ptr->coord
                        + BlockSize
                            * Eigen::Vector3i((1 & child_idx) > 0,
                                              (2 & child_idx) > 0,

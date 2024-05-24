@@ -29,7 +29,7 @@ void propagateBlockUp(const OctreeT& /* octree */,
     BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
     assert(init_scale >= block_ptr->getCurrentScale());
 
-    const Eigen::Vector3i block_coord = block_ptr->getCoord();
+    const Eigen::Vector3i block_coord = block_ptr->coord;
     const int block_size = BlockType::getSize();
 
     for (int child_scale = init_scale; child_scale < se::math::log2_const(block_size);
@@ -86,7 +86,7 @@ void propagateBlockDown(const OctreeT& octree,
     BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
     assert(target_scale <= block_ptr->getCurrentScale());
 
-    const Eigen::Vector3i block_coord = block_ptr->getCoord();
+    const Eigen::Vector3i block_coord = block_ptr->coord;
     const int block_size = BlockType::getSize();
     for (int parent_scale = block_ptr->getCurrentScale(); parent_scale > target_scale;
          --parent_scale) {

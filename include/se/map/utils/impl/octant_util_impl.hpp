@@ -24,12 +24,12 @@ sort_blocks(std::vector<se::OctantBase*>& block_ptrs)
                               const se::OctantBase* block_ptr_rhs) {
         se::key_t key_lhs;
         se::keyops::encode_key(
-            block_ptr_lhs->getCoord(),
+            block_ptr_lhs->coord,
             se::math::log2_const(static_cast<const BlockT*>(block_ptr_lhs)->getSize()),
             key_lhs);
         se::key_t key_rhs;
         se::keyops::encode_key(
-            block_ptr_rhs->getCoord(),
+            block_ptr_rhs->coord,
             se::math::log2_const(static_cast<const BlockT*>(block_ptr_rhs)->getSize()),
             key_rhs);
         return key_lhs < key_rhs;
@@ -47,12 +47,12 @@ sort_blocks(std::vector<se::OctantBase*>& block_ptrs)
                               const se::OctantBase* block_ptr_rhs) {
         se::key_t key_lhs;
         se::keyops::encode_key(
-            block_ptr_lhs->getCoord(),
+            block_ptr_lhs->coord,
             se::math::log2_const(static_cast<const BlockT*>(block_ptr_lhs)->getSize()),
             key_lhs);
         se::key_t key_rhs;
         se::keyops::encode_key(
-            block_ptr_rhs->getCoord(),
+            block_ptr_rhs->coord,
             se::math::log2_const(static_cast<const BlockT*>(block_ptr_rhs)->getSize()),
             key_rhs);
         return key_lhs < key_rhs;
@@ -104,7 +104,7 @@ inline int octant_to_scale(const se::OctantBase* octant_ptr)
 template<typename OctreeT>
 inline se::key_t octant_to_key(const se::OctantBase* octant_ptr)
 {
-    return se::keyops::encode_key(octant_ptr->getCoord(),
+    return se::keyops::encode_key(octant_ptr->coord,
                                   se::octantops::octant_to_scale<OctreeT>(octant_ptr));
 }
 

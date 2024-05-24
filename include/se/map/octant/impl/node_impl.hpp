@@ -28,7 +28,7 @@ Node<DataT, ResT>::Node(const Eigen::Vector3i& coord, const int size, const Data
 template<typename DataT, Res ResT>
 Node<DataT, ResT>::Node(Node* parent_ptr, const int child_idx, const DataT& init_data) :
         OctantBase(false,
-                   parent_ptr->coord_
+                   parent_ptr->coord
                        + (parent_ptr->size_ >> 1)
                            * Eigen::Vector3i((1 & child_idx) > 0,
                                              (2 & child_idx) > 0,
@@ -100,7 +100,7 @@ Eigen::Vector3i Node<DataT, ResT>::getChildCoord(const int child_idx) const
     const Eigen::Vector3i child_offset(
         (child_idx & 1) != 0, (child_idx & 2) != 0, (child_idx & 4) != 0);
     const int child_size = getSize() / 2;
-    return getCoord() + child_size * child_offset;
+    return coord + child_size * child_offset;
 }
 
 
@@ -108,10 +108,10 @@ Eigen::Vector3i Node<DataT, ResT>::getChildCoord(const int child_idx) const
 template<typename DataT, Res ResT>
 int Node<DataT, ResT>::getChildIdx(const Eigen::Vector3i& child_coord)
 {
-    assert(keyops::is_child(keyops::encode_key(getCoord(), math::log2_const(getSize())),
+    assert(keyops::is_child(keyops::encode_key(coord, math::log2_const(getSize())),
                             keyops::encode_key(child_coord, math::log2_const(getSize() / 2)))
            && "child_coord must correspond to a child of the node");
-    const Eigen::Vector3i offset = child_coord - getCoord();
+    const Eigen::Vector3i offset = child_coord - coord;
     const int child_size = getSize() / 2;
     return ((offset.x() & child_size) > 0) + 2 * ((offset.y() & child_size) > 0)
         + 4 * ((offset.z() & child_size) > 0);

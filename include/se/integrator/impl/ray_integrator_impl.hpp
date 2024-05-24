@@ -181,7 +181,7 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockS
 
         // Compute the point of the block centre in the sensor frame ToDo: is this needed? Can't we just use the point in sensor frame?
         const unsigned int block_size = BlockType::size;
-        const Eigen::Vector3i block_coord = block_ptr->getCoord();
+        const Eigen::Vector3i block_coord = block_ptr->coord;
         Eigen::Vector3f block_centre_point_W;
         map_.voxelToPoint(block_coord, block_size, block_centre_point_W);
         const Eigen::Vector3f block_centre_point_C = T_SW_ * block_centre_point_W;
@@ -230,8 +230,7 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
         return;
     // Block (pointer) to be updated
     BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
-    const Eigen::Vector3i block_coord =
-        block_ptr->getCoord(); /// < Coordinates of block to be updated
+    const Eigen::Vector3i block_coord = block_ptr->coord; /// < Coordinates of block to be updated
 
     // Set timestamp of the current block
     timestamp_t previous_time_stamp = block_ptr->getTimeStamp();

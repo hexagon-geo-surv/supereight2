@@ -24,6 +24,11 @@ class OctantBase {
     OctantBase* const parent_ptr_;
 
     public:
+    /** The coordinates in voxels of the octant's vertex closest to the origin. All coordinates must
+     * be non-negative.
+     */
+    const Eigen::Vector3i coord;
+
     /**
      * \brief Setup a octant via its parent
      *
@@ -41,16 +46,6 @@ class OctantBase {
     bool isBlock() const
     {
         return is_block_;
-    }
-
-    /**
-     * \brief Get the voxel coordinates of the octant.
-     *
-     * \return The voxel coordinates of the octant
-     */
-    const Eigen::Vector3i& getCoord() const
-    {
-        return coord_;
     }
 
     /**
@@ -118,9 +113,8 @@ class OctantBase {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     protected:
-    const Eigen::Vector3i coord_; ///< The coordinates of the block (left, front , bottom corner)
-    timestamp_t time_stamp_;      ///< The frame of the last update
-    std::uint8_t children_mask_;  ///< The allocated children
+    timestamp_t time_stamp_;     ///< The frame of the last update
+    std::uint8_t children_mask_; ///< The allocated children
     const bool is_block_;
 
     template<typename DerT, typename DatT, int BS>

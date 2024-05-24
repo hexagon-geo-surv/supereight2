@@ -701,7 +701,7 @@ getData(const OctreeT& octree, BlockT* block_ptr, const Eigen::Vector3i& voxel_c
 {
     assert(block_ptr);
 
-    const Eigen::Vector3i lower_coord = block_ptr->getCoord();
+    const Eigen::Vector3i lower_coord = block_ptr->coord;
     const Eigen::Vector3i upper_coord =
         lower_coord + Eigen::Vector3i::Constant(BlockT::getSize() - 1);
     const bool is_contained = ((voxel_coord.array() >= lower_coord.array())
@@ -755,7 +755,7 @@ getData(const OctreeT& octree,
 {
     assert(block_ptr);
 
-    const Eigen::Vector3i lower_coord = block_ptr->getCoord();
+    const Eigen::Vector3i lower_coord = block_ptr->coord;
     const Eigen::Vector3i upper_coord =
         lower_coord + Eigen::Vector3i::Constant(BlockT::getSize() - 1);
     const bool is_contained = ((voxel_coord.array() >= lower_coord.array())

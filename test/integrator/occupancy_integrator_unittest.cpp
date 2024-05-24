@@ -52,7 +52,7 @@ class OccupancyIntegrator : public ::testing::Test {
             : static_cast<const NodeType*>(child)->getMaxData();
 
         std::stringstream failure_message;
-        failure_message << "for node (" << node.getCoord().transpose() << ") with size "
+        failure_message << "for node (" << node.coord.transpose() << ") with size "
                         << node.getSize();
         if (min_data.field.observed) {
             EXPECT_LE(se::get_field(node.getMinData()), se::get_field(min_data))
@@ -135,7 +135,7 @@ TEST_F(OccupancyIntegrator, propagation)
                 for (int y = 0; y < block->size; y += stride) {
                     for (int x = 0; x < block->size; x += stride) {
                         const Eigen::Vector3i voxel_coord =
-                            block->getCoord() + Eigen::Vector3i(x, y, z);
+                            block->coord + Eigen::Vector3i(x, y, z);
                         expect_valid_scale_data(*block, voxel_coord, scale);
                     }
                 }

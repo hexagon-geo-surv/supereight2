@@ -63,7 +63,7 @@ TEST(VisitorTSDFSingleRes, Interpolation)
         se::keyops::encode_key(block_coord, 0, voxel_key);
         block_ptr_0 = static_cast<BlockType0*>(
             se::allocator::block(voxel_key, *octree_ptr_0, octree_ptr_0->getRoot()));
-        coord_is = block_ptr_0->getCoord();
+        coord_is = block_ptr_0->coord;
         EXPECT_EQ(coord_ought, coord_is);
         for (size_t voxel_idx = 0; voxel_idx < block_ptr_0->size_cu; voxel_idx++) {
             BlockType0::DataType data;
@@ -153,7 +153,7 @@ TEST(VisitorTSDFMultiRes, Interpolation)
         se::keyops::encode_key(block_coord, 0, voxel_key);
         block_ptr_0 = static_cast<BlockType0*>(
             se::allocator::block(voxel_key, *octree_ptr_0, octree_ptr_0->getRoot()));
-        coord_is = block_ptr_0->getCoord();
+        coord_is = block_ptr_0->coord;
         block_ptr_0->setCurrentScale(1);
         EXPECT_EQ(coord_ought, coord_is);
         for (size_t voxel_idx = block_ptr_0->size_cu; voxel_idx < block_ptr_0->size_cu + 64;

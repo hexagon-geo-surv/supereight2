@@ -252,7 +252,7 @@ class FrustumIterator : public BaseIterator<FrustumIterator<MapT, SensorT>> {
         Eigen::Vector3f octant_centre_point_M;
         const int octant_size =
             se::octantops::octant_to_size<typename MapT::OctreeType>(octant_ptr);
-        map_ptr_->voxelToPoint(octant_ptr->getCoord(), octant_size, octant_centre_point_M);
+        map_ptr_->voxelToPoint(octant_ptr->coord, octant_size, octant_centre_point_M);
         // Convert it to the sensor frame.
         const Eigen::Vector3f octant_centre_point_S = T_SM_ * octant_centre_point_M;
 

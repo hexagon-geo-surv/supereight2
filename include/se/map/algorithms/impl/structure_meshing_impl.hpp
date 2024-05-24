@@ -36,7 +36,7 @@ QuadMesh octree_structure_mesh(OctreeT& octree, const bool only_leaves)
 
         // Get the coordinates of the octant vertices.
         Eigen::Vector3f node_corners[8];
-        const Eigen::Vector3i node_coord = octant_ptr->getCoord();
+        const Eigen::Vector3i node_coord = octant_ptr->coord;
         node_corners[0] = node_coord.cast<float>();
         node_corners[1] = (node_coord + Eigen::Vector3i(node_size, 0, 0)).cast<float>();
         node_corners[2] = (node_coord + Eigen::Vector3i(0, node_size, 0)).cast<float>();
