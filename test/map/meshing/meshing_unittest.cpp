@@ -71,7 +71,7 @@ TEST(MeshingTest, EqualScaleNeighbour)
 
     se::TriangleMesh mesh;
     se::algorithms::dual_marching_cube(*octree_ptr, mesh);
-    auto vertex_index_mesh = se::algorithms::dual_marching_cube(*octree_ptr);
+    auto vertex_index_mesh = se::algorithms::dual_marching_cube_new(*octree_ptr);
 
     ASSERT_GT(mesh.size(), 0);
     ASSERT_EQ(mesh.size() * 3, vertex_index_mesh.indices.size());
@@ -147,7 +147,7 @@ TEST(MeshingTest, EqualScaleNeighbour2)
 
     se::TriangleMesh mesh;
     se::algorithms::dual_marching_cube(*octree_ptr, mesh);
-    auto vertex_index_mesh = se::algorithms::dual_marching_cube(*octree_ptr);
+    auto vertex_index_mesh = se::algorithms::dual_marching_cube_new(*octree_ptr);
 
     ASSERT_GT(mesh.size(), 0);
     ASSERT_EQ(mesh.size() * 3, vertex_index_mesh.indices.size());

@@ -172,16 +172,16 @@ void dual_marching_cube_kernel(const OctreeT& octree,
 
 template<typename OctreeT>
 std::vector<meshing::VertexIndexMesh<3>>
-dual_marching_cube_kernel(const OctreeT& octree,
-                          const std::vector<const typename OctreeT::BlockType*>& block_ptrs);
+dual_marching_cube_kernel_new(const OctreeT& octree,
+                              const std::vector<const typename OctreeT::BlockType*>& block_ptrs);
 
 template<typename OctreeT>
 meshing::VertexIndexMesh<3>
-dual_marching_cube(const OctreeT& octree,
-                   const std::vector<const typename OctreeT::BlockType*>& block_ptrs);
+dual_marching_cube_new(const OctreeT& octree,
+                       const std::vector<const typename OctreeT::BlockType*>& block_ptrs);
 
 template<typename OctreeT>
-meshing::VertexIndexMesh<3> dual_marching_cube(const OctreeT& octree);
+meshing::VertexIndexMesh<3> dual_marching_cube_new(const OctreeT& octree);
 
 
 /**

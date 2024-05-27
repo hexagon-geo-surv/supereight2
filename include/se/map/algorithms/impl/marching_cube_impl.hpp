@@ -1002,8 +1002,8 @@ inline uint64_t unique_edge_id(const Eigen::Vector3i& v0, const Eigen::Vector3i&
 
 template<typename OctreeT>
 std::vector<meshing::VertexIndexMesh<3>>
-dual_marching_cube_kernel(const OctreeT& octree,
-                          const std::vector<const typename OctreeT::BlockType*>& block_ptrs)
+dual_marching_cube_kernel_new(const OctreeT& octree,
+                              const std::vector<const typename OctreeT::BlockType*>& block_ptrs)
 {
     using namespace meshing;
     typedef typename OctreeT::BlockType BlockType;
@@ -1143,10 +1143,10 @@ dual_marching_cube_kernel(const OctreeT& octree,
 
 template<typename OctreeT>
 meshing::VertexIndexMesh<3>
-dual_marching_cube(const OctreeT& octree,
-                   const std::vector<const typename OctreeT::BlockType*>& block_ptrs)
+dual_marching_cube_new(const OctreeT& octree,
+                       const std::vector<const typename OctreeT::BlockType*>& block_ptrs)
 {
-    const auto block_meshes = dual_marching_cube_kernel(octree, block_ptrs);
+    const auto block_meshes = dual_marching_cube_kernel_new(octree, block_ptrs);
 
     meshing::VertexIndexMesh<3> mesh;
     for (const auto& block_mesh : block_meshes) {
@@ -1201,7 +1201,7 @@ void dual_marching_cube(const OctreeT& octree, TriangleMesh& triangles)
 
 
 template<typename OctreeT>
-meshing::VertexIndexMesh<3> dual_marching_cube(const OctreeT& octree)
+meshing::VertexIndexMesh<3> dual_marching_cube_new(const OctreeT& octree)
 {
     TICK("dual-marching-cube")
     typedef typename OctreeT::BlockType BlockType;
@@ -1213,7 +1213,8 @@ meshing::VertexIndexMesh<3> dual_marching_cube(const OctreeT& octree)
         block_ptrs.push_back(static_cast<const BlockType*>(*block_ptr_itr));
     }
 
-    const meshing::VertexIndexMesh<3> mesh = se::algorithms::dual_marching_cube(octree, block_ptrs);
+    const meshing::VertexIndexMesh<3> mesh =
+        se::algorithms::dual_marching_cube_new(octree, block_ptrs);
 
     TOCK("dual-marching-cube")
     return mesh;
