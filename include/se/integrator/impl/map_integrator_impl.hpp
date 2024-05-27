@@ -296,14 +296,7 @@ void IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
 
     // Update
     TICK("update")
-    se::Updater updater(map,
-                        sensor,
-                        depth_img,
-                        T_WS,
-                        colour_sensor,
-                        colour_img,
-                        T_SSc,
-                        frame);
+    se::Updater updater(map, sensor, depth_img, T_WS, colour_sensor, colour_img, T_SSc, frame);
     updater(allocation_list, updated_octants);
     TOCK("update")
 }
