@@ -194,16 +194,6 @@ meshing::VertexIndexMesh<3> dual_marching_cube_new(const OctreeT& octree);
 template<typename OctreeT>
 void marching_cube(const OctreeT& octree, TriangleMesh& triangles);
 
-/**
- * \brief Generate the triangle mesh using a dual grid marching cube algorithm.
- *
- * \tparam OctreeT
- * \param[in]  octree       The octree to extract the mesh from
- * \param[out] triangles    The extracted mesh
- */
-template<typename OctreeT>
-void dual_marching_cube(const OctreeT& octree, TriangleMesh& triangles);
-
 } // namespace algorithms
 } // namespace se
 

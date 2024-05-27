@@ -465,12 +465,7 @@ int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMesh(const std::string& fi
                                                            const Eigen::Isometry3f& T_OW) const
 {
     se::TriangleMesh mesh;
-    if constexpr (ResT == se::Res::Single) {
-        se::algorithms::marching_cube(octree_, mesh);
-    }
-    else {
-        se::algorithms::dual_marching_cube(octree_, mesh);
-    }
+    se::algorithms::marching_cube(octree_, mesh);
     const Eigen::Affine3f T_OM = T_OW * T_WM_ * Eigen::Scaling(resolution_);
     return io::save_mesh(mesh, filename, T_OM);
 }
@@ -481,12 +476,7 @@ template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMeshVoxel(const std::string& filename) const
 {
     se::TriangleMesh mesh;
-    if constexpr (ResT == se::Res::Single) {
-        se::algorithms::marching_cube(octree_, mesh);
-    }
-    else {
-        se::algorithms::dual_marching_cube(octree_, mesh);
-    }
+    se::algorithms::marching_cube(octree_, mesh);
     return io::save_mesh(mesh, filename);
 }
 
