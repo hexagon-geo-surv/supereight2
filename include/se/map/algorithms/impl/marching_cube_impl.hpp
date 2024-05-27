@@ -1181,27 +1181,6 @@ void marching_cube(const OctreeT& octree, TriangleMesh& triangles)
 
 
 template<typename OctreeT>
-void marching_cube(const OctreeT& octree, TriangleMesh& triangles, const int time_stamp)
-{
-    TICK("primal-marching-cube")
-    typedef typename OctreeT::BlockType BlockType;
-
-    std::vector<const BlockType*> block_ptrs;
-    for (auto block_ptr_itr = se::UpdateIterator<OctreeT>(
-             &octree, std::max(((int) octree.getRoot()->timestamp) - time_stamp, 0));
-         block_ptr_itr != se::UpdateIterator<OctreeT>();
-         ++block_ptr_itr) {
-        block_ptrs.push_back(static_cast<const BlockType*>(*block_ptr_itr));
-    }
-
-    se::algorithms::marching_cube_kernel(octree, block_ptrs, triangles);
-
-    TOCK("primal-marching-cube")
-}
-
-
-
-template<typename OctreeT>
 void dual_marching_cube(const OctreeT& octree, TriangleMesh& triangles)
 {
     TICK("dual-marching-cube")
@@ -1239,29 +1218,6 @@ meshing::VertexIndexMesh<3> dual_marching_cube(const OctreeT& octree)
     TOCK("dual-marching-cube")
     return mesh;
 }
-
-
-
-template<typename OctreeT>
-void dual_marching_cube(const OctreeT& octree, TriangleMesh& triangles, const int time_stamp)
-{
-    TICK("dual-marching-cube")
-    typedef typename OctreeT::BlockType BlockType;
-
-    std::vector<const BlockType*> block_ptrs;
-    for (auto block_ptr_itr = se::UpdateIterator<OctreeT>(
-             &octree, std::max((octree.getRoot()->timestamp) - time_stamp, 0));
-         block_ptr_itr != se::UpdateIterator<OctreeT>();
-         ++block_ptr_itr) {
-        block_ptrs.push_back(static_cast<const BlockType*>(*block_ptr_itr));
-    }
-
-    se::algorithms::dual_marching_cube_kernel(octree, block_ptrs, triangles);
-
-    TOCK("dual-marching-cube")
-}
-
-
 
 } // namespace algorithms
 } // namespace se

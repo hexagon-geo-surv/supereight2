@@ -195,18 +195,6 @@ template<typename OctreeT>
 void marching_cube(const OctreeT& octree, TriangleMesh& triangles);
 
 /**
- * \brief Generate the triangle mesh using a primal grid marching cube algorithm.
- *        The algorithm only considers voxel values updated after the provided frame number.
- *
- * \tparam OctreeT
- * \param[in]  octree       The octree to extract the mesh from
- * \param[out] triangles    The extracted mesh
- * \param[in]  frame        The lower frame threshold of voxel values to consider
- */
-template<typename OctreeT>
-void marching_cube(const OctreeT& octree, TriangleMesh& triangles, const int frame);
-
-/**
  * \brief Generate the triangle mesh using a dual grid marching cube algorithm.
  *
  * \tparam OctreeT
@@ -215,18 +203,6 @@ void marching_cube(const OctreeT& octree, TriangleMesh& triangles, const int fra
  */
 template<typename OctreeT>
 void dual_marching_cube(const OctreeT& octree, TriangleMesh& triangles);
-
-/**
- * \brief Generate the triangle mesh using a dual grid marching cube algorithm.
- *        The algorithm only considers voxel values updated after the provided frame number.
- *
- * \tparam OctreeT
- * \param[in]  octree       The octree to extract the mesh from
- * \param[out] triangles    The extracted mesh
- * \param[in]  frame        The lower frame threshold of voxel values to consider
- */
-template<typename OctreeT>
-void dual_marching_cube(const OctreeT& octree, TriangleMesh& triangles, const int frame);
 
 } // namespace algorithms
 } // namespace se
