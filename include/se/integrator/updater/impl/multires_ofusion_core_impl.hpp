@@ -121,7 +121,7 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr, const 
 
     typename NodeT::DataType node_max_data = node.getData();
     data::up_prop_max(node_max_data, child_max_data);
-    node.setData(node_max_data);
+    node.setMaxData(node_max_data);
 
     return node_max_data;
 }

@@ -50,68 +50,61 @@ template<Colour ColB, Semantics SemB, typename DerivedT>
 struct NodeData<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
     typedef Data<Field::Occupancy, ColB, SemB> DataType;
 
-    /**
-     * \brief Set the inital data of the node.
-     *
-     * \param init_data   The initial data of the node.
-     */
+    /** Construct a node with both its minimum and maximum data initialized to \p init_data. */
     NodeData(const DataType& init_data)
     {
-        data_ = init_data;
         min_data_ = init_data;
+        max_data_ = init_data;
     }
 
-    /**
-     * \brief Get the node data. If the node is not observed and not a leaf the default data is
+    /** Return the node data. If the node is not observed and not a leaf the default data is
      * returned.
      */
     const DataType& getData() const
     {
         static const DataType default_data = DataType();
-        return (data_.field.observed && underlying()->isLeaf()) ? data_ : default_data;
+        return (max_data_.field.observed && underlying()->isLeaf()) ? getMaxData() : default_data;
     }
 
+    /** Return the minimum data among the node's children. */
     const DataType& getMinData() const
     {
         return min_data_;
     }
 
-    /**
-     * \brief Get the max data of the node.
-     *
-     * \warning The data is not returned by reference as it's the case for the blocks.
-     *
-     * \return The max data of the node.
-     */
-    const DataType getMaxData() const
+    /** Return the maximum data among the node's children. */
+    const DataType& getMaxData() const
     {
-        return data_;
+        return max_data_;
     }
 
-    /**
-     * \brief Set the data / max data of the node.
-     *
-     * \param[in] data    The data to be set
-     */
+    /** Set the node's data to \p data. It should only be called on leaf nodes. */
     void setData(const DataType& data)
     {
-        data_ = data;
+        setMinData(data);
+        setMaxData(data);
     }
 
+    /** Set the minimum data among the node's children to \p data. */
     void setMinData(const DataType& data)
     {
         min_data_ = data;
     }
 
+    /** Set the maximum data among the node's children to \p data. */
+    void setMaxData(const DataType& data)
+    {
+        max_data_ = data;
+    }
+
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-    protected:
-    DataType data_; ///< Holds the max data of the node.
-                    ///< At the leaf of the tree the nodes max data is equivalent to its data
-    // The minimum data among all the Node's children.
-    DataType min_data_;
-
     private:
+    /** The minimum data among the node's children or the node's data if it's a leaf. */
+    DataType min_data_;
+    /** The maximum data among the node's children or the node's data if it's a leaf. */
+    DataType max_data_;
+
     const DerivedT* underlying() const
     {
         return static_cast<const DerivedT*>(this);

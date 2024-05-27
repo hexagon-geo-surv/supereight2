@@ -132,7 +132,7 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr, const 
         if (observed_count == 8) {
             node_data.field.observed = true;
         }
-        node.setData(node_data);
+        node.setMaxData(node_data);
     }
     return node_data;
 }

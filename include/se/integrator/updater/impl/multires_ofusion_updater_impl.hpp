@@ -650,7 +650,6 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
                                map_.getDataConfig().field.max_weight);
         // We don't update colour or semantics in free space.
         node_ptr->setData(node_data);
-        node_ptr->setMinData(node_data);
 #pragma omp critical(node_lock)
         { // Add node to node list for later up-propagation (finest node for this tree-branch)
             node_set_[depth - 1].insert(node_ptr->parent());
