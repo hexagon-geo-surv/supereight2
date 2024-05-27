@@ -1234,9 +1234,10 @@ meshing::VertexIndexMesh<3> dual_marching_cube(const OctreeT& octree)
         block_ptrs.push_back(static_cast<const BlockType*>(*block_ptr_itr));
     }
 
-    return se::algorithms::dual_marching_cube(octree, block_ptrs);
+    const meshing::VertexIndexMesh<3> mesh = se::algorithms::dual_marching_cube(octree, block_ptrs);
 
     TOCK("dual-marching-cube")
+    return mesh;
 }
 
 
