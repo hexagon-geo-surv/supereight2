@@ -160,12 +160,12 @@ inline bool checkVertex(const Eigen::Vector3f& vertex_M, const float dim);
 
 namespace algorithms {
 
-template<typename OctreeT>
+template<typename OctreeT, typename = std::enable_if_t<OctreeT::res_ == se::Res::Single>>
 void marching_cube_kernel(const OctreeT& octree,
                           const std::vector<const typename OctreeT::BlockType*>& block_ptrs,
                           TriangleMesh& triangles);
 
-template<typename OctreeT>
+template<typename OctreeT, typename = std::enable_if_t<OctreeT::res_ == se::Res::Multi>>
 void dual_marching_cube_kernel(const OctreeT& octree,
                                const std::vector<const typename OctreeT::BlockType*>& block_ptrs,
                                TriangleMesh& triangles);

@@ -833,7 +833,7 @@ namespace algorithms {
 
 
 
-template<typename OctreeT>
+template<typename OctreeT, typename>
 void marching_cube_kernel(const OctreeT& octree,
                           const std::vector<const typename OctreeT::BlockType*>& block_ptrs,
                           TriangleMesh& triangles)
@@ -887,7 +887,7 @@ void marching_cube_kernel(const OctreeT& octree,
 
 
 
-template<typename OctreeT>
+template<typename OctreeT, typename>
 void dual_marching_cube_kernel(const OctreeT& octree,
                                const std::vector<const typename OctreeT::BlockType*>& block_ptrs,
                                TriangleMesh& triangles)
