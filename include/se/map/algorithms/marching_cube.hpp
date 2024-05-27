@@ -161,14 +161,14 @@ inline bool checkVertex(const Eigen::Vector3f& vertex_M, const float dim);
 namespace algorithms {
 
 template<typename OctreeT, typename = std::enable_if_t<OctreeT::res_ == se::Res::Single>>
-void marching_cube_kernel(const OctreeT& octree,
-                          const std::vector<const typename OctreeT::BlockType*>& block_ptrs,
-                          TriangleMesh& triangles);
+TriangleMesh
+marching_cube_kernel(const OctreeT& octree,
+                     const std::vector<const typename OctreeT::BlockType*>& block_ptrs);
 
 template<typename OctreeT, typename = std::enable_if_t<OctreeT::res_ == se::Res::Multi>>
-void dual_marching_cube_kernel(const OctreeT& octree,
-                               const std::vector<const typename OctreeT::BlockType*>& block_ptrs,
-                               TriangleMesh& triangles);
+TriangleMesh
+dual_marching_cube_kernel(const OctreeT& octree,
+                          const std::vector<const typename OctreeT::BlockType*>& block_ptrs);
 
 template<typename OctreeT>
 std::vector<meshing::VertexIndexMesh<3>>
@@ -184,15 +184,11 @@ template<typename OctreeT>
 meshing::VertexIndexMesh<3> dual_marching_cube_new(const OctreeT& octree);
 
 
-/**
- * \brief Generate the triangle mesh using a primal grid marching cube algorithm.
- *
- * \tparam OctreeT
- * \param[in]  octree       The octree to extract the mesh from
- * \param[out] triangles    The extracted mesh
+/** Return a triangle mesh of the surface in \p octree. The mesh is generated using the marching
+ * cubes algorithm.
  */
 template<typename OctreeT>
-void marching_cube(const OctreeT& octree, TriangleMesh& triangles);
+TriangleMesh marching_cube(const OctreeT& octree);
 
 } // namespace algorithms
 } // namespace se

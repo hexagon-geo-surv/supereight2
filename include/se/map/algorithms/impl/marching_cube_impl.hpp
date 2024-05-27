@@ -834,13 +834,13 @@ namespace algorithms {
 
 
 template<typename OctreeT, typename>
-void marching_cube_kernel(const OctreeT& octree,
-                          const std::vector<const typename OctreeT::BlockType*>& block_ptrs,
-                          TriangleMesh& triangles)
+TriangleMesh marching_cube_kernel(const OctreeT& octree,
+                                  const std::vector<const typename OctreeT::BlockType*>& block_ptrs)
 {
     using namespace meshing;
     typedef typename OctreeT::BlockType BlockType;
 
+    TriangleMesh mesh;
     const int block_size = OctreeT::BlockType::getSize();
     const int octree_size = octree.getSize();
 
@@ -874,7 +874,7 @@ void marching_cube_kernel(const OctreeT& octree,
                         temp.vertexes[2] = vertex_2;
 #pragma omp critical
                         {
-                            triangles.push_back(temp);
+                            mesh.push_back(temp);
                         }
                     } // edges
 
@@ -883,18 +883,20 @@ void marching_cube_kernel(const OctreeT& octree,
         }         // x
 
     } // block_ptr_itr
+    return mesh;
 }
 
 
 
 template<typename OctreeT, typename>
-void dual_marching_cube_kernel(const OctreeT& octree,
-                               const std::vector<const typename OctreeT::BlockType*>& block_ptrs,
-                               TriangleMesh& triangles)
+TriangleMesh
+dual_marching_cube_kernel(const OctreeT& octree,
+                          const std::vector<const typename OctreeT::BlockType*>& block_ptrs)
 {
     using namespace meshing;
     typedef typename OctreeT::BlockType BlockType;
 
+    TriangleMesh mesh;
     const int block_size = OctreeT::BlockType::getSize();
     const int octree_size = octree.getSize();
 
@@ -953,7 +955,7 @@ void dual_marching_cube_kernel(const OctreeT& octree,
                         temp.max_vertex_scale = voxel_scale;
 #pragma omp critical
                         {
-                            triangles.push_back(temp);
+                            mesh.push_back(temp);
                         };
                     } // edges
 
@@ -962,6 +964,7 @@ void dual_marching_cube_kernel(const OctreeT& octree,
         }         // x
 
     } // block_ptr_itr
+    return mesh;
 }
 
 inline uint64_t unique_edge_id(const Eigen::Vector3i& v0, const Eigen::Vector3i& v1)
@@ -1159,7 +1162,7 @@ dual_marching_cube_new(const OctreeT& octree,
 
 
 template<typename OctreeT>
-void marching_cube(const OctreeT& octree, TriangleMesh& triangles)
+TriangleMesh marching_cube(const OctreeT& octree)
 {
     TICK("marching-cube")
     typedef typename OctreeT::BlockType BlockType;
@@ -1173,14 +1176,16 @@ void marching_cube(const OctreeT& octree, TriangleMesh& triangles)
     }
     TOCK("marching-cube-create-block-list")
 
+    TriangleMesh mesh;
     if constexpr (OctreeT::res_ == se::Res::Single) {
-        se::algorithms::marching_cube_kernel(octree, block_ptrs, triangles);
+        mesh = se::algorithms::marching_cube_kernel(octree, block_ptrs);
     }
     else {
-        se::algorithms::dual_marching_cube_kernel(octree, block_ptrs, triangles);
+        mesh = se::algorithms::dual_marching_cube_kernel(octree, block_ptrs);
     }
 
     TOCK("marching-cube")
+    return mesh;
 }
 
 
