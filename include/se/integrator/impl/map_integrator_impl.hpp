@@ -69,29 +69,10 @@ struct IntegrateRayBatchImplD {
 
 
 /**
- * Single-res TSDF integration helper struct for partial function specialisation
+ * TSDF integration helper struct for partial function specialisation
  */
-template<>
-struct IntegrateDepthImplD<se::Field::TSDF, se::Res::Single> {
-    template<typename SensorT, typename MapT>
-    static void integrate(MapT& map,
-                          const SensorT& sensor,
-                          const se::Image<float>& depth_img,
-                          const Eigen::Isometry3f& T_WS,
-                          const SensorT* const colour_sensor,
-                          const se::Image<colour_t>* const colour_img,
-                          const Eigen::Isometry3f* const T_SSc,
-                          const unsigned int frame,
-                          std::vector<const OctantBase*>* updated_octants);
-};
-
-
-
-/**
- * Multi-res TSDF integration helper struct for partial function specialisation
- */
-template<>
-struct IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi> {
+template<Res ResT>
+struct IntegrateDepthImplD<se::Field::TSDF, ResT> {
     template<typename SensorT, typename MapT>
     static void integrate(MapT& map,
                           const SensorT& sensor,
@@ -167,45 +148,9 @@ using IntegrateRayBatchImpl = IntegrateRayBatchImplD<MapT::fld_, MapT::res_>;
 
 
 
+template<Res ResT>
 template<typename SensorT, typename MapT>
-void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(
-    MapT& map,
-    const SensorT& sensor,
-    const se::Image<float>& depth_img,
-    const Eigen::Isometry3f& T_WS,
-    const SensorT* const colour_sensor,
-    const se::Image<colour_t>* const colour_img,
-    const Eigen::Isometry3f* const T_SSc,
-    const unsigned int frame,
-    std::vector<const OctantBase*>* updated_octants)
-{
-    assert(sensor.model.imageWidth() == depth_img.width());
-    assert(sensor.model.imageHeight() == depth_img.height());
-    // Allocation
-    TICK("allocation")
-    se::RaycastCarver raycast_carver(map, sensor, depth_img, T_WS, frame);
-    std::vector<OctantBase*> block_ptrs = raycast_carver();
-    TOCK("allocation")
-
-    // Update
-    TICK("update")
-    se::Updater updater(map, sensor, depth_img, T_WS, colour_sensor, colour_img, T_SSc, frame);
-    updater(block_ptrs);
-    TOCK("update")
-
-    if (updated_octants) {
-        // TODO: Currently returning allocated, not updated octants. Remove non-updated blocks from
-        // block_ptrs during the call to se::Updater::update() to return only updated octants.
-        updated_octants->clear();
-        updated_octants->reserve(block_ptrs.size());
-        updated_octants->insert(updated_octants->end(), block_ptrs.begin(), block_ptrs.end());
-    }
-}
-
-
-
-template<typename SensorT, typename MapT>
-void IntegrateDepthImplD<se::Field::TSDF, se::Res::Multi>::integrate(
+void IntegrateDepthImplD<se::Field::TSDF, ResT>::integrate(
     MapT& map,
     const SensorT& sensor,
     const se::Image<float>& depth_img,
