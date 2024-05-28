@@ -100,8 +100,9 @@ class Image {
             return image_copy;
         }
         else {
-            // Wrap the non-owned data.
-            return Image(width(), height(), data());
+            // Wrap the non-owned data. The constructor accepting a non-const pointer to non-owned
+            // data so it's always save to cast away the const of non-owned data().
+            return Image(width(), height(), const_cast<T*>(data()));
         }
     }
 
