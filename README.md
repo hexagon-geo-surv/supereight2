@@ -310,8 +310,8 @@ Example snippet
 ```cpp
 // Setup integrator
 se::MapIntegrator integrator(map);
-// Integrate depth image
-integrator.integrateDepth(sensor, processed_depth_img, T_MS, frame_num);
+// Integrate depth image using an se::PinholeCamera
+integrator.integrateDepth(se::Measurements{se::Measurement{processed_depth_img, sensor, T_MS}}, frame_num);
 ```
 
 Internally the integrator is split in an allocator and an updater.

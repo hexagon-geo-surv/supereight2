@@ -136,16 +136,16 @@ int main(int argc, char** argv)
             TICK("integration")
             if (frame % config.app.integration_rate == 0) {
                 if (has_colour) {
-                    integrator.integrateDepth(sensor,
-                                              processed_depth_img,
-                                              T_WS,
-                                              sensor,
-                                              processed_colour_img,
-                                              T_SSc,
-                                              frame);
+                    integrator.integrateDepth(
+                        se::Measurements{
+                            se::Measurement{processed_depth_img, sensor, T_WS},
+                            se::Measurement{processed_colour_img, sensor, T_WS * T_SSc}},
+                        frame);
                 }
                 else {
-                    integrator.integrateDepth(sensor, processed_depth_img, T_WS, frame);
+                    integrator.integrateDepth(
+                        se::Measurements{se::Measurement{processed_depth_img, sensor, T_WS}},
+                        frame);
                 }
             }
             TOCK("integration")

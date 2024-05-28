@@ -48,7 +48,8 @@ TEST(Map, Gradient)
         sensor.model.imageWidth(), sensor.model.imageHeight(), surface_distance);
     // Integrate depth image from an identity T_WS.
     se::MapIntegrator integrator(map);
-    integrator.integrateDepth(sensor, depth_img, Eigen::Isometry3f::Identity(), 0);
+    integrator.integrateDepth(
+        se::Measurements{se::Measurement{depth_img, sensor, Eigen::Isometry3f::Identity()}}, 0);
 
     // Test that points in free space have 0 gradients
     const std::array free_points{

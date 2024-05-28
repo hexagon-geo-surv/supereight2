@@ -23,7 +23,8 @@ int main(int argc, char** argv)
         const se::Image<float> depth(sensor.model.imageWidth(), sensor.model.imageHeight(), 2.0f);
 
         se::MapIntegrator integrator(map);
-        integrator.integrateDepth(sensor, depth, Eigen::Isometry3f::Identity(), 0);
+        integrator.integrateDepth(
+            se::Measurements{se::Measurement{depth, sensor, Eigen::Isometry3f::Identity()}}, 0);
 
         std::cout << "Supereight2 v" << SE_VERSION << " install successful\n";
         return EXIT_SUCCESS;

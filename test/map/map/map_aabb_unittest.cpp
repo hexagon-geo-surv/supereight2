@@ -28,7 +28,8 @@ void integrate_wall(MapT& map, const se::PinholeCamera& sensor, float depth_valu
         sensor.model.imageWidth(), sensor.model.imageHeight(), depth_value);
     const Eigen::Isometry3f T_WB = Eigen::Isometry3f::Identity();
     se::MapIntegrator integrator_stsdf(map);
-    integrator_stsdf.integrateDepth(sensor, depth, T_WB * sensor.T_BS, 0);
+    integrator_stsdf.template integrateDepth(
+        se::Measurements{se::Measurement{depth, sensor, T_WB * sensor.T_BS}}, 0);
 }
 
 int dim_to_blocks(float dim, float block_dim)
