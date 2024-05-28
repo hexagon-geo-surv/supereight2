@@ -112,8 +112,10 @@ void Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
                 else {
                     // This child hasn't been observed before, initialize to the interpolated field
                     // value.
+                    const int child_size = octantops::scale_to_size(child_data_union.scale);
                     const Eigen::Vector3f child_sample_coord_f =
-                        get_sample_coord(child_data_union.coord, 1 << child_data_union.scale);
+                        child_data_union.coord.template cast<float>()
+                        + sample_offset_frac * child_size;
                     const auto interp_field_value = visitor::getFieldInterp(
                         octree, child_sample_coord_f, child_data_union.scale);
                     if (interp_field_value) {

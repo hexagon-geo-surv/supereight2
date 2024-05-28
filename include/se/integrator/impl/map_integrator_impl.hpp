@@ -12,18 +12,6 @@
 #include "se/integrator/updater/updater.hpp"
 
 namespace se {
-
-
-
-static inline Eigen::Vector3f get_sample_coord(const Eigen::Vector3i& octant_coord,
-                                               const int octant_size)
-{
-    assert(octant_size > 0);
-    return octant_coord.cast<float>() + se::sample_offset_frac * octant_size;
-}
-
-
-
 namespace details {
 
 

@@ -68,15 +68,6 @@ frustum(MapT& map, const SensorT& sensor, const Eigen::Isometry3f& T_WS);
 
 
 
-/** Return the sample point coordinates in voxels for an octant with coordinates \p octant_coord and
- * edge length \p octant_size. The sample point is where data is assumed to be sampled, typically at
- * the centre of the octant.
- */
-static inline Eigen::Vector3f get_sample_coord(const Eigen::Vector3i& octant_coord,
-                                               const int octant_size);
-
-
-
 template<typename MapT>
 class MapIntegrator {
     public:
