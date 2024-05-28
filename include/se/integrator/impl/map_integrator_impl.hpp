@@ -45,7 +45,8 @@ struct IntegrateRayImplD {
                           const SensorT& sensor,
                           const Eigen::Vector3f& ray_S,
                           const Eigen::Isometry3f& T_WS,
-                          const unsigned int frame);
+                          const unsigned int frame,
+                          std::vector<const OctantBase*>* updated_octants);
 };
 
 
@@ -157,10 +158,25 @@ struct IntegrateRayImplD<se::Field::Occupancy, se::Res::Multi> {
     template<typename SensorT, typename MapT>
     static void integrate(MapT& map,
                           const SensorT& sensor,
-                          const Eigen::Vector3f& depth_img,
+                          const Eigen::Vector3f& ray_S,
                           const Eigen::Isometry3f& T_WS,
                           const unsigned int frame,
-                          std::vector<const OctantBase*>* updated_octants);
+                          std::vector<const OctantBase*>* updated_octants)
+    {
+        TICK("Ray Integration")
+        TICK("allocation-integration")
+        se::RayIntegrator rayIntegrator(map, sensor, ray_S, T_WS, frame, updated_octants);
+        rayIntegrator();
+        TOCK("allocation-integration")
+        TICK("propagateBlocksToCoarsestScale")
+        rayIntegrator.propagateBlocksToCoarsestScale();
+        TOCK("propagateBlocksToCoarsestScale")
+        TICK("propagateToRoot")
+        rayIntegrator.propagateToRoot();
+        TOCK("propagateToRoot")
+        rayIntegrator.updatedOctants(updated_octants);
+        TOCK("Ray Integration")
+    }
 };
 
 /**
@@ -190,30 +206,6 @@ template<typename MapT>
 using IntegrateRayBatchImpl = IntegrateRayBatchImplD<MapT::fld_, MapT::res_>;
 
 
-
-template<typename SensorT, typename MapT>
-void IntegrateRayImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
-    MapT& map,
-    const SensorT& sensor,
-    const Eigen::Vector3f& ray_S,
-    const Eigen::Isometry3f& T_WS,
-    const unsigned int frame,
-    std::vector<const OctantBase*>* updated_octants)
-{
-    TICK("Ray Integration")
-    TICK("allocation-integration")
-    se::RayIntegrator rayIntegrator(map, sensor, ray_S, T_WS, frame, updated_octants);
-    rayIntegrator();
-    TOCK("allocation-integration")
-    TICK("propagateBlocksToCoarsestScale")
-    rayIntegrator.propagateBlocksToCoarsestScale();
-    TOCK("propagateBlocksToCoarsestScale")
-    TICK("propagateToRoot")
-    rayIntegrator.propagateToRoot();
-    TOCK("propagateToRoot")
-    rayIntegrator.updatedOctants(updated_octants);
-    TOCK("Ray Integration")
-}
 
 template<typename SensorT, typename MapT>
 void IntegrateRayBatchImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
