@@ -248,6 +248,26 @@ MapIntegrator<MapT>::MapIntegrator(MapT& map) : map_(map)
 
 template<typename MapT>
 template<typename SensorT>
+void MapIntegrator<MapT>::integrateDepth(const Measurements<SensorT>& measurements,
+                                         const timestamp_t timestamp,
+                                         std::vector<const OctantBase*>* updated_octants)
+{
+    se::details::IntegrateDepthImpl<MapT>::template integrate<SensorT>(
+        map_,
+        measurements.depth.sensor,
+        measurements.depth.image,
+        measurements.depth.T_WC,
+        measurements.colour ? &measurements.colour->sensor : nullptr,
+        measurements.colour ? &measurements.colour->image : nullptr,
+        measurements.colour ? &measurements.colour->T_WC : nullptr,
+        timestamp,
+        updated_octants);
+}
+
+
+
+template<typename MapT>
+template<typename SensorT>
 void MapIntegrator<MapT>::integrateDepth(const SensorT& sensor,
                                          const se::Image<float>& depth_img,
                                          const Eigen::Isometry3f& T_WS,
@@ -271,13 +291,14 @@ void MapIntegrator<MapT>::integrateDepth(const SensorT& sensor,
                                          const timestamp_t timestamp,
                                          std::vector<const OctantBase*>* updated_octants)
 {
+    const Eigen::Isometry3f T_WSc = T_WS * T_SSc;
     se::details::IntegrateDepthImpl<MapT>::template integrate<SensorT>(map_,
                                                                        sensor,
                                                                        depth_img,
                                                                        T_WS,
                                                                        &colour_sensor,
                                                                        &colour_img,
-                                                                       &T_SSc,
+                                                                       &T_WSc,
                                                                        timestamp,
                                                                        updated_octants);
 }

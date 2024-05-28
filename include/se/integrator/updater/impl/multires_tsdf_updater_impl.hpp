@@ -21,14 +21,14 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Upd
     const Eigen::Isometry3f& T_WS,
     const SensorT* const colour_sensor,
     const Image<colour_t>* const colour_img,
-    const Eigen::Isometry3f* const T_SSc,
+    const Eigen::Isometry3f* const T_WSc,
     const timestamp_t timestamp)
 {
-    const bool has_colour = MapType::col_ == Colour::On && colour_sensor && colour_img && T_SSc;
+    const bool has_colour = MapType::col_ == Colour::On && colour_sensor && colour_img && T_WSc;
     Eigen::Isometry3f T_ScS;
     if constexpr (MapType::col_ == Colour::On) {
         if (has_colour) {
-            T_ScS = T_SSc->inverse();
+            T_ScS = T_WSc->inverse() * T_WS;
         }
     }
 

@@ -12,6 +12,7 @@
 #include <cstddef>
 #include <iterator>
 
+#include "measurement.hpp"
 #include "se/common/math_util.hpp"
 #include "se/integrator/allocator/raycast_carver.hpp"
 #include "se/integrator/allocator/volume_carver.hpp"
@@ -72,6 +73,18 @@ template<typename MapT>
 class MapIntegrator {
     public:
     MapIntegrator(MapT& map);
+
+    /** Integrate the images in \p measurements captured at \p timestamp into the map. If \p
+     * updated_octants is non-null, *updated_octants will contain pointers to the octants updated
+     * during this integration.
+     *
+     * \warning The caller must ensure that any in \p measurements remains valid until
+     * se::MapIntegrator::integrateDepth() returns.
+     */
+    template<typename SensorT>
+    void integrateDepth(const Measurements<SensorT>& measurements,
+                        const timestamp_t timestamp,
+                        std::vector<const OctantBase*>* updated_octants = nullptr);
 
     /**
      * \brief Integrate depth image into the maps field representation.

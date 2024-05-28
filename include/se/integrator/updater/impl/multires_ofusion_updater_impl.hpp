@@ -23,7 +23,7 @@ Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
     const Eigen::Isometry3f& T_WS,
     const SensorT* const colour_sensor,
     const Image<colour_t>* const colour_img,
-    const Eigen::Isometry3f* const T_SSc,
+    const Eigen::Isometry3f* const T_WSc,
     const timestamp_t timestamp) :
         map_(map),
         octree_(map.getOctree()),
@@ -32,7 +32,7 @@ Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
         T_SW_(T_WS.inverse()),
         colour_sensor_(colour_sensor),
         colour_img_(colour_img),
-        has_colour_(colour_sensor_ && colour_img_ && T_SSc),
+        has_colour_(colour_sensor_ && colour_img_ && T_WSc),
         timestamp_(timestamp),
         map_res_(map.getRes()),
         config_(map),
@@ -40,7 +40,7 @@ Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
 {
     if constexpr (MapType::col_ == Colour::On) {
         if (has_colour_) {
-            T_ScS_ = T_SSc->inverse();
+            T_ScS_ = T_WSc->inverse() * T_WS;
         }
     }
 }

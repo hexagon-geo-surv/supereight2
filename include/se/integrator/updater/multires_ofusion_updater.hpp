@@ -59,7 +59,7 @@ class Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Se
             const Eigen::Isometry3f& T_WS,
             const SensorT* const colour_sensor,
             const Image<colour_t>* const colour_img,
-            const Eigen::Isometry3f* const T_SSc,
+            const Eigen::Isometry3f* const T_WSc,
             const timestamp_t timestamp);
 
     void operator()(VolumeCarverAllocation& allocation_list,
