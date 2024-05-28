@@ -30,26 +30,6 @@ class Updater {
     void operator()(UpdateListT& updating_list);
 };
 
-
-
-// Single-res TSDF updater
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-class Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Single, BlockSize>, SensorT>;
-
-
-
-// Multi-res TSDF updater
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-class Updater<Map<Data<se::Field::TSDF, ColB, SemB>, se::Res::Multi, BlockSize>, SensorT>;
-
-
-
-// Multi-res Occupancy updater
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-class Updater<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>, SensorT>;
-
-
-
 } // namespace se
 
 #include "multires_ofusion_updater.hpp"
