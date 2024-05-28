@@ -1,7 +1,7 @@
 /*
- * SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2021-2024 Smart Robotics Lab, Imperial College London, Technical University of Munich
  * SPDX-FileCopyrightText: 2021 Nils Funk
- * SPDX-FileCopyrightText: 2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2021-2024 Sotiris Papatheodorou
  * SPDX-FileCopyrightText: 2022-2024 Simon Boche
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -171,8 +171,8 @@ void IntegrateDepthImplD<se::Field::TSDF, ResT>::integrate(
 
     // Update
     TICK("update")
-    se::Updater updater(map, sensor, depth_img, T_WS, colour_sensor, colour_img, T_SSc, frame);
-    updater(block_ptrs);
+    se::Updater updater(
+        map, block_ptrs, sensor, depth_img, T_WS, colour_sensor, colour_img, T_SSc, frame);
     TOCK("update")
 
     if (updated_octants) {
