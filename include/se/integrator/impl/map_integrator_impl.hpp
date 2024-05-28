@@ -186,29 +186,6 @@ template<>
 struct IntegrateRayBatchImplD<se::Field::Occupancy, se::Res::Multi> {
     template<typename SensorT, typename MapT>
     static void integrate(
-        MapT& map,
-        const SensorT& sensor,
-        const std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
-                          Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
-            rayPoseBatch,
-        const unsigned int frame,
-        std::vector<const OctantBase*>* updated_octants);
-};
-
-
-template<typename MapT>
-using IntegrateDepthImpl = IntegrateDepthImplD<MapT::fld_, MapT::res_>;
-
-template<typename MapT>
-using IntegrateRayImpl = IntegrateRayImplD<MapT::fld_, MapT::res_>;
-
-template<typename MapT>
-using IntegrateRayBatchImpl = IntegrateRayBatchImplD<MapT::fld_, MapT::res_>;
-
-
-
-template<typename SensorT, typename MapT>
-void IntegrateRayBatchImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
     MapT& map,
     const SensorT& sensor,
     const std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
@@ -244,8 +221,17 @@ void IntegrateRayBatchImplD<se::Field::Occupancy, se::Res::Multi>::integrate(
     TOCK("propagateToRoot")
     rayIntegrator.updatedOctants(updated_octants);
 }
+};
 
 
+template<typename MapT>
+using IntegrateDepthImpl = IntegrateDepthImplD<MapT::fld_, MapT::res_>;
+
+template<typename MapT>
+using IntegrateRayImpl = IntegrateRayImplD<MapT::fld_, MapT::res_>;
+
+template<typename MapT>
+using IntegrateRayBatchImpl = IntegrateRayBatchImplD<MapT::fld_, MapT::res_>;
 
 } // namespace details
 
