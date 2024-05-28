@@ -166,22 +166,6 @@ template<typename MapT>
 using IntegrateRayBatchImpl = IntegrateRayBatchImplD<MapT::fld_, MapT::res_>;
 
 
-template<se::Field FldT, se::Res ResT>
-template<typename SensorT, typename MapT>
-void IntegrateDepthImplD<FldT, ResT>::integrate(
-    MapT& /* map */,
-    const SensorT& /* sensor */,
-    const se::Image<float>& /* depth_img */,
-    const Eigen::Isometry3f& /* T_WS */,
-    const SensorT* const /* colour_sensor */,
-    const se::Image<colour_t>* const /* colour_img */,
-    const Eigen::Isometry3f* const /* T_SSc */,
-    const unsigned int /* frame */,
-    std::vector<const OctantBase*>* /* updated_octants */)
-{
-}
-
-
 
 template<typename SensorT, typename MapT>
 void IntegrateDepthImplD<se::Field::TSDF, se::Res::Single>::integrate(
