@@ -28,7 +28,7 @@ template<typename MapT, typename SensorT>
 std::ostream& operator<<(std::ostream& os, const Config<MapT, SensorT>& c)
 {
     os << "Data config -----------------------\n";
-    operator<<<MapT::DataType::fld_, MapT::DataType::col_, MapT::DataType::sem_>(os, c.data);
+    os << c.data;
     os << "Map config ------------------------\n";
     operator<<<MapT>(os, c.map);
     os << "Sensor config ---------------------\n";

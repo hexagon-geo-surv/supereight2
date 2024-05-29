@@ -43,6 +43,16 @@ struct Data {
             colour.readYaml(yaml_file);
             semantic.readYaml(yaml_file);
         }
+
+        // The definition of this function MUST be inside the definition of Config for template
+        // argument deduction to work.
+        friend std::ostream& operator<<(std::ostream& os, const Config& c)
+        {
+            os << c.field;
+            os << c.colour;
+            os << c.semantic;
+            return os;
+        }
     };
 
     static constexpr Field fld_ = FldT;
@@ -51,15 +61,6 @@ struct Data {
     static constexpr bool invert_normals = FieldData<FldT>::invert_normals;
     static constexpr field_t surface_boundary = FieldData<FldT>::surface_boundary;
 };
-
-template<Field FldT, Colour ColB, Semantics SemB>
-std::ostream& operator<<(std::ostream& os, const typename Data<FldT, ColB, SemB>::Config& c)
-{
-    os << c.field;
-    os << c.colour;
-    os << c.semantic;
-    return os;
-}
 
 
 
