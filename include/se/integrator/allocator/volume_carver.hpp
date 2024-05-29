@@ -93,7 +93,7 @@ class VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
      * \param[in]  sensor               The sensor model.
      * \param[in]  depth_img            The depth image to be integrated.
      * \param[in]  T_WS                 The transformation from sensor to world frame.
-     * \param[in]  frame                The frame number to be integrated.
+     * \param[in]  frame                The number of the frame to be integrated. Currently unused.
      */
     VolumeCarver(MapType& map,
                  const SensorT& sensor,
@@ -190,7 +190,6 @@ class VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
     const SensorT& sensor_;
     const se::DensePoolingImage<SensorT> depth_pooling_img_;
     const Eigen::Isometry3f T_SW_;
-    const int frame_;
     const float map_res_;
     VolumeCarverConfig config_;
     const float max_depth_value_;

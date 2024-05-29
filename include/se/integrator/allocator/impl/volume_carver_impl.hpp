@@ -20,13 +20,12 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
                                     const SensorT& sensor,
                                     const se::Image<float>& depth_img,
                                     const Eigen::Isometry3f& T_WS,
-                                    const int frame) :
+                                    const int /* frame */) :
         map_(map),
         octree_(map.getOctree()),
         sensor_(sensor),
         depth_pooling_img_(depth_img),
         T_SW_(T_WS.inverse()),
-        frame_(frame),
         map_res_(map.getRes()),
         config_(map),
         max_depth_value_(
