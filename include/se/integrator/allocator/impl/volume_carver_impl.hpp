@@ -20,7 +20,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
                                     const SensorT& sensor,
                                     const se::Image<float>& depth_img,
                                     const Eigen::Isometry3f& T_WS,
-                                    const int /* frame */) :
+                                    const timestamp_t /* timestamp */) :
         map_(map),
         octree_(map.getOctree()),
         sensor_(sensor),

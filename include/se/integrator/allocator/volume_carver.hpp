@@ -43,7 +43,7 @@ class VolumeCarver {
                  const SensorT& /* sensor */,
                  const se::Image<float>& /* depth_img */,
                  const Eigen::Isometry3f& /* T_WS */,
-                 const int /* frame */);
+                 const timestamp_t /* timestamp */);
 };
 
 
@@ -93,13 +93,13 @@ class VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
      * \param[in]  sensor               The sensor model.
      * \param[in]  depth_img            The depth image to be integrated.
      * \param[in]  T_WS                 The transformation from sensor to world frame.
-     * \param[in]  frame                The number of the frame to be integrated. Currently unused.
+     * \param[in]  timestamp            The timestamp of the frame to be integrated. Currently unused.
      */
     VolumeCarver(MapType& map,
                  const SensorT& sensor,
                  const se::Image<float>& depth_img,
                  const Eigen::Isometry3f& T_WS,
-                 const int frame);
+                 const timestamp_t timestamp);
 
     /**
      * \brief Allocate the frustum using a map-to-camera volume carving approach
