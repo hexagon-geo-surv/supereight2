@@ -248,8 +248,8 @@ MapIntegrator<MapT>::MapIntegrator(MapT& map) : map_(map)
 
 template<typename MapT>
 template<typename SensorT>
-void MapIntegrator<MapT>::integrateDepth(const Measurements<SensorT>& measurements,
-                                         const timestamp_t timestamp,
+void MapIntegrator<MapT>::integrateDepth(const timestamp_t timestamp,
+                                         const Measurements<SensorT>& measurements,
                                          std::vector<const OctantBase*>* updated_octants)
 {
     se::details::IntegrateDepthImpl<MapT>::template integrate<SensorT>(
@@ -268,10 +268,10 @@ void MapIntegrator<MapT>::integrateDepth(const Measurements<SensorT>& measuremen
 
 template<typename MapT>
 template<typename SensorT>
-void MapIntegrator<MapT>::integrateRay(const SensorT& sensor,
+void MapIntegrator<MapT>::integrateRay(const timestamp_t timestamp,
                                        const Eigen::Vector3f& ray_S,
+                                       const SensorT& sensor,
                                        const Eigen::Isometry3f& T_WS,
-                                       const timestamp_t timestamp,
                                        std::vector<const OctantBase*>* updated_octants)
 {
     se::details::IntegrateRayImpl<MapT>::integrate(
@@ -281,11 +281,11 @@ void MapIntegrator<MapT>::integrateRay(const SensorT& sensor,
 template<typename MapT>
 template<typename SensorT>
 void MapIntegrator<MapT>::integrateRayBatch(
-    const SensorT& sensor,
+    const timestamp_t timestamp,
     const std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
                       Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
         rayPoseBatch,
-    const timestamp_t timestamp,
+    const SensorT& sensor,
     std::vector<const OctantBase*>* updated_octants)
 {
     se::details::IntegrateRayBatchImpl<MapT>::integrate(

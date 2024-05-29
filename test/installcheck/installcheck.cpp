@@ -24,7 +24,7 @@ int main(int argc, char** argv)
 
         se::MapIntegrator integrator(map);
         integrator.integrateDepth(
-            se::Measurements{se::Measurement{depth, sensor, Eigen::Isometry3f::Identity()}}, 0);
+            0, se::Measurements{se::Measurement{depth, sensor, Eigen::Isometry3f::Identity()}});
 
         std::cout << "Supereight2 v" << SE_VERSION << " install successful\n";
         return EXIT_SUCCESS;

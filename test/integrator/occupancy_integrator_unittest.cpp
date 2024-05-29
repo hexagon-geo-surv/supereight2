@@ -26,13 +26,13 @@ class OccupancyIntegrator : public ::testing::Test {
         Eigen::Isometry3f T_WB = Eigen::Isometry3f::Identity();
         int frame = 0;
         se::MapIntegrator integrator(map_);
-        integrator.integrateDepth(se::Measurements{se::Measurement{depth, sensor, T_WB * T_BS}},
-                                  frame++);
+        integrator.integrateDepth(frame++,
+                                  se::Measurements{se::Measurement{depth, sensor, T_WB * T_BS}});
         // Integrate the wall from a second, partially-overlapping pose so as to get some data with
         // weight greater than 1.
         T_WB.translation().y() += 1;
-        integrator.integrateDepth(se::Measurements{se::Measurement{depth, sensor, T_WB * T_BS}},
-                                  frame++);
+        integrator.integrateDepth(frame++,
+                                  se::Measurements{se::Measurement{depth, sensor, T_WB * T_BS}});
     }
 
     public:

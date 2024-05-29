@@ -29,7 +29,7 @@ void integrate_wall(MapT& map, const se::PinholeCamera& sensor, float depth_valu
     const Eigen::Isometry3f T_WB = Eigen::Isometry3f::Identity();
     se::MapIntegrator integrator_stsdf(map);
     integrator_stsdf.template integrateDepth(
-        se::Measurements{se::Measurement{depth, sensor, T_WB * sensor.T_BS}}, 0);
+        0, se::Measurements{se::Measurement{depth, sensor, T_WB * sensor.T_BS}});
 }
 
 int dim_to_blocks(float dim, float block_dim)
@@ -158,7 +158,7 @@ TEST(Map, aabb_ray)
     auto measurementIter = pointCloud_a.begin();
     int frame = 0;
     for (; measurementIter != pointCloud_a.end(); measurementIter++) {
-        integrator.integrateRay(sensor, (*measurementIter).cast<float>(), T_WS, frame);
+        integrator.integrateRay(frame, (*measurementIter).cast<float>(), sensor, T_WS);
     }
 
     const float block_dim = res * map.getOctree().block_size;
@@ -251,7 +251,7 @@ TEST(Map, aabb_ray_batch)
     se::MapIntegrator integrator(map);
 
     // ========= Integration (Batched)
-    integrator.integrateRayBatch(sensor, rayBatch, 0);
+    integrator.integrateRayBatch(0, rayBatch, sensor);
 
     const float block_dim = res * map.getOctree().block_size;
     const float half_wall_dim = d * tanf(azimuth_max * deg_to_rad);
@@ -289,7 +289,7 @@ TEST(Map, aabb_ray_batch)
         elevation_angle += elevation_res;
     }
 
-    integrator.integrateRayBatch(sensor, rayBatch, 0);
+    integrator.integrateRayBatch(0, rayBatch, sensor);
 
     // lines are commented out.
     int negative_n_of_blocks_x = std::floor(-(d + 3 * res) / block_dim);

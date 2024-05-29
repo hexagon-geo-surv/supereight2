@@ -81,7 +81,7 @@ TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
     const int max_frame = 1;
     for (int frame = 0; frame < max_frame; frame++) {
         integrator.integrateDepth(
-            se::Measurements{se::Measurement{processed_depth_img, sensor, T_WS}}, frame);
+            frame, se::Measurements{se::Measurement{processed_depth_img, sensor, T_WS}});
     }
 
     map.saveFieldSlices(config.app.slice_path + "/test-field-interp-slice-x.vtk",
@@ -155,7 +155,7 @@ TEST(MultiResOFusionSystemTest, GetField)
     const int max_frame = 1;
     for (int frame = 0; frame < max_frame; frame++) {
         integrator.integrateDepth(
-            se::Measurements{se::Measurement{processed_depth_img, sensor, T_WS}}, frame);
+            frame, se::Measurements{se::Measurement{processed_depth_img, sensor, T_WS}});
     }
 
     const Eigen::Vector3i voxel_coord_unknown_1(688, 500, 933);
@@ -233,7 +233,7 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
     const int max_frame = 1;
     for (int frame = 0; frame < max_frame; frame++) {
         integrator.integrateDepth(
-            se::Measurements{se::Measurement{processed_depth_img, sensor, T_WS}}, frame);
+            frame, se::Measurements{se::Measurement{processed_depth_img, sensor, T_WS}});
     }
 
     const Eigen::Vector3i voxel_coord(640, 512, 896);
@@ -324,7 +324,7 @@ TEST(MultiResOFusionSystemTest, DeleteChildren)
         se::preprocessor::downsample_depth((frame == 0) ? input_noise_depth_img : input_depth_img,
                                            processed_depth_img);
         integrator.integrateDepth(
-            se::Measurements{se::Measurement{processed_depth_img, sensor, T_WS}}, frame);
+            frame, se::Measurements{se::Measurement{processed_depth_img, sensor, T_WS}});
 
         const Eigen::Vector3i voxel_coord(471, 512, 807);
         Eigen::Vector3f point_W;
@@ -412,8 +412,8 @@ TEST(MultiResOFusionSystemTest, Raycasting)
     se::image::remap(input_colour_img, processed_colour_img, downsample_map);
 
     se::MapIntegrator integrator(map);
-    integrator.integrateDepth(se::Measurements{se::Measurement{processed_depth_img, sensor, T_WS}},
-                              frame);
+    integrator.integrateDepth(frame,
+                              se::Measurements{se::Measurement{processed_depth_img, sensor, T_WS}});
 
     se::raycaster::raycast_volume(
         map, sensor, T_WS, surface_point_cloud_W, surface_normals_W, surface_scale);

@@ -222,7 +222,7 @@ TEST(RayIntegrator, Propagation)
 
     // ========= Integration (Batched)
     std::vector<const se::OctantBase*> updated_octants;
-    integrator.integrateRayBatch(sensor, rayBatch, 0, &updated_octants);
+    integrator.integrateRayBatch(0, rayBatch, sensor, &updated_octants);
     std::cout << "Number of updated octants: " << updated_octants.size() << std::endl;
     // Un-Comment if needed for debugging
     map.saveStructure(tmp_ + "/batch_ray_structure.ply");

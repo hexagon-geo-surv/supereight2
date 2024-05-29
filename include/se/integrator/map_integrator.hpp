@@ -82,26 +82,26 @@ class MapIntegrator {
      * se::MapIntegrator::integrateDepth() returns.
      */
     template<typename SensorT>
-    void integrateDepth(const Measurements<SensorT>& measurements,
-                        const timestamp_t timestamp,
+    void integrateDepth(const timestamp_t timestamp,
+                        const Measurements<SensorT>& measurements,
                         std::vector<const OctantBase*>* updated_octants = nullptr);
 
     /**
      * \brief Integrate single ray measurement into the maps field representation.
      *
      * \tparam SensorT
+     * \param[in] timestamp       The timestamp of the ray to be integrated
      * \param[in] ray_S           The measured ray in sensor frame
      * \param[in] sensor          The sensor use for the projection
      * \param[in] T_WS            The transformation from sensor to world frame
-     * \param[in] timestamp       The timestamp of the ray to be integrated
      * \param[in] updated_octants Pointers to the octants updates during integration will be stored
      *                            in \p updated_octants if it's not \p nullptr.
      */
     template<typename SensorT>
-    void integrateRay(const SensorT& sensor,
+    void integrateRay(const timestamp_t timestamp,
                       const Eigen::Vector3f& ray_S,
+                      const SensorT& sensor,
                       const Eigen::Isometry3f& T_WS,
-                      const timestamp_t timestamp,
                       std::vector<const OctantBase*>* updated_octants = nullptr);
 
 
@@ -110,20 +110,19 @@ class MapIntegrator {
      * \brief Integrate a batch of ray images into the maps field representation.
      *
      * \tparam SensorT
-     * \param[in] sensor          The sensor use for the projection
-     * \param[in] rayBatch        The batch of ray measurements (in sensor frame)
-     * \param[in] poseBatch       The batch of corresponding sensor poses in the world frame
      * \param[in] timestamp       The timestamp of the batch to be integrated
+     * \param[in] rayPoseBatch    The batch of ray measurements and poses in the world frame
+     * \param[in] sensor          The sensor use for the projection
      * \param[in] updated_octants Pointers to the octants updates during integration will be stored
      *                            in \p updated_octants if it's not \p nullptr.
      */
     template<typename SensorT>
     void integrateRayBatch(
-        const SensorT& sensor,
+        const timestamp_t timestamp,
         const std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
                           Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
             rayPoseBatch,
-        const timestamp_t timestamp,
+        const SensorT& sensor,
         std::vector<const OctantBase*>* updated_octants = nullptr);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
