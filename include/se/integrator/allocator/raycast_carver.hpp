@@ -44,13 +44,13 @@ class RaycastCarver {
      * \param[in] depth_img   The depth image to be integrated into \p map.
      * \param[in] T_WS        The transformation from the sensor frame S that \p depth_img was
      *                        captured from to the world frame W.
-     * \param[in] frame       The number of the frame to be integrated. Currently unused.
+     * \param[in] timestamp   The timestamp of the frame to be integrated. Currently unused.
      */
     RaycastCarver(MapT& map,
                   const SensorT& sensor,
                   const se::Image<float>& depth_img,
                   const Eigen::Isometry3f& T_WS,
-                  const int frame);
+                  const timestamp_t timestamp);
 
     /** Performs the necessary allocations and returns the allocated blocks. */
     std::vector<se::OctantBase*> operator()();
