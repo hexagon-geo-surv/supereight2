@@ -714,17 +714,6 @@ void Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::Config::readYaml(const std::s
     }
 }
 
-
-
-template<typename MapT>
-std::ostream& operator<<(std::ostream& os, const typename MapT::Config& c)
-{
-    os << str_utils::volume_to_pretty_str(c.dim, "dim") << " m\n";
-    os << str_utils::value_to_pretty_str(c.res, "res") << " m/voxel\n";
-    os << str_utils::eigen_matrix_to_pretty_str(c.T_MW.matrix(), "T_MW") << "\n";
-    return os;
-}
-
 } // namespace se
 
 #endif // SE_MAP_IMPL_HPP

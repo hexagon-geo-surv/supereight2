@@ -30,7 +30,7 @@ std::ostream& operator<<(std::ostream& os, const Config<MapT, SensorT>& c)
     os << "Data config -----------------------\n";
     os << c.data;
     os << "Map config ------------------------\n";
-    operator<<<MapT>(os, c.map);
+    os << c.map;
     os << "Sensor config ---------------------\n";
     os << c.sensor;
     os << "Tracker config --------------------\n";

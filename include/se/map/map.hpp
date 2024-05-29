@@ -62,6 +62,16 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
          */
         void readYaml(const std::string& yaml_file);
 
+        // The definition of this function MUST be inside the definition of Config for template
+        // argument deduction to work.
+        friend std::ostream& operator<<(std::ostream& os, const Config& c)
+        {
+            os << str_utils::volume_to_pretty_str(c.dim, "dim") << " m\n";
+            os << str_utils::value_to_pretty_str(c.res, "res") << " m/voxel\n";
+            os << str_utils::eigen_matrix_to_pretty_str(c.T_MW.matrix(), "T_MW") << "\n";
+            return os;
+        }
+
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
 
@@ -582,9 +592,6 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
     /** The eight relative unit corner offsets */
     static const Eigen::Matrix<float, 3, 8> corner_rel_steps_;
 };
-
-template<typename MapT>
-std::ostream& operator<<(std::ostream& os, const typename MapT::Config& c);
 
 //// Full alias template for alternative setup
 template<se::Field FldT = se::Field::TSDF,
