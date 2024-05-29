@@ -24,7 +24,7 @@ class RayIntegrator {
                   const SensorT& /* sensor */,
                   const Eigen::Vector3f& /*ray*/,
                   const Eigen::Isometry3f& /* T_SW need Lidar frame?*/,
-                  const int /* frame */,
+                  const timestamp_t /* timestamp */,
                   std::vector<const OctantBase*>* /*updated_octants = nullptr*/){};
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -68,28 +68,28 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, 
     * \param[in]  sensor               The sensor model.
     * \param[in]  ray                  The ray to be integrated.
     * \param[in]  T_WS                 The transformation from sensor to world frame.
-    * \param[in]  frame                The frame number to be integrated.
+    * \param[in]  timestamp            The timestamp of the ray to be integrated.
     */
     RayIntegrator(MapType& map,
                   const SensorT& sensor,
                   const Eigen::Vector3f& ray,
                   const Eigen::Isometry3f& T_WS,
-                  const int frame,
+                  const timestamp_t timestamp,
                   std::vector<const OctantBase*>* updated_octants = nullptr);
 
     /**
-     * \brief Reset ray, pose and frame counter for the integrator
+     * \brief Reset ray, pose and timestamp for the integrator
      *
      * \param[in] ray           The new ray measurement
      * \param[in] T_WS          The corresponding pose
-     * \param[in] frame         The frame id
+     * \param[in] timestamp     The ray timestamp
      * \param[in] skip_check    Boolean to decide if we check if ray can be skipped
      *
      * \return False if ray should be skipped. Otherwise true
      */
     bool resetIntegrator(const Eigen::Vector3f& ray,
                          const Eigen::Isometry3f& T_WS,
-                         const int frame,
+                         const timestamp_t timestamp,
                          bool skip_check = false);
 
     /**
@@ -168,7 +168,7 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, 
 
     int free_space_scale_ = 0;
     int computed_integration_scale_ = 0;
-    int frame_;
+    timestamp_t timestamp_;
 
     // Sensor Model - Tau and Sigma
     float ray_dist_ = 0.;

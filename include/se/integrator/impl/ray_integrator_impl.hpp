@@ -17,7 +17,7 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockS
                                       const SensorT& sensor,
                                       const Eigen::Vector3f& ray,
                                       const Eigen::Isometry3f& T_WS,
-                                      const int frame,
+                                      const timestamp_t timestamp,
                                       std::vector<const OctantBase*>* updated_octants) :
         map_(map),
         octree_(map.getOctree()),
@@ -29,7 +29,7 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockS
         last_visited_voxel_(Eigen::Vector3i::Constant(-1)),
         map_res_(map.getRes()),
         free_space_scale_(map_.getDataConfig().field.fs_integr_scale),
-        frame_(frame),
+        timestamp_(timestamp),
         ray_dist_(ray_.norm()),
         tau_(compute_tau(ray_dist_, config_.tau_min, config_.tau_max, map_.getDataConfig())),
         three_sigma_(compute_three_sigma(ray_dist_,
@@ -44,7 +44,7 @@ template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
 bool RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
                    SensorT>::resetIntegrator(const Eigen::Vector3f& ray,
                                              const Eigen::Isometry3f& T_WS,
-                                             const int frame,
+                                             const timestamp_t timestamp,
                                              bool skip_ray)
 {
     // Check if ray is expected to add new information. From the angle between sequential rays we compute the
@@ -64,7 +64,7 @@ bool RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
     ray_ = ray;
     ray_dist_ = ray_.norm();
     T_SW_ = T_WS.inverse();
-    frame_ = frame;
+    timestamp_ = timestamp;
     return true;
 }
 
@@ -234,9 +234,9 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
 
     // Set timestamp of the current block
     timestamp_t previous_time_stamp = block_ptr->timestamp;
-    const bool is_already_integrated = (previous_time_stamp == frame_);
+    const bool is_already_integrated = (previous_time_stamp == timestamp_);
     if (!is_already_integrated) {
-        block_ptr->timestamp = frame_;
+        block_ptr->timestamp = timestamp_;
     }
 
 
@@ -304,13 +304,13 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
         std::set<se::OctantBase*>::iterator it;
         for (it = node_set_[d].begin(); it != node_set_[d].end(); ++it) {
             se::OctantBase* octant_ptr = *it;
-            if (octant_ptr->timestamp == frame_) {
+            if (octant_ptr->timestamp == timestamp_) {
                 continue;
             }
 
             if (octant_ptr->parent()) {
                 auto node_data = ray_integrator::propagate_to_parent_node<NodeType, BlockType>(
-                    octant_ptr, frame_);
+                    octant_ptr, timestamp_);
                 node_set_[d - 1].insert(octant_ptr->parent());
                 if (track_updated_octants_) {
                     updated_blocks_set_.insert(octant_ptr);
@@ -335,7 +335,7 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
         }     // nodes at depth d
     }         // depth d
 
-    ray_integrator::propagate_to_parent_node<NodeType, BlockType>(octree_.getRoot(), frame_);
+    ray_integrator::propagate_to_parent_node<NodeType, BlockType>(octree_.getRoot(), timestamp_);
 }
 
 template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>

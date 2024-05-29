@@ -42,13 +42,13 @@ bool free_voxel(DataT& voxel_data, const ConfigT config);
  *
  * \param[in] node        Node to be summariesed
  * \param[in] voxel_depth Maximum depth of the octree
- * \param[in] frame       Current frame
+ * \param[in] timestamp   The timestamp of the current ray
  *
  * \return data Summary of the node
  */
 template<typename NodeT, typename BlockT>
 typename NodeT::DataType propagate_to_parent_node(se::OctantBase* octant_ptr,
-                                                  const unsigned int frame);
+                                                  const timestamp_t timestamp);
 
 /**
  * \brief Summariese the values from the current integration scale recursively
