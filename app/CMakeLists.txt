@@ -68,11 +68,14 @@ foreach(APP_CONFIG ${SE_APP_CONFIG})
   string(TOLOWER ${RES} RES_LC)
   string(TOLOWER ${SENSOR} SENSOR_LC)
 
-  # Add a custom command that replaces the field, resolution and sensor in
-  # main.cpp using sed. The generated file is then used as the main of the
-  # app.
+  # Generate an app main be replacing the field, resolution and sensor in main.cpp and writing the
+  # results in GENERATED_MAIN. Do nothing if main.cpp hasn't changed since GENERATED_MAIN was
+  # written.
   set(INPUT_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
   set(GENERATED_MAIN "${CMAKE_CURRENT_BINARY_DIR}/main_${FIELD_LC}_${RES_LC}_${SENSOR_LC}.cpp")
+  if(NOT "${INPUT_MAIN}" IS_NEWER_THAN "${GENERATED_MAIN}")
+    continue()
+  endif()
   file(READ "${INPUT_MAIN}" FILE_CONTENT)
   string(REPLACE "se::TSDF" "se::${FIELD}" FILE_CONTENT "${FILE_CONTENT}")
   string(REPLACE "se::Res::Single" "se::Res::${RES}" FILE_CONTENT "${FILE_CONTENT}")
