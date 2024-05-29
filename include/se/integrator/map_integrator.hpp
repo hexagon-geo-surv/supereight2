@@ -87,34 +87,6 @@ class MapIntegrator {
                         std::vector<const OctantBase*>* updated_octants = nullptr);
 
     /**
-     * \brief Integrate depth image into the maps field representation.
-     *
-     * \tparam SensorT
-     * \param[in] depth_img       The sensor depth image
-     * \param[in] sensor          The sensor use for the projection
-     * \param[in] T_WS            The transformation from sensor to world frame
-     * \param[in] timestamp       The timestamp of the image to be integrated
-     * \param[in] updated_octants Pointers to the octants updates during integration will be stored
-     *                            in \p updated_octants if it's not \p nullptr.
-     */
-    template<typename SensorT>
-    void integrateDepth(const SensorT& sensor,
-                        const se::Image<float>& depth_img,
-                        const Eigen::Isometry3f& T_WS,
-                        const timestamp_t timestamp,
-                        std::vector<const OctantBase*>* updated_octants = nullptr);
-
-    template<typename SensorT>
-    void integrateDepth(const SensorT& sensor,
-                        const se::Image<float>& depth_img,
-                        const Eigen::Isometry3f& T_WS,
-                        const SensorT& colour_sensor,
-                        const se::Image<colour_t>& colour_img,
-                        const Eigen::Isometry3f& T_SSc,
-                        const timestamp_t timestamp,
-                        std::vector<const OctantBase*>* updated_octants = nullptr);
-
-    /**
      * \brief Integrate single ray measurement into the maps field representation.
      *
      * \tparam SensorT

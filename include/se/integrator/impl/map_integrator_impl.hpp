@@ -268,45 +268,6 @@ void MapIntegrator<MapT>::integrateDepth(const Measurements<SensorT>& measuremen
 
 template<typename MapT>
 template<typename SensorT>
-void MapIntegrator<MapT>::integrateDepth(const SensorT& sensor,
-                                         const se::Image<float>& depth_img,
-                                         const Eigen::Isometry3f& T_WS,
-                                         const timestamp_t timestamp,
-                                         std::vector<const OctantBase*>* updated_octants)
-{
-    se::details::IntegrateDepthImpl<MapT>::template integrate<SensorT>(
-        map_, sensor, depth_img, T_WS, nullptr, nullptr, nullptr, timestamp, updated_octants);
-}
-
-
-
-template<typename MapT>
-template<typename SensorT>
-void MapIntegrator<MapT>::integrateDepth(const SensorT& sensor,
-                                         const se::Image<float>& depth_img,
-                                         const Eigen::Isometry3f& T_WS,
-                                         const SensorT& colour_sensor,
-                                         const se::Image<colour_t>& colour_img,
-                                         const Eigen::Isometry3f& T_SSc,
-                                         const timestamp_t timestamp,
-                                         std::vector<const OctantBase*>* updated_octants)
-{
-    const Eigen::Isometry3f T_WSc = T_WS * T_SSc;
-    se::details::IntegrateDepthImpl<MapT>::template integrate<SensorT>(map_,
-                                                                       sensor,
-                                                                       depth_img,
-                                                                       T_WS,
-                                                                       &colour_sensor,
-                                                                       &colour_img,
-                                                                       &T_WSc,
-                                                                       timestamp,
-                                                                       updated_octants);
-}
-
-
-
-template<typename MapT>
-template<typename SensorT>
 void MapIntegrator<MapT>::integrateRay(const SensorT& sensor,
                                        const Eigen::Vector3f& ray_S,
                                        const Eigen::Isometry3f& T_WS,
