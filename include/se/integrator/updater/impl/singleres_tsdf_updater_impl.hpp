@@ -21,7 +21,7 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::Up
     const SensorT* const colour_sensor,
     const Image<colour_t>* const colour_img,
     const Eigen::Isometry3f* const T_SSc,
-    const int frame)
+    const timestamp_t timestamp)
 {
     const bool has_colour = MapType::col_ == Colour::On && colour_sensor && colour_img && T_SSc;
     Eigen::Isometry3f T_ScS;
@@ -43,7 +43,7 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::Up
         assert(block_ptrs[i]);
         assert(block_ptrs[i]->is_block);
         auto& block = *static_cast<BlockType*>(block_ptrs[i]);
-        block.timestamp = frame;
+        block.timestamp = timestamp;
         const Eigen::Vector3i block_coord = block.coord;
 
         for (int x = 0; x < BlockType::getSize(); ++x) {
