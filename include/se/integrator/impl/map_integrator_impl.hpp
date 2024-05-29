@@ -29,7 +29,7 @@ struct IntegrateDepthImplD {
                           const SensorT* const colour_sensor,
                           const se::Image<colour_t>* const colour_img,
                           const Eigen::Isometry3f* const T_SSc,
-                          const unsigned int frame,
+                          const timestamp_t timestamp,
                           std::vector<const OctantBase*>* updated_octants);
 };
 
@@ -45,7 +45,7 @@ struct IntegrateRayImplD {
                           const SensorT& sensor,
                           const Eigen::Vector3f& ray_S,
                           const Eigen::Isometry3f& T_WS,
-                          const unsigned int frame,
+                          const timestamp_t timestamp,
                           std::vector<const OctantBase*>* updated_octants);
 };
 
@@ -63,7 +63,7 @@ struct IntegrateRayBatchImplD {
         const std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
                           Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
             rayPoseBatch,
-        const unsigned int frame,
+        const timestamp_t timestamp,
         std::vector<const OctantBase*>* updated_octants);
 };
 
@@ -82,21 +82,21 @@ struct IntegrateDepthImplD<se::Field::TSDF, ResT> {
                           const SensorT* const colour_sensor,
                           const se::Image<colour_t>* const colour_img,
                           const Eigen::Isometry3f* const T_SSc,
-                          const unsigned int frame,
+                          const timestamp_t timestamp,
                           std::vector<const OctantBase*>* updated_octants)
     {
         assert(sensor.model.imageWidth() == depth_img.width());
         assert(sensor.model.imageHeight() == depth_img.height());
         // Allocation
         TICK("allocation")
-        se::RaycastCarver raycast_carver(map, sensor, depth_img, T_WS, frame);
+        se::RaycastCarver raycast_carver(map, sensor, depth_img, T_WS, timestamp);
         std::vector<OctantBase*> block_ptrs = raycast_carver();
         TOCK("allocation")
 
         // Update
         TICK("update")
         se::Updater updater(
-            map, block_ptrs, sensor, depth_img, T_WS, colour_sensor, colour_img, T_SSc, frame);
+            map, block_ptrs, sensor, depth_img, T_WS, colour_sensor, colour_img, T_SSc, timestamp);
         TOCK("update")
 
         if (updated_octants) {
@@ -124,7 +124,7 @@ struct IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi> {
                           const SensorT* const colour_sensor,
                           const se::Image<colour_t>* const colour_img,
                           const Eigen::Isometry3f* const T_SSc,
-                          const unsigned int frame,
+                          const timestamp_t timestamp,
                           std::vector<const OctantBase*>* updated_octants)
     {
         assert(sensor.model.imageWidth() == depth_img.width());
@@ -136,13 +136,14 @@ struct IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi> {
             sensor,
             depth_img,
             T_WS,
-            frame); //< process based on variance state and project inside
+            timestamp); //< process based on variance state and project inside
         se::VolumeCarverAllocation allocation_list = volume_carver();
         TOCK("allocation")
 
         // Update
         TICK("update")
-        se::Updater updater(map, sensor, depth_img, T_WS, colour_sensor, colour_img, T_SSc, frame);
+        se::Updater updater(
+            map, sensor, depth_img, T_WS, colour_sensor, colour_img, T_SSc, timestamp);
         updater(allocation_list, updated_octants);
         TOCK("update")
     }
@@ -160,12 +161,12 @@ struct IntegrateRayImplD<se::Field::Occupancy, se::Res::Multi> {
                           const SensorT& sensor,
                           const Eigen::Vector3f& ray_S,
                           const Eigen::Isometry3f& T_WS,
-                          const unsigned int frame,
+                          const timestamp_t timestamp,
                           std::vector<const OctantBase*>* updated_octants)
     {
         TICK("Ray Integration")
         TICK("allocation-integration")
-        se::RayIntegrator rayIntegrator(map, sensor, ray_S, T_WS, frame, updated_octants);
+        se::RayIntegrator rayIntegrator(map, sensor, ray_S, T_WS, timestamp, updated_octants);
         rayIntegrator();
         TOCK("allocation-integration")
         TICK("propagateBlocksToCoarsestScale")
@@ -186,41 +187,42 @@ template<>
 struct IntegrateRayBatchImplD<se::Field::Occupancy, se::Res::Multi> {
     template<typename SensorT, typename MapT>
     static void integrate(
-    MapT& map,
-    const SensorT& sensor,
-    const std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
-                      Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
-        rayPoseBatch,
-    const unsigned int frame,
-    std::vector<const OctantBase*>* updated_octants)
-{
-    se::RayIntegrator<MapT, SensorT> rayIntegrator(
-        map, sensor, rayPoseBatch[0].second, rayPoseBatch[0].first, frame, updated_octants);
+        MapT& map,
+        const SensorT& sensor,
+        const std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
+                          Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
+            rayPoseBatch,
+        const timestamp_t timestamp,
+        std::vector<const OctantBase*>* updated_octants)
+    {
+        se::RayIntegrator<MapT, SensorT> rayIntegrator(
+            map, sensor, rayPoseBatch[0].second, rayPoseBatch[0].first, timestamp, updated_octants);
 
-    // do downsampling
-    int skip_count = 0;
+        // do downsampling
+        int skip_count = 0;
 
-    for (size_t i = 0; i < rayPoseBatch.size(); i++) {
-        TICK("Ray Integration")
-        TICK("allocation-integration")
-        if (rayIntegrator.resetIntegrator(rayPoseBatch[i].second, rayPoseBatch[i].first, frame)) {
-            rayIntegrator();
+        for (size_t i = 0; i < rayPoseBatch.size(); i++) {
+            TICK("Ray Integration")
+            TICK("allocation-integration")
+            if (rayIntegrator.resetIntegrator(
+                    rayPoseBatch[i].second, rayPoseBatch[i].first, timestamp)) {
+                rayIntegrator();
+            }
+            else {
+                skip_count++;
+            }
+            TOCK("allocation-integration")
+            TOCK("Ray Integration")
         }
-        else {
-            skip_count++;
-        }
-        TOCK("allocation-integration")
-        TOCK("Ray Integration")
+        // Do Propagations
+        TICK("propagateBlocksToCoarsestScale")
+        rayIntegrator.propagateBlocksToCoarsestScale();
+        TOCK("propagateBlocksToCoarsestScale")
+        TICK("propagateToRoot")
+        rayIntegrator.propagateToRoot();
+        TOCK("propagateToRoot")
+        rayIntegrator.updatedOctants(updated_octants);
     }
-    // Do Propagations
-    TICK("propagateBlocksToCoarsestScale")
-    rayIntegrator.propagateBlocksToCoarsestScale();
-    TOCK("propagateBlocksToCoarsestScale")
-    TICK("propagateToRoot")
-    rayIntegrator.propagateToRoot();
-    TOCK("propagateToRoot")
-    rayIntegrator.updatedOctants(updated_octants);
-}
 };
 
 
@@ -249,11 +251,11 @@ template<typename SensorT>
 void MapIntegrator<MapT>::integrateDepth(const SensorT& sensor,
                                          const se::Image<float>& depth_img,
                                          const Eigen::Isometry3f& T_WS,
-                                         const unsigned int frame,
+                                         const timestamp_t timestamp,
                                          std::vector<const OctantBase*>* updated_octants)
 {
     se::details::IntegrateDepthImpl<MapT>::template integrate<SensorT>(
-        map_, sensor, depth_img, T_WS, nullptr, nullptr, nullptr, frame, updated_octants);
+        map_, sensor, depth_img, T_WS, nullptr, nullptr, nullptr, timestamp, updated_octants);
 }
 
 
@@ -266,11 +268,18 @@ void MapIntegrator<MapT>::integrateDepth(const SensorT& sensor,
                                          const SensorT& colour_sensor,
                                          const se::Image<colour_t>& colour_img,
                                          const Eigen::Isometry3f& T_SSc,
-                                         const unsigned int frame,
+                                         const timestamp_t timestamp,
                                          std::vector<const OctantBase*>* updated_octants)
 {
-    se::details::IntegrateDepthImpl<MapT>::template integrate<SensorT>(
-        map_, sensor, depth_img, T_WS, &colour_sensor, &colour_img, &T_SSc, frame, updated_octants);
+    se::details::IntegrateDepthImpl<MapT>::template integrate<SensorT>(map_,
+                                                                       sensor,
+                                                                       depth_img,
+                                                                       T_WS,
+                                                                       &colour_sensor,
+                                                                       &colour_img,
+                                                                       &T_SSc,
+                                                                       timestamp,
+                                                                       updated_octants);
 }
 
 
@@ -280,11 +289,11 @@ template<typename SensorT>
 void MapIntegrator<MapT>::integrateRay(const SensorT& sensor,
                                        const Eigen::Vector3f& ray_S,
                                        const Eigen::Isometry3f& T_WS,
-                                       const unsigned int frame,
+                                       const timestamp_t timestamp,
                                        std::vector<const OctantBase*>* updated_octants)
 {
     se::details::IntegrateRayImpl<MapT>::integrate(
-        map_, sensor, ray_S, T_WS, frame, updated_octants);
+        map_, sensor, ray_S, T_WS, timestamp, updated_octants);
 }
 
 template<typename MapT>
@@ -294,11 +303,11 @@ void MapIntegrator<MapT>::integrateRayBatch(
     const std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
                       Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
         rayPoseBatch,
-    const unsigned int frame,
+    const timestamp_t timestamp,
     std::vector<const OctantBase*>* updated_octants)
 {
     se::details::IntegrateRayBatchImpl<MapT>::integrate(
-        map_, sensor, rayPoseBatch, frame, updated_octants);
+        map_, sensor, rayPoseBatch, timestamp, updated_octants);
 }
 
 
