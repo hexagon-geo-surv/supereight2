@@ -151,11 +151,14 @@ void SemanticData<se::Semantics::On>::Config::readYaml(const std::string& /* yam
 
 
 
-template<>
-std::ostream& operator<< <se::Semantics::On>(std::ostream& os,
-                                             const SemanticData<se::Semantics::On>::Config& /* c */)
+std::ostream& operator<<(std::ostream& os, const SemanticData<se::Semantics::Off>::Config& /* c */)
 {
-    // TODO Implement when semantics fusion is added.
     return os;
 }
+
+std::ostream& operator<<(std::ostream& os, const SemanticData<se::Semantics::On>::Config& /* c */)
+{
+    return os;
+}
+
 } // namespace se

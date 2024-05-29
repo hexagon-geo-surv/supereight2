@@ -57,7 +57,7 @@ std::ostream& operator<<(std::ostream& os, const typename Data<FldT, ColB, SemB>
 {
     os << c.field;
     os << c.colour;
-    operator<<<SemB>(os, c.semantic);
+    os << c.semantic;
     return os;
 }
 

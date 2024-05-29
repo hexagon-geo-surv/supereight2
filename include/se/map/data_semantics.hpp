@@ -26,12 +26,6 @@ struct SemanticData {
     };
 };
 
-template<Semantics SemB>
-std::ostream& operator<<(std::ostream& os, const typename SemanticData<SemB>::Config& /* c */)
-{
-    return os;
-}
-
 // Semantic data
 template<>
 struct SemanticData<Semantics::On> {
@@ -45,9 +39,8 @@ struct SemanticData<Semantics::On> {
     semantics_t sem = dflt_semantics;
 };
 
-template<>
-std::ostream& operator<<<Semantics::On>(std::ostream& os,
-                                        const SemanticData<Semantics::On>::Config& c);
+std::ostream& operator<<(std::ostream& os, const SemanticData<Semantics::Off>::Config& c);
+std::ostream& operator<<(std::ostream& os, const SemanticData<Semantics::On>::Config& c);
 
 ///////////////////
 /// DELTA DATA  ///
