@@ -56,7 +56,7 @@ template<Field FldT, Colour ColB, Semantics SemB>
 std::ostream& operator<<(std::ostream& os, const typename Data<FldT, ColB, SemB>::Config& c)
 {
     os << c.field;
-    operator<<<ColB>(os, c.colour);
+    os << c.colour;
     operator<<<SemB>(os, c.semantic);
     return os;
 }

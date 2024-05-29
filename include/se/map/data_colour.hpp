@@ -25,12 +25,6 @@ struct ColourData {
     };
 };
 
-template<Colour ColB>
-std::ostream& operator<<(std::ostream& os, const typename ColourData<ColB>::Config& /* c */)
-{
-    return os;
-}
-
 template<>
 struct ColourData<Colour::On> {
     colour_t colour;
@@ -52,8 +46,8 @@ struct ColourData<Colour::On> {
     void setToMean(const BoundedVector<ColourData, 8>& child_data);
 };
 
-template<>
-std::ostream& operator<<<Colour::On>(std::ostream& os, const ColourData<Colour::On>::Config& c);
+std::ostream& operator<<(std::ostream& os, const ColourData<Colour::Off>::Config& c);
+std::ostream& operator<<(std::ostream& os, const ColourData<Colour::On>::Config& c);
 
 } // namespace se
 

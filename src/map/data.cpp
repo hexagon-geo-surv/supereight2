@@ -132,9 +132,12 @@ void ColourData<se::Colour::On>::Config::readYaml(const std::string& /* yaml_fil
 
 
 
-template<>
-std::ostream& operator<< <se::Colour::On>(std::ostream& os,
-                                          const ColourData<se::Colour::On>::Config& /* c */)
+std::ostream& operator<<(std::ostream& os, const ColourData<se::Colour::Off>::Config& /* c */)
+{
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const ColourData<se::Colour::On>::Config& /* c */)
 {
     return os;
 }
