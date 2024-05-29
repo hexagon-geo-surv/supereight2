@@ -145,19 +145,6 @@ const DerivedT* SensorBase<DerivedT>::underlying() const
 
 
 template<typename DerivedT>
-std::ostream& operator<<(std::ostream& os, const typename se::SensorBase<DerivedT>::Config& c)
-{
-    os << str_utils::value_to_pretty_str(c.width, "width") << " px\n";
-    os << str_utils::value_to_pretty_str(c.height, "height") << " px\n";
-    os << str_utils::value_to_pretty_str(c.near_plane, "near_plane") << " m\n";
-    os << str_utils::value_to_pretty_str(c.far_plane, "far_plane") << " m\n";
-    os << str_utils::eigen_matrix_to_pretty_str(c.T_BS.matrix(), "T_BS") << "\n";
-    return os;
-}
-
-
-
-template<typename DerivedT>
 void se::SensorBase<DerivedT>::Config::readYaml(const std::string& filename)
 {
     // Open the file for reading.

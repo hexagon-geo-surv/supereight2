@@ -29,7 +29,7 @@ void se::LeicaLidar::Config::readYaml(const std::string& filename)
 
 std::ostream& se::operator<<(std::ostream& os, const se::LeicaLidar::Config& c)
 {
-    operator<< <LeicaLidar>(os, static_cast<const SensorBase<LeicaLidar>::Config&>(c));
+    os << static_cast<const SensorBase<LeicaLidar>::Config&>(c);
     os << str_utils::value_to_pretty_str(c.elevation_resolution_angle_,
                                          "elevation_resolution_angle")
        << " degrees\n";

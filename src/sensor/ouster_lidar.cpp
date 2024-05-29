@@ -40,7 +40,7 @@ void se::OusterLidar::Config::readYaml(const std::string& filename)
 
 std::ostream& se::operator<<(std::ostream& os, const se::OusterLidar::Config& c)
 {
-    operator<< <OusterLidar>(os, static_cast<const SensorBase<OusterLidar>::Config&>(c));
+    os << static_cast<const SensorBase<OusterLidar>::Config&>(c);
     os << str_utils::eigen_vector_to_pretty_str(c.beam_azimuth_angles, "beam_azimuth_angles")
        << " degrees\n";
     os << str_utils::eigen_vector_to_pretty_str(c.beam_elevation_angles, "beam_elevation_angles")

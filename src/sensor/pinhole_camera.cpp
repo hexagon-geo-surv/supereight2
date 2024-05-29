@@ -33,7 +33,7 @@ void se::PinholeCamera::Config::readYaml(const std::string& filename)
 
 std::ostream& se::operator<<(std::ostream& os, const se::PinholeCamera::Config& c)
 {
-    operator<< <PinholeCamera>(os, static_cast<const SensorBase<PinholeCamera>::Config&>(c));
+    os << static_cast<const SensorBase<PinholeCamera>::Config&>(c);
     os << str_utils::value_to_pretty_str(c.fx, "fx") << " px\n";
     os << str_utils::value_to_pretty_str(c.fy, "fy") << " px\n";
     os << str_utils::value_to_pretty_str(c.cx, "cx") << " px\n";

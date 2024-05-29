@@ -61,6 +61,18 @@ class SensorBase {
          */
         void readYaml(const std::string& filename);
 
+        // The definition of this function MUST be inside the definition of Config for template
+        // argument deduction to work.
+        friend std::ostream& operator<<(std::ostream& os, const Config& c)
+        {
+            os << str_utils::value_to_pretty_str(c.width, "width") << " px\n";
+            os << str_utils::value_to_pretty_str(c.height, "height") << " px\n";
+            os << str_utils::value_to_pretty_str(c.near_plane, "near_plane") << " m\n";
+            os << str_utils::value_to_pretty_str(c.far_plane, "far_plane") << " m\n";
+            os << str_utils::eigen_matrix_to_pretty_str(c.T_BS.matrix(), "T_BS") << "\n";
+            return os;
+        }
+
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
 
@@ -203,9 +215,6 @@ class SensorBase {
     // Simplify access to derived member functions
     const DerivedT* underlying() const;
 };
-
-template<typename DerivedT>
-std::ostream& operator<<(std::ostream& os, const typename SensorBase<DerivedT>::Config& c);
 
 } // namespace se
 
