@@ -24,7 +24,7 @@ Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
     const SensorT* const colour_sensor,
     const Image<colour_t>* const colour_img,
     const Eigen::Isometry3f* const T_SSc,
-    const int frame) :
+    const timestamp_t timestamp) :
         map_(map),
         octree_(map.getOctree()),
         sensor_(sensor),
@@ -33,7 +33,7 @@ Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
         colour_sensor_(colour_sensor),
         colour_img_(colour_img),
         has_colour_(colour_sensor_ && colour_img_ && T_SSc),
-        frame_(frame),
+        timestamp_(timestamp),
         map_res_(map.getRes()),
         config_(map),
         node_set_(octree_.getBlockDepth())
@@ -136,12 +136,12 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
         std::set<OctantBase*>::iterator it;
         for (it = node_set_[d].begin(); it != node_set_[d].end(); ++it) {
             OctantBase* octant_ptr = *it;
-            if (octant_ptr->timestamp == frame_) {
+            if (octant_ptr->timestamp == timestamp_) {
                 continue;
             }
             if (octant_ptr->parent()) {
                 auto node_data =
-                    updater::propagate_to_parent_node<NodeType, BlockType>(octant_ptr, frame_);
+                    updater::propagate_to_parent_node<NodeType, BlockType>(octant_ptr, timestamp_);
                 node_set_[d - 1].insert(octant_ptr->parent());
                 if (track_updated_octants_) {
                     updated_octants_.insert(octant_ptr);
@@ -165,7 +165,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
         }     // nodes at depth d
     }         // depth d
 
-    updater::propagate_to_parent_node<NodeType, BlockType>(octree_.getRoot(), frame_);
+    updater::propagate_to_parent_node<NodeType, BlockType>(octree_.getRoot(), timestamp_);
 }
 
 

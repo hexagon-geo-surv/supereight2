@@ -88,13 +88,14 @@ bool free_voxel(DataT& voxel_data, const ConfigT config)
 
 
 template<typename NodeT, typename BlockT>
-typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr, const int frame)
+typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr,
+                                                  const timestamp_t timestamp)
 {
     assert(octant_ptr);
     assert(!octant_ptr->is_block);
 
     NodeT& node = *static_cast<NodeT*>(octant_ptr);
-    node.timestamp = frame;
+    node.timestamp = timestamp;
 
     // Gather the child minimum and maximum data.
     std::array<typename NodeT::DataType, 8> child_min_data;
