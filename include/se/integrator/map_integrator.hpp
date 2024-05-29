@@ -77,35 +77,19 @@ class MapIntegrator {
      * \brief Integrate depth image into the maps field representation.
      *
      * \tparam SensorT
-     * \param[in] depth_img   The sensor depth image
-     * \param[in] sensor      The sensor use for the projection
-     * \param[in] T_WS        The transformation from sensor to world frame
-     * \param[in] frame       The frame number to be integrated
-     */
-    template<typename SensorT>
-    void integrateDepth(const SensorT& sensor,
-                        const se::Image<float>& depth_img,
-                        const Eigen::Isometry3f& T_WS,
-                        const unsigned int frame);
-
-    /** Same as se::MapIntegrator::integrateDepth() but also stores pointers to the octants updated
-     * during the integration in \p updated_octants.
+     * \param[in] depth_img       The sensor depth image
+     * \param[in] sensor          The sensor use for the projection
+     * \param[in] T_WS            The transformation from sensor to world frame
+     * \param[in] frame           The frame number to be integrated
+     * \param[in] updated_octants Pointers to the octants updates during integration will be stored
+     *                            in \p updated_octants if it's not \p nullptr.
      */
     template<typename SensorT>
     void integrateDepth(const SensorT& sensor,
                         const se::Image<float>& depth_img,
                         const Eigen::Isometry3f& T_WS,
                         const unsigned int frame,
-                        std::vector<const OctantBase*>& updated_octants);
-
-    template<typename SensorT>
-    void integrateDepth(const SensorT& sensor,
-                        const se::Image<float>& depth_img,
-                        const Eigen::Isometry3f& T_WS,
-                        const SensorT& colour_sensor,
-                        const se::Image<colour_t>& colour_img,
-                        const Eigen::Isometry3f& T_SSc,
-                        const unsigned int frame);
+                        std::vector<const OctantBase*>* updated_octants = nullptr);
 
     template<typename SensorT>
     void integrateDepth(const SensorT& sensor,
@@ -115,32 +99,25 @@ class MapIntegrator {
                         const se::Image<colour_t>& colour_img,
                         const Eigen::Isometry3f& T_SSc,
                         const unsigned int frame,
-                        std::vector<const OctantBase*>& updated_octants);
+                        std::vector<const OctantBase*>* updated_octants = nullptr);
 
     /**
      * \brief Integrate single ray measurement into the maps field representation.
      *
      * \tparam SensorT
-     * \param[in] ray_S       The measured ray in sensor frame
-     * \param[in] sensor      The sensor use for the projection
-     * \param[in] T_WS        The transformation from sensor to world frame
-     * \param[in] frame       The frame number to be integrated (number of so-far integrated rays)
-     */
-    template<typename SensorT>
-    void integrateRay(const SensorT& sensor,
-                      const Eigen::Vector3f& ray_S,
-                      const Eigen::Isometry3f& T_WS,
-                      const unsigned int frame);
-
-    /** Same as se::MapIntegrator::integrateRay() but also stores pointers to the octants updated
-     * during the integration in \p updated_octants.
+     * \param[in] ray_S           The measured ray in sensor frame
+     * \param[in] sensor          The sensor use for the projection
+     * \param[in] T_WS            The transformation from sensor to world frame
+     * \param[in] frame           The frame number to be integrated (number of so-far integrated rays)
+     * \param[in] updated_octants Pointers to the octants updates during integration will be stored
+     *                            in \p updated_octants if it's not \p nullptr.
      */
     template<typename SensorT>
     void integrateRay(const SensorT& sensor,
                       const Eigen::Vector3f& ray_S,
                       const Eigen::Isometry3f& T_WS,
                       const unsigned int frame,
-                      std::vector<const OctantBase*>& updated_octants);
+                      std::vector<const OctantBase*>* updated_octants = nullptr);
 
 
 
@@ -148,21 +125,12 @@ class MapIntegrator {
      * \brief Integrate a batch of ray images into the maps field representation.
      *
      * \tparam SensorT
-     * \param[in] sensor      The sensor use for the projection
-     * \param[in] rayBatch    The batch of ray measurements (in sensor frame)
-     * \param[in] poseBatch   The batch of corresponding sensor poses in the world frame
-     * \param[in] frame       The frame number to be integrated (will be number of batch)
-     */
-    template<typename SensorT>
-    void integrateRayBatch(
-        const SensorT& sensor,
-        const std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
-                          Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
-            rayPoseBatch,
-        const unsigned int frame);
-
-    /** Same as se::MapIntegrator::integrateRayBatch() but also stores pointers to the octants updated
-     * during the integration in \p updated_octants.
+     * \param[in] sensor          The sensor use for the projection
+     * \param[in] rayBatch        The batch of ray measurements (in sensor frame)
+     * \param[in] poseBatch       The batch of corresponding sensor poses in the world frame
+     * \param[in] frame           The frame number to be integrated (will be number of batch)
+     * \param[in] updated_octants Pointers to the octants updates during integration will be stored
+     *                            in \p updated_octants if it's not \p nullptr.
      */
     template<typename SensorT>
     void integrateRayBatch(
@@ -171,7 +139,7 @@ class MapIntegrator {
                           Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
             rayPoseBatch,
         const unsigned int frame,
-        std::vector<const OctantBase*>& updated_octants);
+        std::vector<const OctantBase*>* updated_octants = nullptr);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
