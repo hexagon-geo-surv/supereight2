@@ -16,27 +16,22 @@ template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
 Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Updater(
     MapType& map,
     std::vector<OctantBase*>& block_ptrs,
-    const SensorT& sensor,
-    const Image<float>& depth_img,
-    const Eigen::Isometry3f& T_WS,
-    const SensorT* const colour_sensor,
-    const Image<colour_t>* const colour_img,
-    const Eigen::Isometry3f* const T_WSc,
-    const timestamp_t timestamp)
+    const timestamp_t timestamp,
+    const Measurements<SensorT>& measurements)
 {
-    const bool has_colour = MapType::col_ == Colour::On && colour_sensor && colour_img && T_WSc;
-    Eigen::Isometry3f T_ScS;
+    const bool has_colour = MapType::col_ == Colour::On && measurements.colour;
+    Eigen::Isometry3f T_CcC;
     if constexpr (MapType::col_ == Colour::On) {
         if (has_colour) {
-            T_ScS = T_WSc->inverse() * T_WS;
+            T_CcC = measurements.colour->T_WC.inverse() * measurements.depth.T_WC;
         }
     }
 
     const float truncation_boundary =
         map.getRes() * map.getDataConfig().field.truncation_boundary_factor;
-    const Eigen::Isometry3f T_SW = T_WS.inverse();
-    // Transformation from the octree frame v (in voxels) to the sensor frame S (in meters).
-    const Eigen::Affine3f T_Sv = T_SW * map.getTWM() * Eigen::Scaling(map.getRes())
+    const Eigen::Isometry3f T_CW = measurements.depth.T_WC.inverse();
+    // Transformation from the octree frame V (in voxels) to the sensor frame C (in meters).
+    const Eigen::Affine3f T_CV = T_CW * map.getTWM() * Eigen::Scaling(map.getRes())
         * Eigen::Translation3f(sample_offset_frac);
     const Octree<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>& octree = map.getOctree();
 
@@ -49,16 +44,17 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Upd
         const Eigen::Vector3i block_coord = block.coord;
         Eigen::Vector3f block_centre_point_W;
         map.voxelToPoint(block_coord, block.getSize(), block_centre_point_W);
-        const Eigen::Vector3f block_centre_point_S = T_SW * block_centre_point_W;
+        const Eigen::Vector3f block_centre_point_C = T_CW * block_centre_point_W;
         const int last_curr_scale = block.getCurrentScale();
         const int lower_curr_scale_limit = last_curr_scale - 1;
 
-        const int curr_scale = std::max(sensor.computeIntegrationScale(block_centre_point_S,
+        const int curr_scale =
+            std::max(measurements.depth.sensor.computeIntegrationScale(block_centre_point_C,
                                                                        map.getRes(),
                                                                        last_curr_scale,
                                                                        block.getMinScale(),
                                                                        block.getMaxScale()),
-                                        lower_curr_scale_limit);
+                     lower_curr_scale_limit);
 
         block.setMinScale(block.getMinScale() < 0 ? curr_scale
                                                   : std::min(block.getMinScale(), curr_scale));
@@ -140,27 +136,28 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Upd
                 for (int z = 0; z < BlockType::getSize(); z += stride) {
                     const Eigen::Vector3i voxel_coord = block_coord + Eigen::Vector3i(x, y, z);
                     // Compute the coordinates of the voxel sample position in the sensor frame.
-                    const Eigen::Vector3f point_S = T_Sv * voxel_coord.cast<float>();
+                    const Eigen::Vector3f point_C = T_CV * voxel_coord.cast<float>();
 
-                    if (point_S.norm() > sensor.farDist(point_S)) {
+                    if (point_C.norm() > measurements.depth.sensor.farDist(point_C)) {
                         continue;
                     }
 
                     // Get the depth value this voxel projects into.
                     Eigen::Vector2f depth_pixel_f;
-                    if (sensor.model.project(point_S, &depth_pixel_f)
+                    if (measurements.depth.sensor.model.project(point_C, &depth_pixel_f)
                         != srl::projection::ProjectionStatus::Successful) {
                         continue;
                     }
                     const Eigen::Vector2i depth_pixel = se::round_pixel(depth_pixel_f);
-                    const float depth_value = depth_img(depth_pixel.x(), depth_pixel.y());
-                    if (depth_value < sensor.near_plane) {
+                    const float depth_value =
+                        measurements.depth.image(depth_pixel.x(), depth_pixel.y());
+                    if (depth_value < measurements.depth.sensor.near_plane) {
                         continue;
                     }
 
                     // Update the TSDF
-                    const float m = sensor.measurementFromPoint(point_S);
-                    const field_t sdf_value = (depth_value - m) / m * point_S.norm();
+                    const float m = measurements.depth.sensor.measurementFromPoint(point_C);
+                    const field_t sdf_value = (depth_value - m) / m * point_C.norm();
 
                     typename BlockType::DataUnion data_union =
                         block.getDataUnion(voxel_coord, block.getCurrentScale());
@@ -168,13 +165,13 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Upd
                         sdf_value, truncation_boundary, map.getDataConfig().field.max_weight);
                     data_union.past_data.field.weight++;
 
-                    // Compute the coordinates of the depth hit in the depth sensor frame S if data
+                    // Compute the coordinates of the depth hit in the depth sensor frame C if data
                     // other than depth needs to be integrated.
-                    Eigen::Vector3f hit_S;
+                    Eigen::Vector3f hit_C;
                     if constexpr (MapType::col_ == Colour::On || MapType::sem_ == Semantics::On) {
                         if (has_colour && field_updated) {
-                            sensor.model.backProject(depth_pixel_f, &hit_S);
-                            hit_S.array() *= depth_value;
+                            measurements.depth.sensor.model.backProject(depth_pixel_f, &hit_C);
+                            hit_C.array() *= depth_value;
                         }
                     }
 
@@ -183,14 +180,14 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Upd
                     if constexpr (MapType::col_ == Colour::On) {
                         if (has_colour && field_updated) {
                             // Project the depth hit onto the colour image.
-                            const Eigen::Vector3f hit_Sc = T_ScS * hit_S;
+                            const Eigen::Vector3f hit_Cc = T_CcC * hit_C;
                             Eigen::Vector2f colour_pixel_f;
-                            if (colour_sensor->model.project(hit_Sc, &colour_pixel_f)
+                            if (measurements.colour->sensor.model.project(hit_Cc, &colour_pixel_f)
                                 == srl::projection::ProjectionStatus::Successful) {
                                 const Eigen::Vector2i colour_pixel =
                                     se::round_pixel(colour_pixel_f);
                                 data_union.data.colour.update(
-                                    (*colour_img)(colour_pixel.x(), colour_pixel.y()),
+                                    measurements.colour->image(colour_pixel.x(), colour_pixel.y()),
                                     map.getDataConfig().field.max_weight);
                             }
                         }

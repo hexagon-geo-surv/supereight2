@@ -8,6 +8,8 @@
 #ifndef SE_UPDATER_HPP
 #define SE_UPDATER_HPP
 
+#include "se/integrator/measurement.hpp"
+
 namespace se {
 
 template<typename MapT, typename SensorT>
@@ -23,13 +25,8 @@ struct Updater {
 
     Updater(MapT& map,
             std::vector<OctantBase*>& octant_ptrs,
-            const SensorT& sensor,
-            const se::Image<float>& depth_img,
-            const Eigen::Isometry3f& T_WS,
-            const SensorT* const colour_sensor,
-            const Image<colour_t>* const colour_img,
-            const Eigen::Isometry3f* const T_SSc,
-            const timestamp_t timestamp);
+            const timestamp_t timestamp,
+            const Measurements<SensorT>& measurements);
 };
 
 } // namespace se

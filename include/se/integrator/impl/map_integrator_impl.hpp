@@ -9,8 +9,6 @@
 #ifndef SE_MAP_INTEGRATOR_IMPL_HPP
 #define SE_MAP_INTEGRATOR_IMPL_HPP
 
-#include "se/integrator/updater/updater.hpp"
-
 namespace se {
 namespace details {
 
@@ -89,15 +87,7 @@ struct IntegrateDepthImplD<se::Field::TSDF, ResT> {
 
         // Update
         TICK("update")
-        se::Updater updater(map,
-                            block_ptrs,
-                            measurements.depth.sensor,
-                            measurements.depth.image,
-                            measurements.depth.T_WC,
-                            measurements.colour ? &measurements.colour->sensor : nullptr,
-                            measurements.colour ? &measurements.colour->image : nullptr,
-                            measurements.colour ? &measurements.colour->T_WC : nullptr,
-                            timestamp);
+        se::Updater updater(map, block_ptrs, timestamp, measurements);
         TOCK("update")
 
         if (updated_octants) {

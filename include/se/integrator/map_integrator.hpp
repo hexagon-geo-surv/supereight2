@@ -12,11 +12,11 @@
 #include <cstddef>
 #include <iterator>
 
-#include "measurement.hpp"
 #include "se/common/math_util.hpp"
 #include "se/integrator/allocator/raycast_carver.hpp"
 #include "se/integrator/allocator/volume_carver.hpp"
 #include "se/integrator/ray_integrator.hpp"
+#include "se/integrator/updater/updater.hpp"
 #include "se/map/octree/fetcher.hpp"
 #include "se/map/octree/integrator.hpp"
 #include "se/map/utils/setup_util.hpp"

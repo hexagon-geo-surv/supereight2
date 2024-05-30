@@ -23,13 +23,8 @@ struct Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, Senso
 
     Updater(MapType& map,
             std::vector<OctantBase*>& block_ptrs,
-            const SensorT& sensor,
-            const Image<float>& depth_img,
-            const Eigen::Isometry3f& T_WS,
-            const SensorT* const colour_sensor,
-            const Image<colour_t>* const colour_img,
-            const Eigen::Isometry3f* const T_WSc,
-            const timestamp_t timestamp);
+            const timestamp_t timestamp,
+            const Measurements<SensorT>& measurements);
 };
 
 } // namespace se
