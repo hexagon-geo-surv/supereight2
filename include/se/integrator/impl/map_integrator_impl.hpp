@@ -23,13 +23,8 @@ template<se::Field FldT, se::Res ResT>
 struct IntegrateDepthImplD {
     template<typename SensorT, typename MapT>
     static void integrate(MapT& map,
-                          const SensorT& sensor,
-                          const se::Image<float>& depth_img,
-                          const Eigen::Isometry3f& T_WS,
-                          const SensorT* const colour_sensor,
-                          const se::Image<colour_t>* const colour_img,
-                          const Eigen::Isometry3f* const T_SSc,
                           const timestamp_t timestamp,
+                          const Measurements<SensorT>& measurements,
                           std::vector<const OctantBase*>* updated_octants);
 };
 
@@ -76,27 +71,33 @@ template<Res ResT>
 struct IntegrateDepthImplD<se::Field::TSDF, ResT> {
     template<typename SensorT, typename MapT>
     static void integrate(MapT& map,
-                          const SensorT& sensor,
-                          const se::Image<float>& depth_img,
-                          const Eigen::Isometry3f& T_WS,
-                          const SensorT* const colour_sensor,
-                          const se::Image<colour_t>* const colour_img,
-                          const Eigen::Isometry3f* const T_SSc,
                           const timestamp_t timestamp,
+                          const Measurements<SensorT>& measurements,
                           std::vector<const OctantBase*>* updated_octants)
     {
-        assert(sensor.model.imageWidth() == depth_img.width());
-        assert(sensor.model.imageHeight() == depth_img.height());
+        assert(measurements.depth.sensor.model.imageWidth() == measurements.depth.image.width());
+        assert(measurements.depth.sensor.model.imageHeight() == measurements.depth.image.height());
         // Allocation
         TICK("allocation")
-        se::RaycastCarver raycast_carver(map, sensor, depth_img, T_WS, timestamp);
+        se::RaycastCarver raycast_carver(map,
+                                         measurements.depth.sensor,
+                                         measurements.depth.image,
+                                         measurements.depth.T_WC,
+                                         timestamp);
         std::vector<OctantBase*> block_ptrs = raycast_carver();
         TOCK("allocation")
 
         // Update
         TICK("update")
-        se::Updater updater(
-            map, block_ptrs, sensor, depth_img, T_WS, colour_sensor, colour_img, T_SSc, timestamp);
+        se::Updater updater(map,
+                            block_ptrs,
+                            measurements.depth.sensor,
+                            measurements.depth.image,
+                            measurements.depth.T_WC,
+                            measurements.colour ? &measurements.colour->sensor : nullptr,
+                            measurements.colour ? &measurements.colour->image : nullptr,
+                            measurements.colour ? &measurements.colour->T_WC : nullptr,
+                            timestamp);
         TOCK("update")
 
         if (updated_octants) {
@@ -118,32 +119,33 @@ template<>
 struct IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi> {
     template<typename SensorT, typename MapT>
     static void integrate(MapT& map,
-                          const SensorT& sensor,
-                          const se::Image<float>& depth_img,
-                          const Eigen::Isometry3f& T_WS,
-                          const SensorT* const colour_sensor,
-                          const se::Image<colour_t>* const colour_img,
-                          const Eigen::Isometry3f* const T_SSc,
                           const timestamp_t timestamp,
+                          const Measurements<SensorT>& measurements,
                           std::vector<const OctantBase*>* updated_octants)
     {
-        assert(sensor.model.imageWidth() == depth_img.width());
-        assert(sensor.model.imageHeight() == depth_img.height());
+        assert(measurements.depth.sensor.model.imageWidth() == measurements.depth.image.width());
+        assert(measurements.depth.sensor.model.imageHeight() == measurements.depth.image.height());
         // Allocation
         TICK("allocation")
         VolumeCarver<MapT, SensorT> volume_carver(
             map,
-            sensor,
-            depth_img,
-            T_WS,
+            measurements.depth.sensor,
+            measurements.depth.image,
+            measurements.depth.T_WC,
             timestamp); //< process based on variance state and project inside
         se::VolumeCarverAllocation allocation_list = volume_carver();
         TOCK("allocation")
 
         // Update
         TICK("update")
-        se::Updater updater(
-            map, sensor, depth_img, T_WS, colour_sensor, colour_img, T_SSc, timestamp);
+        se::Updater updater(map,
+                            measurements.depth.sensor,
+                            measurements.depth.image,
+                            measurements.depth.T_WC,
+                            measurements.colour ? &measurements.colour->sensor : nullptr,
+                            measurements.colour ? &measurements.colour->image : nullptr,
+                            measurements.colour ? &measurements.colour->T_WC : nullptr,
+                            timestamp);
         updater(allocation_list, updated_octants);
         TOCK("update")
     }
@@ -253,15 +255,7 @@ void MapIntegrator<MapT>::integrateDepth(const timestamp_t timestamp,
                                          std::vector<const OctantBase*>* updated_octants)
 {
     se::details::IntegrateDepthImpl<MapT>::template integrate<SensorT>(
-        map_,
-        measurements.depth.sensor,
-        measurements.depth.image,
-        measurements.depth.T_WC,
-        measurements.colour ? &measurements.colour->sensor : nullptr,
-        measurements.colour ? &measurements.colour->image : nullptr,
-        measurements.colour ? &measurements.colour->T_WC : nullptr,
-        timestamp,
-        updated_octants);
+        map_, timestamp, measurements, updated_octants);
 }
 
 
