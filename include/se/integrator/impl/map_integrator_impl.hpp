@@ -128,14 +128,7 @@ struct IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi> {
 
         // Update
         TICK("update")
-        se::Updater updater(map,
-                            measurements.depth.sensor,
-                            measurements.depth.image,
-                            measurements.depth.T_WC,
-                            measurements.colour ? &measurements.colour->sensor : nullptr,
-                            measurements.colour ? &measurements.colour->image : nullptr,
-                            measurements.colour ? &measurements.colour->T_WC : nullptr,
-                            timestamp);
+        se::Updater updater(map, timestamp, measurements);
         updater(allocation_list, updated_octants);
         TOCK("update")
     }

@@ -18,21 +18,16 @@ namespace se {
 template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
 Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Updater(
     MapType& map,
-    const SensorT& sensor,
-    const Image<float>& depth_img,
-    const Eigen::Isometry3f& T_WS,
-    const SensorT* const colour_sensor,
-    const Image<colour_t>* const colour_img,
-    const Eigen::Isometry3f* const T_WSc,
-    const timestamp_t timestamp) :
+    const timestamp_t timestamp,
+    const Measurements<SensorT>& measurements) :
         map_(map),
         octree_(map.getOctree()),
-        sensor_(sensor),
-        depth_img_(depth_img),
-        T_SW_(T_WS.inverse()),
-        colour_sensor_(colour_sensor),
-        colour_img_(colour_img),
-        has_colour_(colour_sensor_ && colour_img_ && T_WSc),
+        sensor_(measurements.depth.sensor),
+        depth_img_(measurements.depth.image),
+        T_CW_(measurements.depth.T_WC.inverse()),
+        colour_sensor_(measurements.colour ? &measurements.colour->sensor : nullptr),
+        colour_img_(measurements.colour ? &measurements.colour->image : nullptr),
+        has_colour_(measurements.colour),
         timestamp_(timestamp),
         map_res_(map.getRes()),
         config_(map),
@@ -40,7 +35,7 @@ Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
 {
     if constexpr (MapType::col_ == Colour::On) {
         if (has_colour_) {
-            T_ScS_ = T_WSc->inverse() * T_WS;
+            T_CcC_ = measurements.colour->T_WC.inverse() * measurements.depth.T_WC;
         }
     }
 }
@@ -185,7 +180,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
     Eigen::Vector3f block_centre_point_W;
 
     map_.voxelToPoint(block_coord, block_size, block_centre_point_W);
-    const Eigen::Vector3f block_centre_point_C = T_SW_ * block_centre_point_W;
+    const Eigen::Vector3f block_centre_point_C = T_CW_ * block_centre_point_W;
 
     // Compute the integration scale
     // The last integration scale
@@ -337,10 +332,10 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
     Eigen::Vector3f block_centre_point_W;
     map_.voxelToPoint(block_coord, block_size, block_centre_point_W);
-    const Eigen::Vector3f block_centre_point_S = T_SW_ * block_centre_point_W;
+    const Eigen::Vector3f block_centre_point_C = T_CW_ * block_centre_point_W;
 
     // Convert block centre to measurement >> PinholeCamera -> .z() | OusterLidar -> .norm()
-    const float block_point_C_m = sensor_.measurementFromPoint(block_centre_point_S);
+    const float block_point_C_m = sensor_.measurementFromPoint(block_centre_point_C);
 
     // Compute one tau and 3x sigma value for the block
     float tau =
@@ -354,7 +349,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
     // The recommended integration scale
     const int computed_integration_scale =
-        sensor_.computeIntegrationScale(block_centre_point_S,
+        sensor_.computeIntegrationScale(block_centre_point_C,
                                         map_res_,
                                         last_scale,
                                         block_ptr->getMinScale(),
@@ -441,10 +436,10 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
         const Eigen::Vector3i voxel_coord_base = block_ptr->coord;
         Eigen::Vector3f sample_point_base_W;
         map_.voxelToPoint(voxel_coord_base, recommended_stride, sample_point_base_W);
-        const Eigen::Vector3f sample_point_base_S = T_SW_ * sample_point_base_W;
+        const Eigen::Vector3f sample_point_base_C = T_CW_ * sample_point_base_W;
 
-        const Eigen::Matrix3f sample_point_delta_matrix_S =
-            (T_SW_.linear()
+        const Eigen::Matrix3f sample_point_delta_matrix_C =
+            (T_CW_.linear()
              * (map_res_
                 * (Eigen::Matrix3f() << recommended_stride,
                    0,
@@ -461,8 +456,8 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
             for (unsigned int y = 0; y < size_at_recommended_scale_li; y++) {
 #pragma omp simd
                 for (unsigned int x = 0; x < size_at_recommended_scale_li; x++) {
-                    const Eigen::Vector3f sample_point_C = sample_point_base_S
-                        + sample_point_delta_matrix_S * Eigen::Vector3f(x, y, z);
+                    const Eigen::Vector3f sample_point_C = sample_point_base_C
+                        + sample_point_delta_matrix_C * Eigen::Vector3f(x, y, z);
 
                     // Get the depth value this voxel projects into.
                     Eigen::Vector2f depth_pixel_f;
@@ -493,14 +488,14 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                             buffer_data, range_diff, tau, three_sigma, map_.getDataConfig()));
                         const bool field_updated = range_diff < tau;
 
-                        // Compute the coordinates of the depth hit in the depth sensor frame S if
+                        // Compute the coordinates of the depth hit in the depth sensor frame C if
                         // data other than depth needs to be integrated.
-                        Eigen::Vector3f hit_S;
+                        Eigen::Vector3f hit_C;
                         if constexpr (MapType::col_ == Colour::On
                                       || MapType::sem_ == Semantics::On) {
                             if (has_colour_ && field_updated) {
-                                sensor_.model.backProject(depth_pixel_f, &hit_S);
-                                hit_S.array() *= depth_value;
+                                sensor_.model.backProject(depth_pixel_f, &hit_C);
+                                hit_C.array() *= depth_value;
                             }
                         }
 
@@ -509,9 +504,9 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                         if constexpr (MapType::col_ == Colour::On) {
                             if (has_colour_ && field_updated) {
                                 // Project the depth hit onto the colour image.
-                                const Eigen::Vector3f hit_Sc = T_ScS_ * hit_S;
+                                const Eigen::Vector3f hit_Cc = T_CcC_ * hit_C;
                                 Eigen::Vector2f colour_pixel_f;
-                                if (colour_sensor_->model.project(hit_Sc, &colour_pixel_f)
+                                if (colour_sensor_->model.project(hit_Cc, &colour_pixel_f)
                                     == srl::projection::ProjectionStatus::Successful) {
                                     const Eigen::Vector2i colour_pixel =
                                         se::round_pixel(colour_pixel_f);
@@ -543,10 +538,10 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
     const Eigen::Vector3i voxel_coord_base = block_ptr->coord;
     Eigen::Vector3f sample_point_base_W;
     map_.voxelToPoint(voxel_coord_base, integration_stride, sample_point_base_W);
-    const Eigen::Vector3f sample_point_base_S = T_SW_ * sample_point_base_W;
+    const Eigen::Vector3f sample_point_base_C = T_CW_ * sample_point_base_W;
 
-    const Eigen::Matrix3f sample_point_delta_matrix_S =
-        (T_SW_.linear()
+    const Eigen::Matrix3f sample_point_delta_matrix_C =
+        (T_CW_.linear()
          * (map_res_
             * (Eigen::Matrix3f() << integration_stride,
                0,
@@ -564,7 +559,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 #pragma omp simd
             for (unsigned int x = 0; x < size_at_integration_scale_li; x++) {
                 const Eigen::Vector3f sample_point_C =
-                    sample_point_base_S + sample_point_delta_matrix_S * Eigen::Vector3f(x, y, z);
+                    sample_point_base_C + sample_point_delta_matrix_C * Eigen::Vector3f(x, y, z);
 
                 // Get the depth value this voxel projects into.
                 Eigen::Vector2f depth_pixel_f;
@@ -596,13 +591,13 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                         voxel_data, range_diff, tau, three_sigma, map_.getDataConfig()));
                     const bool field_updated = range_diff < tau;
 
-                    // Compute the coordinates of the depth hit in the depth sensor frame S if
+                    // Compute the coordinates of the depth hit in the depth sensor frame C if
                     // data other than depth needs to be integrated.
-                    Eigen::Vector3f hit_S;
+                    Eigen::Vector3f hit_C;
                     if constexpr (MapType::col_ == Colour::On || MapType::sem_ == Semantics::On) {
                         if (has_colour_ && field_updated) {
-                            sensor_.model.backProject(depth_pixel_f, &hit_S);
-                            hit_S.array() *= depth_value;
+                            sensor_.model.backProject(depth_pixel_f, &hit_C);
+                            hit_C.array() *= depth_value;
                         }
                     }
 
@@ -611,9 +606,9 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                     if constexpr (MapType::col_ == Colour::On) {
                         if (has_colour_ && field_updated) {
                             // Project the depth hit onto the colour image.
-                            const Eigen::Vector3f hit_Sc = T_ScS_ * hit_S;
+                            const Eigen::Vector3f hit_Cc = T_CcC_ * hit_C;
                             Eigen::Vector2f colour_pixel_f;
-                            if (colour_sensor_->model.project(hit_Sc, &colour_pixel_f)
+                            if (colour_sensor_->model.project(hit_Cc, &colour_pixel_f)
                                 == srl::projection::ProjectionStatus::Successful) {
                                 const Eigen::Vector2i colour_pixel =
                                     se::round_pixel(colour_pixel_f);

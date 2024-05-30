@@ -53,14 +53,7 @@ class Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Se
      * \param[in]  T_WS                 The transformation from sensor to world frame.
      * \param[in]  timestamp            The timestamp of the image to be integrated.
      */
-    Updater(MapType& map,
-            const SensorT& sensor,
-            const Image<float>& depth_img,
-            const Eigen::Isometry3f& T_WS,
-            const SensorT* const colour_sensor,
-            const Image<colour_t>* const colour_img,
-            const Eigen::Isometry3f* const T_WSc,
-            const timestamp_t timestamp);
+    Updater(MapType& map, const timestamp_t timestamp, const Measurements<SensorT>& measurements);
 
     void operator()(VolumeCarverAllocation& allocation_list,
                     std::vector<const OctantBase*>* updated_octants = nullptr);
@@ -97,10 +90,10 @@ class Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Se
     OctreeType& octree_;
     const SensorT& sensor_;
     const Image<float>& depth_img_;
-    const Eigen::Isometry3f T_SW_;
+    const Eigen::Isometry3f T_CW_;
     const SensorT* const colour_sensor_;
     const Image<colour_t>* const colour_img_;
-    Eigen::Isometry3f T_ScS_;
+    Eigen::Isometry3f T_CcC_;
     const bool has_colour_;
     const timestamp_t timestamp_;
     const float map_res_;
