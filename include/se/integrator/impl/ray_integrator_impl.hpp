@@ -62,8 +62,15 @@ bool RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
     }
 
     ray_ = ray;
-    ray_dist_ = ray_.norm();
+    ray_dist_ = ray.norm();
     T_SW_ = T_WS.inverse();
+    computed_integration_scale_ = 0;
+    tau_ = compute_tau(ray_dist_, config_.tau_min, config_.tau_max, map_.getDataConfig());
+    three_sigma_ = compute_three_sigma(ray_dist_,
+                                       config_.sigma_min,
+                                       config_.sigma_max,
+                                       map_.getDataConfig());
+    last_visited_voxel_ = Eigen::Vector3i::Constant(-1);
     timestamp_ = timestamp;
     return true;
 }
