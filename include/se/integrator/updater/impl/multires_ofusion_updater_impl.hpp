@@ -33,7 +33,7 @@ Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
         config_(map),
         node_set_(octree_.getBlockDepth())
 {
-    if constexpr (MapType::col_ == Colour::On) {
+    if constexpr (ColB == Colour::On) {
         if (has_colour_) {
             T_CcC_ = measurements.colour->T_WC.inverse() * measurements.depth.T_WC;
         }
@@ -491,8 +491,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                         // Compute the coordinates of the depth hit in the depth sensor frame C if
                         // data other than depth needs to be integrated.
                         Eigen::Vector3f hit_C;
-                        if constexpr (MapType::col_ == Colour::On
-                                      || MapType::sem_ == Semantics::On) {
+                        if constexpr (ColB == Colour::On || SemB == Semantics::On) {
                             if (has_colour_ && field_updated) {
                                 sensor_.model.backProject(depth_pixel_f, &hit_C);
                                 hit_C.array() *= depth_value;
@@ -501,7 +500,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
                         // Update the colour data if possible and only if the field was updated,
                         // that is if we have corresponding depth information.
-                        if constexpr (MapType::col_ == Colour::On) {
+                        if constexpr (ColB == Colour::On) {
                             if (has_colour_ && field_updated) {
                                 // Project the depth hit onto the colour image.
                                 const Eigen::Vector3f hit_Cc = T_CcC_ * hit_C;
@@ -594,7 +593,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                     // Compute the coordinates of the depth hit in the depth sensor frame C if
                     // data other than depth needs to be integrated.
                     Eigen::Vector3f hit_C;
-                    if constexpr (MapType::col_ == Colour::On || MapType::sem_ == Semantics::On) {
+                    if constexpr (ColB == Colour::On || SemB == Semantics::On) {
                         if (has_colour_ && field_updated) {
                             sensor_.model.backProject(depth_pixel_f, &hit_C);
                             hit_C.array() *= depth_value;
@@ -603,7 +602,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
                     // Update the colour data if possible and only if the field was updated,
                     // that is if we have corresponding depth information.
-                    if constexpr (MapType::col_ == Colour::On) {
+                    if constexpr (ColB == Colour::On) {
                         if (has_colour_ && field_updated) {
                             // Project the depth hit onto the colour image.
                             const Eigen::Vector3f hit_Cc = T_CcC_ * hit_C;

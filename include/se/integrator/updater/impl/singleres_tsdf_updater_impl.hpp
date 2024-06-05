@@ -18,9 +18,9 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::Up
     const timestamp_t timestamp,
     const Measurements<SensorT>& measurements)
 {
-    const bool has_colour = MapType::col_ == Colour::On && measurements.colour;
+    const bool has_colour = ColB == Colour::On && measurements.colour;
     Eigen::Isometry3f T_CcC;
-    if constexpr (MapType::col_ == Colour::On) {
+    if constexpr (ColB == Colour::On) {
         if (has_colour) {
             T_CcC = measurements.colour->T_WC.inverse() * measurements.depth.T_WC;
         }
@@ -76,7 +76,7 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::Up
                     // Compute the coordinates of the depth hit in the depth sensor frame C if data
                     // other than depth needs to be integrated.
                     Eigen::Vector3f hit_C;
-                    if constexpr (MapType::col_ == Colour::On || MapType::sem_ == Semantics::On) {
+                    if constexpr (ColB == Colour::On || SemB == Semantics::On) {
                         if (has_colour && field_updated) {
                             measurements.depth.sensor.model.backProject(depth_pixel_f, &hit_C);
                             hit_C.array() *= depth_value;
@@ -85,7 +85,7 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::Up
 
                     // Update the colour data if possible and only if the field was updated, that is
                     // if we have corresponding depth information.
-                    if constexpr (MapType::col_ == Colour::On) {
+                    if constexpr (ColB == Colour::On) {
                         if (has_colour && field_updated) {
                             // Project the depth hit onto the colour image.
                             const Eigen::Vector3f hit_Cc = T_CcC * hit_C;
