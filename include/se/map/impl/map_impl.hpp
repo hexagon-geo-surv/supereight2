@@ -462,19 +462,21 @@ int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveStructure(const std::strin
 
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 typename Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::SurfaceMesh
-Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::mesh(const Eigen::Isometry3f& T_OW) const
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::mesh(const Eigen::Isometry3f& T_OW,
+                                                   const int min_desired_scale) const
 {
     const Eigen::Affine3f T_OV = T_OW * T_WM_ * Eigen::Scaling(resolution_);
-    return meshVoxel(T_OV);
+    return meshVoxel(T_OV, min_desired_scale);
 }
 
 
 
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 typename Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::SurfaceMesh
-Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::meshVoxel(const Eigen::Affine3f& T_OV) const
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::meshVoxel(const Eigen::Affine3f& T_OV,
+                                                        const int min_desired_scale) const
 {
-    SurfaceMesh mesh = algorithms::marching_cube(octree_);
+    SurfaceMesh mesh = algorithms::marching_cube(octree_, min_desired_scale);
     for (auto& face : mesh) {
         for (size_t v = 0; v < SurfaceMesh::value_type::num_vertexes; ++v) {
             face.vertexes[v] = T_OV * face.vertexes[v];
@@ -487,17 +489,19 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::meshVoxel(const Eigen::Affine3f& T
 
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMesh(const std::string& filename,
-                                                           const Eigen::Isometry3f& T_OW) const
+                                                           const Eigen::Isometry3f& T_OW,
+                                                           const int min_desired_scale) const
 {
-    return io::save_mesh(mesh(T_OW), filename);
+    return io::save_mesh(mesh(T_OW, min_desired_scale), filename);
 }
 
 
 
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
-int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMeshVoxel(const std::string& filename) const
+int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMeshVoxel(const std::string& filename,
+                                                                const int min_desired_scale) const
 {
-    return io::save_mesh(meshVoxel(), filename);
+    return io::save_mesh(meshVoxel(Eigen::Affine3f::Identity(), min_desired_scale), filename);
 }
 
 

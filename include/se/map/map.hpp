@@ -408,36 +408,56 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
                       const Eigen::Affine3f& T_WM = Eigen::Affine3f::Identity()) const;
 
     /** Return a mesh of the reconstructed surface in the world frame in units of metres. Apply a
-     * transformation from the world frame W to some output frame O \p T_OW to each mesh vertex.
+     * transformation from the world frame W to some output frame O \p T_OW to each mesh vertex. For
+     * se::Res::Multi maps, only data at scale \p min_desired_scale or coarser will be used to
+     * generate the mesh. This allows generating a coarser mesh which is less demanding in terms of
+     * computational time and memory. The value of \p min_desired_scale has no effect on
+     * se::Res::Single maps.
      */
-    SurfaceMesh mesh(const Eigen::Isometry3f& T_OW = Eigen::Isometry3f::Identity()) const;
+    SurfaceMesh mesh(const Eigen::Isometry3f& T_OW = Eigen::Isometry3f::Identity(),
+                     const int min_desired_scale = 0) const;
 
     /** Return a mesh of the reconstructed surface in the octree frame in units of voxels. Apply a
      * transformation from the octree frame V to some output frame O \p T_OV to each mesh vertex.
+     * For se::Res::Multi maps, only data at scale \p min_desired_scale or coarser will be used to
+     * generate the mesh. This allows generating a coarser mesh which is less demanding in terms of
+     * computational time and memory. The value of \p min_desired_scale has no effect on
+     * se::Res::Single maps.
      */
-    SurfaceMesh meshVoxel(const Eigen::Affine3f& T_OV = Eigen::Affine3f::Identity()) const;
+    SurfaceMesh meshVoxel(const Eigen::Affine3f& T_OV = Eigen::Affine3f::Identity(),
+                          const int min_desired_scale = 0) const;
 
     /**
      * \brief Create a mesh in the world frame in units of metres and save it to a file.
      *
-     * \param[in] filename The file where the mesh will be saved. The file format will be selected
-     *                     based on the file extension. Its extension must be one of those in
-     *                     se::io::mesh_extensions.
-     * \param[in] T_OW     Transformation from the world frame in units of metres to the output frame. Defaults to identity.
+     * \param[in] filename          The file where the mesh will be saved. The file format will be
+     *                              selected based on the file extension. Its extension must be one
+     *                              of those in se::io::mesh_extensions.
+     * \param[in] T_OW              Transformation from the world frame in units of metres to the
+     *                              output frame. Defaults to identity.
+     * \param[in] min_desired_scale Only data at this scale or coarser will be used to generate the
+     *                              mesh. This allows generating a coarser mesh which is less
+     *                              demanding in terms of computational time and memory. Has no
+     *                              effect on se::Res::Single maps.
      * \return Zero on success and non-zero on error.
      */
     int saveMesh(const std::string& filename,
-                 const Eigen::Isometry3f& T_OW = Eigen::Isometry3f::Identity()) const;
+                 const Eigen::Isometry3f& T_OW = Eigen::Isometry3f::Identity(),
+                 const int min_desired_scale = 0) const;
 
     /**
      * \brief Create a mesh in the map frame in units of voxel and save it to a file.
      *
-     * \param[in] filename The file where the mesh will be saved. The file format will be selected
-     *                     based on the file extension. Its extension must be one of those in
-     *                     se::io::mesh_extensions.
+     * \param[in] filename          The file where the mesh will be saved. The file format will be
+     *                              selected based on the file extension. Its extension must be one
+     *                              of those in se::io::mesh_extensions.
+     * \param[in] min_desired_scale Only data at this scale or coarser will be used to generate the
+     *                              mesh. This allows generating a coarser mesh which is less
+     *                              demanding in terms of computational time and memory. Has no
+     *                              effect on se::Res::Single maps.
      * \return Zero on success and non-zero on error.
      */
-    int saveMeshVoxel(const std::string& filename) const;
+    int saveMeshVoxel(const std::string& filename, const int min_desired_scale = 0) const;
 
     /**
      * \brief Convert voxel coordinates in [voxel] to its centre point coordinates in [meter].
