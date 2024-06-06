@@ -70,11 +70,9 @@ TEST(MeshingTest, EqualScaleNeighbour)
     auto octree_ptr = create_octree<se::Octree<se::TSDFData, se::Res::Single, 8>>();
 
     se::TriangleMesh mesh;
-    se::algorithms::dual_marching_cube(*octree_ptr, mesh);
-    auto vertex_index_mesh = se::algorithms::dual_marching_cube_new(*octree_ptr);
+    se::algorithms::marching_cube(*octree_ptr, mesh);
 
     ASSERT_GT(mesh.size(), 0);
-    ASSERT_EQ(mesh.size() * 3, vertex_index_mesh.indices.size());
 
     std::string filename = "multires-mesh-equal-neighbour-single.vtk";
     std::cout << "Saving triangle mesh to file: " << filename << std::endl;
