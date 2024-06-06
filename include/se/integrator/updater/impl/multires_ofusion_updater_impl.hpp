@@ -236,7 +236,6 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
                 for (unsigned int z = 0; z < size_at_parent_scale_li; z++) {
                     for (unsigned int y = 0; y < size_at_parent_scale_li; y++) {
-#pragma omp simd // TODO: MOVE UP
                         for (unsigned int x = 0; x < size_at_parent_scale_li; x++) {
                             const int parent_idx =
                                 x + y * size_at_parent_scale_li + z * size_at_parent_scale_sq;
@@ -272,7 +271,6 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
         for (unsigned int z = 0; z < size_at_recommended_scale_li; z++) {
             for (unsigned int y = 0; y < size_at_recommended_scale_li; y++) {
-#pragma omp simd
                 for (unsigned int x = 0; x < size_at_recommended_scale_li; x++) {
                     const int buffer_idx =
                         x + y * size_at_recommended_scale_li + z * size_at_recommended_scale_sq;
@@ -299,7 +297,6 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
     for (unsigned int z = 0; z < size_at_integration_scale_li; z++) {
         for (unsigned int y = 0; y < size_at_integration_scale_li; y++) {
-#pragma omp simd // TODO: Move UP
             for (unsigned int x = 0; x < size_at_integration_scale_li; x++) {
                 const int voxel_idx =
                     x + y * size_at_integration_scale_li + z * size_at_integration_scale_sq;
@@ -398,7 +395,6 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
                 for (unsigned int z = 0; z < size_at_parent_scale_li; z++) {
                     for (unsigned int y = 0; y < size_at_parent_scale_li; y++) {
-#pragma omp simd
                         for (unsigned int x = 0; x < size_at_parent_scale_li; x++) {
                             const int parent_idx =
                                 x + y * size_at_parent_scale_li + z * size_at_parent_scale_sq;
@@ -454,7 +450,6 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
         for (unsigned int z = 0; z < size_at_recommended_scale_li; z++) {
             for (unsigned int y = 0; y < size_at_recommended_scale_li; y++) {
-#pragma omp simd
                 for (unsigned int x = 0; x < size_at_recommended_scale_li; x++) {
                     const Eigen::Vector3f sample_point_C = sample_point_base_C
                         + sample_point_delta_matrix_C * Eigen::Vector3f(x, y, z);
@@ -555,7 +550,6 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
     for (unsigned int z = 0; z < size_at_integration_scale_li; z++) {
         for (unsigned int y = 0; y < size_at_integration_scale_li; y++) {
-#pragma omp simd
             for (unsigned int x = 0; x < size_at_integration_scale_li; x++) {
                 const Eigen::Vector3f sample_point_C =
                     sample_point_base_C + sample_point_delta_matrix_C * Eigen::Vector3f(x, y, z);
