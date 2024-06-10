@@ -13,9 +13,6 @@
 
 namespace se {
 
-// Defaults
-static constexpr semantics_t dflt_semantics = 0;
-
 // Semantic data
 template<Semantics SemB>
 struct SemanticData {
@@ -29,23 +26,18 @@ struct SemanticData {
 // Semantic data
 template<>
 struct SemanticData<Semantics::On> {
+    semantics_t sem = semantics_t(0);
+
     struct Config {
         /** Reads the struct members from the "data" node of a YAML file. Members not present in the
          * YAML file aren't modified.
          */
         void readYaml(const std::string& yaml_file);
     };
-
-    semantics_t sem = dflt_semantics;
 };
 
 std::ostream& operator<<(std::ostream& os, const SemanticData<Semantics::Off>::Config& c);
 std::ostream& operator<<(std::ostream& os, const SemanticData<Semantics::On>::Config& c);
-
-///////////////////
-/// DELTA DATA  ///
-///////////////////
-
 
 } // namespace se
 
