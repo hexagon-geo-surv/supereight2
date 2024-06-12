@@ -31,6 +31,25 @@ static const std::vector<RGB> scale = {{102, 194, 165},
                                        {179, 179, 179}};
 } // namespace colours
 
+
+
+namespace colour {
+
+/** Blend colors \p a and \p b based on the value of \p alpha. Returns per-channel
+ * `alpha * a + (1 - alpha) * b`. The value of alpha must be in the range [0, 1] inclusive.
+ *
+ * \note Swapping \p a and \p b while keeping the same \p alpha is not guaranteed to produce the
+ * same result.
+ */
+static inline RGB blend(const RGB a, const RGB b, const float alpha);
+
+/** \overload */
+static inline RGBA blend(const RGBA a, const RGBA b, const float alpha);
+
+} // namespace colour
+
+
+
 /**
  * Pack the individual RGBA channels into a single 32-bit unsigned integer.
  *

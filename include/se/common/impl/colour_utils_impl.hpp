@@ -9,6 +9,34 @@
 #define SE_COLOUR_UTILS_IMPL_HPP
 
 namespace se {
+
+namespace colour {
+
+RGB blend(const RGB a, const RGB b, const float alpha)
+{
+    assert(alpha >= 0.0f);
+    assert(alpha <= 1.0f);
+    const float inv_alpha = 1.0f - alpha;
+    return {std::uint8_t(alpha * a.r + inv_alpha * b.r),
+            std::uint8_t(alpha * a.g + inv_alpha * b.g),
+            std::uint8_t(alpha * a.b + inv_alpha * b.b)};
+}
+
+RGBA blend(const RGBA a, const RGBA b, const float alpha)
+{
+    assert(alpha >= 0.0f);
+    assert(alpha <= 1.0f);
+    const float inv_alpha = 1.0f - alpha;
+    return {std::uint8_t(alpha * a.r + inv_alpha * b.r),
+            std::uint8_t(alpha * a.g + inv_alpha * b.g),
+            std::uint8_t(alpha * a.b + inv_alpha * b.b),
+            std::uint8_t(alpha * a.a + inv_alpha * b.a)};
+}
+
+} // namespace colour
+
+
+
 static inline uint32_t pack_rgba(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a)
 {
     return (a << 24) + (b << 16) + (g << 8) + r;
