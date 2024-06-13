@@ -14,10 +14,8 @@ static inline TriangleMesh quad_to_triangle_mesh(const QuadMesh& quad_mesh)
     TriangleMesh triangle_mesh;
     triangle_mesh.reserve(2 * quad_mesh.size());
     for (const auto& f : quad_mesh) {
-        triangle_mesh.push_back(
-            {{f.vertexes[0], f.vertexes[1], f.vertexes[2]}, f.max_vertex_scale});
-        triangle_mesh.push_back(
-            {{f.vertexes[0], f.vertexes[2], f.vertexes[3]}, f.max_vertex_scale});
+        triangle_mesh.push_back({{f.vertexes[0], f.vertexes[1], f.vertexes[2]}, f.scale});
+        triangle_mesh.push_back({{f.vertexes[0], f.vertexes[2], f.vertexes[3]}, f.scale});
     }
     return triangle_mesh;
 }

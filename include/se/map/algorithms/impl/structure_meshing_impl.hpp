@@ -56,7 +56,7 @@ QuadMesh octree_structure_mesh(OctreeT& octree, const bool only_leaves)
             mesh.emplace_back();
             for (size_t v = 0; v < Quad::num_vertexes; ++v) {
                 mesh.back().vertexes[v] = node_corners[face_vertex_idx[f][v]];
-                mesh.back().max_vertex_scale = node_scale;
+                mesh.back().scale = node_scale;
             }
         }
     }

@@ -22,7 +22,7 @@ namespace se {
 template<size_t NumVertexes>
 struct MeshFace {
     std::array<Eigen::Vector3f, NumVertexes> vertexes;
-    int8_t max_vertex_scale = 0;
+    std::int8_t scale = 0;
 
     static constexpr size_t num_vertexes = NumVertexes;
 

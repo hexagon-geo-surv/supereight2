@@ -952,7 +952,7 @@ dual_marching_cube_kernel(const OctreeT& octree,
                         temp.vertexes[0] = vertex_0;
                         temp.vertexes[1] = vertex_1;
                         temp.vertexes[2] = vertex_2;
-                        temp.max_vertex_scale = voxel_scale;
+                        temp.scale = voxel_scale;
 #pragma omp critical
                         {
                             mesh.push_back(temp);

@@ -77,13 +77,13 @@ int save_mesh_vtk(const Mesh<FaceT>& mesh_M,
     file << "SCALARS scale unsigned_char\n";
     file << "LOOKUP_TABLE default\n";
     for (const auto& face : mesh_M) {
-        file << static_cast<int>(face.max_vertex_scale) << "\n";
+        file << static_cast<int>(face.scale) << "\n";
     }
 
     // Write the face scale colours.
     file << "COLOR_SCALARS scale_colour 3\n";
     for (const auto& face : mesh_M) {
-        const RGB rgb = scale_colour(face.max_vertex_scale);
+        const RGB rgb = scale_colour(face.scale);
         file << rgb.r / 255.0f << " " << rgb.g / 255.0f << " " << rgb.b / 255.0f << "\n";
     }
     file << "\n";
@@ -139,7 +139,7 @@ int save_mesh_ply(const Mesh<FaceT>& mesh_M,
             file << " " << FaceT::num_vertexes * f + v;
         }
         // Write the face scale colour.
-        const RGB rgb = scale_colour(mesh_M[f].max_vertex_scale);
+        const RGB rgb = scale_colour(mesh_M[f].scale);
         file << " " << static_cast<int>(rgb.r) << " " << static_cast<int>(rgb.g) << " "
              << static_cast<int>(rgb.b) << "\n";
     }
