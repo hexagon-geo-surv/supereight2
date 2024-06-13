@@ -16,7 +16,8 @@ namespace se {
 /** Return a mesh of the octants of \p octree. Only leaf octants will be contained in the mesh if
  * \p only_leaves is true. */
 template<typename OctreeT>
-QuadMesh octree_structure_mesh(OctreeT& octree, const bool only_leaves = true);
+typename OctreeT::StructureMesh octree_structure_mesh(OctreeT& octree,
+                                                      const bool only_leaves = true);
 
 } // namespace se
 

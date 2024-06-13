@@ -69,7 +69,7 @@ TEST(MeshingTest, EqualScaleNeighbour)
 {
     auto octree_ptr = create_octree<se::Octree<se::TSDFData, se::Res::Single, 8>>();
 
-    const se::TriangleMesh mesh = se::algorithms::marching_cube(*octree_ptr);
+    const auto mesh = se::algorithms::marching_cube(*octree_ptr);
 
     ASSERT_GT(mesh.size(), 0);
 
@@ -142,7 +142,7 @@ TEST(MeshingTest, EqualScaleNeighbour2)
 {
     auto octree_ptr = create_octree_scale<se::Octree<se::TSDFData, se::Res::Multi, 8>>();
 
-    const se::TriangleMesh mesh = se::algorithms::marching_cube(*octree_ptr);
+    const auto mesh = se::algorithms::marching_cube(*octree_ptr);
     auto vertex_index_mesh = se::algorithms::dual_marching_cube_new(*octree_ptr);
 
     ASSERT_GT(mesh.size(), 0);

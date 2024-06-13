@@ -834,13 +834,15 @@ namespace algorithms {
 
 
 template<typename OctreeT, typename>
-TriangleMesh marching_cube_kernel(const OctreeT& octree,
-                                  const std::vector<const typename OctreeT::BlockType*>& block_ptrs)
+typename OctreeT::SurfaceMesh
+marching_cube_kernel(const OctreeT& octree,
+                     const std::vector<const typename OctreeT::BlockType*>& block_ptrs)
 {
     using namespace meshing;
     typedef typename OctreeT::BlockType BlockType;
+    typedef typename OctreeT::SurfaceMesh::value_type Face;
 
-    TriangleMesh mesh;
+    typename OctreeT::SurfaceMesh mesh;
     const int block_size = OctreeT::BlockType::getSize();
     const int octree_size = octree.getSize();
 
@@ -868,7 +870,7 @@ TriangleMesh marching_cube_kernel(const OctreeT& octree,
                             continue;
                         }
 
-                        Triangle temp;
+                        Face temp;
                         temp.vertexes[0] = vertex_0;
                         temp.vertexes[1] = vertex_1;
                         temp.vertexes[2] = vertex_2;
@@ -889,14 +891,15 @@ TriangleMesh marching_cube_kernel(const OctreeT& octree,
 
 
 template<typename OctreeT, typename>
-TriangleMesh
+typename OctreeT::SurfaceMesh
 dual_marching_cube_kernel(const OctreeT& octree,
                           const std::vector<const typename OctreeT::BlockType*>& block_ptrs)
 {
     using namespace meshing;
     typedef typename OctreeT::BlockType BlockType;
+    typedef typename OctreeT::SurfaceMesh::value_type Face;
 
-    TriangleMesh mesh;
+    typename OctreeT::SurfaceMesh mesh;
     const int block_size = OctreeT::BlockType::getSize();
     const int octree_size = octree.getSize();
 
@@ -948,7 +951,7 @@ dual_marching_cube_kernel(const OctreeT& octree,
                             || checkVertex(vertex_2, octree_size)) {
                             continue;
                         }
-                        Triangle temp;
+                        Face temp;
                         temp.vertexes[0] = vertex_0;
                         temp.vertexes[1] = vertex_1;
                         temp.vertexes[2] = vertex_2;
@@ -1162,7 +1165,7 @@ dual_marching_cube_new(const OctreeT& octree,
 
 
 template<typename OctreeT>
-TriangleMesh marching_cube(const OctreeT& octree)
+typename OctreeT::SurfaceMesh marching_cube(const OctreeT& octree)
 {
     TICK("marching-cube")
     typedef typename OctreeT::BlockType BlockType;
@@ -1176,7 +1179,7 @@ TriangleMesh marching_cube(const OctreeT& octree)
     }
     TOCK("marching-cube-create-block-list")
 
-    TriangleMesh mesh;
+    typename OctreeT::SurfaceMesh mesh;
     if constexpr (OctreeT::res_ == se::Res::Single) {
         mesh = se::algorithms::marching_cube_kernel(octree, block_ptrs);
     }

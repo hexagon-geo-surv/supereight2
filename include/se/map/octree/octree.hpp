@@ -11,6 +11,7 @@
 
 #include <Eigen/Geometry>
 #include <memory>
+#include <se/map/algorithms/mesh.hpp>
 
 #include "se/map/octant/octant.hpp"
 #include "se/map/octree/iterator.hpp"
@@ -40,6 +41,8 @@ class Octree {
     typedef DataT DataType;
     typedef Node<DataT, ResT> NodeType;
     typedef Block<DataT, ResT, BlockSize> BlockType;
+    typedef TriangleMesh SurfaceMesh;
+    typedef QuadMesh StructureMesh;
 
     /** Initialize an octree with an edge length of at least \p size voxels. The actual edge length
      * in voxels will be the smallest power of 2 that is greater or equal to \p size. and at least

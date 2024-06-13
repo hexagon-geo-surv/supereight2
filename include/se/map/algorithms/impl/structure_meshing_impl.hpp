@@ -12,10 +12,11 @@
 namespace se {
 
 template<typename OctreeT>
-QuadMesh octree_structure_mesh(OctreeT& octree, const bool only_leaves)
+typename OctreeT::StructureMesh octree_structure_mesh(OctreeT& octree, const bool only_leaves)
 {
-    QuadMesh mesh;
+    typedef typename OctreeT::StructureMesh::value_type Face;
 
+    typename OctreeT::StructureMesh mesh;
     for (auto octant_it = octree.begin(); octant_it != octree.end(); ++octant_it) {
         const auto octant_ptr = *octant_it;
         if (only_leaves && !octant_ptr->isLeaf()) {
@@ -47,14 +48,14 @@ QuadMesh octree_structure_mesh(OctreeT& octree, const bool only_leaves)
         node_corners[7] =
             (node_coord + Eigen::Vector3i(node_size, node_size, node_size)).cast<float>();
 
-        // The Quad::num_vertexes vertex indices to node_corners for each of the 6 faces.
-        int face_vertex_idx[6][Quad::num_vertexes] = {
+        // The Face::num_vertexes vertex indices to node_corners for each of the 6 faces.
+        int face_vertex_idx[6][Face::num_vertexes] = {
             {0, 2, 3, 1}, {1, 3, 7, 5}, {5, 7, 6, 4}, {0, 4, 6, 2}, {0, 1, 5, 4}, {2, 6, 7, 3}};
 
         // Create the octant faces.
         for (int f = 0; f < 6; ++f) {
             mesh.emplace_back();
-            for (size_t v = 0; v < Quad::num_vertexes; ++v) {
+            for (size_t v = 0; v < Face::num_vertexes; ++v) {
                 mesh.back().vertexes[v] = node_corners[face_vertex_idx[f][v]];
                 mesh.back().scale = node_scale;
             }
