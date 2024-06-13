@@ -71,6 +71,18 @@ int save_mesh_vtk(const Mesh<FaceT>& mesh_M,
     }
     file << "\n";
 
+    if constexpr (FaceT::col == Colour::On) {
+        file << "POINT_DATA " << num_vertices << "\n\n";
+        file << "COLOR_SCALARS color 3\n";
+        for (const auto& face : mesh_M) {
+            for (const auto colour : face.colour.vertexes) {
+                file << colour.r / 255.0f << " " << colour.g / 255.0f << " " << colour.b / 255.0f
+                     << "\n";
+            }
+        }
+        file << "\n";
+    }
+
     file << "CELL_DATA " << num_faces << "\n\n";
 
     // Write the face scale.
@@ -117,6 +129,11 @@ int save_mesh_ply(const Mesh<FaceT>& mesh_M,
     file << "property float x\n";
     file << "property float y\n";
     file << "property float z\n";
+    if constexpr (FaceT::col == Colour::On) {
+        file << "property uchar red\n";
+        file << "property uchar green\n";
+        file << "property uchar blue\n";
+    }
     file << "element face " << num_faces << "\n";
     file << "property list uchar int vertex_index\n";
     file << "property uchar red\n";
@@ -126,9 +143,14 @@ int save_mesh_ply(const Mesh<FaceT>& mesh_M,
 
     // Write the vertices.
     for (const auto& face : mesh_M) {
-        for (const auto& vertex_M : face.vertexes) {
-            const Eigen::Vector3f vertex_W = T_OM * vertex_M;
-            file << vertex_W.x() << " " << vertex_W.y() << " " << vertex_W.z() << "\n";
+        for (size_t v = 0; v < FaceT::num_vertexes; ++v) {
+            const Eigen::Vector3f vertex_W = T_OM * face.vertexes[v];
+            file << vertex_W.x() << " " << vertex_W.y() << " " << vertex_W.z();
+            if constexpr (FaceT::col == Colour::On) {
+                const auto colour = face.colour.vertexes[v];
+                file << " " << int(colour.r) << " " << int(colour.g) << " " << int(colour.b);
+            }
+            file << "\n";
         }
     }
 
