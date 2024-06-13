@@ -9,13 +9,25 @@
 
 namespace se {
 
-static inline TriangleMesh quad_to_triangle_mesh(const QuadMesh& quad_mesh)
+template<Colour ColB, Semantics SemB>
+TriangleMesh<ColB, SemB> quad_to_triangle_mesh(const QuadMesh<ColB, SemB>& quad_mesh)
 {
-    TriangleMesh triangle_mesh;
+    // Contains the indices of the quad vertices that should be used for the vertices of each of the
+    // two resulting triangles.
+    static constexpr std::array<std::array<int, 3>, 2> tri_to_quad = {{{0, 1, 2}, {0, 2, 3}}};
+    TriangleMesh<ColB, SemB> triangle_mesh;
     triangle_mesh.reserve(2 * quad_mesh.size());
-    for (const auto& f : quad_mesh) {
-        triangle_mesh.push_back({{f.vertexes[0], f.vertexes[1], f.vertexes[2]}, f.scale});
-        triangle_mesh.push_back({{f.vertexes[0], f.vertexes[2], f.vertexes[3]}, f.scale});
+    for (const auto& quad : quad_mesh) {
+        for (const auto& indices : tri_to_quad) {
+            auto& triangle = triangle_mesh.emplace_back();
+            triangle.scale = quad.scale;
+            for (size_t i = 0; i < indices.size(); i++) {
+                triangle.vertexes[i] = quad.vertexes[indices[i]];
+                if constexpr (ColB == Colour::On) {
+                    triangle.colour.vertexes[i] = quad.colour.vertexes[indices[i]];
+                }
+            }
+        }
     }
     return triangle_mesh;
 }

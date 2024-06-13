@@ -15,19 +15,43 @@
 #include <cstdint>
 #include <optional>
 #include <se/common/rgb.hpp>
+#include <se/map/utils/setup_util.hpp>
 #include <vector>
 
 namespace se {
 
+template<size_t NumVertexes, Colour ColB>
+struct MeshFaceColourData {
+};
+
 template<size_t NumVertexes>
+struct MeshFaceColourData<NumVertexes, Colour::On> {
+    std::array<RGB, NumVertexes> vertexes;
+};
+
+
+
+template<size_t NumVertexes, Semantics SemB>
+struct MeshFaceSemanticData {
+};
+
+
+
+template<size_t NumVertexes, Colour ColB = Colour::Off, Semantics SemB = Semantics::Off>
 struct MeshFace {
     std::array<Eigen::Vector3f, NumVertexes> vertexes;
+    MeshFaceColourData<NumVertexes, ColB> colour;
+    MeshFaceSemanticData<NumVertexes, SemB> semantic;
     std::int8_t scale = 0;
 
     static constexpr size_t num_vertexes = NumVertexes;
+    static constexpr Colour col = ColB;
+    static constexpr Semantics sem = SemB;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
+
+
 
 /** \brief Meshes are represented as lists of faces.
  *
@@ -38,16 +62,23 @@ struct MeshFace {
 template<typename FaceT>
 using Mesh = std::vector<FaceT>;
 
-typedef MeshFace<3> Triangle;
-typedef Mesh<Triangle> TriangleMesh;
+template<Colour ColB = Colour::Off, Semantics SemB = Semantics::Off>
+using Triangle = MeshFace<3, ColB, SemB>;
 
-typedef MeshFace<4> Quad;
-typedef Mesh<Quad> QuadMesh;
+template<Colour ColB = Colour::Off, Semantics SemB = Semantics::Off>
+using TriangleMesh = Mesh<Triangle<ColB, SemB>>;
+
+template<Colour ColB = Colour::Off, Semantics SemB = Semantics::Off>
+using Quad = MeshFace<4, ColB, SemB>;
+
+template<Colour ColB = Colour::Off, Semantics SemB = Semantics::Off>
+using QuadMesh = Mesh<Quad<ColB, SemB>>;
 
 
 
 /** Return a triangle mesh containig two triangles for each face of \p quad_mesh. */
-static inline TriangleMesh quad_to_triangle_mesh(const QuadMesh& quad_mesh);
+template<Colour ColB, Semantics SemB>
+TriangleMesh<ColB, SemB> quad_to_triangle_mesh(const QuadMesh<ColB, SemB>& quad_mesh);
 
 namespace meshing {
 
