@@ -874,6 +874,15 @@ marching_cube_kernel(const OctreeT& octree,
                         temp.vertexes[0] = vertex_0;
                         temp.vertexes[1] = vertex_1;
                         temp.vertexes[2] = vertex_2;
+                        if constexpr (Face::col == Colour::On) {
+                            for (size_t v = 0; v < Face::num_vertexes; v++) {
+                                const auto colour =
+                                    visitor::getColourInterp(octree, temp.vertexes[v]);
+                                if (colour) {
+                                    temp.colour.vertexes[v] = *colour;
+                                }
+                            }
+                        }
 #pragma omp critical
                         {
                             mesh.push_back(temp);
@@ -956,6 +965,15 @@ dual_marching_cube_kernel(const OctreeT& octree,
                         temp.vertexes[1] = vertex_1;
                         temp.vertexes[2] = vertex_2;
                         temp.scale = voxel_scale;
+                        if constexpr (Face::col == Colour::On) {
+                            for (size_t v = 0; v < Face::num_vertexes; v++) {
+                                const auto colour =
+                                    visitor::getColourInterp(octree, temp.vertexes[v], voxel_scale);
+                                if (colour) {
+                                    temp.colour.vertexes[v] = *colour;
+                                }
+                            }
+                        }
 #pragma omp critical
                         {
                             mesh.push_back(temp);
