@@ -43,6 +43,8 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
     typedef Data<FldT, ColB, SemB> DataType;
     typedef typename Data<FldT, ColB, SemB>::Config DataConfigType;
     typedef se::Octree<DataType, ResT, BlockSize> OctreeType;
+    typedef typename OctreeType::SurfaceMesh SurfaceMesh;
+    typedef typename OctreeType::StructureMesh StructureMesh;
 
     struct Config {
         /** The dimensions of the map in metres.

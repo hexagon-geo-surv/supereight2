@@ -454,7 +454,7 @@ template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveStructure(const std::string& filename,
                                                                 const Eigen::Isometry3f& T_WM) const
 {
-    const QuadMesh mesh = octree_structure_mesh(octree_);
+    const StructureMesh mesh = octree_structure_mesh(octree_);
     return io::save_mesh(mesh, filename, T_WM);
 }
 
@@ -464,7 +464,7 @@ template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMesh(const std::string& filename,
                                                            const Eigen::Isometry3f& T_OW) const
 {
-    const TriangleMesh mesh = algorithms::marching_cube(octree_);
+    const SurfaceMesh mesh = algorithms::marching_cube(octree_);
     const Eigen::Affine3f T_OM = T_OW * T_WM_ * Eigen::Scaling(resolution_);
     return io::save_mesh(mesh, filename, T_OM);
 }
@@ -474,7 +474,7 @@ int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMesh(const std::string& fi
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMeshVoxel(const std::string& filename) const
 {
-    const TriangleMesh mesh = algorithms::marching_cube(octree_);
+    const SurfaceMesh mesh = algorithms::marching_cube(octree_);
     return io::save_mesh(mesh, filename);
 }
 
