@@ -59,6 +59,12 @@ void clamp(Eigen::MatrixBase<T>& x,
     x = x.array().max(low.array()).min(high.array()).matrix();
 }
 
+template<typename T, typename U, typename V>
+void clamp(Eigen::ArrayBase<T>& x, const Eigen::ArrayBase<U>& low, const Eigen::ArrayBase<V>& high)
+{
+    x = x.max(low).min(high);
+}
+
 } // namespace eigen
 } // namespace se
 

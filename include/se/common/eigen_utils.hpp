@@ -37,6 +37,10 @@ void clamp(Eigen::MatrixBase<T>& x,
            const Eigen::MatrixBase<U>& low,
            const Eigen::MatrixBase<V>& high);
 
+/** \overload */
+template<typename T, typename U, typename V>
+void clamp(Eigen::ArrayBase<T>& x, const Eigen::ArrayBase<U>& low, const Eigen::ArrayBase<V>& high);
+
 } // namespace eigen
 } // namespace se
 
