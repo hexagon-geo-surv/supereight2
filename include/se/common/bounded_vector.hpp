@@ -51,7 +51,9 @@ class ArrayAllocator {
     template<typename U, std::size_t M>
     bool operator==(const ArrayAllocator<U, M>& rhs)
     {
-        return std::is_same_v<T, U> && N == M && data_ == rhs.data_;
+        // Each instance of ArrayAllocator can only deallocate objects that were allocated by
+        // itself so it should compare equal only with itself.
+        return this == &rhs;
     }
 
     template<typename U, std::size_t M>
