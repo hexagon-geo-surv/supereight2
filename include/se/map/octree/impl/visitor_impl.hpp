@@ -70,6 +70,14 @@ bool get_neighbours(const OctreeT& octree,
                     typename OctreeT::DataType neighbour_data[8])
 {
     unsigned int stride = 1;
+
+    // Check for bounds
+    const Eigen::Array3i upper_bounds(base_coord + Eigen::Vector3i::Constant(stride));
+    const Eigen::Array3i lower_bounds(base_coord);
+    if ((upper_bounds >= octree.getSize()).any() || (lower_bounds < 0).any()) {
+        return false;
+    }
+
     unsigned int block_size = OctreeT::BlockType::getSize();
     unsigned int crossmask = (((base_coord.x() & (block_size - 1)) == block_size - stride) << 2)
         | (((base_coord.y() & (block_size - 1)) == block_size - stride) << 1)
@@ -394,6 +402,14 @@ bool get_neighbours(const OctreeT& octree,
                     typename OctreeT::DataType neighbour_data[8])
 {
     const int stride = 1 << scale; // Multi-res
+
+    // Check for bounds
+    const Eigen::Array3i upper_bounds(base_coord + Eigen::Vector3i::Constant(stride));
+    const Eigen::Array3i lower_bounds(base_coord);
+    if ((upper_bounds >= octree.getSize()).any() || (lower_bounds < 0).any()) {
+        return false;
+    }
+
     const OctantBase* base_octant_ptr =
         fetcher::template leaf<OctreeT>(base_coord, octree.getRoot());
     if (!base_octant_ptr) {
