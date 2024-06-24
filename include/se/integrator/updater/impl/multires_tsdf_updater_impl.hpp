@@ -112,7 +112,7 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Upd
                             assert(interp_colour_value);
                             child_data_union.data.colour.colour = *interp_colour_value;
                             child_data_union.data.colour.weight =
-                                parent_data_union.data.field.weight;
+                                parent_data_union.data.colour.weight;
                             child_data_union.past_data.colour.colour =
                                 child_data_union.data.colour.colour;
                             child_data_union.past_data.colour.weight = 0;
