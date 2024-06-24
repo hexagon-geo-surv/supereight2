@@ -15,8 +15,10 @@ namespace se {
 
 namespace detail {
 
-// An allocator using a static array of N elements of type T. It's not expected to work correctly
-// for any container other than std::vector.
+/** An allocator using a static array of \p N elements of type \p T.
+ *
+ * \warning It's not expected to work correctly for any container other than std::vector.
+ */
 template<typename T, std::size_t N>
 class ArrayAllocator {
     static_assert(math::is_power_of_two(N), "std::vector typically allocates powers of 2");
@@ -46,6 +48,7 @@ class ArrayAllocator {
 
     void deallocate(T*, std::size_t)
     {
+        // Nothing to do on deallocation.
     }
 
     template<typename U, std::size_t M>
