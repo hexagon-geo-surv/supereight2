@@ -43,9 +43,9 @@ int main(int argc, char** argv)
         const Eigen::Vector2i processed_img_res =
             input_img_res / config.app.sensor_downsampling_factor;
         se::Image<float> processed_depth_img(processed_img_res.x(), processed_img_res.y());
-        se::Image<se::RGB> processed_colour_img(processed_img_res.x(), processed_img_res.y());
 
         // Setup output images / renders
+        se::Image<se::RGB> downsampled_colour_img(processed_img_res.x(), processed_img_res.y());
         se::Image<se::RGBA> output_colour_img(processed_img_res.x(), processed_img_res.y());
         se::Image<se::RGBA> output_depth_img(processed_img_res.x(), processed_img_res.y());
         se::Image<se::RGBA> output_tracking_img(processed_img_res.x(), processed_img_res.y());
@@ -63,6 +63,7 @@ int main(int argc, char** argv)
         // Create a pinhole camera and downsample the intrinsics
         // Supported sensor models {se::PinholeCamera, se::OusterLidar}
         const se::PinholeCamera sensor(config.sensor, config.app.sensor_downsampling_factor);
+        const se::PinholeCamera colour_sensor(config.sensor);
 
         // ========= READER INITIALIZATION  =========
         std::unique_ptr<se::Reader> reader(se::create_reader(config.reader));
@@ -118,9 +119,6 @@ int main(int argc, char** argv)
             const se::Image<size_t> downsample_map =
                 se::preprocessor::downsample_depth(input_depth_img, processed_depth_img);
             TOCK("ds-depth")
-            TICK("ds-colour")
-            se::image::remap(input_colour_img, processed_colour_img, downsample_map);
-            TOCK("ds-colour")
 
             // Track pose (if enabled)
             // Initial pose (frame == 0) is initialised with the identity matrix
@@ -140,7 +138,7 @@ int main(int argc, char** argv)
                         frame,
                         se::Measurements{
                             se::Measurement{processed_depth_img, sensor, T_WS},
-                            se::Measurement{processed_colour_img, sensor, T_WS * T_SSc}});
+                            se::Measurement{input_colour_img, colour_sensor, T_WS * T_SSc}});
                 }
                 else {
                     integrator.integrateDepth(
@@ -167,7 +165,8 @@ int main(int argc, char** argv)
             // The volume is only rendered at the set rendering rate
             TICK("render")
             if (config.app.enable_rendering) {
-                se::image::rgb_to_rgba(processed_colour_img, output_colour_img);
+                se::image::remap(input_colour_img, downsampled_colour_img, downsample_map);
+                se::image::rgb_to_rgba(downsampled_colour_img, output_colour_img);
                 convert_to_output_depth_img(processed_depth_img,
                                             sensor.near_plane,
                                             sensor.far_plane,
