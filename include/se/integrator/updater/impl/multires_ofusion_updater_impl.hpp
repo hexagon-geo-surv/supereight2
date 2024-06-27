@@ -24,6 +24,7 @@ Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
         octree_(map.getOctree()),
         sensor_(measurements.depth.sensor),
         depth_img_(measurements.depth.image),
+        sigma_img_(measurements.depth_sigma),
         T_CW_(measurements.depth.T_WC.inverse()),
         colour_sensor_(measurements.colour ? &measurements.colour->sensor : nullptr),
         colour_img_(measurements.colour ? &measurements.colour->image : nullptr),
@@ -33,6 +34,7 @@ Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
         config_(map),
         node_set_(octree_.getBlockDepth())
 {
+    assert(sigma_img_);
     if constexpr (ColB == Colour::On) {
         if (has_colour_) {
             T_CcC_ = measurements.colour->T_WC.inverse() * measurements.depth.T_WC;
@@ -334,11 +336,9 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
     // Convert block centre to measurement >> PinholeCamera -> .z() | OusterLidar -> .norm()
     const float block_point_C_m = sensor_.measurementFromPoint(block_centre_point_C);
 
-    // Compute one tau and 3x sigma value for the block
+    // Compute the surface thickness value (tau) for the block.
     float tau =
         compute_tau(block_point_C_m, config_.tau_min, config_.tau_max, map_.getDataConfig());
-    float three_sigma = compute_three_sigma(
-        block_point_C_m, config_.sigma_min, config_.sigma_max, map_.getDataConfig());
 
     // Compute the integration scale
     // The last integration scale
@@ -465,6 +465,8 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                     if (depth_value < sensor_.near_plane) {
                         continue;
                     }
+                    const float three_sigma =
+                        3.0f * (*sigma_img_)(depth_pixel.x(), depth_pixel.y());
 
                     const int buffer_idx =
                         x + y * size_at_recommended_scale_li + z * size_at_recommended_scale_sq;
@@ -565,6 +567,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                 if (depth_value < sensor_.near_plane) {
                     continue;
                 }
+                const float three_sigma = 3.0f * (*sigma_img_)(depth_pixel.x(), depth_pixel.y());
 
                 // Update the voxel data based using the depth measurement
                 const int voxel_idx =

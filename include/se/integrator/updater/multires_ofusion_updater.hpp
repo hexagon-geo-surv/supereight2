@@ -90,6 +90,7 @@ class Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Se
     OctreeType& octree_;
     const SensorT& sensor_;
     const Image<float>& depth_img_;
+    const Image<float>* const sigma_img_;
     const Eigen::Isometry3f T_CW_;
     const SensorT* const colour_sensor_;
     const Image<colour_t>* const colour_img_;

@@ -89,15 +89,17 @@ class VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
     /**
      * \brief Setup the volume carver.
      *
-     * \param[in]  map                  The reference to the map to be updated.
-     * \param[in]  sensor               The sensor model.
-     * \param[in]  depth_img            The depth image to be integrated.
-     * \param[in]  T_WS                 The transformation from sensor to world frame.
-     * \param[in]  timestamp            The timestamp of the frame to be integrated. Currently unused.
+     * \param[in]  map                The reference to the map to be updated.
+     * \param[in]  sensor             The sensor model.
+     * \param[in]  depth_img          The depth image to be integrated.
+     * \param[in]  depth_sigma_img    The uncertainty (standard deviation) image of depth_img
+     * \param[in]  T_WS               The transformation from sensor to world frame.
+     * \param[in]  timestamp          The timestamp of the frame to be integrated. Currently unused.
      */
     VolumeCarver(MapType& map,
                  const SensorT& sensor,
                  const se::Image<float>& depth_img,
+                 const se::Image<float>& depth_sigma_img,
                  const Eigen::Isometry3f& T_WS,
                  const timestamp_t timestamp);
 
@@ -141,13 +143,15 @@ class VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
      * \param[in] depth_value_max Depth measurement min value inside voxel.
      * \param[in] node_dist_min_m Minimum node distance along z-axis in meter.
      * \param[in] node_dist_max_m Maximum node distance along z-axis in meter.
+     * \param[in] std_dev_max     Maximum standard deviation of a measurement.
      *
      * \return Estimate of the variance
      */
     se::VarianceState computeVariance(const float depth_value_min,
                                       const float depth_value_max,
                                       const float node_dist_min_m,
-                                      const float node_dist_max_m);
+                                      const float node_dist_max_m,
+                                      const float std_dev_max);
 
     /**
      * \brief Recursively decide if to allocate or terminate a node.
@@ -189,6 +193,12 @@ class VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
     OctreeType& octree_;
     const SensorT& sensor_;
     const se::DensePoolingImage<SensorT> depth_pooling_img_;
+    // XXX: the sigma pooling image isn't strictly necessary, we only need the sigma corresponding
+    // to the maximum depth at each depth pooling image lookup. Find a way to avoid it or combine
+    // both pooling images into one. One way to avoid it would be to also store the pixel
+    // coordinates corresponding to se::Pixel::min and se::Pixel::max in se::Pixel. Then, getting
+    // the sigma corresponding to the maximum depth would be just an image lookup.
+    const se::DensePoolingImage<SensorT> sigma_pooling_img_;
     const Eigen::Isometry3f T_SW_;
     const float map_res_;
     VolumeCarverConfig config_;

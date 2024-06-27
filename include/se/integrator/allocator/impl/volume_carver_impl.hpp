@@ -19,12 +19,14 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
              SensorT>::VolumeCarver(MapType& map,
                                     const SensorT& sensor,
                                     const se::Image<float>& depth_img,
+                                    const se::Image<float>& depth_sigma_img,
                                     const Eigen::Isometry3f& T_WS,
                                     const timestamp_t /* timestamp */) :
         map_(map),
         octree_(map.getOctree()),
         sensor_(sensor),
         depth_pooling_img_(depth_img),
+        sigma_pooling_img_(depth_sigma_img),
         T_SW_(T_WS.inverse()),
         map_res_(map.getRes()),
         config_(map),
@@ -103,7 +105,8 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
              SensorT>::computeVariance(const float depth_value_min,
                                        const float depth_value_max,
                                        const float node_dist_min_m,
-                                       const float node_dist_max_m)
+                                       const float node_dist_max_m,
+                                       const float std_dev_max)
 {
     assert(depth_value_min <= depth_value_max);
     assert(node_dist_min_m <= node_dist_max_m);
@@ -113,8 +116,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
 
     const float tau_max =
         compute_tau(depth_value_max, config_.tau_min, config_.tau_max, map_.getDataConfig());
-    const float three_sigma_min = compute_three_sigma(
-        depth_value_max, config_.sigma_min, config_.sigma_max, map_.getDataConfig());
+    const float three_sigma_min = 3.0f * std_dev_max;
 
     if (z_diff_min > 1.25 * tau_max) { // behind of surface
         return se::VarianceState::Undefined;
@@ -240,8 +242,13 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
                 return;
             }
 
-            variance_state = computeVariance(
-                pooling_pixel.min, pooling_pixel.max, node_dist_min_m, node_dist_max_m);
+            const se::Pixel sigma_pix =
+                sigma_pooling_img_.conservativeQuery(img_bb_min, img_bb_max);
+            variance_state = computeVariance(pooling_pixel.min,
+                                             pooling_pixel.max,
+                                             node_dist_min_m,
+                                             node_dist_max_m,
+                                             sigma_pix.max);
 
             /// CASE 1 (REDUNDANT DATA): Depth values in the bounding box are far away from the node or unknown (1).
             ///                          The node to be evaluated is free (2) and fully observed (3),
@@ -436,10 +443,13 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
                 return;
             }
 
+            const se::Pixel sigma_pix =
+                sigma_pooling_img_.conservativeQuery(img_bb_min, img_bb_max);
             variance_state = computeVariance(pooling_pixel.min,
                                              pooling_pixel.max,
                                              approx_depth_value_min,
-                                             approx_depth_value_max);
+                                             approx_depth_value_max,
+                                             sigma_pix.max);
 
             /// CASE 1 (REDUNDANT DATA): Depth values in the bounding box are far away from the node or unknown (1).
             ///                          The node to be evaluated is free (2) and fully observed (3)

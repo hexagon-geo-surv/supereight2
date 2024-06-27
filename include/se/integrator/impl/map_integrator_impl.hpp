@@ -110,17 +110,30 @@ struct IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi> {
     template<typename SensorT, typename MapT>
     static void integrate(MapT& map,
                           const timestamp_t timestamp,
-                          const Measurements<SensorT>& measurements,
+                          const Measurements<SensorT>& measurements_,
                           std::vector<const OctantBase*>* updated_octants)
     {
-        assert(measurements.depth.sensor.model.imageWidth() == measurements.depth.image.width());
-        assert(measurements.depth.sensor.model.imageHeight() == measurements.depth.image.height());
+        // Create a (shallow) copy of the measurements to generate a depth sigma image if needed.
+        // The std::optional allows skipping the Image<float> initialization if it's not needed.
+        Measurements<SensorT> measurements = measurements_;
+        std::optional<Image<float>> depth_sigma;
+        if (!measurements.depth_sigma) {
+            depth_sigma = uncert::depth_sigma(
+                measurements.depth.image, map.getRes(), map.getDataConfig().field);
+            measurements.depth_sigma = &depth_sigma.value();
+        }
+        assert(measurements.depth_sigma);
+        assert(measurements.depth.image.width() == measurements.depth.sensor.model.imageWidth());
+        assert(measurements.depth.image.height() == measurements.depth.sensor.model.imageHeight());
+        assert(measurements.depth.image.width() == measurements.depth_sigma->width());
+        assert(measurements.depth.image.height() == measurements.depth_sigma->height());
         // Allocation
         TICK("allocation")
         VolumeCarver<MapT, SensorT> volume_carver(
             map,
             measurements.depth.sensor,
             measurements.depth.image,
+            *measurements.depth_sigma,
             measurements.depth.T_WC,
             timestamp); //< process based on variance state and project inside
         se::VolumeCarverAllocation allocation_list = volume_carver();

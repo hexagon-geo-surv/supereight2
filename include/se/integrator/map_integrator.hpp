@@ -16,6 +16,7 @@
 #include "se/integrator/allocator/raycast_carver.hpp"
 #include "se/integrator/allocator/volume_carver.hpp"
 #include "se/integrator/ray_integrator.hpp"
+#include "se/integrator/uncertainty.hpp"
 #include "se/integrator/updater/updater.hpp"
 #include "se/map/octree/fetcher.hpp"
 #include "se/map/octree/integrator.hpp"
