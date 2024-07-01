@@ -16,8 +16,8 @@ static inline Eigen::Vector3f sample_offset_frac = Eigen::Vector3f::Constant(0.5
 
 // Representation enums
 enum class Field { TSDF, Occupancy };
-enum class Colour { On = true, Off = false };
-enum class Semantics { On = true, Off = false };
+enum class Colour { Off, On };
+enum class Semantics { Off, On };
 
 // Other enums
 enum class Res { Single, Multi };
