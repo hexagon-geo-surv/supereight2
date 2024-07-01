@@ -838,7 +838,6 @@ typename OctreeT::SurfaceMesh
 marching_cube_kernel(const OctreeT& octree,
                      const std::vector<const typename OctreeT::BlockType*>& block_ptrs)
 {
-    typedef typename OctreeT::BlockType BlockType;
     typedef typename OctreeT::SurfaceMesh::value_type Face;
 
     typename OctreeT::SurfaceMesh mesh;
@@ -847,7 +846,7 @@ marching_cube_kernel(const OctreeT& octree,
 
 #pragma omp parallel for
     for (size_t block_idx = 0; block_idx < block_ptrs.size(); block_idx++) {
-        const BlockType* block_ptr = block_ptrs[block_idx];
+        const typename OctreeT::BlockType* block_ptr = block_ptrs[block_idx];
 
         const Eigen::Vector3i& start_coord = block_ptr->coord;
         const Eigen::Vector3i last_coord =
@@ -906,7 +905,6 @@ typename OctreeT::SurfaceMesh
 dual_marching_cube_kernel(const OctreeT& octree,
                           const std::vector<const typename OctreeT::BlockType*>& block_ptrs)
 {
-    typedef typename OctreeT::BlockType BlockType;
     typedef typename OctreeT::SurfaceMesh::value_type Face;
 
     typename OctreeT::SurfaceMesh mesh;
@@ -915,7 +913,7 @@ dual_marching_cube_kernel(const OctreeT& octree,
 
 #pragma omp parallel for
     for (size_t block_idx = 0; block_idx < block_ptrs.size(); block_idx++) {
-        const BlockType* block_ptr = block_ptrs[block_idx];
+        const typename OctreeT::BlockType* block_ptr = block_ptrs[block_idx];
         const int voxel_scale = block_ptr->getCurrentScale();
         const int voxel_stride = 1 << voxel_scale;
         const Eigen::Vector3i& start_coord = block_ptr->coord;
@@ -1030,15 +1028,13 @@ std::vector<meshing::VertexIndexMesh<3>>
 dual_marching_cube_kernel_new(const OctreeT& octree,
                               const std::vector<const typename OctreeT::BlockType*>& block_ptrs)
 {
-    typedef typename OctreeT::BlockType BlockType;
-
     const int block_size = OctreeT::BlockType::getSize();
     const int octree_size = octree.getSize();
     std::vector<meshing::VertexIndexMesh<3>> block_meshes;
 
 #pragma omp parallel for
     for (size_t block_idx = 0; block_idx < block_ptrs.size(); block_idx++) {
-        const BlockType* block_ptr = block_ptrs[block_idx];
+        const typename OctreeT::BlockType* block_ptr = block_ptrs[block_idx];
         const int voxel_scale = block_ptr->getCurrentScale();
         const int voxel_stride = 1 << voxel_scale;
         const Eigen::Vector3i& start_coord = block_ptr->coord;
