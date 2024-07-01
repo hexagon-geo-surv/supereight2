@@ -289,4 +289,17 @@ constexpr int triTable[256][16] = {
     {0, 3, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
     {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}};
 
+// Ensure all rows of triTable contain the correct sentinel value so that iteration in marching
+// cubes stops correctly.
+static_assert(
+    []() {
+        for (int i = 0; i < 256; i++) {
+            if (triTable[i][15] != -1) {
+                return false;
+            }
+        }
+        return true;
+    }(),
+    "The last element of each row of triTable must be -1.");
+
 #endif // SE_EDGE_TABLES_HPP
