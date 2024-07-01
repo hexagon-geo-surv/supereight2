@@ -838,7 +838,6 @@ typename OctreeT::SurfaceMesh
 marching_cube_kernel(const OctreeT& octree,
                      const std::vector<const typename OctreeT::BlockType*>& block_ptrs)
 {
-    using namespace meshing;
     typedef typename OctreeT::BlockType BlockType;
     typedef typename OctreeT::SurfaceMesh::value_type Face;
 
@@ -857,16 +856,20 @@ marching_cube_kernel(const OctreeT& octree,
         for (int x = start_coord.x(); x < last_coord.x(); x++) {
             for (int y = start_coord.y(); y < last_coord.y(); y++) {
                 for (int z = start_coord.z(); z < last_coord.z(); z++) {
-                    const uint8_t edge_pattern_idx =
-                        meshing::compute_index(octree, block_ptr, x, y, z, isosurface::occupied);
+                    const uint8_t edge_pattern_idx = meshing::compute_index(
+                        octree, block_ptr, x, y, z, meshing::isosurface::occupied);
                     const int* edges = triTable[edge_pattern_idx];
                     for (unsigned int e = 0; edges[e] != -1 && e < 16; e += 3) {
-                        Eigen::Vector3f vertex_0 = interp_vertexes(octree, x, y, z, edges[e]);
-                        Eigen::Vector3f vertex_1 = interp_vertexes(octree, x, y, z, edges[e + 1]);
-                        Eigen::Vector3f vertex_2 = interp_vertexes(octree, x, y, z, edges[e + 2]);
+                        Eigen::Vector3f vertex_0 =
+                            meshing::interp_vertexes(octree, x, y, z, edges[e]);
+                        Eigen::Vector3f vertex_1 =
+                            meshing::interp_vertexes(octree, x, y, z, edges[e + 1]);
+                        Eigen::Vector3f vertex_2 =
+                            meshing::interp_vertexes(octree, x, y, z, edges[e + 2]);
 
-                        if (checkVertex(vertex_0, octree_size) || checkVertex(vertex_1, octree_size)
-                            || checkVertex(vertex_2, octree_size)) {
+                        if (meshing::checkVertex(vertex_0, octree_size)
+                            || meshing::checkVertex(vertex_1, octree_size)
+                            || meshing::checkVertex(vertex_2, octree_size)) {
                             continue;
                         }
 
@@ -905,7 +908,6 @@ typename OctreeT::SurfaceMesh
 dual_marching_cube_kernel(const OctreeT& octree,
                           const std::vector<const typename OctreeT::BlockType*>& block_ptrs)
 {
-    using namespace meshing;
     typedef typename OctreeT::BlockType BlockType;
     typedef typename OctreeT::SurfaceMesh::value_type Face;
 
@@ -947,18 +949,19 @@ dual_marching_cube_kernel(const OctreeT& octree,
                                                 data,
                                                 dual_corner_coords_f,
                                                 dual_corner_coords_i,
-                                                isosurface::occupied);
+                                                meshing::isosurface::occupied);
                     const int* edges = triTable[edge_pattern_idx];
                     for (unsigned int e = 0; edges[e] != -1 && e < 16; e += 3) {
                         Eigen::Vector3f vertex_0 =
-                            interp_dual_vertexes(edges[e], data, dual_corner_coords_f);
+                            meshing::interp_dual_vertexes(edges[e], data, dual_corner_coords_f);
                         Eigen::Vector3f vertex_1 =
-                            interp_dual_vertexes(edges[e + 1], data, dual_corner_coords_f);
+                            meshing::interp_dual_vertexes(edges[e + 1], data, dual_corner_coords_f);
                         Eigen::Vector3f vertex_2 =
-                            interp_dual_vertexes(edges[e + 2], data, dual_corner_coords_f);
+                            meshing::interp_dual_vertexes(edges[e + 2], data, dual_corner_coords_f);
 
-                        if (checkVertex(vertex_0, octree_size) || checkVertex(vertex_1, octree_size)
-                            || checkVertex(vertex_2, octree_size)) {
+                        if (meshing::checkVertex(vertex_0, octree_size)
+                            || meshing::checkVertex(vertex_1, octree_size)
+                            || meshing::checkVertex(vertex_2, octree_size)) {
                             continue;
                         }
                         Face temp;
@@ -1031,7 +1034,6 @@ std::vector<meshing::VertexIndexMesh<3>>
 dual_marching_cube_kernel_new(const OctreeT& octree,
                               const std::vector<const typename OctreeT::BlockType*>& block_ptrs)
 {
-    using namespace meshing;
     typedef typename OctreeT::BlockType BlockType;
 
     const int block_size = OctreeT::BlockType::getSize();
@@ -1078,22 +1080,22 @@ dual_marching_cube_kernel_new(const OctreeT& octree,
                                                 data,
                                                 dual_corner_coords_f,
                                                 dual_corner_coords_i,
-                                                isosurface::occupied);
+                                                meshing::isosurface::occupied);
                     const int* edges = triTable[edge_pattern_idx];
                     for (unsigned int e = 0; edges[e] != -1 && e < 16; e += 3) {
-                        const auto corner_indices_0 = edge_to_corner_indices(edges[e]);
+                        const auto corner_indices_0 = meshing::edge_to_corner_indices(edges[e]);
                         const auto edge_id_0 =
                             unique_edge_id(dual_corner_coords_i[corner_indices_0.first],
                                            dual_corner_coords_i[corner_indices_0.second]);
                         auto it_0 = edge_vertex_map.find(edge_id_0);
 
-                        const auto corner_indices_1 = edge_to_corner_indices(edges[e + 1]);
+                        const auto corner_indices_1 = meshing::edge_to_corner_indices(edges[e + 1]);
                         const auto edge_id_1 =
                             unique_edge_id(dual_corner_coords_i[corner_indices_1.first],
                                            dual_corner_coords_i[corner_indices_1.second]);
                         auto it_1 = edge_vertex_map.find(edge_id_1);
 
-                        const auto corner_indices_2 = edge_to_corner_indices(edges[e + 2]);
+                        const auto corner_indices_2 = meshing::edge_to_corner_indices(edges[e + 2]);
                         const auto edge_id_2 =
                             unique_edge_id(dual_corner_coords_i[corner_indices_2.first],
                                            dual_corner_coords_i[corner_indices_2.second]);
@@ -1101,32 +1103,32 @@ dual_marching_cube_kernel_new(const OctreeT& octree,
 
 
                         if (it_0 == edge_vertex_map.end()) {
-                            vertex_0 = compute_dual_intersection(
+                            vertex_0 = meshing::compute_dual_intersection(
                                 data[corner_indices_0.first],
                                 data[corner_indices_0.second],
                                 dual_corner_coords_f[corner_indices_0.first],
                                 dual_corner_coords_f[corner_indices_0.second]);
-                            if (checkVertex(vertex_0, octree_size)) {
+                            if (meshing::checkVertex(vertex_0, octree_size)) {
                                 continue;
                             }
                         }
                         if (it_1 == edge_vertex_map.end()) {
-                            vertex_1 = compute_dual_intersection(
+                            vertex_1 = meshing::compute_dual_intersection(
                                 data[corner_indices_1.first],
                                 data[corner_indices_1.second],
                                 dual_corner_coords_f[corner_indices_1.first],
                                 dual_corner_coords_f[corner_indices_1.second]);
-                            if (checkVertex(vertex_1, octree_size)) {
+                            if (meshing::checkVertex(vertex_1, octree_size)) {
                                 continue;
                             }
                         }
                         if (it_2 == edge_vertex_map.end()) {
-                            vertex_2 = compute_dual_intersection(
+                            vertex_2 = meshing::compute_dual_intersection(
                                 data[corner_indices_2.first],
                                 data[corner_indices_2.second],
                                 dual_corner_coords_f[corner_indices_2.first],
                                 dual_corner_coords_f[corner_indices_2.second]);
-                            if (checkVertex(vertex_2, octree_size)) {
+                            if (meshing::checkVertex(vertex_2, octree_size)) {
                                 continue;
                             }
                         }
