@@ -846,7 +846,7 @@ marching_cube_kernel(const OctreeT& octree,
 
 #pragma omp parallel for
     for (size_t block_idx = 0; block_idx < block_ptrs.size(); block_idx++) {
-        const typename OctreeT::BlockType* block_ptr = block_ptrs[block_idx];
+        const typename OctreeT::BlockType* const block_ptr = block_ptrs[block_idx];
 
         const Eigen::Vector3i& start_coord = block_ptr->coord;
         const Eigen::Vector3i last_coord =
@@ -857,7 +857,7 @@ marching_cube_kernel(const OctreeT& octree,
                 for (int z = start_coord.z(); z < last_coord.z(); z++) {
                     const uint8_t edge_pattern_idx = meshing::compute_index(
                         octree, block_ptr, x, y, z, meshing::isosurface::occupied);
-                    const int* edges = triTable[edge_pattern_idx];
+                    const int* const edges = triTable[edge_pattern_idx];
                     for (int e = 0; edges[e] != -1; e += 3) {
                         Eigen::Vector3f vertex_0 =
                             meshing::interp_vertexes(octree, x, y, z, edges[e]);
@@ -913,7 +913,7 @@ dual_marching_cube_kernel(const OctreeT& octree,
 
 #pragma omp parallel for
     for (size_t block_idx = 0; block_idx < block_ptrs.size(); block_idx++) {
-        const typename OctreeT::BlockType* block_ptr = block_ptrs[block_idx];
+        const typename OctreeT::BlockType* const block_ptr = block_ptrs[block_idx];
         const int voxel_scale = block_ptr->getCurrentScale();
         const int voxel_stride = 1 << voxel_scale;
         const Eigen::Vector3i& start_coord = block_ptr->coord;
@@ -946,7 +946,7 @@ dual_marching_cube_kernel(const OctreeT& octree,
                                                 dual_corner_coords_f,
                                                 dual_corner_coords_i,
                                                 meshing::isosurface::occupied);
-                    const int* edges = triTable[edge_pattern_idx];
+                    const int* const edges = triTable[edge_pattern_idx];
                     for (int e = 0; edges[e] != -1; e += 3) {
                         Eigen::Vector3f vertex_0 =
                             meshing::interp_dual_vertexes(edges[e], data, dual_corner_coords_f);
@@ -1034,7 +1034,7 @@ dual_marching_cube_kernel_new(const OctreeT& octree,
 
 #pragma omp parallel for
     for (size_t block_idx = 0; block_idx < block_ptrs.size(); block_idx++) {
-        const typename OctreeT::BlockType* block_ptr = block_ptrs[block_idx];
+        const typename OctreeT::BlockType* const block_ptr = block_ptrs[block_idx];
         const int voxel_scale = block_ptr->getCurrentScale();
         const int voxel_stride = 1 << voxel_scale;
         const Eigen::Vector3i& start_coord = block_ptr->coord;
@@ -1073,7 +1073,7 @@ dual_marching_cube_kernel_new(const OctreeT& octree,
                                                 dual_corner_coords_f,
                                                 dual_corner_coords_i,
                                                 meshing::isosurface::occupied);
-                    const int* edges = triTable[edge_pattern_idx];
+                    const int* const edges = triTable[edge_pattern_idx];
                     for (int e = 0; edges[e] != -1; e += 3) {
                         const auto corner_indices_0 = meshing::edge_to_corner_indices(edges[e]);
                         const auto edge_id_0 =
