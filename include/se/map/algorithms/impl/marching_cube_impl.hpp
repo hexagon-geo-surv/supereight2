@@ -858,7 +858,7 @@ marching_cube_kernel(const OctreeT& octree,
                     const uint8_t edge_pattern_idx = meshing::compute_index(
                         octree, block_ptr, x, y, z, meshing::isosurface::occupied);
                     const int* edges = triTable[edge_pattern_idx];
-                    for (unsigned int e = 0; edges[e] != -1 && e < 16; e += 3) {
+                    for (int e = 0; edges[e] != -1; e += 3) {
                         Eigen::Vector3f vertex_0 =
                             meshing::interp_vertexes(octree, x, y, z, edges[e]);
                         Eigen::Vector3f vertex_1 =
@@ -947,7 +947,7 @@ dual_marching_cube_kernel(const OctreeT& octree,
                                                 dual_corner_coords_i,
                                                 meshing::isosurface::occupied);
                     const int* edges = triTable[edge_pattern_idx];
-                    for (unsigned int e = 0; edges[e] != -1 && e < 16; e += 3) {
+                    for (int e = 0; edges[e] != -1; e += 3) {
                         Eigen::Vector3f vertex_0 =
                             meshing::interp_dual_vertexes(edges[e], data, dual_corner_coords_f);
                         Eigen::Vector3f vertex_1 =
@@ -1074,7 +1074,7 @@ dual_marching_cube_kernel_new(const OctreeT& octree,
                                                 dual_corner_coords_i,
                                                 meshing::isosurface::occupied);
                     const int* edges = triTable[edge_pattern_idx];
-                    for (unsigned int e = 0; edges[e] != -1 && e < 16; e += 3) {
+                    for (int e = 0; edges[e] != -1; e += 3) {
                         const auto corner_indices_0 = meshing::edge_to_corner_indices(edges[e]);
                         const auto edge_id_0 =
                             unique_edge_id(dual_corner_coords_i[corner_indices_0.first],
