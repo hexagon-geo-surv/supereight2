@@ -284,8 +284,7 @@ void gather_dual_data(const BlockT* block_ptr,
         dual_corner_coords_f[corner_idx] =
             primal_corner_coord_f + actual_dual_scaling * norm_dual_offset_f[corner_idx];
         data_arr[corner_idx] =
-            block_ptr->getData(dual_corner_coords_f[corner_idx]
-                                   .cast<int>()); /// <- TODO: Should take data from current scale
+            block_ptr->getData(dual_corner_coords_f[corner_idx].cast<int>(), scale);
     }
 }
 
@@ -691,6 +690,7 @@ void gather_dual_data(const OctreeT& octree,
                       std::array<Eigen::Vector3f, 8>& dual_corner_coords_f,
                       std::array<Eigen::Vector3i, 8>& dual_corner_coords_i)
 {
+    const int block_scale = block_ptr->getCurrentScale();
     const Eigen::Vector3i primal_corner_coord_rel = primal_corner_coord - block_ptr->coord;
 
     BoundedVector<int, 8> lower_priority_neighbours, higher_priority_neighbours;
@@ -711,7 +711,8 @@ void gather_dual_data(const OctreeT& octree,
         typename OctreeT::BlockType* block_neighbour_ptr =
             static_cast<typename OctreeT::BlockType*>(
                 se::fetcher::template block<OctreeT>(logical_dual_corner_coord, octree.getRoot()));
-        if (block_neighbour_ptr == nullptr || block_neighbour_ptr->getCurrentScale() <= scale) {
+        if (block_neighbour_ptr == nullptr
+            || block_neighbour_ptr->getCurrentScale() <= block_scale) {
             set_invalid(data_arr[0]);
             return;
         }
@@ -726,21 +727,21 @@ void gather_dual_data(const OctreeT& octree,
         typename OctreeT::BlockType* block_neighbour_ptr =
             static_cast<typename OctreeT::BlockType*>(
                 se::fetcher::template block<OctreeT>(logical_dual_corner_coord, octree.getRoot()));
-        if (block_neighbour_ptr == nullptr || block_neighbour_ptr->getCurrentScale() < scale) {
+        if (block_neighbour_ptr == nullptr
+            || block_neighbour_ptr->getCurrentScale() < block_scale) {
             set_invalid(data_arr[0]);
             return;
         }
     }
 
-    const int stride = 1 << block_ptr->getCurrentScale();
+    const int stride = octantops::scale_to_size(scale);
     for (const auto& offset_idx : neighbours[0]) {
         dual_corner_coords_i[offset_idx] = primal_corner_coord + logical_dual_offset[offset_idx];
         dual_corner_coords_f[offset_idx] =
             ((dual_corner_coords_i[offset_idx] / stride) * stride).cast<float>()
             + stride * se::sample_offset_frac; // TODO:  OctreeT<FieldType>::sample_offset_frac_
         data_arr[offset_idx] =
-            block_ptr->getData(dual_corner_coords_f[offset_idx]
-                                   .cast<int>()); /// <- TODO: Should take data from current scale
+            block_ptr->getData(dual_corner_coords_f[offset_idx].cast<int>(), scale);
     }
     for (size_t neighbour_idx = 1; neighbour_idx < neighbours.size(); ++neighbour_idx) {
         Eigen::Vector3i logical_dual_corner_coord =
@@ -748,7 +749,8 @@ void gather_dual_data(const OctreeT& octree,
         typename OctreeT::BlockType* block_neighbour_ptr =
             static_cast<typename OctreeT::BlockType*>(
                 se::fetcher::template block<OctreeT>(logical_dual_corner_coord, octree.getRoot()));
-        const int neighbour_stride = 1 << block_neighbour_ptr->getCurrentScale();
+        const int neighbour_scale = std::max(block_neighbour_ptr->getCurrentScale(), scale);
+        const int neighbour_stride = octantops::scale_to_size(neighbour_scale);
         for (const auto& offset_idx : neighbours[neighbour_idx]) {
             dual_corner_coords_i[offset_idx] =
                 primal_corner_coord + logical_dual_offset[offset_idx];
@@ -758,8 +760,7 @@ void gather_dual_data(const OctreeT& octree,
                 + neighbour_stride
                     * se::sample_offset_frac; // TODO: OctreeT<FieldType>::sample_offset_frac_
             data_arr[offset_idx] = block_neighbour_ptr->getData(
-                dual_corner_coords_f[offset_idx]
-                    .cast<int>()); /// <- TODO: Should take data from current scale
+                dual_corner_coords_f[offset_idx].cast<int>(), neighbour_scale);
         }
     }
 }
@@ -895,16 +896,20 @@ marching_cube_kernel(const OctreeT& octree,
 template<typename OctreeT, typename>
 typename OctreeT::SurfaceMesh
 dual_marching_cube_kernel(const OctreeT& octree,
-                          const std::vector<const typename OctreeT::BlockType*>& block_ptrs)
+                          const std::vector<const typename OctreeT::BlockType*>& block_ptrs,
+                          const int min_desired_scale)
 {
+    assert(min_desired_scale >= 0);
+    assert(min_desired_scale <= OctreeT::BlockType::getMaxScale());
     typedef typename OctreeT::SurfaceMesh::value_type Face;
 
     typename OctreeT::SurfaceMesh mesh;
 #pragma omp parallel for
     for (size_t block_idx = 0; block_idx < block_ptrs.size(); block_idx++) {
         const typename OctreeT::BlockType* const block_ptr = block_ptrs[block_idx];
-        const int voxel_scale = block_ptr->getCurrentScale();
-        const int voxel_stride = 1 << voxel_scale;
+        const int voxel_scale = std::clamp(
+            min_desired_scale, block_ptr->getCurrentScale(), OctreeT::BlockType::getMaxScale());
+        const int voxel_stride = octantops::scale_to_size(voxel_scale);
         const Eigen::Vector3i& start_coord = block_ptr->coord;
         const Eigen::Vector3i last_coord =
             (start_coord + Eigen::Vector3i::Constant(OctreeT::BlockType::getSize()))
@@ -1161,8 +1166,10 @@ dual_marching_cube_new(const OctreeT& octree,
 
 
 
+// min_desired_scale is unused in se::Res::Single, prevent compiler warning with [[maybe_unused]].
 template<typename OctreeT>
-typename OctreeT::SurfaceMesh marching_cube(const OctreeT& octree)
+typename OctreeT::SurfaceMesh marching_cube(const OctreeT& octree,
+                                            [[maybe_unused]] const int min_desired_scale)
 {
     TICK("marching-cube")
     typedef typename OctreeT::BlockType BlockType;
@@ -1181,7 +1188,7 @@ typename OctreeT::SurfaceMesh marching_cube(const OctreeT& octree)
         mesh = se::algorithms::marching_cube_kernel(octree, block_ptrs);
     }
     else {
-        mesh = se::algorithms::dual_marching_cube_kernel(octree, block_ptrs);
+        mesh = se::algorithms::dual_marching_cube_kernel(octree, block_ptrs, min_desired_scale);
     }
 
     TOCK("marching-cube")

@@ -168,7 +168,8 @@ marching_cube_kernel(const OctreeT& octree,
 template<typename OctreeT, typename = std::enable_if_t<OctreeT::res_ == se::Res::Multi>>
 typename OctreeT::SurfaceMesh
 dual_marching_cube_kernel(const OctreeT& octree,
-                          const std::vector<const typename OctreeT::BlockType*>& block_ptrs);
+                          const std::vector<const typename OctreeT::BlockType*>& block_ptrs,
+                          const int min_desired_scale);
 
 template<typename OctreeT>
 std::vector<meshing::VertexIndexMesh<3>>
@@ -184,11 +185,12 @@ template<typename OctreeT>
 meshing::VertexIndexMesh<3> dual_marching_cube_new(const OctreeT& octree);
 
 
-/** Return a triangle mesh of the surface in \p octree. The mesh is generated using the marching
- * cubes algorithm.
+/** Return a triangle mesh of the surface in \p octree. For se::Res::Multi octrees a minimum desired
+ * scale \p min_desired_scale can be specified in order to obtain a coarser surface mesh. The value
+ * of \p min_desired_scale is ignored for se::Res::Single octrees.
  */
 template<typename OctreeT>
-typename OctreeT::SurfaceMesh marching_cube(const OctreeT& octree);
+typename OctreeT::SurfaceMesh marching_cube(const OctreeT& octree, const int min_desired_scale = 0);
 
 } // namespace algorithms
 } // namespace se
