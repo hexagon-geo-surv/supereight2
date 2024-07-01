@@ -890,13 +890,11 @@ marching_cube_kernel(const OctreeT& octree,
                         {
                             mesh.push_back(temp);
                         }
-                    } // edges
-
-                } // z
-            }     // y
-        }         // x
-
-    } // block_ptr_itr
+                    }
+                }
+            }
+        }
+    }
     mesh.shrink_to_fit();
     return mesh;
 }
@@ -982,13 +980,11 @@ dual_marching_cube_kernel(const OctreeT& octree,
                         {
                             mesh.push_back(temp);
                         };
-                    } // edges
-
-                } // z
-            }     // y
-        }         // x
-
-    } // block_ptr_itr
+                    }
+                }
+            }
+        }
+    }
     mesh.shrink_to_fit();
     return mesh;
 }
@@ -1154,16 +1150,15 @@ dual_marching_cube_kernel_new(const OctreeT& octree,
                             block_mesh.vertices.push_back(vertex_2);
                         }
                         block_mesh.indices.push_back(it_2->second);
-                    } // edges
-
-                } // z
-            }     // y
-        }         // x
+                    }
+                }
+            }
+        }
 #pragma omp critical
         {
             block_meshes.emplace_back(block_mesh);
         }
-    } // block_ptr_itr
+    }
     return block_meshes;
 }
 
