@@ -147,7 +147,8 @@ int se::LeicaLidar::computeIntegrationScaleImpl(const Eigen::Vector3f& block_cen
     }
 
     if (recompute) {
-        return computeIntegrationScale(block_centre_hyst, map_res, last_scale, -1, max_block_scale);
+        return computeIntegrationScaleImpl(
+            block_centre_hyst, map_res, last_scale, -1, max_block_scale);
     }
     else {
         return scale;

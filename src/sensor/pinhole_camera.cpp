@@ -160,7 +160,7 @@ int se::PinholeCamera::computeIntegrationScaleImpl(const Eigen::Vector3f& block_
     }
 
     if (recompute) {
-        return computeIntegrationScale(
+        return computeIntegrationScaleImpl(
             block_centre_S_hyst, map_res, last_scale, -1, max_block_scale);
     }
     else {
