@@ -452,7 +452,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveScaleSlices(const std::string&
 
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveStructure(const std::string& filename,
-                                                                const Eigen::Isometry3f& T_WM) const
+                                                                const Eigen::Affine3f& T_WM) const
 {
     const StructureMesh mesh = octree_structure_mesh(octree_);
     return io::save_mesh(mesh, filename, T_WM);

@@ -405,7 +405,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \return Zero on success and non-zero on error.
      */
     int saveStructure(const std::string& filename,
-                      const Eigen::Isometry3f& T_WM = Eigen::Isometry3f::Identity()) const;
+                      const Eigen::Affine3f& T_WM = Eigen::Affine3f::Identity()) const;
 
     /** Return a mesh of the reconstructed surface in the world frame in units of metres. Apply a
      * transformation from the world frame W to some output frame O \p T_OW to each mesh vertex.
