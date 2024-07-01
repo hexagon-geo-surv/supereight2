@@ -943,36 +943,32 @@ dual_marching_cube_kernel(const OctreeT& octree,
                                                 meshing::isosurface::occupied);
                     const int* const edges = triTable[edge_pattern_idx];
                     for (int e = 0; edges[e] != -1; e += 3) {
-                        Eigen::Vector3f vertex_0 =
-                            meshing::interp_dual_vertexes(edges[e], data, dual_corner_coords_f);
-                        Eigen::Vector3f vertex_1 =
-                            meshing::interp_dual_vertexes(edges[e + 1], data, dual_corner_coords_f);
-                        Eigen::Vector3f vertex_2 =
-                            meshing::interp_dual_vertexes(edges[e + 2], data, dual_corner_coords_f);
-
-                        if (meshing::checkVertex(vertex_0, octree_size)
-                            || meshing::checkVertex(vertex_1, octree_size)
-                            || meshing::checkVertex(vertex_2, octree_size)) {
-                            continue;
+                        Face face;
+                        for (size_t v = 0; v < Face::num_vertexes; v++) {
+                            face.vertexes[v] = meshing::interp_dual_vertexes(
+                                edges[e + v], data, dual_corner_coords_f);
+                            if (meshing::checkVertex(face.vertexes[v], octree.getSize())) {
+                                goto skip_face;
+                            }
                         }
-                        Face temp;
-                        temp.vertexes[0] = vertex_0;
-                        temp.vertexes[1] = vertex_1;
-                        temp.vertexes[2] = vertex_2;
-                        temp.scale = voxel_scale;
+                        face.scale = voxel_scale;
                         if constexpr (Face::col == Colour::On) {
+                            // Using a separate loop than the vertex computation to avoid the
+                            // expensive colour interpolation if one of the vertices is invalid and
+                            // the whole face is skipped.
                             for (size_t v = 0; v < Face::num_vertexes; v++) {
                                 const auto colour =
-                                    visitor::getColourInterp(octree, temp.vertexes[v], voxel_scale);
+                                    visitor::getColourInterp(octree, face.vertexes[v], voxel_scale);
                                 if (colour) {
-                                    temp.colour.vertexes[v] = *colour;
+                                    face.colour.vertexes[v] = *colour;
                                 }
                             }
                         }
 #pragma omp critical
                         {
-                            mesh.push_back(temp);
-                        };
+                            mesh.push_back(face);
+                        }
+                    skip_face:;
                     }
                 }
             }
