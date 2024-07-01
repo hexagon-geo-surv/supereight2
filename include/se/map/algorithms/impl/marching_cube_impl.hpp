@@ -841,17 +841,14 @@ marching_cube_kernel(const OctreeT& octree,
     typedef typename OctreeT::SurfaceMesh::value_type Face;
 
     typename OctreeT::SurfaceMesh mesh;
-    const int block_size = OctreeT::BlockType::getSize();
-    const int octree_size = octree.getSize();
-
 #pragma omp parallel for
     for (size_t block_idx = 0; block_idx < block_ptrs.size(); block_idx++) {
         const typename OctreeT::BlockType* const block_ptr = block_ptrs[block_idx];
 
         const Eigen::Vector3i& start_coord = block_ptr->coord;
         const Eigen::Vector3i last_coord =
-            (start_coord + Eigen::Vector3i::Constant(block_size))
-                .cwiseMin(Eigen::Vector3i::Constant(octree_size - 1));
+            (start_coord + Eigen::Vector3i::Constant(OctreeT::BlockType::getSize()))
+                .cwiseMin(Eigen::Vector3i::Constant(octree.getSize() - 1));
         for (int x = start_coord.x(); x < last_coord.x(); x++) {
             for (int y = start_coord.y(); y < last_coord.y(); y++) {
                 for (int z = start_coord.z(); z < last_coord.z(); z++) {
@@ -903,9 +900,6 @@ dual_marching_cube_kernel(const OctreeT& octree,
     typedef typename OctreeT::SurfaceMesh::value_type Face;
 
     typename OctreeT::SurfaceMesh mesh;
-    const int block_size = OctreeT::BlockType::getSize();
-    const int octree_size = octree.getSize();
-
 #pragma omp parallel for
     for (size_t block_idx = 0; block_idx < block_ptrs.size(); block_idx++) {
         const typename OctreeT::BlockType* const block_ptr = block_ptrs[block_idx];
@@ -913,8 +907,8 @@ dual_marching_cube_kernel(const OctreeT& octree,
         const int voxel_stride = 1 << voxel_scale;
         const Eigen::Vector3i& start_coord = block_ptr->coord;
         const Eigen::Vector3i last_coord =
-            (start_coord + Eigen::Vector3i::Constant(block_size))
-                .cwiseMin(Eigen::Vector3i::Constant(octree_size - 1));
+            (start_coord + Eigen::Vector3i::Constant(OctreeT::BlockType::getSize()))
+                .cwiseMin(Eigen::Vector3i::Constant(octree.getSize() - 1));
         for (int x = start_coord.x(); x <= last_coord.x(); x += voxel_stride) {
             for (int y = start_coord.y(); y <= last_coord.y(); y += voxel_stride) {
                 for (int z = start_coord.z(); z <= last_coord.z(); z += voxel_stride) {
@@ -1019,7 +1013,6 @@ std::vector<meshing::VertexIndexMesh<3>>
 dual_marching_cube_kernel_new(const OctreeT& octree,
                               const std::vector<const typename OctreeT::BlockType*>& block_ptrs)
 {
-    const int block_size = OctreeT::BlockType::getSize();
     const int octree_size = octree.getSize();
     std::vector<meshing::VertexIndexMesh<3>> block_meshes;
 
@@ -1030,7 +1023,7 @@ dual_marching_cube_kernel_new(const OctreeT& octree,
         const int voxel_stride = 1 << voxel_scale;
         const Eigen::Vector3i& start_coord = block_ptr->coord;
         const Eigen::Vector3i last_coord =
-            (start_coord + Eigen::Vector3i::Constant(block_size))
+            (start_coord + Eigen::Vector3i::Constant(OctreeT::BlockType::getSize()))
                 .cwiseMin(Eigen::Vector3i::Constant(octree_size - 1));
 
         Eigen::Vector3f vertex_0, vertex_1, vertex_2;
