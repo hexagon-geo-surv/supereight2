@@ -38,27 +38,6 @@ SensorBase<DerivedT>::SensorBase(const DerivedT& d) :
 
 
 template<typename DerivedT>
-template<typename ValidPredicate>
-bool SensorBase<DerivedT>::getPixelValue(const Eigen::Vector2f& pixel_f,
-                                         const se::Image<float>& img,
-                                         float& img_value,
-                                         ValidPredicate valid_predicate) const
-{
-    if (!underlying()->model.isInImage(pixel_f)) {
-        return false;
-    }
-    Eigen::Vector2i pixel = se::round_pixel(pixel_f);
-    img_value = img(pixel.x(), pixel.y());
-    // Return false for invalid depth measurement
-    if (!valid_predicate(img_value)) {
-        return false;
-    }
-    return true;
-}
-
-
-
-template<typename DerivedT>
 int SensorBase<DerivedT>::computeIntegrationScale(const Eigen::Vector3f& block_centre_S,
                                                   const float map_res,
                                                   const int last_scale,
