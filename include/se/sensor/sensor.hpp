@@ -18,41 +18,41 @@
 #include "se/common/yaml.hpp"
 #include "se/image/image.hpp"
 
-
-
 namespace se {
 
+/** Base class for all sensor models used for integrating measurements. It uses CRTP for
+ * compile-time polymorphism: https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern
+ */
 template<typename DerivedT>
 class SensorBase {
     public:
+    /** Configuration parameters common for all sensor models. */
     struct Config {
-        /** The width of images produced by the sensor in pixels.
-         */
+        /** The width of images produced by the sensor in pixels. */
         int width = 0;
 
-        /** The height of images produced by the sensor in pixels.
-         */
+        /** The height of images produced by the sensor in pixels. */
         int height = 0;
 
         /** The sensor's near plane in metres. Avoid setting to 0 since numerical issues may arise.
          */
         float near_plane = 0.01f;
 
-        /** The sensor's far plane in metres. Avoid setting to infinity since performance may degrade
-         * significantly, for example with depth images containing really large erroneous measurements.
+        /** The sensor's far plane in metres. Avoid setting to infinity since performance may
+         * degrade significantly, for example with depth images containing really large erroneous
+         * measurements.
          */
         float far_plane = 10.0f;
 
-        /** The transformation from the sensor frame S to the body frame B.
-         */
+        /** The transformation from the sensor frame S to the body frame B. */
         Eigen::Isometry3f T_BS = Eigen::Isometry3f::Identity();
 
-        /** The pixel-size to voxel-size ratio in physical coordinates for computing the integration scale.
-         *  See SensorBase::computeIntegrationScale()
-         *  Thresholds defining the resolution scale in ascending order.
-         *  pixel/voxel < pixel_voxel_ratio_per_scale[0] -> scale = 0
-         *  pixel/voxel < pixel_voxel_ratio_per_scale[1] -> scale = 1
-         *  ...
+        /** The pixel-size to voxel-size ratio thresholds, in ascendig order and in physical
+         * coordinates, for computing the integration scale. See also
+         * se::SensorBase::computeIntegrationScale(). For example:
+         * - `pixel/voxel < pixel_voxel_ratio_per_scale[0]` → `scale = 0`
+         * - `pixel/voxel < pixel_voxel_ratio_per_scale[1]` → `scale = 1`
+         * - etc.
          */
         std::vector<float> pixel_voxel_ratio_per_scale = {1.5f, 3.0f, 6.0f};
 
@@ -81,21 +81,17 @@ class SensorBase {
 
     SensorBase(const DerivedT& d);
 
-    /**
-     * \brief Computes the scale corresponding to the back-projected pixel size
-     * in voxel space.
+    /** Return the integration scale for an se::Block at \p block_centre_S. The scale depends on the
+     * back-projected pixel size in voxel space and the values in
+     * se::SensorBase::Config::pixel_voxel_ratio_per_scale.
      *
-     * \param[in] block_centre_S  The coordinates of the block
-     *                            centre in the sensor frame.
-     * \param[in] map_res         The resolution of the map in [meter].
-     * \param[in] last_scale      Scale from which propagate up voxel
-     *                            values.
-     * \param[in] min_scale       Finest scale at which data has been
-     *                            integrated into the voxel block (-1 if no
-     *                            data has been integrated yet).
-     * \param[in] max_block_scale The maximum allowed scale within a
-     *                            VoxelBlock.
-     * \return The scale that should be used for the integration.
+     * \param[in] block_centre_S  The coordinates of the block centre expressed in the sensor frame.
+     * \param[in] map_res         The resolution of the map in metres.
+     * \param[in] last_scale      The block's current scale.
+     * \param[in] min_scale       The minimum scale at which this block has been updated. It should
+     *                            be -1 if the block hasn't been updated yet.
+     * \param[in] max_block_scale The maximum possible scale for an se::Block.
+     * \return The scale the block should be updated at.
      */
     int computeIntegrationScale(const Eigen::Vector3f& block_centre_S,
                                 const float map_res,
@@ -103,84 +99,50 @@ class SensorBase {
                                 const int min_scale,
                                 const int max_block_scale) const;
 
-    /**
-     * \brief Return the minimum distance at which measurements are available
-     * along the ray passing through pixels x and y.
+    /** Return the minimum distance along \p ray_S, expressed in the sensor frame, that can be
+     * measured.
      *
-     * This differs from the PinholeCamera::near_plane since the near_plane is
-     * a z-value while nearDist is a distance along a ray.
-     *
-     * \param[in] ray_S The ray starting from the sensor centre and expressed
-     *                  in the sensor frame along which nearDist
-     *                  will be computed.
-     * \return The minimum distance along the ray through the pixel at which
-     *         valid measurements may be encountered.
+     * \note This may differ from se::SensorBase::Config::near_plane depending on the underlying
+     * projection model.
      */
     float nearDist(const Eigen::Vector3f& ray_S) const;
 
-    /**
-     * \brief Return the maximum distance at which measurements are available
-     * along the ray passing through pixels x and y.
+    /** Return the maximum distance along \p ray_S, expressed in the sensor frame, that can be
+     * measured.
      *
-     * This differs from the PinholeCamera::far_plane since the far_plane is a
-     * z-value while farDist is a distance along a ray.
-     *
-     * \param[in] ray_S The ray starting from the sensor centre and expressed
-     *                  in the sensor frame along which nearDist
-     *                  will be computed.
-     * \return The maximum distance along the ray through the pixel at which
-     *         valid measurements may be encountered.
+     * \note This may differ from se::SensorBase::Config::far_plane depending on the underlying
+     * projection model.
      */
     float farDist(const Eigen::Vector3f& ray_S) const;
 
-    /**
-     * \brief Convert a point in the sensor frame into a depth measurement.
-     * For the PinholeCamera this means returning the z-coordinate
-     * of the point.
+    /** Return the depth measurement that would result form \p point_S, expressed in the sensor
+     * frame, being measured.
      *
-     * \param[in] point_C A point observed by the sensor expressed in the
-     *                    sensor frame.
-     * \return The depth value that the sensor would get from this point.
+     * \note For example, for a pinhole camera this would return the z-coordinate of \p point_S
+     * whereas for a LiDAR it would return the norm of \p point_S.
      */
     float measurementFromPoint(const Eigen::Vector3f& point_S) const;
 
-    /**
-     * \brief Test whether a 3D point in sensor coordinates is inside the
-     * sensor frustum.
-     */
+    /** Return whether \p point_S, expressed in the sensor frame, is inside the sensor frustum. */
     bool pointInFrustum(const Eigen::Vector3f& point_S) const;
 
-    /**
-     * \brief Test whether a 3D point in sensor coordinates is inside the
-     * sensor frustum.
-     *
-     * The difference from PinholeCamera::pointInFrustum is that it is assumed
-     * that the far plane is at infinity.
-     */
+    /** Return whether \p point_S, expressed in the sensor frame, is inside the sensor frustum but
+     * without considering the far plane. */
     bool pointInFrustumInf(const Eigen::Vector3f& point_S) const;
 
-    /**
-     * \brief Test whether a sphere in sensor coordinates is at least partially inside the sensor
-     * frustum.
-     *
-     * It is tested whether the sphere's centre is inside the sensor frustum
-     * offest outwards by the sphere's radius. This is a quick test that in
-     * some rare cases may return a sphere as being visible although it isn't.
+    /** Return whether a sphere with \p centre_S and \p radius, expressed in the sensor frame, is at
+     * least partially inside the sensor frustum. This is a fast approximate test that in rare cases
+     * may return false positives.
      */
     bool sphereInFrustum(const Eigen::Vector3f& centre_S, const float radius) const;
 
-    /**
-     * \brief Test whether a sphere in sensor coordinates is at least partially inside the sensor
-     * frustum.
-     *
-     * The difference from PinholeCamera::sphereInFrustum is that it is assumed
-     * that the far plane is at infinity.
+    /** Return whether a sphere with \p centre_S and \p radius, expressed in the sensor frame, is at
+     * least partially inside the sensor frustum but without considering the far plane. This is a
+     * fast approximate test that in rare cases may return false positives.
      */
     bool sphereInFrustumInf(const Eigen::Vector3f& centre_S, const float radius) const;
 
-    /**
-     * \brief Return the sensor type as a string.
-     */
+    /** Return the underlying sensor type as a string. */
     static std::string type();
 
     bool left_hand_frame;
