@@ -102,7 +102,7 @@ Eigen::Vector3i Node<DataT, ResT>::getChildCoord(const int child_idx) const
 
 
 template<typename DataT, Res ResT>
-int Node<DataT, ResT>::getChildIdx(const Eigen::Vector3i& child_coord)
+int Node<DataT, ResT>::getChildIdx(const Eigen::Vector3i& child_coord) const
 {
     assert(keyops::is_child(keyops::encode_key(coord, math::log2_const(getSize())),
                             keyops::encode_key(child_coord, math::log2_const(getSize() / 2)))

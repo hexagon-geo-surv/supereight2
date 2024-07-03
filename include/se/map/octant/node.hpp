@@ -163,7 +163,7 @@ class Node : public OctantBase, public NodeData<DataT, Node<DataT, ResT>> {
      * \warning Will return garbage if \p child_coord doesn't correspond to the coordinates of a
      * child of the node.
      */
-    int getChildIdx(const Eigen::Vector3i& child_coord);
+    int getChildIdx(const Eigen::Vector3i& child_coord) const;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
