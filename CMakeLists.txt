@@ -36,6 +36,7 @@ add_library(${LIB_NAME} STATIC
     "src/common/str_utils.cpp"
     "src/common/yaml.cpp"
     "src/image/image.cpp"
+    "src/integrator/uncertainty.cpp"
     "src/map/data.cpp"
     "src/map/io/mesh_io.cpp"
     "src/map/preprocessor.cpp"
