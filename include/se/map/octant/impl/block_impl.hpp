@@ -1013,10 +1013,10 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::blockMax
 
 
 
-template<typename DataT, Res ResT, int BlockSize, typename PolicyT>
-Block<DataT, ResT, BlockSize, PolicyT>::Block(Node<DataT, ResT>* parent_ptr,
-                                              const int child_idx,
-                                              const DataT init_data) :
+template<typename DataT, Res ResT, int BlockSize>
+Block<DataT, ResT, BlockSize>::Block(Node<DataT, ResT>* parent_ptr,
+                                     const int child_idx,
+                                     const DataT init_data) :
         OctantBase(parent_ptr->coord
                        + BlockSize
                            * Eigen::Vector3i((1 & child_idx) > 0,

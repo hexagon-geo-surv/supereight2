@@ -247,12 +247,7 @@ class BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT> {
 
 
 // Forward decleration
-template<typename DataT,
-         Res ResT = Res::Single,
-         int BlockSize = 8,
-         typename PolicyT = std::enable_if_t<math::is_power_of_two(
-             BlockSize)> ///< Verify that the block size is sensible
-         >
+template<typename DataT, Res ResT = Res::Single, int BlockSize = 8>
 class Block;
 
 
@@ -739,7 +734,7 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
  * \tparam ResT      The value of se::Res for the octree.
  * \tparam BlockSize The edge length of se::Block in voxels.
  */
-template<typename DataT, Res ResT, int BlockSize, typename PolicyT>
+template<typename DataT, Res ResT, int BlockSize>
 class Block : public OctantBase,
               public std::conditional<
                   ResT == Res::Single,
@@ -766,6 +761,8 @@ class Block : public OctantBase,
     }
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+    static_assert(math::is_power_of_two(BlockSize));
 };
 
 } // namespace se
