@@ -247,7 +247,7 @@ class BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT> {
 
 
 // Forward decleration
-template<typename DataT, Res ResT = Res::Single, int BlockSize = 8>
+template<typename DataT, Res ResT, int BlockSize>
 class Block;
 
 
