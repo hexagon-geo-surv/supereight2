@@ -165,8 +165,6 @@ class Octree {
     MemoryPool<NodeType, BlockType> memory_pool_;
     OctantBase* const root_ptr_; // The pointer lifetime is managed by memory_pool_.
     Eigen::AlignedBox3i aabb_;
-
-    static_assert(math::is_power_of_two(BlockSize));
 };
 
 
