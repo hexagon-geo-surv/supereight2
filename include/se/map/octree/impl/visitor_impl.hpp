@@ -1409,8 +1409,9 @@ getFieldGrad(const OctreeT& octree,
         bool is_valid = true;
 
         for (unsigned int i = 0; i < 32; i++) {
-            auto grad_field_value = visitor::getField(octree, block_ptr, grad_coords[i]);
-            if (!grad_field_value) {
+            int returned_scale;
+            auto grad_field_value = visitor::getField(octree, block_ptr, grad_coords[i], scale, returned_scale);
+            if (!grad_field_value || scale != returned_scale) {
                 is_valid = false;
                 break;
             }
