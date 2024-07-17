@@ -26,7 +26,12 @@ struct FieldData<Field::Occupancy> {
     field_t occupancy = 0;
     weight_t weight = 0;
     bool observed = false;
-    static constexpr bool invert_normals = true;
+
+    /** The direction of surface normals in occupancy fields is opposite from the direction of the
+     * field gradient. This is because the occupancy field is negative in free space and positive in
+     * occupied space.
+     */
+    static constexpr bool normals_along_gradient = false;
     static constexpr field_t surface_boundary = 0;
     static constexpr field_t min_occupancy = -100;
     static constexpr field_t max_occupancy = 100;
@@ -80,7 +85,12 @@ struct FieldData<Field::TSDF> {
 
     field_t tsdf = 1;
     weight_t weight = 0;
-    static constexpr bool invert_normals = false;
+
+    /** The direction of surface normals in TSDF fields is the same as the direction of the field
+     * gradient. This is because the TSDF field is positive outside the surface and negative inside
+     * it.
+     */
+    static constexpr bool normals_along_gradient = true;
     static constexpr field_t surface_boundary = 0;
 
     /** Return whether the field data has been updated at least once. */

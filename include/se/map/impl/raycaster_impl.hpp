@@ -575,14 +575,16 @@ void raycast_volume(const MapT& map,
                 surface_scale[idx] = static_cast<int>(surface_intersection_W->w());
                 // Set surface point
                 surface_point_cloud_W[idx] = surface_intersection_W->head<3>();
-                // Set surface normal
+                // Compute surface normal from the field gradient.
                 const std::optional<Eigen::Vector3f> surface_normal_W =
                     map.getFieldGrad(surface_intersection_W->head<3>());
                 if (surface_normal_W) {
-                    // Invert surface normals for TSDF representations.
-                    surface_normals_W[idx] = (MapT::DataType::invert_normals)
-                        ? (-1.f * (*surface_normal_W)).normalized()
-                        : surface_normal_W->normalized();
+                    if constexpr (MapT::DataType::normals_along_gradient) {
+                        surface_normals_W[idx] = surface_normal_W->normalized();
+                    }
+                    else {
+                        surface_normals_W[idx] = -surface_normal_W->normalized();
+                    }
                 }
                 else {
                     surface_normals_W[idx] = math::g_invalid_normal;

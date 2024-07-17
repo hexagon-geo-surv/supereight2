@@ -58,7 +58,7 @@ struct Data {
     static constexpr Field fld_ = FldT;
     static constexpr Colour col_ = ColB;
     static constexpr Semantics sem_ = SemB;
-    static constexpr bool invert_normals = FieldData<FldT>::invert_normals;
+    static constexpr bool normals_along_gradient = FieldData<FldT>::normals_along_gradient;
     static constexpr field_t surface_boundary = FieldData<FldT>::surface_boundary;
 };
 
