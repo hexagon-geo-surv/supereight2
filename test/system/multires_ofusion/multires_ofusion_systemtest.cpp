@@ -320,7 +320,6 @@ TEST(MultiResOFusionSystemTest, DeleteChildren)
 
     const int max_frame = 15;
     for (int frame = 0; frame < max_frame; frame++) {
-        std::cout << "FRAME = " << frame << std::endl;
         se::preprocessor::downsample_depth((frame == 0) ? input_noise_depth_img : input_depth_img,
                                            processed_depth_img);
         integrator.integrateDepth(
