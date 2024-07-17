@@ -43,7 +43,6 @@ int main(int argc, char** argv)
         const Eigen::Vector2i processed_img_res =
             input_img_res / config.app.sensor_downsampling_factor;
         se::Image<float> processed_depth_img(processed_img_res.x(), processed_img_res.y());
-        se::Image<se::RGB> processed_colour_img(processed_img_res.x(), processed_img_res.y());
 
         // Setup output images / renders
         se::Image<se::RGB> downsampled_colour_img(processed_img_res.x(), processed_img_res.y());
@@ -120,9 +119,6 @@ int main(int argc, char** argv)
             const se::Image<size_t> downsample_map =
                 se::preprocessor::downsample_depth(input_depth_img, processed_depth_img);
             TOCK("ds-depth")
-            TICK("ds-colour")
-            se::image::remap(input_colour_img, processed_colour_img, downsample_map);
-            TOCK("ds-colour")
 
             // Track pose (if enabled)
             // Initial pose (frame == 0) is initialised with the identity matrix
@@ -142,7 +138,7 @@ int main(int argc, char** argv)
                         frame,
                         se::Measurements{
                             se::Measurement{processed_depth_img, sensor, T_WS},
-                            se::Measurement{processed_colour_img, sensor, T_WS * T_SSc}});
+                            se::Measurement{input_colour_img, colour_sensor, T_WS * T_SSc}});
                 }
                 else {
                     integrator.integrateDepth(
