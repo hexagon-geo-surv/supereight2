@@ -219,6 +219,10 @@ then
 	exit 2
 fi
 
+# Ensure an absolute path is used so that it's consistent after changing
+# directory inside the tests.
+output_dir=$(realpath "$1")
+
 # Assuming the script is located inside the supereight2 repository.
 cd "$(dirname "$0")" || exit
 supereight_repo_root=$(git rev-parse --show-toplevel)
@@ -228,11 +232,11 @@ cd "$supereight_repo_root" || exit
 # Print useful information.
 git --no-pager log --date=format:'%Y-%m-%d' -n 1 \
 	--pretty=format:'supereight2 commit %h %ad %s%n' HEAD
-printf 'Results stored in %s\n' "$1"
+printf 'Results stored in %s\n' "$output_dir"
 lsb_release -d | cut -f 2-
 printf 'CMAKE_BUILD_PARALLEL_LEVEL=%s\n' "${CMAKE_BUILD_PARALLEL_LEVEL:-}"
 printf 'MAKEFLAGS=%s\n' "${MAKEFLAGS:-}"
 printf '\n'
 
 # Run all tests.
-test_run "$1"
+test_run "$output_dir"
