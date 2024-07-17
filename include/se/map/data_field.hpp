@@ -23,6 +23,22 @@ struct FieldData {
 
 template<>
 struct FieldData<Field::Occupancy> {
+    field_t occupancy = 0;
+    weight_t weight = 0;
+    bool observed = false;
+    static constexpr bool invert_normals = false;
+    static constexpr field_t surface_boundary = 0;
+    static constexpr field_t min_occupancy = -100;
+    static constexpr field_t max_occupancy = 100;
+
+    /** Return whether the field data has been updated at least once. */
+    bool valid() const;
+
+    /** Perform a weighted average log-odds occupancy update and set the data to observed, while
+     * ensuring the weight doesn't exceed \p max_weight. Return whether the data was updated.
+     */
+    bool update(const field_t occupancy, const weight_t max_weight);
+
     struct Config {
         float k_sigma = 0.052f;
         float sigma_min_factor = 1.5f;
@@ -46,22 +62,6 @@ struct FieldData<Field::Occupancy> {
          */
         void readYaml(const std::string& yaml_file);
     };
-
-    field_t occupancy = 0;
-    weight_t weight = 0;
-    bool observed = false;
-    static constexpr bool invert_normals = false;
-    static constexpr field_t surface_boundary = 0;
-    static constexpr field_t min_occupancy = -100;
-    static constexpr field_t max_occupancy = 100;
-
-    /** Return whether the field data has been updated at least once. */
-    bool valid() const;
-
-    /** Perform a weighted average log-odds occupancy update and set the data to observed, while
-     * ensuring the weight doesn't exceed \p max_weight. Return whether the data was updated.
-     */
-    bool update(const field_t occupancy, const weight_t max_weight);
 };
 
 std::ostream& operator<<(std::ostream& os, const FieldData<Field::Occupancy>::Config& c);
