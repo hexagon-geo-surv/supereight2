@@ -20,7 +20,7 @@ class Node;
 /**
  * \brief The base used for single-resolution blocks
  */
-template<typename DerivedT, typename DataT, int BlockSize>
+template<typename DataT, int BlockSize, typename DerivedT>
 class BlockSingleRes {
     public:
     typedef DataT DataType;
@@ -738,7 +738,7 @@ template<typename DataT, Res ResT, int BlockSize>
 class Block : public OctantBase,
               public std::conditional<
                   ResT == Res::Single,
-                  BlockSingleRes<Block<DataT, ResT, BlockSize>, DataT, BlockSize>,
+                  BlockSingleRes<DataT, BlockSize, Block<DataT, ResT, BlockSize>>,
                   BlockMultiRes<DataT, BlockSize, Block<DataT, ResT, BlockSize>>>::type
 
 {

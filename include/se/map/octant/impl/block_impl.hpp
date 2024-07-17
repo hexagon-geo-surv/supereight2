@@ -13,16 +13,16 @@ namespace se {
 
 /// Single-res Block ///
 
-template<typename DerivedT, typename DataT, int BlockSize>
-BlockSingleRes<DerivedT, DataT, BlockSize>::BlockSingleRes(const DataType init_data)
+template<typename DataT, int BlockSize, typename DerivedT>
+BlockSingleRes<DataT, BlockSize, DerivedT>::BlockSingleRes(const DataType init_data)
 {
     block_data_.fill(init_data); // TODO: Verify that initialisation doesn't cause regression
 }
 
 
-template<typename DerivedT, typename DataT, int BlockSize>
-const typename BlockSingleRes<DerivedT, DataT, BlockSize>::DataType&
-BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const int voxel_idx) const
+template<typename DataT, int BlockSize, typename DerivedT>
+const typename BlockSingleRes<DataT, BlockSize, DerivedT>::DataType&
+BlockSingleRes<DataT, BlockSize, DerivedT>::getData(const int voxel_idx) const
 {
     assert(voxel_idx >= 0);
     assert(static_cast<size_t>(voxel_idx) < block_data_.size());
@@ -31,9 +31,9 @@ BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const int voxel_idx) const
 
 
 
-template<typename DerivedT, typename DataT, int BlockSize>
-typename BlockSingleRes<DerivedT, DataT, BlockSize>::DataType&
-BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const int voxel_idx)
+template<typename DataT, int BlockSize, typename DerivedT>
+typename BlockSingleRes<DataT, BlockSize, DerivedT>::DataType&
+BlockSingleRes<DataT, BlockSize, DerivedT>::getData(const int voxel_idx)
 {
     assert(voxel_idx >= 0);
     assert(static_cast<size_t>(voxel_idx) < block_data_.size());
@@ -42,9 +42,9 @@ BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const int voxel_idx)
 
 
 
-template<typename DerivedT, typename DataT, int BlockSize>
-const typename BlockSingleRes<DerivedT, DataT, BlockSize>::DataType&
-BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const Eigen::Vector3i& voxel_coord) const
+template<typename DataT, int BlockSize, typename DerivedT>
+const typename BlockSingleRes<DataT, BlockSize, DerivedT>::DataType&
+BlockSingleRes<DataT, BlockSize, DerivedT>::getData(const Eigen::Vector3i& voxel_coord) const
 {
     const Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord;
     const int voxel_idx = voxel_offset.x() + voxel_offset.y() * underlying()->size
@@ -54,9 +54,9 @@ BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const Eigen::Vector3i& voxel
 
 
 
-template<typename DerivedT, typename DataT, int BlockSize>
-typename BlockSingleRes<DerivedT, DataT, BlockSize>::DataType&
-BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const Eigen::Vector3i& voxel_coord)
+template<typename DataT, int BlockSize, typename DerivedT>
+typename BlockSingleRes<DataT, BlockSize, DerivedT>::DataType&
+BlockSingleRes<DataT, BlockSize, DerivedT>::getData(const Eigen::Vector3i& voxel_coord)
 {
     const Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord;
     const int voxel_idx = voxel_offset.x() + voxel_offset.y() * underlying()->size
@@ -66,8 +66,8 @@ BlockSingleRes<DerivedT, DataT, BlockSize>::getData(const Eigen::Vector3i& voxel
 
 
 
-template<typename DerivedT, typename DataT, int BlockSize>
-void BlockSingleRes<DerivedT, DataT, BlockSize>::setData(const Eigen::Vector3i& voxel_coord,
+template<typename DataT, int BlockSize, typename DerivedT>
+void BlockSingleRes<DataT, BlockSize, DerivedT>::setData(const Eigen::Vector3i& voxel_coord,
                                                          const DataType& data)
 {
     const Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord;
@@ -78,8 +78,8 @@ void BlockSingleRes<DerivedT, DataT, BlockSize>::setData(const Eigen::Vector3i& 
 
 
 
-template<typename DerivedT, typename DataT, int BlockSize>
-void BlockSingleRes<DerivedT, DataT, BlockSize>::setData(const int voxel_idx, const DataType& data)
+template<typename DataT, int BlockSize, typename DerivedT>
+void BlockSingleRes<DataT, BlockSize, DerivedT>::setData(const int voxel_idx, const DataType& data)
 {
     assert(voxel_idx >= 0);
     assert(static_cast<size_t>(voxel_idx) < block_data_.size());
@@ -1026,7 +1026,7 @@ Block<DataT, ResT, BlockSize>::Block(Node<DataT, ResT>* parent_ptr,
                    parent_ptr),
         std::conditional<
             ResT == Res::Single,
-            BlockSingleRes<Block<DataT, ResT, BlockSize>, DataT, BlockSize>,
+            BlockSingleRes<DataT, BlockSize, Block<DataT, ResT, BlockSize>>,
             BlockMultiRes<DataT, BlockSize, Block<DataT, ResT, BlockSize>>>::type(init_data)
 {
     assert(BlockSize == (parent_ptr->getSize() >> 1));
