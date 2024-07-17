@@ -30,13 +30,6 @@ struct ColourData<Colour::On> {
     colour_t colour;
     std::uint8_t weight = 0;
 
-    struct Config {
-        /** Reads the struct members from the "data" node of a YAML file. Members not present in the
-         * YAML file aren't modified.
-         */
-        void readYaml(const std::string& yaml_file);
-    };
-
     /** Perform a weighted averge colour update using \p colour, while ensuring the weight doesn't
      * exceed \p max_weight. Return whether the data was updated.
      */
@@ -44,6 +37,13 @@ struct ColourData<Colour::On> {
 
     /** Set to the mean of the data in \p child_data. */
     void setToMean(const BoundedVector<ColourData, 8>& child_data);
+
+    struct Config {
+        /** Reads the struct members from the "data" node of a YAML file. Members not present in the
+         * YAML file aren't modified.
+         */
+        void readYaml(const std::string& yaml_file);
+    };
 };
 
 std::ostream& operator<<(std::ostream& os, const ColourData<Colour::Off>::Config& c);
