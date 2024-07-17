@@ -80,9 +80,9 @@ test_formatting() {
 	printf 'clang-format\t'
 	{
 		clang-format --version
-		# shellcheck disable=SC2046
-		time -p clang-format --style=file --dry-run --Werror \
-			$(git ls-files '*.[ch]pp')
+		time -p find app include src test -type f \
+			-name '*.[ch]pp' ! -path '*/external/*' \
+			-exec clang-format --style=file --dry-run --Werror {} +
 	} >"$1/clang-format.log" 2>&1
 	ok_or_fail
 }
