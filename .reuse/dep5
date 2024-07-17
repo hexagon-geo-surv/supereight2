@@ -27,6 +27,6 @@ Copyright: 2015 Autonomous Systems Lab, ETH Zurich
 	2020-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
 License: BSD-3-Clause
 
-Files: include/external/tinycolormap.hpp
+Files: include/se/external/tinycolormap.hpp
 Copyright: 2018-2020 Yuki Koyama
 License: MIT
