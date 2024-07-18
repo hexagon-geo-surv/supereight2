@@ -26,7 +26,7 @@ struct FieldData<Field::Occupancy> {
     field_t occupancy = 0;
     weight_t weight = 0;
     bool observed = false;
-    static constexpr bool invert_normals = false;
+    static constexpr bool invert_normals = true;
     static constexpr field_t surface_boundary = 0;
     static constexpr field_t min_occupancy = -100;
     static constexpr field_t max_occupancy = 100;
@@ -80,7 +80,7 @@ struct FieldData<Field::TSDF> {
 
     field_t tsdf = 1;
     weight_t weight = 0;
-    static constexpr bool invert_normals = true;
+    static constexpr bool invert_normals = false;
     static constexpr field_t surface_boundary = 0;
 
     /** Return whether the field data has been updated at least once. */

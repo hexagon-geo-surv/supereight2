@@ -366,8 +366,13 @@ void Tracker<MapT, SensorT>::trackKernel(
             }
 
             const Eigen::Vector2i ref_pixel = se::round_pixel(ref_pixel_f);
+            // TODO: Properly fix the ICP tracking instead of blindly inverting the reference
+            // normal. Due to a bug in raycast_volume(), it used to return the inwards instead of
+            // the outwards facing normals. Using the outwards facing normals breaks tracking in the
+            // TUM RGB-D dataset but it's not clear why. Added the normal inversion here until a
+            // proper fix for the ICP is found.
             const Eigen::Vector3f ref_normal_W =
-                surface_normals_W_ref[ref_pixel.x() + ref_pixel.y() * ref_res.x()];
+                -surface_normals_W_ref[ref_pixel.x() + ref_pixel.y() * ref_res.x()];
 
             if (ref_normal_W == math::g_invalid_normal) {
                 row.result = -3;

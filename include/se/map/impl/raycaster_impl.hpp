@@ -628,7 +628,7 @@ void render_volume(se::Image<RGBA>& render,
         const Eigen::Vector3f& surface_normal_W = surface_normals_W[pixel_idx];
         if (surface_normal_W != math::g_invalid_normal && surface_normal_W.norm() > 0.f) {
             const Eigen::Vector3f& surface_point_W = surface_points_W[pixel_idx];
-            const Eigen::Vector3f light_dir_W = (surface_point_W - light_source_W).normalized();
+            const Eigen::Vector3f light_dir_W = (light_source_W - surface_point_W).normalized();
             assert(surface_normal_W.isApprox(surface_normal_W.normalized()));
             // The intensity must be 0 if the light is opposite the surface (negative dot product).
             const float intensity = std::max(surface_normal_W.dot(light_dir_W), 0.0f);
