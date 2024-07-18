@@ -88,26 +88,6 @@ class MapIntegrator {
                         std::vector<const OctantBase*>* updated_octants = nullptr);
 
     /**
-     * \brief Integrate single ray measurement into the maps field representation.
-     *
-     * \tparam SensorT
-     * \param[in] timestamp       The timestamp of the ray to be integrated
-     * \param[in] ray_S           The measured ray in sensor frame
-     * \param[in] sensor          The sensor use for the projection
-     * \param[in] T_WS            The transformation from sensor to world frame
-     * \param[in] updated_octants Pointers to the octants updates during integration will be stored
-     *                            in \p updated_octants if it's not \p nullptr.
-     */
-    template<typename SensorT>
-    void integrateRay(const timestamp_t timestamp,
-                      const Eigen::Vector3f& ray_S,
-                      const SensorT& sensor,
-                      const Eigen::Isometry3f& T_WS,
-                      std::vector<const OctantBase*>* updated_octants = nullptr);
-
-
-
-    /**
      * \brief Integrate a batch of ray images into the maps field representation.
      *
      * \tparam SensorT

@@ -32,22 +32,6 @@ struct IntegrateDepthImplD {
  * Integration helper struct for partial function specialisation
  */
 template<se::Field FldT, se::Res ResT>
-struct IntegrateRayImplD {
-    template<typename SensorT, typename MapT>
-    static void integrate(MapT& map,
-                          const SensorT& sensor,
-                          const Eigen::Vector3f& ray_S,
-                          const Eigen::Isometry3f& T_WS,
-                          const timestamp_t timestamp,
-                          std::vector<const OctantBase*>* updated_octants);
-};
-
-
-
-/**
- * Integration helper struct for partial function specialisation
- */
-template<se::Field FldT, se::Res ResT>
 struct IntegrateRayBatchImplD {
     template<typename SensorT, typename MapT>
     static void integrate(
@@ -153,35 +137,6 @@ struct IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi> {
  * Multi-res OFusion integration helper struct for partial function specialisation
  */
 template<>
-struct IntegrateRayImplD<se::Field::Occupancy, se::Res::Multi> {
-    template<typename SensorT, typename MapT>
-    static void integrate(MapT& map,
-                          const SensorT& sensor,
-                          const Eigen::Vector3f& ray_S,
-                          const Eigen::Isometry3f& T_WS,
-                          const timestamp_t timestamp,
-                          std::vector<const OctantBase*>* updated_octants)
-    {
-        TICK("Ray Integration")
-        TICK("allocation-integration")
-        se::RayIntegrator rayIntegrator(map, sensor, ray_S, T_WS, timestamp, updated_octants);
-        rayIntegrator();
-        TOCK("allocation-integration")
-        TICK("propagateBlocksToCoarsestScale")
-        rayIntegrator.propagateBlocksToCoarsestScale();
-        TOCK("propagateBlocksToCoarsestScale")
-        TICK("propagateToRoot")
-        rayIntegrator.propagateToRoot();
-        TOCK("propagateToRoot")
-        rayIntegrator.updatedOctants(updated_octants);
-        TOCK("Ray Integration")
-    }
-};
-
-/**
- * Multi-res OFusion integration helper struct for partial function specialisation
- */
-template<>
 struct IntegrateRayBatchImplD<se::Field::Occupancy, se::Res::Multi> {
     template<typename SensorT, typename MapT>
     static void integrate(
@@ -228,9 +183,6 @@ template<typename MapT>
 using IntegrateDepthImpl = IntegrateDepthImplD<MapT::fld_, MapT::res_>;
 
 template<typename MapT>
-using IntegrateRayImpl = IntegrateRayImplD<MapT::fld_, MapT::res_>;
-
-template<typename MapT>
 using IntegrateRayBatchImpl = IntegrateRayBatchImplD<MapT::fld_, MapT::res_>;
 
 } // namespace details
@@ -255,18 +207,6 @@ void MapIntegrator<MapT>::integrateDepth(const timestamp_t timestamp,
 }
 
 
-
-template<typename MapT>
-template<typename SensorT>
-void MapIntegrator<MapT>::integrateRay(const timestamp_t timestamp,
-                                       const Eigen::Vector3f& ray_S,
-                                       const SensorT& sensor,
-                                       const Eigen::Isometry3f& T_WS,
-                                       std::vector<const OctantBase*>* updated_octants)
-{
-    se::details::IntegrateRayImpl<MapT>::integrate(
-        map_, sensor, ray_S, T_WS, timestamp, updated_octants);
-}
 
 template<typename MapT>
 template<typename SensorT>
