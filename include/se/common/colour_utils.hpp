@@ -72,7 +72,7 @@ void depth_to_rgba(RGBA* depth_RGBA_image_data,
  * If the scale is greater or equal to the number of colours in se::colours::scale then the last
  * colour will be returned.
  */
-static inline const RGB scale_colour(const int scale);
+static inline RGB scale_colour(const int scale);
 
 } // namespace se
 

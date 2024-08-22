@@ -37,7 +37,7 @@ RGBA blend(const RGBA a, const RGBA b, const float alpha)
 
 
 
-const RGB scale_colour(const int scale)
+RGB scale_colour(const int scale)
 {
     assert(scale >= 0);
     if (static_cast<size_t>(scale) < colours::scale.size()) {
