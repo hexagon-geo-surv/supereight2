@@ -167,11 +167,6 @@ class Octree {
     Eigen::AlignedBox3i aabb_;
 };
 
-
-
-template<typename DataT, Res ResT, int BlockSize>
-constexpr scale_t Octree<DataT, ResT, BlockSize>::max_block_scale;
-
 } // namespace se
 
 #include "impl/octree_impl.hpp"
