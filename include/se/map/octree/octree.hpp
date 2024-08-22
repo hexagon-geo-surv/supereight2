@@ -41,17 +41,15 @@ class Octree {
     typedef QuadMesh<Colour::Off, Semantics::Off> StructureMesh;
 
     /** Initialize an octree with an edge length of at least \p size voxels. The actual edge length
-     * in voxels will be the smallest power of 2 that is greater or equal to \p size. and at least
-     * 2 * \p BlockSize.
+     * in voxels, as returned by se::Octree::getSize(), will be the smallest power of 2 that at
+     * least \p size and at least `2 * BlockSize`.
      */
     Octree(const int size);
 
-    /** The copy constructor is explicitly deleted.
-     */
+    /** The copy constructor is explicitly deleted because copying octrees is expensive. */
     Octree(const Octree&) = delete;
 
-    /** The copy assignment operator is explicitly deleted.
-     */
+    /** The copy assignment operator is explicitly deleted because copying octrees is expensive. */
     Octree& operator=(const Octree&) = delete;
 
     OctreeIterator<Octree<DataT, ResT, BlockSize>> begin();
@@ -61,31 +59,26 @@ class Octree {
     OctreeIterator<const Octree<DataT, ResT, BlockSize>> end() const;
     OctreeIterator<const Octree<DataT, ResT, BlockSize>> cend() const;
 
-    /** Test if point \p voxel_coord with coordinates in voxels is contained in the octree.
+    /** Return whether point \p voxel_coord with coordinates in voxels is contained in the octree.
      */
     bool contains(const Eigen::Vector3i& voxel_coord) const;
 
-    /** Get the pointer octree's root octant.
-     */
+    /** Return a non-null pointer to the octree's root node. */
     OctantBase* getRoot();
 
-    /** Get the pointer octree's root octant.
+    /** Const version of se::Octree::getRoot().
      *
-     * \todo Return `const OctantBase*` once all relevant functions have been made const-correct.
+     * \todo Return `const OctantBase*` once a proper const iterator is implemented.
      */
     OctantBase* getRoot() const;
 
-    /** Get the length of the octree edge in voxels.
-     */
+    /** Return the edge length of the octree volume in voxels. */
     int getSize() const;
 
-    /**
-     * Get the maximum scale of the octree, i.e. the scale of the root node.
-     */
+    /** Return the maximum octree scale, that is, the scale of the root node. */
     int getMaxScale() const;
 
-    /** Get the depth voxel blocks are allocated at.
-     */
+    /** Return the depth blocks are allocated at. */
     int getBlockDepth() const;
 
     /** Allocate a child of a node.
@@ -103,12 +96,10 @@ class Octree {
      */
     bool allocate(NodeType* const parent_ptr, const int child_idx, OctantBase*& child_ptr);
 
-    /** Allocate all the child nodes of \p parent_ptr.
-     */
+    /** Allocate all the children of \p parent_ptr. */
     void allocateChildren(NodeType* const parent_ptr);
 
-    /** Recursively delete all children of \p parent_ptr.
-     */
+    /** Recursively delete all the children of \p parent_ptr. */
     void deleteChildren(NodeType* const parent_ptr);
 
     /** Return the axis-aligned bounding box of the octree's allocated leaves. The bounding box is
@@ -133,9 +124,9 @@ class Octree {
     static constexpr Colour col_ = DataT::col_;
     static constexpr Semantics sem_ = DataT::sem_;
     static constexpr Res res_ = ResT;
-    /** The edge length of a voxel block in voxels. */
+    /** The edge length of a block in voxels. */
     static constexpr int block_size = BlockSize;
-    /** The maximum scale of a voxel block. */
+    /** The maximum scale of a block. */
     static constexpr scale_t max_block_scale = math::log2_const(BlockSize);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
