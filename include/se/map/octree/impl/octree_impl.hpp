@@ -1,8 +1,8 @@
 /*
  * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
- * SPDX-FileCopyrightText: 2019-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2019-2024 Smart Robotics Lab, Imperial College London, Technical University of Munich
  * SPDX-FileCopyrightText: 2019-2021 Nils Funk
- * SPDX-FileCopyrightText: 2019-2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2019-2024 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -73,6 +73,46 @@ bool Octree<DataT, ResT, BlockSize>::contains(const Eigen::Vector3i& voxel_coord
 {
     return voxel_coord.x() >= 0 && voxel_coord.x() < size_ && voxel_coord.y() >= 0
         && voxel_coord.y() < size_ && voxel_coord.z() >= 0 && voxel_coord.z() < size_;
+}
+
+
+
+template<typename DataT, Res ResT, int BlockSize>
+OctantBase* Octree<DataT, ResT, BlockSize>::getRoot()
+{
+    return root_ptr_;
+}
+
+
+
+template<typename DataT, Res ResT, int BlockSize>
+OctantBase* Octree<DataT, ResT, BlockSize>::getRoot() const
+{
+    return root_ptr_;
+}
+
+
+
+template<typename DataT, Res ResT, int BlockSize>
+int Octree<DataT, ResT, BlockSize>::getSize() const
+{
+    return size_;
+}
+
+
+
+template<typename DataT, Res ResT, int BlockSize>
+int Octree<DataT, ResT, BlockSize>::getMaxScale() const
+{
+    return math::log2_const(size_);
+}
+
+
+
+template<typename DataT, Res ResT, int BlockSize>
+int Octree<DataT, ResT, BlockSize>::getBlockDepth() const
+{
+    return math::log2_const(size_) - math::log2_const(BlockSize);
 }
 
 

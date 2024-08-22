@@ -1,8 +1,8 @@
 /*
  * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
- * SPDX-FileCopyrightText: 2019-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2019-2024 Smart Robotics Lab, Imperial College London, Technical University of Munich
  * SPDX-FileCopyrightText: 2019-2021 Nils Funk
- * SPDX-FileCopyrightText: 2019-2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2019-2024 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -67,41 +67,26 @@ class Octree {
 
     /** Get the pointer octree's root octant.
      */
-    OctantBase* getRoot()
-    {
-        return root_ptr_;
-    };
+    OctantBase* getRoot();
 
     /** Get the pointer octree's root octant.
      *
      * \todo Return `const OctantBase*` once all relevant functions have been made const-correct.
      */
-    OctantBase* getRoot() const
-    {
-        return root_ptr_;
-    };
+    OctantBase* getRoot() const;
 
     /** Get the length of the octree edge in voxels.
      */
-    int getSize() const
-    {
-        return size_;
-    }
+    int getSize() const;
 
     /**
      * Get the maximum scale of the octree, i.e. the scale of the root node.
      */
-    int getMaxScale() const
-    {
-        return math::log2_const(size_);
-    }
+    int getMaxScale() const;
 
     /** Get the depth voxel blocks are allocated at.
      */
-    int getBlockDepth() const
-    {
-        return math::log2_const(size_) - math::log2_const(BlockSize);
-    }
+    int getBlockDepth() const;
 
     /** Allocate a child of a node.
      *
