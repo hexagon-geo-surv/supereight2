@@ -1480,7 +1480,7 @@ getFieldGrad(const OctreeT& octree,
                    * factor.y())
                 * factor.z();
 
-        return 0.5f * gradient;
+        return 0.5f * gradient / octantops::scale_to_size(scale_returned);
     }
 
     return std::nullopt;
