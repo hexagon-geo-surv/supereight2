@@ -159,6 +159,16 @@ Octree<DataT, ResT, BlockSize>::structure(const Eigen::Affine3f& T_OV, const boo
 
 
 template<typename DataT, Res ResT, int BlockSize>
+int Octree<DataT, ResT, BlockSize>::saveStructure(const std::string& filename,
+                                                  const Eigen::Affine3f& T_OV,
+                                                  const bool only_leaves) const
+{
+    return io::save_mesh(structure(T_OV, only_leaves), filename);
+}
+
+
+
+template<typename DataT, Res ResT, int BlockSize>
 bool Octree<DataT, ResT, BlockSize>::allocate(NodeType* const parent_ptr,
                                               const int child_idx,
                                               OctantBase*& child_ptr)

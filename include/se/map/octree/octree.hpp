@@ -110,6 +110,15 @@ class Octree {
     StructureMesh structure(const Eigen::Affine3f& T_OV = Eigen::Affine3f::Identity(),
                             const bool only_leaves = true) const;
 
+    /** Save the mesh returned by se::Octree::structure() in \p filename. The \p T_OV and \p
+     * only_leaves arguments are passed directly to se::Octree::structure(). The file format will be
+     * selected based on the extension of \p filename, which must be one of those in
+     * se::io::mesh_extensions. Return the value returned by se::io::save_mesh().
+     */
+    int saveStructure(const std::string& filename,
+                      const Eigen::Affine3f& T_OV = Eigen::Affine3f::Identity(),
+                      const bool only_leaves = true) const;
+
     /** Allocate a child of a node.
      *
      * \note The returned pointer is of type se::OctantBase as the child might be a node or block.
