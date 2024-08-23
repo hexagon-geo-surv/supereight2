@@ -10,11 +10,7 @@
 #include "reader_raw.hpp"
 
 #include <iostream>
-
-#include "se/common/filesystem.hpp"
-#include "se/common/image_utils.hpp"
-
-
+#include <se/common/filesystem.hpp>
 
 constexpr size_t se::RAWReader::depth_pixel_size_;
 constexpr size_t se::RAWReader::colour_pixel_size_;

@@ -9,11 +9,8 @@
 #ifndef SE_ALLOCATOR_HPP
 #define SE_ALLOCATOR_HPP
 
-#include <Eigen/StdVector>
+#include <se/map/octant/octant.hpp>
 #include <set>
-
-#include "octree.hpp"
-#include "se/map/utils/type_util.hpp"
 
 /**
  * Helper wrapper to allocate and de-allocate octants in the octree.

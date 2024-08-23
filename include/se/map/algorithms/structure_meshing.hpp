@@ -9,7 +9,7 @@
 #ifndef SE_STRUCTURE_MESHING_HPP
 #define SE_STRUCTURE_MESHING_HPP
 
-#include "se/map/octree/octree.hpp"
+#include <Eigen/Core>
 
 namespace se {
 

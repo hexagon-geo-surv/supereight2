@@ -7,22 +7,10 @@
 
 #include "reader_tum.hpp"
 
-#include <Eigen/Geometry>
-#include <Eigen/StdVector>
-#include <algorithm>
-#include <cassert>
-#include <cmath>
-#include <cstring>
-#include <iomanip>
 #include <iostream>
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/opencv.hpp>
-
-#include "se/common/filesystem.hpp"
-#include "se/common/image_utils.hpp"
-
-
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgproc.hpp>
+#include <se/common/filesystem.hpp>
 
 /** The filename of a depth or RGB image and its timestamp.
  */

@@ -11,14 +11,10 @@
 
 #include <optional>
 #include <se/common/eigen_utils.hpp>
-#include <se/common/rgb.hpp>
-#include <se/common/rgba.hpp>
-
-#include "se/common/colour_utils.hpp"
-#include "se/common/math_util.hpp"
-#include "se/image/image.hpp"
-#include "se/map/octree/visitor.hpp"
-#include "se/map/octree/voxel_block_ray_iterator.hpp"
+#include <se/common/math_util.hpp>
+#include <se/image/image.hpp>
+#include <se/map/octree/visitor.hpp>
+#include <se/map/octree/voxel_block_ray_iterator.hpp>
 
 
 

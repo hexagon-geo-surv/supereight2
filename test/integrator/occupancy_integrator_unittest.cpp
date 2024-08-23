@@ -6,9 +6,8 @@
 
 #include <gtest/gtest.h>
 #include <queue>
+#include <se/integrator/map_integrator.hpp>
 #include <sstream>
-
-#include "se/integrator/map_integrator.hpp"
 
 class OccupancyIntegrator : public ::testing::Test {
     protected:

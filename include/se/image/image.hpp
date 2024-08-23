@@ -11,10 +11,7 @@
 
 #include <cassert>
 #include <memory>
-#include <se/common/rgb.hpp>
-#include <se/common/rgba.hpp>
-
-#include "se/common/colour_utils.hpp"
+#include <se/common/colour_utils.hpp>
 
 namespace se {
 

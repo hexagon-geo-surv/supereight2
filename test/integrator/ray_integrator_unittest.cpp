@@ -5,11 +5,9 @@
  */
 
 #include <gtest/gtest.h>
-#include <math.h>
 #include <queue>
 #include <se/common/filesystem.hpp>
 #include <se/integrator/map_integrator.hpp>
-#include <se/map/map.hpp>
 
 typedef se::OccupancyMap<se::Res::Multi, 8>::OctreeType::NodeType NodeType;
 typedef se::OccupancyMap<se::Res::Multi, 8>::OctreeType::BlockType BlockType;

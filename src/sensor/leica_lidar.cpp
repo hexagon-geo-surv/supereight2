@@ -4,10 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "se/common/str_utils.hpp"
 #include "se/sensor/sensor.hpp"
-
-
 
 void se::LeicaLidar::Config::readYaml(const std::string& filename)
 {

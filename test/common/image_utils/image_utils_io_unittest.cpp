@@ -6,8 +6,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <Eigen/Core>
-#include <cstdint>
 #include <cstring>
 #include <gtest/gtest.h>
 #include <memory>

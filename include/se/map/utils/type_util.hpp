@@ -9,7 +9,6 @@
 #define SE_TYPE_UTIL_HPP
 
 #include <Eigen/StdVector>
-#include <cstdint>
 #include <se/common/rgb.hpp>
 
 EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector2f)

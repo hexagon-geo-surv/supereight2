@@ -12,8 +12,6 @@
 
 #include "reader_base.hpp"
 
-
-
 namespace se {
 
 /** Create the appropriate reader instance based on the configuration.

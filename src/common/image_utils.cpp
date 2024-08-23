@@ -11,11 +11,7 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
-#include <opencv2/core.hpp>
-#include <opencv2/highgui.hpp>
 #include <opencv2/imgcodecs.hpp>
-
-
 
 int se::save_depth_png(const float* depth_image_data,
                        const Eigen::Vector2i& depth_image_res,

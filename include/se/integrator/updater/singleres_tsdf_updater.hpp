@@ -9,8 +9,7 @@
 #ifndef SE_SINGLERES_TSDF_UPDATER_HPP
 #define SE_SINGLERES_TSDF_UPDATER_HPP
 
-#include "se/map/map.hpp"
-#include "se/sensor/sensor.hpp"
+#include <se/map/octant/octant.hpp>
 
 namespace se {
 

@@ -9,7 +9,6 @@
 #ifndef SE_KEY_UTIL_IMPL_HPP
 #define SE_KEY_UTIL_IMPL_HPP
 
-#include "se/supereight_config.hpp"
 #if defined(SE_TBB) && SE_TBB
 #    include <execution>
 #    define SE_PARALLEL_SORT(keys) std::sort(std::execution::par_unseq, keys.begin(), keys.end())

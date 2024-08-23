@@ -10,10 +10,8 @@
 #include "se/map/preprocessor.hpp"
 
 #include <Eigen/StdVector>
-#include <iostream>
 #include <se/common/eigen_utils.hpp>
-
-#include "se/common/math_util.hpp"
+#include <se/common/math_util.hpp>
 
 namespace se {
 namespace preprocessor {

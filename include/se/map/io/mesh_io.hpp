@@ -10,14 +10,11 @@
 #define SE_MESHING_IO_HPP
 
 #include <Eigen/Geometry>
-#include <algorithm>
-#include <array>
 #include <fstream>
 #include <iostream>
-
-#include "se/common/colour_utils.hpp"
-#include "se/common/str_utils.hpp"
-#include "se/map/algorithms/mesh.hpp"
+#include <se/common/colour_utils.hpp>
+#include <se/common/str_utils.hpp>
+#include <se/map/algorithms/mesh.hpp>
 
 namespace se {
 namespace io {

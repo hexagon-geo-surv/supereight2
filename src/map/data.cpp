@@ -8,9 +8,8 @@
 #include "se/map/data.hpp"
 
 #include <cmath>
-
-#include "se/common/str_utils.hpp"
-#include "se/common/yaml.hpp"
+#include <se/common/str_utils.hpp>
+#include <se/common/yaml.hpp>
 
 namespace se {
 

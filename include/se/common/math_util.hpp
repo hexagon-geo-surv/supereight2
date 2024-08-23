@@ -13,7 +13,6 @@
 
 #include <Eigen/Geometry>
 #include <cmath>
-#include <vector>
 
 
 

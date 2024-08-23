@@ -7,8 +7,6 @@
 #include <gtest/gtest.h>
 #include <se/map/io/mesh_io.hpp>
 
-
-
 TEST(MeshIO, hasSupportedMeshExtension)
 {
     const std::vector<std::pair<std::string, bool>> test_data = {{"foo.ply", true},

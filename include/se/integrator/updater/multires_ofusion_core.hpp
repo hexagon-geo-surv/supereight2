@@ -9,11 +9,7 @@
 #define SE_MULTIRES_OFUSION_CORE_HPP
 
 #include <algorithm>
-#include <limits>
-
-#include "se/common/str_utils.hpp"
-#include "se/map/data.hpp"
-#include "se/map/octant/octant.hpp"
+#include <se/map/octant/octant.hpp>
 
 namespace se {
 

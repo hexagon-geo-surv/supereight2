@@ -11,8 +11,7 @@
 #define SE_PREPROCESSOR_HPP
 
 #include <Eigen/Geometry>
-
-#include "se/image/image.hpp"
+#include <se/image/image.hpp>
 
 namespace se {
 namespace preprocessor {

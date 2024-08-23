@@ -10,16 +10,14 @@
 
 #include "reader.hpp"
 
-#include "reader_interiornet.hpp"
-#include "reader_leica.hpp"
-#include "reader_newercollege.hpp"
-#include "reader_openni.hpp"
-#include "reader_raw.hpp"
-#include "reader_tum.hpp"
-#include "se/common/filesystem.hpp"
-#include "se/common/str_utils.hpp"
-
-
+#include <iostream>
+#include <reader_interiornet.hpp>
+#include <reader_leica.hpp>
+#include <reader_newercollege.hpp>
+#include <reader_openni.hpp>
+#include <reader_raw.hpp>
+#include <reader_tum.hpp>
+#include <se/common/filesystem.hpp>
 
 se::Reader* se::create_reader(const se::Reader::Config& config)
 {

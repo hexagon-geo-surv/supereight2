@@ -8,8 +8,8 @@
 #ifndef SE_DATA_SEMANTICS_HPP
 #define SE_DATA_SEMANTICS_HPP
 
-#include "utils/setup_util.hpp"
-#include "utils/type_util.hpp"
+#include <se/map/utils/setup_util.hpp>
+#include <se/map/utils/type_util.hpp>
 
 namespace se {
 

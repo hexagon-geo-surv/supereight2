@@ -9,16 +9,7 @@
 #ifndef __READER_NEWERCOLLEGE_HPP
 #define __READER_NEWERCOLLEGE_HPP
 
-#include <Eigen/Core>
-#include <cstdint>
-#include <fstream>
-#include <string>
-
 #include "reader_base.hpp"
-#include "se/common/projection.hpp"
-#include "se/image/image.hpp"
-
-
 
 namespace se {
 

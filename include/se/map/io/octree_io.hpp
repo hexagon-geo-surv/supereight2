@@ -13,8 +13,6 @@
 #include <iostream>
 #include <sstream>
 
-#include "se/map/octree/octree.hpp"
-
 namespace se {
 namespace io {
 

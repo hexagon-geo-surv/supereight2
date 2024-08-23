@@ -10,11 +10,8 @@
 #define SE_KEY_UTIL_HPP
 
 #include <algorithm>
-
-#include "se/map/utils/setup_util.hpp"
-#include "se/map/utils/type_util.hpp"
-
-
+#include <se/map/utils/setup_util.hpp>
+#include <se/map/utils/type_util.hpp>
 
 namespace se {
 

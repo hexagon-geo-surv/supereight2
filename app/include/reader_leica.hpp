@@ -7,17 +7,7 @@
 #ifndef __READER_LEICA_HPP
 #define __READER_LEICA_HPP
 
-#include <Eigen/Dense>
-#include <Eigen/StdVector>
-#include <cstdint>
-#include <fstream>
-#include <string>
-
 #include "reader_base.hpp"
-#include "se/common/projection.hpp"
-#include "se/image/image.hpp"
-
-
 
 namespace se {
 

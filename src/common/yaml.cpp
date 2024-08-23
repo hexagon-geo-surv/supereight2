@@ -7,14 +7,10 @@
 
 #include "se/common/yaml.hpp"
 
-#include "se/common/str_utils.hpp"
-
-
+#include <se/common/str_utils.hpp>
 
 namespace se {
 namespace yaml {
-
-
 
 void subnode_as_bool(const cv::FileNode& base_node, const std::string& subnode_name, bool& b)
 {

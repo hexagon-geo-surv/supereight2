@@ -13,15 +13,9 @@
 
 #include <Eigen/Geometry>
 #include <chrono>
-#include <cstdint>
 #include <fstream>
-#include <se/common/rgba.hpp>
-#include <string>
-
-#include "se/common/str_utils.hpp"
-#include "se/image/image.hpp"
-
-
+#include <se/common/str_utils.hpp>
+#include <se/image/image.hpp>
 
 namespace se {
 

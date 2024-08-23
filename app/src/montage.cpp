@@ -7,7 +7,6 @@
 
 #include "montage.hpp"
 
-#include <iostream>
 #include <opencv2/imgproc.hpp>
 
 namespace se {

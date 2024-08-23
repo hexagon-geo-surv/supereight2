@@ -9,11 +9,6 @@
 
 #include "se/tracker/tracker.hpp"
 
-#include "se/common/str_utils.hpp"
-#include "se/common/yaml.hpp"
-
-
-
 namespace se {
 
 void TrackerConfig::readYaml(const std::string& filename)

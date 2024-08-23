@@ -5,12 +5,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <Eigen/StdVector>
 #include <gtest/gtest.h>
-
-#include "se/map/data.hpp"
-#include "se/map/octree/allocator.hpp"
-#include "se/map/utils/octant_util.hpp"
+#include <se/map/octree/allocator.hpp>
+#include <se/map/octree/octree.hpp>
 
 // Helper function to create ought values.
 Eigen::Vector3i adapt_to_scale(const Eigen::Vector3i& coord, const se::scale_t scale)

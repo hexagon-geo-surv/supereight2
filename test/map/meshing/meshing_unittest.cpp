@@ -8,9 +8,9 @@
 
 #include <Eigen/StdVector>
 #include <gtest/gtest.h>
-#include <random>
-
-#include "se/map/map.hpp"
+#include <se/map/algorithms/marching_cube.hpp>
+#include <se/map/io/mesh_io.hpp>
+#include <se/map/octree/octree.hpp>
 
 template<typename OctreeType>
 std::shared_ptr<OctreeType>

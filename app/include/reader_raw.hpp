@@ -10,15 +10,7 @@
 #ifndef __READER_RAW_HPP
 #define __READER_RAW_HPP
 
-#include <Eigen/Core>
-#include <cstdint>
-#include <fstream>
-#include <string>
-
 #include "reader_base.hpp"
-#include "se/image/image.hpp"
-
-
 
 namespace se {
 

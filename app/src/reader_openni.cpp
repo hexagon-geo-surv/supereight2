@@ -9,12 +9,7 @@
 
 #include "reader_openni.hpp"
 
-#include <algorithm>
 #include <iostream>
-
-#include "se/common/image_utils.hpp"
-
-
 
 #ifdef SE_OPENNI2
 

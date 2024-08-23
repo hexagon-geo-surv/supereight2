@@ -9,18 +9,13 @@
 #ifndef SE_CONFIG_HPP
 #define SE_CONFIG_HPP
 
+#include <se/map/map.hpp>
+#include <se/sensor/sensor.hpp>
+#include <se/tracker/tracker.hpp>
 
-
-#include "reader.hpp"
-#include "se/map/map.hpp"
-#include "se/sensor/sensor.hpp"
-#include "se/tracker/tracker.hpp"
-
-
+#include "reader_base.hpp"
 
 namespace se {
-
-
 
 struct AppConfig {
     /** Whether to use the available ground truth camera pose.

@@ -10,20 +10,11 @@
 #ifndef __READER_OPENNI_HPP
 #define __READER_OPENNI_HPP
 
-#include <Eigen/Core>
-#include <cstdint>
-#include <fstream>
-#include <memory>
-#include <string>
-
 #include "reader_base.hpp"
-#include "se/image/image.hpp"
 
 #ifdef SE_OPENNI2
 #    include <openni2/OpenNI.h>
 #endif
-
-
 
 namespace se {
 

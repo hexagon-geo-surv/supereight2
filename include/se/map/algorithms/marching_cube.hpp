@@ -9,17 +9,12 @@
 #ifndef SE_MARCHING_CUBE_HPP
 #define SE_MARCHING_CUBE_HPP
 
-
-
-#include "edge_tables.hpp"
-#include "se/common/bounded_vector.hpp"
-#include "se/common/timings.hpp"
-#include "se/map/algorithms/mesh.hpp"
-#include "se/map/octree/fetcher.hpp"
-#include "se/map/octree/iterator.hpp"
-#include "se/map/octree/visitor.hpp"
-
-
+#include <se/common/bounded_vector.hpp>
+#include <se/common/timings.hpp>
+#include <se/map/algorithms/edge_tables.hpp>
+#include <se/map/algorithms/mesh.hpp>
+#include <se/map/octree/iterator.hpp>
+#include <se/map/octree/visitor.hpp>
 
 namespace se {
 namespace meshing {

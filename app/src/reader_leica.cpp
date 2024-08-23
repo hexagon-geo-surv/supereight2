@@ -6,18 +6,8 @@
 
 #include "reader_leica.hpp"
 
-#include <cassert>
-#include <cctype>
-#include <cmath>
-#include <cstring>
-#include <iomanip>
 #include <iostream>
-#include <opencv2/opencv.hpp>
-#include <regex>
-
-#include "se/common/filesystem.hpp"
-#include "se/common/image_utils.hpp"
-#include "se/common/yaml.hpp"
+#include <se/common/filesystem.hpp>
 
 /** A timestamped ground truth pose (VIO estimate) .
  */

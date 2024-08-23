@@ -10,7 +10,7 @@
 #ifndef SE_VOXEL_BLOCK_RAY_ITERATOR_HPP
 #define SE_VOXEL_BLOCK_RAY_ITERATOR_HPP
 
-#include "se/map/octree/octree.hpp"
+#include <se/map/octant/octant.hpp>
 
 #define CAST_STACK_DEPTH 23
 

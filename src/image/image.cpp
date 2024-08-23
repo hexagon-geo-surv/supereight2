@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <se/image/image.hpp>
+#include "se/image/image.hpp"
 
 namespace se {
 namespace image {

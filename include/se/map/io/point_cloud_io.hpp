@@ -10,9 +10,8 @@
 
 #include <Eigen/Geometry>
 #include <fstream>
+#include <se/image/image.hpp>
 #include <string>
-
-#include "se/image/image.hpp"
 
 /**
  * \brief Save a point cloud as a VTK file.

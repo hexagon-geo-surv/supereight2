@@ -5,14 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "se/map/map.hpp"
-
-#include <Eigen/StdVector>
 #include <gtest/gtest.h>
-#include <se/map/map.hpp>
-#include <vector>
-
-#include "se/integrator/map_integrator.hpp"
+#include <se/integrator/map_integrator.hpp>
 
 TEST(Map, Gradient)
 {

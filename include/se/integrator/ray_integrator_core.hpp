@@ -6,6 +6,9 @@
 
 #ifndef SE_RAY_INTEGRATOR_CORE_HPP
 #define SE_RAY_INTEGRATOR_CORE_HPP
+
+#include <se/map/octant/octant.hpp>
+
 namespace se {
 
 namespace ray_integrator {
@@ -81,6 +84,7 @@ void propagate_block_down_to_scale(se::OctantBase* octant_ptr, int desired_scale
 } // namespace ray_integrator
 
 } // namespace se
+
 #include "impl/ray_integrator_core_impl.hpp"
 
 #endif //SE_RAY_INTEGRATOR_CORE_HPP

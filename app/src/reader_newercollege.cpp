@@ -8,16 +8,9 @@
 
 #include "reader_newercollege.hpp"
 
-#include <cassert>
-#include <cctype>
-#include <cmath>
-#include <cstring>
-#include <iomanip>
 #include <iostream>
 #include <regex>
-
-#include "se/common/filesystem.hpp"
-#include "se/common/image_utils.hpp"
+#include <se/common/filesystem.hpp>
 
 #ifdef SE_PCL
 #    include <pcl/io/pcd_io.h>

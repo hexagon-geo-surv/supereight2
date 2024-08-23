@@ -9,10 +9,9 @@
 #ifndef SE_OCTANT_HPP
 #define SE_OCTANT_HPP
 
-#include "se/common/math_util.hpp"
-#include "se/map/data.hpp"
-#include "se/map/utils/key_util.hpp"
-#include "se/map/utils/setup_util.hpp"
+#include <se/common/math_util.hpp>
+#include <se/map/data.hpp>
+#include <se/map/utils/key_util.hpp>
 
 namespace se {
 

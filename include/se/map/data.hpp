@@ -9,13 +9,9 @@
 #define SE_DATA_HPP
 
 #include <array>
-#include <se/common/bounded_vector.hpp>
-
-#include "data_colour.hpp"
-#include "data_field.hpp"
-#include "data_semantics.hpp"
-#include "utils/setup_util.hpp"
-#include "utils/type_util.hpp"
+#include <se/map/data_colour.hpp>
+#include <se/map/data_field.hpp>
+#include <se/map/data_semantics.hpp>
 
 namespace se {
 

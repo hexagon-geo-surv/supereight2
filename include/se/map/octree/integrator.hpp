@@ -9,7 +9,7 @@
 #ifndef SE_INTEGRATOR_HPP
 #define SE_INTEGRATOR_HPP
 
-#include "allocator.hpp"
+#include <se/map/octree/allocator.hpp>
 
 namespace se {
 

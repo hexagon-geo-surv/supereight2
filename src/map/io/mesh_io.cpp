@@ -7,8 +7,6 @@
 
 #include "se/map/io/mesh_io.hpp"
 
-#include "se/common/str_utils.hpp"
-
 namespace se {
 namespace io {
 

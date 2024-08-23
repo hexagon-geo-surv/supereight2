@@ -9,8 +9,7 @@
 #ifndef SE_FETCHER_HPP
 #define SE_FETCHER_HPP
 
-#include "octree.hpp"
-#include "se/map/utils/type_util.hpp"
+#include <se/map/utils/octant_util.hpp>
 
 namespace se {
 namespace fetcher {

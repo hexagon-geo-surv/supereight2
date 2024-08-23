@@ -8,13 +8,8 @@
 #ifndef SE_MULTIRES_OFUSION_UPDATER_HPP
 #define SE_MULTIRES_OFUSION_UPDATER_HPP
 
-
-
+#include <se/integrator/updater/multires_ofusion_core.hpp>
 #include <set>
-
-#include "se/sensor/sensor.hpp"
-
-
 
 namespace se {
 

@@ -8,20 +8,9 @@
 #ifndef __READER_TUM_HPP
 #define __READER_TUM_HPP
 
-
-#include <Eigen/Core>
-#include <cstdint>
-#include <fstream>
-#include <string>
-
 #include "reader_base.hpp"
-#include "se/image/image.hpp"
-
-
 
 namespace se {
-
-
 
 /** Reader for the TUM RGBD dataset.
  * https://vision.in.tum.de/data/datasets/rgbd-dataset

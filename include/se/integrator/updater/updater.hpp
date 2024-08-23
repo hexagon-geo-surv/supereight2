@@ -8,7 +8,7 @@
 #ifndef SE_UPDATER_HPP
 #define SE_UPDATER_HPP
 
-#include "se/integrator/measurement.hpp"
+#include <se/integrator/measurement.hpp>
 
 namespace se {
 

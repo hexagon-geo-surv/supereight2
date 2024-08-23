@@ -7,11 +7,9 @@
 #ifndef SE_RAY_INTEGRATOR_HPP
 #define SE_RAY_INTEGRATOR_HPP
 
-#include <Eigen/Core>
+#include <se/integrator/ray_integrator_core.hpp>
 #include <set>
-#include <thread>
-
-#include "se/integrator/ray_integrator_core.hpp"
+#include <unordered_set>
 
 namespace se {
 

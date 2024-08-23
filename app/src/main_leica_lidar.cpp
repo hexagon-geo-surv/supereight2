@@ -5,14 +5,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <se/common/filesystem.hpp>
+#include <se/common/system_utils.hpp>
 #include <se/supereight.hpp>
 
 #include "config.hpp"
 #include "draw.hpp"
 #include "montage.hpp"
 #include "reader.hpp"
-#include "se/common/filesystem.hpp"
-#include "se/common/system_utils.hpp"
 
 int main(int argc, char** argv)
 {

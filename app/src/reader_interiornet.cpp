@@ -7,17 +7,10 @@
 
 #include "reader_interiornet.hpp"
 
-#include <Eigen/Geometry>
-#include <Eigen/StdVector>
-#include <algorithm>
-#include <cassert>
-#include <cmath>
-#include <cstring>
-#include <iomanip>
 #include <iostream>
-
-#include "se/common/filesystem.hpp"
-#include "se/common/image_utils.hpp"
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgproc.hpp>
+#include <se/common/filesystem.hpp>
 
 struct InteriorNetIntrinsics {
     static constexpr float f_x = 600;

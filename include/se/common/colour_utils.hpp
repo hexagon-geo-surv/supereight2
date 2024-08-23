@@ -9,7 +9,6 @@
 #define SE_COLOUR_UTILS_HPP
 
 #include <Eigen/Core>
-#include <cstdint>
 #include <se/common/rgb.hpp>
 #include <se/common/rgba.hpp>
 #include <vector>

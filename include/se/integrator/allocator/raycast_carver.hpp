@@ -9,11 +9,14 @@
 #ifndef SE_RAYCAST_CARVER_HPP
 #define SE_RAYCAST_CARVER_HPP
 
-#include "se/common/math_util.hpp"
-#include "se/integrator/allocator/dense_pooling_image.hpp"
-#include "se/integrator/allocator/volume_carver.hpp"
-#include "se/integrator/updater/multires_ofusion_core.hpp"
-#include "se/map/octree/propagator.hpp"
+#include <Eigen/Geometry>
+#include <se/common/timings.hpp>
+#include <se/image/image.hpp>
+#include <se/map/octant/octant.hpp>
+#include <se/map/octree/allocator.hpp>
+#include <se/map/octree/fetcher.hpp>
+#include <se/map/octree/iterator.hpp>
+#include <set>
 
 namespace se {
 namespace fetcher {

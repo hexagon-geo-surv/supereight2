@@ -4,9 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <cmath>
-#include <se/common/math_util.hpp>
-#include <se/integrator/uncertainty.hpp>
+#include "se/integrator/uncertainty.hpp"
 
 namespace se {
 namespace uncert {

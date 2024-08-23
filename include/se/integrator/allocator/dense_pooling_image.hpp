@@ -8,15 +8,9 @@
 #ifndef SE_DENSE_POOLING_IMAGE
 #define SE_DENSE_POOLING_IMAGE
 
-#include <Eigen/Core>
 #include <iostream>
-
-#include "se/common/perfstats.hpp"
-#include "se/common/timings.hpp"
-#include "se/image/image.hpp"
-#include "se/sensor/sensor.hpp"
-
-
+#include <se/common/timings.hpp>
+#include <se/sensor/sensor.hpp>
 
 namespace se {
 

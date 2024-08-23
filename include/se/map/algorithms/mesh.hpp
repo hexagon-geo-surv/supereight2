@@ -9,10 +9,8 @@
 #ifndef SE_MESH_FACE_HPP
 #define SE_MESH_FACE_HPP
 
-#include <Eigen/Core>
 #include <Eigen/StdVector>
 #include <array>
-#include <cstdint>
 #include <optional>
 #include <se/common/rgb.hpp>
 #include <se/map/utils/setup_util.hpp>

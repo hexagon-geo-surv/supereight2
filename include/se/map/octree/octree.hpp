@@ -12,12 +12,8 @@
 #include <Eigen/Geometry>
 #include <memory>
 #include <se/map/algorithms/mesh.hpp>
-
-#include "se/map/octant/octant.hpp"
-#include "se/map/octree/iterator.hpp"
-#include "se/map/utils/key_util.hpp"
-#include "se/map/utils/memory_pool.hpp"
-#include "se/map/utils/setup_util.hpp"
+#include <se/map/octree/iterator.hpp>
+#include <se/map/utils/memory_pool.hpp>
 
 namespace se {
 

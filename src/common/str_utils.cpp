@@ -8,8 +8,7 @@
 #include "se/common/str_utils.hpp"
 
 #include <algorithm>
-
-#include "se/common/filesystem.hpp"
+#include <se/common/filesystem.hpp>
 
 // The wordexp.h header and wordexp() are part of POSIX.
 #if __has_include(<wordexp.h>)

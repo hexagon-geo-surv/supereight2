@@ -9,11 +9,9 @@
 #ifndef SE_PROPAGATOR_HPP
 #define SE_PROPAGATOR_HPP
 
+#include <se/common/timings.hpp>
+#include <se/map/octant/octant.hpp>
 #include <unordered_set>
-
-#include "se/common/timings.hpp"
-#include "se/map/octant/octant.hpp"
-#include "se/map/utils/type_util.hpp"
 
 namespace se {
 

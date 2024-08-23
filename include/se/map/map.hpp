@@ -9,21 +9,15 @@
 #ifndef SE_MAP_HPP
 #define SE_MAP_HPP
 
-#include <Eigen/StdVector>
 #include <optional>
-
-#include "se/common/eigen_utils.hpp"
-#include "se/common/math_util.hpp"
-#include "se/common/str_utils.hpp"
-#include "se/common/yaml.hpp"
-#include "se/map/algorithms/marching_cube.hpp"
-#include "se/map/algorithms/structure_meshing.hpp"
-#include "se/map/data.hpp"
-#include "se/map/io/mesh_io.hpp"
-#include "se/map/io/octree_io.hpp"
-#include "se/map/octree/visitor.hpp"
-#include "se/map/raycaster.hpp"
-#include "se/map/utils/octant_util.hpp"
+#include <se/common/eigen_utils.hpp>
+#include <se/common/yaml.hpp>
+#include <se/map/algorithms/marching_cube.hpp>
+#include <se/map/algorithms/structure_meshing.hpp>
+#include <se/map/io/mesh_io.hpp>
+#include <se/map/io/octree_io.hpp>
+#include <se/map/octree/octree.hpp>
+#include <se/map/raycaster.hpp>
 
 
 

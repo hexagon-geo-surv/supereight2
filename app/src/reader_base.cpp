@@ -9,19 +9,12 @@
 
 #include "reader_base.hpp"
 
-#include <Eigen/Geometry>
 #include <algorithm>
-#include <cassert>
-#include <cmath>
 #include <iostream>
+#include <se/common/filesystem.hpp>
+#include <se/common/yaml.hpp>
 #include <sstream>
 #include <thread>
-
-#include "se/common/filesystem.hpp"
-#include "se/common/str_utils.hpp"
-#include "se/common/yaml.hpp"
-
-
 
 se::ReaderType se::string_to_reader_type(const std::string& s)
 {

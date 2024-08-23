@@ -5,15 +5,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <config.hpp>
 #include <gtest/gtest.h>
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/opencv.hpp>
+#include <opencv2/core.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgproc.hpp>
+#include <reader.hpp>
 #include <se/common/filesystem.hpp>
-
-#include "config.hpp"
-#include "se/integrator/map_integrator.hpp"
-#include "se/map/map.hpp"
+#include <se/supereight.hpp>
 
 extern int my_argc;
 extern char** my_argv;

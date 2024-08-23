@@ -8,17 +8,9 @@
 #ifndef SE_VOLUME_CARVER_HPP
 #define SE_VOLUME_CARVER_HPP
 
-
-
-#include <Eigen/Core>
-#include <set>
-
-#include "se/common/image_utils.hpp"
-#include "se/common/str_utils.hpp"
-#include "se/integrator/updater/multires_ofusion_core.hpp"
-#include "se/map/map.hpp"
-
-
+#include <Eigen/Geometry>
+#include <se/integrator/allocator/dense_pooling_image.hpp>
+#include <se/map/map.hpp>
 
 namespace se {
 

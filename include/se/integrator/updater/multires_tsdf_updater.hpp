@@ -9,9 +9,8 @@
 #ifndef SE_MULTIRES_TSDF_UPDATER_HPP
 #define SE_MULTIRES_TSDF_UPDATER_HPP
 
-#include "se/map/map.hpp"
-#include "se/map/octree/propagator.hpp"
-#include "se/sensor/sensor.hpp"
+#include <se/map/octant/octant.hpp>
+#include <se/map/octree/propagator.hpp>
 
 namespace se {
 

@@ -8,24 +8,11 @@
 #ifndef SE_READER_INTERIORNET_HPP
 #define SE_READER_INTERIORNET_HPP
 
-
-
-#include <Eigen/Core>
-#include <cstdint>
-#include <fstream>
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/opencv.hpp>
-#include <string>
+#include <opencv2/core/mat.hpp>
 
 #include "reader_base.hpp"
-#include "se/image/image.hpp"
-
-
 
 namespace se {
-
-
 
 /** Reader for the InteriorNet dataset.
  * https://interiornet.org/

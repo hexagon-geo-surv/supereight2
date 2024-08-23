@@ -9,9 +9,8 @@
 #define SE_DATA_COLOUR_HPP
 
 #include <se/common/bounded_vector.hpp>
-
-#include "utils/setup_util.hpp"
-#include "utils/type_util.hpp"
+#include <se/map/utils/setup_util.hpp>
+#include <se/map/utils/type_util.hpp>
 
 namespace se {
 
