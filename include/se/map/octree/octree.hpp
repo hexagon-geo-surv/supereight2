@@ -13,6 +13,7 @@
 #include <memory>
 #include <se/map/algorithms/marching_cube.hpp>
 #include <se/map/algorithms/mesh.hpp>
+#include <se/map/algorithms/structure_meshing.hpp>
 #include <se/map/io/mesh_io.hpp>
 #include <se/map/octree/iterator.hpp>
 #include <se/map/utils/memory_pool.hpp>
@@ -101,6 +102,13 @@ class Octree {
     int saveMesh(const std::string& filename,
                  const Eigen::Affine3f& T_OV = Eigen::Affine3f::Identity(),
                  const int min_desired_scale = 0) const;
+
+    /** Return a mesh of the octree structure in the octree frame in units of voxels. Apply a
+     * transformation, from the octree frame V to some output frame O, \p T_OV to each mesh vertex.
+     * The returned mesh will only contain leaf octants if \p only_leaves is true.
+     */
+    StructureMesh structure(const Eigen::Affine3f& T_OV = Eigen::Affine3f::Identity(),
+                            const bool only_leaves = true) const;
 
     /** Allocate a child of a node.
      *

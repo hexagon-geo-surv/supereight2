@@ -144,6 +144,21 @@ int Octree<DataT, ResT, BlockSize>::saveMesh(const std::string& filename,
 
 
 template<typename DataT, Res ResT, int BlockSize>
+typename Octree<DataT, ResT, BlockSize>::StructureMesh
+Octree<DataT, ResT, BlockSize>::structure(const Eigen::Affine3f& T_OV, const bool only_leaves) const
+{
+    StructureMesh mesh = octree_structure_mesh(*this, only_leaves);
+    for (auto& face : mesh) {
+        for (size_t v = 0; v < StructureMesh::value_type::num_vertexes; v++) {
+            face.vertexes[v] = T_OV * face.vertexes[v];
+        }
+    }
+    return mesh;
+}
+
+
+
+template<typename DataT, Res ResT, int BlockSize>
 bool Octree<DataT, ResT, BlockSize>::allocate(NodeType* const parent_ptr,
                                               const int child_idx,
                                               OctantBase*& child_ptr)

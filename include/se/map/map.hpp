@@ -12,7 +12,6 @@
 #include <optional>
 #include <se/common/eigen_utils.hpp>
 #include <se/common/yaml.hpp>
-#include <se/map/algorithms/structure_meshing.hpp>
 #include <se/map/io/octree_io.hpp>
 #include <se/map/octree/octree.hpp>
 #include <se/map/raycaster.hpp>
