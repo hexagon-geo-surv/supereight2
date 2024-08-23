@@ -412,7 +412,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * computational time and memory. The value of \p min_desired_scale has no effect on
      * se::Res::Single maps.
      */
-    SurfaceMesh mesh(const Eigen::Isometry3f& T_OW = Eigen::Isometry3f::Identity(),
+    SurfaceMesh mesh(const Eigen::Affine3f& T_OW = Eigen::Affine3f::Identity(),
                      const int min_desired_scale = 0) const;
 
     /** Save the mesh returned by se::Map::mesh() in \p filename. The \p T_OW and \p
@@ -421,7 +421,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * se::io::mesh_extensions. Return the value returned by se::io::save_mesh().
      */
     int saveMesh(const std::string& filename,
-                 const Eigen::Isometry3f& T_OW = Eigen::Isometry3f::Identity(),
+                 const Eigen::Affine3f& T_OW = Eigen::Affine3f::Identity(),
                  const int min_desired_scale = 0) const;
 
     /**

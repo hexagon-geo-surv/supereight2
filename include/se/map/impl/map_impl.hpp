@@ -461,7 +461,7 @@ int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveStructure(const std::strin
 
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 typename Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::SurfaceMesh
-Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::mesh(const Eigen::Isometry3f& T_OW,
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::mesh(const Eigen::Affine3f& T_OW,
                                                    const int min_desired_scale) const
 {
     const Eigen::Affine3f T_OV = T_OW * T_WM_ * Eigen::Scaling(resolution_);
@@ -472,7 +472,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::mesh(const Eigen::Isometry3f& T_OW
 
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMesh(const std::string& filename,
-                                                           const Eigen::Isometry3f& T_OW,
+                                                           const Eigen::Affine3f& T_OW,
                                                            const int min_desired_scale) const
 {
     return io::save_mesh(mesh(T_OW, min_desired_scale), filename);
