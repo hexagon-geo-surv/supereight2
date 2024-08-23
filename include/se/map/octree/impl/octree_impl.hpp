@@ -119,6 +119,31 @@ int Octree<DataT, ResT, BlockSize>::getBlockDepth() const
 
 
 template<typename DataT, Res ResT, int BlockSize>
+typename Octree<DataT, ResT, BlockSize>::SurfaceMesh
+Octree<DataT, ResT, BlockSize>::mesh(const Eigen::Affine3f& T_OV, const int min_desired_scale) const
+{
+    SurfaceMesh mesh = algorithms::marching_cube(*this, min_desired_scale);
+    for (auto& face : mesh) {
+        for (size_t v = 0; v < SurfaceMesh::value_type::num_vertexes; v++) {
+            face.vertexes[v] = T_OV * face.vertexes[v];
+        }
+    }
+    return mesh;
+}
+
+
+
+template<typename DataT, Res ResT, int BlockSize>
+int Octree<DataT, ResT, BlockSize>::saveMesh(const std::string& filename,
+                                             const Eigen::Affine3f& T_OV,
+                                             const int min_desired_scale) const
+{
+    return io::save_mesh(mesh(T_OV, min_desired_scale), filename);
+}
+
+
+
+template<typename DataT, Res ResT, int BlockSize>
 bool Octree<DataT, ResT, BlockSize>::allocate(NodeType* const parent_ptr,
                                               const int child_idx,
                                               OctantBase*& child_ptr)

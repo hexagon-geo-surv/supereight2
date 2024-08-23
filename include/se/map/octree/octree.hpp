@@ -11,7 +11,9 @@
 
 #include <Eigen/Geometry>
 #include <memory>
+#include <se/map/algorithms/marching_cube.hpp>
 #include <se/map/algorithms/mesh.hpp>
+#include <se/map/io/mesh_io.hpp>
 #include <se/map/octree/iterator.hpp>
 #include <se/map/utils/memory_pool.hpp>
 
@@ -80,6 +82,25 @@ class Octree {
 
     /** Return the depth blocks are allocated at. */
     int getBlockDepth() const;
+
+    /** Return a mesh of the reconstructed surface in the octree frame in units of voxels. Apply a
+     * transformation, from the octree frame V to some output frame O, \p T_OV to each mesh vertex.
+     * For se::Res::Multi maps, only data at scale \p min_desired_scale or coarser will be used to
+     * generate the mesh. This allows generating a coarser mesh which is less demanding in terms of
+     * computational time and memory. The value of \p min_desired_scale has no effect on
+     * se::Res::Single maps.
+     */
+    SurfaceMesh mesh(const Eigen::Affine3f& T_OV = Eigen::Affine3f::Identity(),
+                     const int min_desired_scale = 0) const;
+
+    /** Save the mesh returned by se::Octree::mesh() in \p filename. The \p T_OV and \p
+     * min_desired_scale arguments are passed directly to se::Octree::mesh(). The file format will
+     * be selected based on the extension of \p filename, which must be one of those in
+     * se::io::mesh_extensions. Return the value returned by se::io::save_mesh().
+     */
+    int saveMesh(const std::string& filename,
+                 const Eigen::Affine3f& T_OV = Eigen::Affine3f::Identity(),
+                 const int min_desired_scale = 0) const;
 
     /** Allocate a child of a node.
      *

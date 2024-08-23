@@ -205,7 +205,7 @@ TEST(Map, aabb_ray_batch)
 
     // Un-Comment if debugging necessary (allocated structure visualization)
     map.saveStructure(tmp_ + "/multi-ray-aabb-allocated_structure.ply");
-    map.saveMeshVoxel(tmp_ + "/multi-ray-aabb-voxel-mesh.ply");
+    map.getOctree().saveMesh(tmp_ + "/multi-ray-aabb-voxel-mesh.ply");
     map.saveMesh(tmp_ + "/multi-ray-aabb-metric-mesh.ply");
     map.saveFieldSlices(tmp_ + "/multi-ray-aabb-slice-x.vtk",
                         tmp_ + "/multi-ray-aabb-slice-y.vtk",

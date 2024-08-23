@@ -224,7 +224,7 @@ TEST(RayIntegrator, Propagation)
     std::cout << "Number of updated octants: " << updated_octants.size() << std::endl;
     // Un-Comment if needed for debugging
     map.saveStructure(tmp_ + "/batch_ray_structure.ply");
-    map.saveMeshVoxel(tmp_ + "/batch_ray_mesh.ply");
+    map.getOctree().saveMesh(tmp_ + "/batch_ray_mesh.ply");
 
     std::queue<const NodeType*> nodes;
     std::queue<const BlockType*> blocks;

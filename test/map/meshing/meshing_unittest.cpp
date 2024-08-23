@@ -8,8 +8,6 @@
 
 #include <Eigen/StdVector>
 #include <gtest/gtest.h>
-#include <se/map/algorithms/marching_cube.hpp>
-#include <se/map/io/mesh_io.hpp>
 #include <se/map/octree/octree.hpp>
 
 template<typename OctreeType>
