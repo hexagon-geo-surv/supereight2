@@ -415,19 +415,10 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
     SurfaceMesh mesh(const Eigen::Isometry3f& T_OW = Eigen::Isometry3f::Identity(),
                      const int min_desired_scale = 0) const;
 
-    /**
-     * \brief Create a mesh in the world frame in units of metres and save it to a file.
-     *
-     * \param[in] filename          The file where the mesh will be saved. The file format will be
-     *                              selected based on the file extension. Its extension must be one
-     *                              of those in se::io::mesh_extensions.
-     * \param[in] T_OW              Transformation from the world frame in units of metres to the
-     *                              output frame. Defaults to identity.
-     * \param[in] min_desired_scale Only data at this scale or coarser will be used to generate the
-     *                              mesh. This allows generating a coarser mesh which is less
-     *                              demanding in terms of computational time and memory. Has no
-     *                              effect on se::Res::Single maps.
-     * \return Zero on success and non-zero on error.
+    /** Save the mesh returned by se::Map::mesh() in \p filename. The \p T_OW and \p
+     * min_desired_scale arguments are passed directly to se::Map::mesh(). The file format will be
+     * selected based on the extension of \p filename, which must be one of those in
+     * se::io::mesh_extensions. Return the value returned by se::io::save_mesh().
      */
     int saveMesh(const std::string& filename,
                  const Eigen::Isometry3f& T_OW = Eigen::Isometry3f::Identity(),
