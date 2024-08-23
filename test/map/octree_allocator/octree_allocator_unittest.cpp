@@ -62,16 +62,16 @@ TEST(SingleResAllocation, BlockKey)
     typedef se::Octree<DataType, se::Res::Single, block_size_0> OctreeType0;
     typedef OctreeType0::BlockType BlockType0;
 
-    OctreeType0::Ptr octree_ptr_0 = OctreeType0::Ptr(new OctreeType0(octree_size));
+    OctreeType0 octree_0(octree_size);
 
     BlockType0* block_ptr_0 = nullptr;
 
     for (const auto& voxel_coord : voxel_coords) {
-        coord_ought = adapt_to_scale(voxel_coord, octree_ptr_0->max_block_scale);
+        coord_ought = adapt_to_scale(voxel_coord, octree_0.max_block_scale);
         se::key_t voxel_key;
         se::keyops::encode_key(voxel_coord, 0, voxel_key);
-        block_ptr_0 = static_cast<BlockType0*>(
-            se::allocator::block(voxel_key, *octree_ptr_0, octree_ptr_0->getRoot()));
+        block_ptr_0 =
+            static_cast<BlockType0*>(se::allocator::block(voxel_key, octree_0, octree_0.getRoot()));
         coord_is = block_ptr_0->coord;
         EXPECT_EQ(coord_ought, coord_is);
 
@@ -97,16 +97,16 @@ TEST(SingleResAllocation, BlockKey)
     typedef se::Octree<DataType, se::Res::Single, block_size_1> OctreeType1;
     typedef OctreeType1::BlockType BlockType1;
 
-    OctreeType1::Ptr octree_ptr_1 = OctreeType1::Ptr(new OctreeType1(octree_size));
+    OctreeType1 octree_1(octree_size);
 
     BlockType1* block_ptr_1 = nullptr;
 
     for (const auto& voxel_coord : voxel_coords) {
-        coord_ought = adapt_to_scale(voxel_coord, octree_ptr_1->max_block_scale);
+        coord_ought = adapt_to_scale(voxel_coord, octree_1.max_block_scale);
         se::key_t voxel_key;
         se::keyops::encode_key(voxel_coord, 0, voxel_key);
-        block_ptr_1 = static_cast<BlockType1*>(
-            se::allocator::block(voxel_key, *octree_ptr_1, octree_ptr_1->getRoot()));
+        block_ptr_1 =
+            static_cast<BlockType1*>(se::allocator::block(voxel_key, octree_1, octree_1.getRoot()));
         coord_is = block_ptr_1->coord;
         EXPECT_EQ(coord_ought, coord_is);
 
@@ -132,16 +132,16 @@ TEST(SingleResAllocation, BlockKey)
     typedef se::Octree<DataType, se::Res::Single, block_size_2> OctreeType2;
     typedef OctreeType2::BlockType BlockType2;
 
-    OctreeType2::Ptr octree_ptr_2 = OctreeType2::Ptr(new OctreeType2(octree_size));
+    OctreeType2 octree_2(octree_size);
 
     BlockType2* block_ptr_2 = nullptr;
 
     for (const auto& voxel_coord : voxel_coords) {
-        coord_ought = adapt_to_scale(voxel_coord, octree_ptr_2->max_block_scale);
+        coord_ought = adapt_to_scale(voxel_coord, octree_2.max_block_scale);
         se::key_t voxel_key;
         se::keyops::encode_key(voxel_coord, 0, voxel_key);
-        block_ptr_2 = static_cast<BlockType2*>(
-            se::allocator::block(voxel_key, *octree_ptr_2, octree_ptr_2->getRoot()));
+        block_ptr_2 =
+            static_cast<BlockType2*>(se::allocator::block(voxel_key, octree_2, octree_2.getRoot()));
         coord_is = block_ptr_2->coord;
         EXPECT_EQ(coord_ought, coord_is);
 
@@ -167,16 +167,16 @@ TEST(SingleResAllocation, BlockKey)
     typedef se::Octree<DataType, se::Res::Single, block_size_3> OctreeType3;
     typedef OctreeType3::BlockType BlockType3;
 
-    OctreeType3::Ptr octree_ptr_3 = OctreeType3::Ptr(new OctreeType3(octree_size));
+    OctreeType3 octree_3(octree_size);
 
     BlockType3* block_ptr_3 = nullptr;
 
     for (const auto& voxel_coord : voxel_coords) {
-        coord_ought = adapt_to_scale(voxel_coord, octree_ptr_3->max_block_scale);
+        coord_ought = adapt_to_scale(voxel_coord, octree_3.max_block_scale);
         se::key_t voxel_key;
         se::keyops::encode_key(voxel_coord, 0, voxel_key);
-        block_ptr_3 = static_cast<BlockType3*>(
-            se::allocator::block(voxel_key, *octree_ptr_3, octree_ptr_3->getRoot()));
+        block_ptr_3 =
+            static_cast<BlockType3*>(se::allocator::block(voxel_key, octree_3, octree_3.getRoot()));
         coord_is = block_ptr_3->coord;
         EXPECT_EQ(coord_ought, coord_is);
 
@@ -202,16 +202,16 @@ TEST(SingleResAllocation, BlockKey)
     typedef se::Octree<DataType, se::Res::Single, block_size_4> OctreeType4;
     typedef OctreeType4::BlockType BlockType4;
 
-    OctreeType4::Ptr octree_ptr_4 = OctreeType4::Ptr(new OctreeType4(octree_size));
+    OctreeType4 octree_4(octree_size);
 
     BlockType4* block_ptr_4 = nullptr;
 
     for (const auto& voxel_coord : voxel_coords) {
-        coord_ought = adapt_to_scale(voxel_coord, octree_ptr_4->max_block_scale);
+        coord_ought = adapt_to_scale(voxel_coord, octree_4.max_block_scale);
         se::key_t voxel_key;
         se::keyops::encode_key(voxel_coord, 0, voxel_key);
-        block_ptr_4 = static_cast<BlockType4*>(
-            se::allocator::block(voxel_key, *octree_ptr_4, octree_ptr_4->getRoot()));
+        block_ptr_4 =
+            static_cast<BlockType4*>(se::allocator::block(voxel_key, octree_4, octree_4.getRoot()));
         coord_is = block_ptr_4->coord;
         EXPECT_EQ(coord_ought, coord_is);
 
@@ -241,7 +241,7 @@ TEST(SingleResAllocation, BlockCoord)
     typedef OctreeType::NodeType NodeType;
     typedef OctreeType::BlockType BlockType;
 
-    OctreeType::Ptr octree_ptr = OctreeType::Ptr(new OctreeType(octree_size));
+    OctreeType octree(octree_size);
 
     Eigen::Vector3i voxel_coord;
     Eigen::Vector3i coord_ought;
@@ -257,9 +257,9 @@ TEST(SingleResAllocation, BlockCoord)
         Eigen::Vector3i(33, 104, 55)};
 
     for (const auto& voxel_coord : voxel_coords) {
-        coord_ought = adapt_to_scale(voxel_coord, octree_ptr->max_block_scale);
-        block_ptr = static_cast<BlockType*>(
-            se::allocator::block(voxel_coord, *octree_ptr, octree_ptr->getRoot()));
+        coord_ought = adapt_to_scale(voxel_coord, octree.max_block_scale);
+        block_ptr =
+            static_cast<BlockType*>(se::allocator::block(voxel_coord, octree, octree.getRoot()));
         coord_is = block_ptr->coord;
         EXPECT_EQ(coord_ought, coord_is);
 
@@ -289,7 +289,7 @@ TEST(SingleResAllocation, BlockKeys)
     // Create an octree.
     constexpr se::scale_t max_tree_scale = 8;
     constexpr int octree_size = 1 << max_tree_scale;
-    OctreeType::Ptr octree_ptr = OctreeType::Ptr(new OctreeType(octree_size));
+    OctreeType octree(octree_size);
 
     // The coordinates of some voxels.
     std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> voxel_coords = {
@@ -306,13 +306,13 @@ TEST(SingleResAllocation, BlockKeys)
         voxel_coords.begin(),
         voxel_coords.end(),
         desired_block_coords.begin(),
-        [=](const Eigen::Vector3i& x) { return adapt_to_scale(x, octree_ptr->max_block_scale); });
+        [&](const Eigen::Vector3i& x) { return adapt_to_scale(x, octree.max_block_scale); });
     // Sort the Block coordinates to make later comparisons easier.
     std::sort(desired_block_coords.begin(), desired_block_coords.end(), vector3i_less);
 
     // Allocate the Blocks.
     std::vector<se::OctantBase*> block_ptrs =
-        se::allocator::blocks(voxel_coords, *octree_ptr, octree_ptr->getRoot());
+        se::allocator::blocks(voxel_coords, octree, octree.getRoot());
 
     // Sort the returned Blocks based on their coordinates.
     std::sort(block_ptrs.begin(), block_ptrs.end(), [](const auto& b1, const auto& b2) {
@@ -349,10 +349,10 @@ TEST(SingleResAllocation, BlockKeys)
 
     // Get the coordinates of the Block corresponding to the new voxel.
     desired_block_coords.clear();
-    desired_block_coords.push_back(adapt_to_scale(new_voxel, octree_ptr->max_block_scale));
+    desired_block_coords.push_back(adapt_to_scale(new_voxel, octree.max_block_scale));
 
     // Allocate the Blocks and return only the newly allocated Blocks.
-    block_ptrs = se::allocator::blocks(voxel_coords, *octree_ptr, octree_ptr->getRoot(), true);
+    block_ptrs = se::allocator::blocks(voxel_coords, octree, octree.getRoot(), true);
 
     // Get the coordinates of the returned Blocks and sort them.
     std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> actual_block_coords(
@@ -370,10 +370,10 @@ TEST(SingleResAllocation, BlockKeys)
 
     // Test asking to allocate some already allocated Blocks.
     // Only return newly allocated Blocks.
-    block_ptrs = se::allocator::blocks(voxel_coords, *octree_ptr, octree_ptr->getRoot(), true);
+    block_ptrs = se::allocator::blocks(voxel_coords, octree, octree.getRoot(), true);
     EXPECT_EQ(0u, block_ptrs.size());
     // Return newly or already allocated Blocks.
-    block_ptrs = se::allocator::blocks(voxel_coords, *octree_ptr, octree_ptr->getRoot());
+    block_ptrs = se::allocator::blocks(voxel_coords, octree, octree.getRoot());
     EXPECT_EQ(voxel_coords.size(), block_ptrs.size());
 }
 
@@ -388,7 +388,7 @@ TEST(SingleResAllocation, BlockCoords)
     typedef OctreeType::NodeType NodeType;
     typedef OctreeType::BlockType BlockType;
 
-    OctreeType::Ptr octree_ptr = OctreeType::Ptr(new OctreeType(octree_size));
+    OctreeType octree(octree_size);
 
     Eigen::Vector3i coord_ought;
     Eigen::Vector3i coord_is;
@@ -409,7 +409,7 @@ TEST(SingleResAllocation, BlockCoords)
     }
 
     std::vector<se::OctantBase*> block_ptrs =
-        se::allocator::blocks(voxel_coords, *octree_ptr, octree_ptr->getRoot());
+        se::allocator::blocks(voxel_coords, octree, octree.getRoot());
 
     se::keyops::sort_keys(voxel_keys);
     se::octantops::sort_blocks<BlockType>(block_ptrs);
@@ -418,7 +418,7 @@ TEST(SingleResAllocation, BlockCoords)
         Eigen::Vector3i voxel_coord;
         se::scale_t voxel_scale;
         se::keyops::decode_key(voxel_keys[i], voxel_coord, voxel_scale);
-        coord_ought = adapt_to_scale(voxel_coord, octree_ptr->max_block_scale);
+        coord_ought = adapt_to_scale(voxel_coord, octree.max_block_scale);
         auto block_ptr = block_ptrs[i];
         coord_is = block_ptr->coord;
         EXPECT_EQ(coord_ought, coord_is);
