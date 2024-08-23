@@ -708,9 +708,8 @@ void gather_dual_data(const OctreeT& octree,
             set_invalid(data_arr[0]);
             return;
         }
-        typename OctreeT::BlockType* block_neighbour_ptr =
-            static_cast<typename OctreeT::BlockType*>(
-                se::fetcher::template block<OctreeT>(logical_dual_corner_coord, octree.getRoot()));
+        const auto* const block_neighbour_ptr = static_cast<const typename OctreeT::BlockType*>(
+            se::fetcher::template block<OctreeT>(logical_dual_corner_coord, octree.getRoot()));
         if (block_neighbour_ptr == nullptr
             || block_neighbour_ptr->getCurrentScale() <= block_scale) {
             set_invalid(data_arr[0]);
@@ -724,9 +723,8 @@ void gather_dual_data(const OctreeT& octree,
             set_invalid(data_arr[0]);
             return;
         }
-        typename OctreeT::BlockType* block_neighbour_ptr =
-            static_cast<typename OctreeT::BlockType*>(
-                se::fetcher::template block<OctreeT>(logical_dual_corner_coord, octree.getRoot()));
+        const auto* const block_neighbour_ptr = static_cast<const typename OctreeT::BlockType*>(
+            se::fetcher::template block<OctreeT>(logical_dual_corner_coord, octree.getRoot()));
         if (block_neighbour_ptr == nullptr
             || block_neighbour_ptr->getCurrentScale() < block_scale) {
             set_invalid(data_arr[0]);
@@ -746,9 +744,8 @@ void gather_dual_data(const OctreeT& octree,
     for (size_t neighbour_idx = 1; neighbour_idx < neighbours.size(); ++neighbour_idx) {
         Eigen::Vector3i logical_dual_corner_coord =
             primal_corner_coord + logical_dual_offset[neighbours[neighbour_idx][0]];
-        typename OctreeT::BlockType* block_neighbour_ptr =
-            static_cast<typename OctreeT::BlockType*>(
-                se::fetcher::template block<OctreeT>(logical_dual_corner_coord, octree.getRoot()));
+        const auto* const block_neighbour_ptr = static_cast<const typename OctreeT::BlockType*>(
+            se::fetcher::template block<OctreeT>(logical_dual_corner_coord, octree.getRoot()));
         const int neighbour_scale = std::max(block_neighbour_ptr->getCurrentScale(), scale);
         const int neighbour_stride = octantops::scale_to_size(neighbour_scale);
         for (const auto& offset_idx : neighbours[neighbour_idx]) {
