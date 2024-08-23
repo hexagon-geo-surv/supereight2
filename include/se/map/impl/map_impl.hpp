@@ -405,7 +405,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveScaleSlices(const std::string&
     Eigen::Vector3i voxel_coord;
     pointToVoxel(point_W, voxel_coord);
 
-    se::OctantBase* root_ptr = octree_.getRoot();
+    const OctantBase* const root_ptr = octree_.getRoot();
     const int max_scale = octree_.getMaxScale();
 
     auto get_scale = [&](const Eigen::Vector3i& coord) {
