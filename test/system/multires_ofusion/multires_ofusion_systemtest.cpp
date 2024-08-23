@@ -87,8 +87,8 @@ TEST(MultiResOFusionSystemTest, GetFieldInterpolation)
                         config.app.slice_path + "/test-field-interp-slice-y.vtk",
                         config.app.slice_path + "/test-field-interp-slice-z.vtk",
                         T_WS.translation());
-    map.saveStructure(config.app.structure_path + "/test-field-interp-structure_"
-                      + std::to_string(max_frame) + ".ply");
+    map.getOctree().saveStructure(config.app.structure_path + "/test-field-interp-structure_"
+                                  + std::to_string(max_frame) + ".ply");
 
     Eigen::Vector3f point_W;
     std::optional<se::field_t> field_value;
@@ -170,8 +170,8 @@ TEST(MultiResOFusionSystemTest, GetField)
                         config.app.slice_path + "/test-field-slice-z.vtk",
                         T_WS.translation());
 
-    map.saveStructure(config.app.structure_path + "/test-field-structure_"
-                      + std::to_string(max_frame) + ".ply");
+    map.getOctree().saveStructure(config.app.structure_path + "/test-field-structure_"
+                                  + std::to_string(max_frame) + ".ply");
 
     map.voxelToPoint(voxel_coord_unknown_1, point_W);
     data = map.getData(point_W);
@@ -268,8 +268,8 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
                                scale);
     }
 
-    map.saveStructure(config.app.structure_path + "/test-max-field-structure_"
-                      + std::to_string(max_frame) + ".ply");
+    map.getOctree().saveStructure(config.app.structure_path + "/test-max-field-structure_"
+                                  + std::to_string(max_frame) + ".ply");
 }
 
 
@@ -338,8 +338,8 @@ TEST(MultiResOFusionSystemTest, DeleteChildren)
             config.app.slice_path + "/test-delete-child-slice-" + std::to_string(frame) + "-z.vtk",
             T_WS.translation());
 
-        map.saveStructure(config.app.structure_path + "/test-delete-child-structure_"
-                          + std::to_string(frame) + ".ply");
+        map.getOctree().saveStructure(config.app.structure_path + "/test-delete-child-structure_"
+                                      + std::to_string(frame) + ".ply");
     }
 }
 
@@ -424,12 +424,12 @@ TEST(MultiResOFusionSystemTest, Raycasting)
                                        surface_scale,
                                        T_WS.translation());
 
-    map.saveStructure(config.app.structure_path + "/test-raycasting-structure_"
-                      + std::to_string(frame) + ".ply");
-    map.saveStructure(config.app.structure_path + "/test-raycasting-structure_"
-                      + std::to_string(frame) + ".vtk");
-    map.saveStructure(config.app.structure_path + "/test-raycasting-structure_"
-                      + std::to_string(frame) + ".obj");
+    map.getOctree().saveStructure(config.app.structure_path + "/test-raycasting-structure_"
+                                  + std::to_string(frame) + ".ply");
+    map.getOctree().saveStructure(config.app.structure_path + "/test-raycasting-structure_"
+                                  + std::to_string(frame) + ".vtk");
+    map.getOctree().saveStructure(config.app.structure_path + "/test-raycasting-structure_"
+                                  + std::to_string(frame) + ".obj");
     map.saveFieldSlices(
         config.app.slice_path + "/test-raycasting-slice-field-" + std::to_string(frame) + "-x.vtk",
         config.app.slice_path + "/test-raycasting-slice-field-" + std::to_string(frame) + "-y.vtk",

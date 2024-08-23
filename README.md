@@ -348,7 +348,7 @@ The map's underlying octree structure up to block level can saved using `se::Map
 The structure can be saved as a `.ply`, `.obj` or `.vtk` file. Based on the provided filename the according type will be saved.
 
 ```cpp
-map.saveStructure("./octree_structure.ply");
+map.getOctree().saveStructure("./octree_structure.ply");
 ```
 
 #### Slice

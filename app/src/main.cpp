@@ -233,8 +233,8 @@ int main(int argc, char** argv)
                 }
                 if (!config.app.structure_path.empty()) {
                     stdfs::create_directories(config.app.structure_path);
-                    map.saveStructure(config.app.structure_path + "/struct_" + std::to_string(frame)
-                                      + ".ply");
+                    map.getOctree().saveStructure(config.app.structure_path + "/struct_"
+                                                  + std::to_string(frame) + ".ply");
                 }
             }
 

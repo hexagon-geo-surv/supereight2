@@ -146,7 +146,7 @@ TEST(RayIntegrator, SingleRay)
     }
 
     // Un-Comment if debugging necessary (allocated structure visualization)
-    map.saveStructure(tmp_ + "/single_ray_allocated_structure.ply");
+    map.getOctree().saveStructure(tmp_ + "/single_ray_allocated_structure.ply");
 }
 
 TEST(RayIntegrator, Propagation)
@@ -223,7 +223,7 @@ TEST(RayIntegrator, Propagation)
     integrator.integrateRayBatch(0, rayBatch, sensor, &updated_octants);
     std::cout << "Number of updated octants: " << updated_octants.size() << std::endl;
     // Un-Comment if needed for debugging
-    map.saveStructure(tmp_ + "/batch_ray_structure.ply");
+    map.getOctree().saveStructure(tmp_ + "/batch_ray_structure.ply");
     map.getOctree().saveMesh(tmp_ + "/batch_ray_mesh.ply");
 
     std::queue<const NodeType*> nodes;

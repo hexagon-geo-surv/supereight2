@@ -449,14 +449,6 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveScaleSlices(const std::string&
     return 0;
 }
 
-template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
-int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveStructure(const std::string& filename,
-                                                                const Eigen::Affine3f& T_WM) const
-{
-    const StructureMesh mesh = octree_structure_mesh(octree_);
-    return io::save_mesh(mesh, filename, T_WM);
-}
-
 
 
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
@@ -476,6 +468,27 @@ int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveMesh(const std::string& fi
                                                            const int min_desired_scale) const
 {
     return io::save_mesh(mesh(T_OW, min_desired_scale), filename);
+}
+
+
+
+template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
+typename Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::StructureMesh
+Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::structure(const Eigen::Affine3f& T_OW,
+                                                        const bool only_leaves) const
+{
+    const Eigen::Affine3f T_OV = T_OW * T_WM_ * Eigen::Scaling(resolution_);
+    return octree_.structure(T_OV, only_leaves);
+}
+
+
+
+template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
+int Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveStructure(const std::string& filename,
+                                                                const Eigen::Affine3f& T_OW,
+                                                                const bool only_leaves) const
+{
+    return io::save_mesh(structure(T_OW, only_leaves), filename);
 }
 
 

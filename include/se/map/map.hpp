@@ -391,19 +391,6 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
                     const std::string& filename_z,
                     const Eigen::Vector3f& point_W) const;
 
-    /**
-     * \brief Save the octree structure to a file.
-     *
-     * \param[in] filename The file where the mesh will be saved. The file format will be selected
-     *                     based on the file extension. Its extension must be one of those in
-     *                     se::io::mesh_extensions.
-     * \param[in] T_WM     Transformation from the world frame where the mesh is generated to the world
-     *                     frame. Defaults to identity.
-     * \return Zero on success and non-zero on error.
-     */
-    int saveStructure(const std::string& filename,
-                      const Eigen::Affine3f& T_WM = Eigen::Affine3f::Identity()) const;
-
     /** Return a mesh of the reconstructed surface in the world frame in units of metres. Apply a
      * transformation, from the world frame W to some output frame O, \p T_OW to each mesh vertex.
      * For se::Res::Multi maps, only data at scale \p min_desired_scale or coarser will be used to
@@ -422,6 +409,22 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
     int saveMesh(const std::string& filename,
                  const Eigen::Affine3f& T_OW = Eigen::Affine3f::Identity(),
                  const int min_desired_scale = 0) const;
+
+    /** Return a mesh of the octree structure in the world frame in units of metres. Apply a
+     * transformation, from the world frame W to some output frame O, \p T_OW to each mesh vertex.
+     * The \p only_leaves argument is passed directly to se::octree_structure_mesh().
+     */
+    StructureMesh structure(const Eigen::Affine3f& T_OW = Eigen::Affine3f::Identity(),
+                            const bool only_leaves = true) const;
+
+    /** Save the mesh returned by se::Map::structure_meshing() in \p filename. The \p T_OW and \p
+     * only_leaves arguments are passed directly to se::Map::structure(). The file format will be
+     * selected based on the extension of \p filename, which must be one of those in
+     * se::io::mesh_extensions. Return the value returned by se::io::save_mesh().
+     */
+    int saveStructure(const std::string& filename,
+                      const Eigen::Affine3f& T_OW = Eigen::Affine3f::Identity(),
+                      const bool only_leaves = true) const;
 
     /**
      * \brief Convert voxel coordinates in [voxel] to its centre point coordinates in [meter].

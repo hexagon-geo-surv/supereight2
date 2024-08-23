@@ -204,7 +204,7 @@ TEST(Map, aabb_ray_batch)
     EXPECT_EQ(dim_to_blocks(map.aabb().max().y(), block_dim), half_wall_blocks + 1);
 
     // Un-Comment if debugging necessary (allocated structure visualization)
-    map.saveStructure(tmp_ + "/multi-ray-aabb-allocated_structure.ply");
+    map.getOctree().saveStructure(tmp_ + "/multi-ray-aabb-allocated_structure.ply");
     map.getOctree().saveMesh(tmp_ + "/multi-ray-aabb-voxel-mesh.ply");
     map.saveMesh(tmp_ + "/multi-ray-aabb-metric-mesh.ply");
     map.saveFieldSlices(tmp_ + "/multi-ray-aabb-slice-x.vtk",
