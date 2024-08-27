@@ -656,7 +656,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
                 freeBlock(child_ptr); // TODO: Add to block_list?
 #pragma omp critical(node_lock)
                 { // Add node to node list for later up-propagation (finest node for this tree-branch)
-                    node_set_[depth - 1].insert(child_ptr->parent());
+                    node_set_[depth].insert(child_ptr->parent());
                 }
 #pragma omp critical(block_lock)
                 { // Add node to node list for later up-propagation (finest node for this tree-branch)
