@@ -104,7 +104,7 @@ int Octree<DataT, ResT, BlockSize>::getSize() const
 template<typename DataT, Res ResT, int BlockSize>
 int Octree<DataT, ResT, BlockSize>::getMaxScale() const
 {
-    return math::log2_const(size_);
+    return octantops::size_to_scale(size_);
 }
 
 
@@ -112,7 +112,8 @@ int Octree<DataT, ResT, BlockSize>::getMaxScale() const
 template<typename DataT, Res ResT, int BlockSize>
 int Octree<DataT, ResT, BlockSize>::getBlockDepth() const
 {
-    return math::log2_const(size_) - math::log2_const(BlockSize);
+    // The scale of the root is the same as the depth of the leaves.
+    return getMaxScale() - octantops::size_to_scale(BlockSize);
 }
 
 
@@ -123,25 +124,23 @@ bool Octree<DataT, ResT, BlockSize>::allocate(NodeType* const parent_ptr,
                                               OctantBase*& child_ptr)
 {
     assert(parent_ptr);
-    assert(!parent_ptr->is_block);
 
     child_ptr = parent_ptr->getChild(child_idx);
     if (child_ptr) {
         return false;
     }
 
-    const DataT& init_data = parent_ptr->getData();
     if (parent_ptr->getSize() == 2 * BlockSize) {
 #pragma omp critical
         {
-            child_ptr = memory_pool_.allocateBlock(parent_ptr, child_idx, init_data);
+            child_ptr = memory_pool_.allocateBlock(parent_ptr, child_idx, parent_ptr->getData());
         }
         aabbExtend(child_ptr->coord, parent_ptr->getSize() / 2);
     }
     else {
 #pragma omp critical
         {
-            child_ptr = memory_pool_.allocateNode(parent_ptr, child_idx, init_data);
+            child_ptr = memory_pool_.allocateNode(parent_ptr, child_idx, parent_ptr->getData());
         }
     }
     parent_ptr->setChild(child_idx, child_ptr);
@@ -154,7 +153,7 @@ template<typename DataT, Res ResT, int BlockSize>
 void Octree<DataT, ResT, BlockSize>::allocateChildren(NodeType* const parent_ptr)
 {
     assert(parent_ptr);
-    const DataT& init_data = parent_ptr->getData();
+
     const bool children_are_blocks = parent_ptr->getSize() == 2 * BlockSize;
     for (int child_idx = 0; child_idx < 8; child_idx++) {
         OctantBase* child_ptr = parent_ptr->getChild(child_idx);
@@ -164,13 +163,14 @@ void Octree<DataT, ResT, BlockSize>::allocateChildren(NodeType* const parent_ptr
         if (children_are_blocks) {
 #pragma omp critical
             {
-                child_ptr = memory_pool_.allocateBlock(parent_ptr, child_idx, init_data);
+                child_ptr =
+                    memory_pool_.allocateBlock(parent_ptr, child_idx, parent_ptr->getData());
             }
         }
         else {
 #pragma omp critical
             {
-                child_ptr = memory_pool_.allocateNode(parent_ptr, child_idx, init_data);
+                child_ptr = memory_pool_.allocateNode(parent_ptr, child_idx, parent_ptr->getData());
             }
         }
         parent_ptr->setChild(child_idx, child_ptr);
@@ -198,8 +198,8 @@ void Octree<DataT, ResT, BlockSize>::deleteChildren(NodeType* const parent_ptr)
                 deleteChildren(node_ptr);
                 memory_pool_.deleteNode(node_ptr);
             }
+            parent_ptr->setChild(child_idx, nullptr);
         }
-        parent_ptr->setChild(child_idx, nullptr);
     }
 }
 
