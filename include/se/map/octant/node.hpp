@@ -130,7 +130,7 @@ class Node : public OctantBase, public NodeData<DataT, Node<DataT, ResT>> {
     /** Construct the child node of \p parent_ptr with index \p child_idx and initialize its data
      * with \p init_data. The value of \p child_idx must be in the interval [0, 7] inclusive.
      */
-    Node(Node* parent_ptr, const int child_idx, const DataT& init_data);
+    Node(Node* const parent_ptr, const int child_idx, const DataT& init_data);
 
     /** Return the edge length of the node in voxels */
     int getSize() const;

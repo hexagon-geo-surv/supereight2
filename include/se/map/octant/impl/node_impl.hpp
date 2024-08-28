@@ -24,16 +24,10 @@ Node<DataT, ResT>::Node(const Eigen::Vector3i& coord, const int size, const Data
 
 
 template<typename DataT, Res ResT>
-Node<DataT, ResT>::Node(Node* parent_ptr, const int child_idx, const DataT& init_data) :
-        OctantBase(parent_ptr->coord
-                       + (parent_ptr->size_ >> 1)
-                           * Eigen::Vector3i((1 & child_idx) > 0,
-                                             (2 & child_idx) > 0,
-                                             (4 & child_idx) > 0),
-                   false,
-                   parent_ptr),
+Node<DataT, ResT>::Node(Node* const parent_ptr, const int child_idx, const DataT& init_data) :
+        OctantBase(parent_ptr->getChildCoord(child_idx), false, parent_ptr),
         NodeData<DataT, Node<DataT, ResT>>(init_data),
-        size_(parent_ptr->size_ >> 1)
+        size_(parent_ptr->size_ / 2)
 {
     assert(child_idx >= 0);
     assert(static_cast<size_t>(child_idx) < children_ptr_.size());
@@ -53,9 +47,9 @@ int Node<DataT, ResT>::getSize() const
 template<typename DataT, Res ResT>
 OctantBase* Node<DataT, ResT>::getChild(const int child_idx)
 {
-    assert(child_idx >= 0);
-    assert(static_cast<size_t>(child_idx) < children_ptr_.size());
-    return children_ptr_[child_idx];
+    // Call the const overload. Casting away the const is well defined since the Node object this
+    // is called on is non-const.
+    return const_cast<OctantBase*>(const_cast<const Node<DataT, ResT>*>(this)->getChild(child_idx));
 }
 
 
