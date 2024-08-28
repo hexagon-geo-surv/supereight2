@@ -78,7 +78,7 @@ bool Octree<DataT, ResT, BlockSize>::contains(const Eigen::Vector3i& voxel_coord
 
 
 template<typename DataT, Res ResT, int BlockSize>
-bool Octree<DataT, ResT, BlockSize>::allocate(NodeType* parent_ptr,
+bool Octree<DataT, ResT, BlockSize>::allocate(NodeType* const parent_ptr,
                                               const int child_idx,
                                               OctantBase*& child_ptr)
 {
@@ -111,7 +111,7 @@ bool Octree<DataT, ResT, BlockSize>::allocate(NodeType* parent_ptr,
 
 
 template<typename DataT, Res ResT, int BlockSize>
-void Octree<DataT, ResT, BlockSize>::allocateChildren(NodeType* parent_ptr)
+void Octree<DataT, ResT, BlockSize>::allocateChildren(NodeType* const parent_ptr)
 {
     assert(parent_ptr);
     const DataT& init_data = parent_ptr->getData();
@@ -145,16 +145,16 @@ void Octree<DataT, ResT, BlockSize>::allocateChildren(NodeType* parent_ptr)
 
 
 template<typename DataT, Res ResT, int BlockSize>
-void Octree<DataT, ResT, BlockSize>::deleteChildren(NodeType* parent_ptr)
+void Octree<DataT, ResT, BlockSize>::deleteChildren(NodeType* const parent_ptr)
 {
     for (int child_idx = 0; child_idx < 8; child_idx++) {
-        OctantBase* child_ptr = parent_ptr->getChild(child_idx);
+        OctantBase* const child_ptr = parent_ptr->getChild(child_idx);
         if (child_ptr) {
             if (child_ptr->is_block) {
                 memory_pool_.deleteBlock(static_cast<BlockType*>(child_ptr));
             }
             else {
-                NodeType* node_ptr = static_cast<NodeType*>(child_ptr);
+                auto* const node_ptr = static_cast<NodeType*>(child_ptr);
                 deleteChildren(node_ptr);
                 memory_pool_.deleteNode(node_ptr);
             }

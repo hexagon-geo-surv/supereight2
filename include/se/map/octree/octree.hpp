@@ -116,15 +116,15 @@ class Octree {
      *
      * \return True if the child was allocated, false if it was already allocated.
      */
-    bool allocate(NodeType* parent_ptr, const int child_idx, OctantBase*& child_ptr);
+    bool allocate(NodeType* const parent_ptr, const int child_idx, OctantBase*& child_ptr);
 
     /** Allocate all the child nodes of \p parent_ptr.
      */
-    void allocateChildren(NodeType* parent_ptr);
+    void allocateChildren(NodeType* const parent_ptr);
 
     /** Recursively delete all children of \p parent_ptr.
      */
-    void deleteChildren(NodeType* parent_ptr);
+    void deleteChildren(NodeType* const parent_ptr);
 
     /** Return the axis-aligned bounding box of the octree's allocated leaves. The bounding box is
      * computed using the coordinates of allocated voxels, not using the whole allocated volume.
