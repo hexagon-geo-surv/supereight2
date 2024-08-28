@@ -402,8 +402,8 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
                       const Eigen::Affine3f& T_WM = Eigen::Affine3f::Identity()) const;
 
     /** Return a mesh of the reconstructed surface in the world frame in units of metres. Apply a
-     * transformation from the world frame W to some output frame O \p T_OW to each mesh vertex. For
-     * se::Res::Multi maps, only data at scale \p min_desired_scale or coarser will be used to
+     * transformation, from the world frame W to some output frame O, \p T_OW to each mesh vertex.
+     * For se::Res::Multi maps, only data at scale \p min_desired_scale or coarser will be used to
      * generate the mesh. This allows generating a coarser mesh which is less demanding in terms of
      * computational time and memory. The value of \p min_desired_scale has no effect on
      * se::Res::Single maps.
