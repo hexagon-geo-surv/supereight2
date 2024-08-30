@@ -37,8 +37,7 @@ template<typename DerivedT>
 class BaseIterator {
     public:
     typedef typename BaseTraits<DerivedT>::OctreeType OctreeType;
-    typedef typename BaseTraits<DerivedT>::NodeType NodeType;
-    typedef typename BaseTraits<DerivedT>::BlockType BlockType;
+    typedef typename OctreeType::NodeType NodeType;
 
     BaseIterator();
 
@@ -222,9 +221,6 @@ template<typename MapT, typename SensorT>
 class FrustumIterator : public BaseIterator<FrustumIterator<MapT, SensorT>> {
     public:
     typedef typename MapT::OctreeType OctreeType;
-    typedef typename MapT::OctreeType::NodeType NodeType;
-    typedef typename MapT::OctreeType::BlockType BlockType;
-
 
     FrustumIterator() : BaseIterator<FrustumIterator<MapT, SensorT>>(){};
 
@@ -272,8 +268,6 @@ class FrustumIterator : public BaseIterator<FrustumIterator<MapT, SensorT>> {
 template<typename OctreeT>
 struct BaseTraits<OctreeIterator<OctreeT>> {
     typedef OctreeT OctreeType;
-    typedef typename OctreeT::NodeType NodeType;
-    typedef typename OctreeT::BlockType BlockType;
 };
 
 
@@ -282,8 +276,6 @@ struct BaseTraits<OctreeIterator<OctreeT>> {
 template<typename OctreeT>
 struct BaseTraits<NodesIterator<OctreeT>> {
     typedef OctreeT OctreeType;
-    typedef typename OctreeT::NodeType NodeType;
-    typedef typename OctreeT::BlockType BlockType;
 };
 
 
@@ -292,8 +284,6 @@ struct BaseTraits<NodesIterator<OctreeT>> {
 template<typename OctreeT>
 struct BaseTraits<BlocksIterator<OctreeT>> {
     typedef OctreeT OctreeType;
-    typedef typename OctreeT::NodeType NodeType;
-    typedef typename OctreeT::BlockType BlockType;
 };
 
 
@@ -302,8 +292,6 @@ struct BaseTraits<BlocksIterator<OctreeT>> {
 template<typename OctreeT>
 struct BaseTraits<LeavesIterator<OctreeT>> {
     typedef OctreeT OctreeType;
-    typedef typename OctreeT::NodeType NodeType;
-    typedef typename OctreeT::BlockType BlockType;
 };
 
 
@@ -312,16 +300,12 @@ struct BaseTraits<LeavesIterator<OctreeT>> {
 template<typename OctreeT>
 struct BaseTraits<UpdateIterator<OctreeT>> {
     typedef OctreeT OctreeType;
-    typedef typename OctreeT::NodeType NodeType;
-    typedef typename OctreeT::BlockType BlockType;
 };
 
 // Declare and define a base_traits specialization for the update iterator:
 template<typename MapT, typename SensorT>
 struct BaseTraits<FrustumIterator<MapT, SensorT>> {
     typedef typename MapT::OctreeType OctreeType;
-    typedef typename MapT::OctreeType::NodeType NodeType;
-    typedef typename MapT::OctreeType::BlockType BlockType;
 };
 
 
