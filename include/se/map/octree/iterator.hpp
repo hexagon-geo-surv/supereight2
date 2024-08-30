@@ -43,8 +43,6 @@ class BaseIterator {
 
     BaseIterator(OctreeType* octree_ptr);
 
-    BaseIterator(const BaseIterator& other);
-
     BaseIterator& operator++();
 
     BaseIterator operator++(int);

@@ -31,13 +31,6 @@ BaseIterator<DerivedT>::BaseIterator(OctreeType* octree_ptr) : octree_ptr_(octre
 
 
 template<typename DerivedT>
-BaseIterator<DerivedT>::BaseIterator(const BaseIterator& other) : octant_stack_(other.octant_stack_)
-{
-}
-
-
-
-template<typename DerivedT>
 BaseIterator<DerivedT>& BaseIterator<DerivedT>::operator++()
 {
     if (octant_stack_.empty()) {
