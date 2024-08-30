@@ -1,7 +1,7 @@
 /*
- * SPDX-FileCopyrightText: 2020-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2020-2024 Smart Robotics Lab, Imperial College London, Technical University of Munich
  * SPDX-FileCopyrightText: 2020-2021 Nils Funk
- * SPDX-FileCopyrightText: 2019-2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2019-2024 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -83,7 +83,7 @@ bool BaseIterator<DerivedT>::operator!=(const BaseIterator& other) const
 
 
 template<typename DerivedT>
-se::OctantBase* BaseIterator<DerivedT>::operator*() const
+OctantBase* BaseIterator<DerivedT>::operator*() const
 {
     return octant_;
 }
@@ -98,7 +98,7 @@ void BaseIterator<DerivedT>::init()
         if (root != nullptr) {
             // Push the root's children on the stack
             for (unsigned int child_idx = 0; child_idx < 8; ++child_idx) {
-                se::OctantBase* child_ptr = root->getChild(child_idx);
+                OctantBase* child_ptr = root->getChild(child_idx);
                 if (child_ptr) {
                     octant_stack_.push(child_ptr);
                 }
@@ -134,7 +134,7 @@ void BaseIterator<DerivedT>::nextData()
             return;
         }
         // Get the data from the top of the stacks
-        se::OctantBase* octant = octant_stack_.top();
+        OctantBase* octant = octant_stack_.top();
         // Pop the node since we'll be done with it after this call
         octant_stack_.pop();
 
@@ -147,7 +147,7 @@ void BaseIterator<DerivedT>::nextData()
         if (octant != nullptr && !octant->is_block) {
             // Non-leaf Node, push all children to the stack
             for (int child_idx = 0; child_idx < 8; child_idx++) {
-                se::OctantBase* child_ptr = static_cast<NodeType*>(octant)->getChild(child_idx);
+                OctantBase* child_ptr = static_cast<NodeType*>(octant)->getChild(child_idx);
                 if (child_ptr) {
                     octant_stack_.push(child_ptr);
                 }

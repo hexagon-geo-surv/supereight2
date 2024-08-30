@@ -1,7 +1,7 @@
 /*
- * SPDX-FileCopyrightText: 2020-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2020-2024 Smart Robotics Lab, Imperial College London, Technical University of Munich
  * SPDX-FileCopyrightText: 2020-2021 Nils Funk
- * SPDX-FileCopyrightText: 2019-2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2019-2024 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -54,13 +54,13 @@ class BaseIterator {
 
     bool operator!=(const BaseIterator& other) const;
 
-    se::OctantBase* operator*() const;
+    OctantBase* operator*() const;
 
     // Iterator traits
     using difference_type = long;
-    using value_type = se::OctantBase;
-    using pointer = se::OctantBase*;
-    using reference = se::OctantBase&;
+    using value_type = OctantBase;
+    using pointer = OctantBase*;
+    using reference = OctantBase&;
     using iterator_category = std::forward_iterator_tag;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -87,9 +87,9 @@ class BaseIterator {
 
     // The 3 stacks should always be kept in sync.
     // Pointers to the Nodes that haven't been checked yet.
-    std::stack<se::OctantBase*> octant_stack_;
+    std::stack<OctantBase*> octant_stack_;
 
-    se::OctantBase* octant_;
+    OctantBase* octant_;
 
     OctreeType* octree_ptr_ = nullptr;
 };
@@ -108,7 +108,7 @@ class OctreeIterator : public BaseIterator<OctreeIterator<OctreeT>> {
 
     static constexpr bool has_ignore_condition = false;
 
-    bool isNext(se::OctantBase* /* octant_ptr */)
+    bool isNext(OctantBase* /* octant_ptr */)
     {
         return true;
     }
@@ -131,7 +131,7 @@ class NodesIterator : public BaseIterator<NodesIterator<OctreeT>> {
 
     static constexpr bool has_ignore_condition = false;
 
-    bool isNext(se::OctantBase* octant_ptr)
+    bool isNext(OctantBase* octant_ptr)
     {
         return !octant_ptr->is_block;
     }
@@ -154,7 +154,7 @@ class BlocksIterator : public BaseIterator<BlocksIterator<OctreeT>> {
 
     static constexpr bool has_ignore_condition = false;
 
-    bool isNext(se::OctantBase* octant_ptr)
+    bool isNext(OctantBase* octant_ptr)
     {
         return octant_ptr->is_block;
     }
@@ -177,7 +177,7 @@ class LeavesIterator : public BaseIterator<LeavesIterator<OctreeT>> {
 
     static constexpr bool has_ignore_condition = false;
 
-    bool isNext(se::OctantBase* octant_ptr)
+    bool isNext(OctantBase* octant_ptr)
     {
         return octant_ptr->isLeaf();
     }
@@ -201,12 +201,12 @@ class UpdateIterator : public BaseIterator<UpdateIterator<OctreeT>> {
 
     static constexpr bool has_ignore_condition = true;
 
-    bool isNext(se::OctantBase* octant_ptr)
+    bool isNext(OctantBase* octant_ptr)
     {
         return octant_ptr->is_block && octant_ptr->timestamp >= time_stamp_;
     }
 
-    bool doIgnore(se::OctantBase* octant_ptr)
+    bool doIgnore(OctantBase* octant_ptr)
     {
         return octant_ptr->timestamp < time_stamp_;
     }
@@ -240,16 +240,15 @@ class FrustumIterator : public BaseIterator<FrustumIterator<MapT, SensorT>> {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     protected:
-    bool isNext(se::OctantBase* octant_ptr)
+    bool isNext(OctantBase* octant_ptr)
     {
         return octant_ptr->is_block;
     }
 
-    bool doIgnore(se::OctantBase* octant_ptr)
+    bool doIgnore(OctantBase* octant_ptr)
     {
         Eigen::Vector3f octant_centre_point_M;
-        const int octant_size =
-            se::octantops::octant_to_size<typename MapT::OctreeType>(octant_ptr);
+        const int octant_size = octantops::octant_to_size<typename MapT::OctreeType>(octant_ptr);
         map_ptr_->voxelToPoint(octant_ptr->coord, octant_size, octant_centre_point_M);
         // Convert it to the sensor frame.
         const Eigen::Vector3f octant_centre_point_S = T_SM_ * octant_centre_point_M;
