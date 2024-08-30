@@ -65,7 +65,7 @@ const OctantBase* Node<DataT, ResT>::getChild(const int child_idx) const
 
 
 template<typename DataT, Res ResT>
-OctantBase* Node<DataT, ResT>::setChild(const int child_idx, OctantBase* child_ptr)
+void Node<DataT, ResT>::setChild(const int child_idx, OctantBase* const child_ptr)
 {
     assert(child_idx >= 0);
     assert(static_cast<size_t>(child_idx) < children_ptr_.size());
@@ -76,8 +76,7 @@ OctantBase* Node<DataT, ResT>::setChild(const int child_idx, OctantBase* child_p
     else {
         child_mask &= ~(1 << child_idx);
     }
-    std::swap(child_ptr, children_ptr_[child_idx]);
-    return child_ptr;
+    children_ptr_[child_idx] = child_ptr;
 }
 
 

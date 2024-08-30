@@ -143,10 +143,10 @@ class Node : public OctantBase, public NodeData<DataT, Node<DataT, ResT>> {
     /** A non-const overload of the previous member function. */
     OctantBase* getChild(const int child_idx);
 
-    /** Set the node child with index \p child_idx to \p child_ptr and return a pointer to the old
-     * child. The value of \p child_idx must be in the interval [0, 7] inclusive.
+    /** Set the node child with index \p child_idx to \p child_ptr. The value of \p child_idx must
+     * be in the interval [0, 7] inclusive.
      */
-    OctantBase* setChild(const int child_idx, OctantBase* child_ptr);
+    void setChild(const int child_idx, OctantBase* const child_ptr);
 
     /** Return the coordinates in voxels of the child with index \p child_idx. */
     Eigen::Vector3i getChildCoord(const int child_idx) const;
