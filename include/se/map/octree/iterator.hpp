@@ -105,15 +105,12 @@ class OctreeIterator : public BaseIterator<OctreeIterator<OctreeT>> {
         this->init();
     };
 
-    static constexpr bool has_ignore_condition = false;
-
     bool isNext(OctantBase* /* octant_ptr */)
     {
         return true;
     }
 
-    protected:
-    friend class BaseIterator<OctreeIterator<OctreeT>>;
+    static constexpr bool has_ignore_condition = false;
 };
 
 
@@ -128,15 +125,12 @@ class NodesIterator : public BaseIterator<NodesIterator<OctreeT>> {
         this->init();
     };
 
-    static constexpr bool has_ignore_condition = false;
-
     bool isNext(OctantBase* octant_ptr)
     {
         return !octant_ptr->is_block;
     }
 
-    protected:
-    friend class BaseIterator<NodesIterator<OctreeT>>;
+    static constexpr bool has_ignore_condition = false;
 };
 
 
@@ -151,15 +145,12 @@ class BlocksIterator : public BaseIterator<BlocksIterator<OctreeT>> {
         this->init();
     };
 
-    static constexpr bool has_ignore_condition = false;
-
     bool isNext(OctantBase* octant_ptr)
     {
         return octant_ptr->is_block;
     }
 
-    protected:
-    friend class BaseIterator<BlocksIterator<OctreeT>>;
+    static constexpr bool has_ignore_condition = false;
 };
 
 
@@ -174,15 +165,12 @@ class LeavesIterator : public BaseIterator<LeavesIterator<OctreeT>> {
         this->init();
     };
 
-    static constexpr bool has_ignore_condition = false;
-
     bool isNext(OctantBase* octant_ptr)
     {
         return octant_ptr->isLeaf();
     }
 
-    protected:
-    friend class BaseIterator<LeavesIterator<OctreeT>>;
+    static constexpr bool has_ignore_condition = false;
 };
 
 
@@ -198,8 +186,6 @@ class UpdateIterator : public BaseIterator<UpdateIterator<OctreeT>> {
         this->init();
     };
 
-    static constexpr bool has_ignore_condition = true;
-
     bool isNext(OctantBase* octant_ptr)
     {
         return octant_ptr->is_block && octant_ptr->timestamp >= time_stamp_;
@@ -212,8 +198,7 @@ class UpdateIterator : public BaseIterator<UpdateIterator<OctreeT>> {
 
     const timestamp_t time_stamp_;
 
-    protected:
-    friend class BaseIterator<UpdateIterator<OctreeT>>;
+    static constexpr bool has_ignore_condition = true;
 };
 
 
@@ -233,9 +218,6 @@ class FrustumIterator : public BaseIterator<FrustumIterator<MapT, SensorT>> {
         this->init();
     }
 
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
-    protected:
     bool isNext(OctantBase* octant_ptr)
     {
         return octant_ptr->is_block;
@@ -256,11 +238,12 @@ class FrustumIterator : public BaseIterator<FrustumIterator<MapT, SensorT>> {
 
     static constexpr bool has_ignore_condition = true;
 
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+    protected:
     MapT* map_ptr_;
     const SensorT* sensor_ptr_;
     const Eigen::Isometry3f T_SM_; // TODO: Needs to be ref?
-
-    friend class BaseIterator<FrustumIterator<MapT, SensorT>>;
 };
 
 
