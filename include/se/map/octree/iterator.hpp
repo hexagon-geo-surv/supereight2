@@ -34,8 +34,7 @@ struct BaseTraits;
  * behavior.
  */
 template<typename DerivedT>
-class BaseIterator {
-    public:
+struct BaseIterator {
     typedef typename BaseTraits<DerivedT>::OctreeType OctreeType;
     typedef typename OctreeType::NodeType NodeType;
 
@@ -94,8 +93,7 @@ class BaseIterator {
 
 
 template<typename OctreeT>
-class OctreeIterator : public BaseIterator<OctreeIterator<OctreeT>> {
-    public:
+struct OctreeIterator : public BaseIterator<OctreeIterator<OctreeT>> {
     OctreeIterator() : BaseIterator<OctreeIterator<OctreeT>>(){};
 
     OctreeIterator(OctreeT* octree_ptr) : BaseIterator<OctreeIterator<OctreeT>>(octree_ptr)
@@ -114,8 +112,7 @@ class OctreeIterator : public BaseIterator<OctreeIterator<OctreeT>> {
 
 
 template<typename OctreeT>
-class NodesIterator : public BaseIterator<NodesIterator<OctreeT>> {
-    public:
+struct NodesIterator : public BaseIterator<NodesIterator<OctreeT>> {
     NodesIterator() : BaseIterator<NodesIterator<OctreeT>>(){};
 
     NodesIterator(OctreeT* octree_ptr) : BaseIterator<NodesIterator<OctreeT>>(octree_ptr)
@@ -134,8 +131,7 @@ class NodesIterator : public BaseIterator<NodesIterator<OctreeT>> {
 
 
 template<typename OctreeT>
-class BlocksIterator : public BaseIterator<BlocksIterator<OctreeT>> {
-    public:
+struct BlocksIterator : public BaseIterator<BlocksIterator<OctreeT>> {
     BlocksIterator() : BaseIterator<BlocksIterator<OctreeT>>(){};
 
     BlocksIterator(OctreeT* octree_ptr) : BaseIterator<BlocksIterator<OctreeT>>(octree_ptr)
@@ -154,8 +150,7 @@ class BlocksIterator : public BaseIterator<BlocksIterator<OctreeT>> {
 
 
 template<typename OctreeT>
-class LeavesIterator : public BaseIterator<LeavesIterator<OctreeT>> {
-    public:
+struct LeavesIterator : public BaseIterator<LeavesIterator<OctreeT>> {
     LeavesIterator() : BaseIterator<LeavesIterator<OctreeT>>(){};
 
     LeavesIterator(OctreeT* octree_ptr) : BaseIterator<LeavesIterator<OctreeT>>(octree_ptr)
@@ -174,8 +169,7 @@ class LeavesIterator : public BaseIterator<LeavesIterator<OctreeT>> {
 
 
 template<typename OctreeT>
-class UpdateIterator : public BaseIterator<UpdateIterator<OctreeT>> {
-    public:
+struct UpdateIterator : public BaseIterator<UpdateIterator<OctreeT>> {
     UpdateIterator() : BaseIterator<UpdateIterator<OctreeT>>(), time_stamp_(0){};
 
     UpdateIterator(OctreeT* octree_ptr, timestamp_t time_stamp) :
@@ -201,8 +195,7 @@ class UpdateIterator : public BaseIterator<UpdateIterator<OctreeT>> {
 
 
 template<typename MapT, typename SensorT>
-class FrustumIterator : public BaseIterator<FrustumIterator<MapT, SensorT>> {
-    public:
+struct FrustumIterator : public BaseIterator<FrustumIterator<MapT, SensorT>> {
     typedef typename MapT::OctreeType OctreeType;
 
     FrustumIterator() : BaseIterator<FrustumIterator<MapT, SensorT>>(){};
