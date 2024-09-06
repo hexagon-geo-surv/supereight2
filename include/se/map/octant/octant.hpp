@@ -17,30 +17,32 @@ namespace se {
 
 /** The base class of all octants (se::Node and se::Block) in an se::Octree. */
 class OctantBase {
-    /** Pointer to the parent octant. The parent pointer of the root octant is nullptr. */
+    // The OctantBase data member order was selected so that sizeof(OctantBase) is minimized.
+
     OctantBase* const parent_ptr_;
 
     public:
-    /** The coordinates in voxels of the octant's vertex closest to the origin. All coordinates must
-     * be non-negative.
-     */
+    /** The coordinates in voxels of the octant's vertex closest to the origin. */
     const Eigen::Vector3i coord;
 
-    /** The frame the octant was last updated at. */
+    /** The time the octant was last updated at. */
     timestamp_t timestamp;
 
-    /** The i-th bit of the mask must be set if the i-th child of the octant is allocated. */
+    /** The i-th least significant bit of the mask must be set if the i-th child of the octant is
+     * allocated.
+     */
     std::uint8_t child_mask;
 
-    /** Whether the octant is a voxel block. */
+    /** Whether the octant is an se::Block. */
     const bool is_block;
 
 
 
     protected:
-    /** Construct an octant given its coordinates (\p coord), whether it's a voxel block (\p
-     * is_block) and the pointer to its parent octant (\p parent_ptr). When constructing the root of
-     * an se::Octree \p parent_ptr must be nullptr.
+    /** Construct an octant given the non-negative coordinates in voxels of its vertex closest to
+     * the origin (\p coord), whether it's an se::Block (\p is_block) and the pointer to its parent
+     * octant (\p parent_ptr). When constructing the root octant of an se::Octree, \p parent_ptr
+     * must be null.
      */
     OctantBase(const Eigen::Vector3i& coord, const bool is_block, OctantBase* const parent_ptr) :
             parent_ptr_(parent_ptr), coord(coord), timestamp(-1), child_mask(0u), is_block(is_block)
@@ -48,7 +50,7 @@ class OctantBase {
     }
 
     public:
-    /** Return the pointer to the octant's parent. */
+    /** Return the pointer to the octant's parent. The parent pointer of the root octant is null. */
     OctantBase* parent()
     {
         return parent_ptr_;
