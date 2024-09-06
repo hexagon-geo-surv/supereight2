@@ -41,7 +41,7 @@ class OctantBase {
      * is_block) and the pointer to its parent octant (\p parent_ptr). When constructing the root of
      * an se::Octree \p parent_ptr must be nullptr.
      */
-    OctantBase(const Eigen::Vector3i& coord, const bool is_block, OctantBase* parent_ptr) :
+    OctantBase(const Eigen::Vector3i& coord, const bool is_block, OctantBase* const parent_ptr) :
             parent_ptr_(parent_ptr), coord(coord), timestamp(-1), child_mask(0u), is_block(is_block)
     {
     }
