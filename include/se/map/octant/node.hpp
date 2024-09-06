@@ -31,6 +31,9 @@ struct NodeData<Data<FldT, ColB, SemB>, DerivedT> {
     }
 
     public:
+    /** Always returns the default data. This method allows simplifying the implementation of
+     * certain algorithms.
+     */
     const DataType& getData() const
     {
         static const DataType default_data = DataType();
