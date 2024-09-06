@@ -12,21 +12,13 @@
 namespace se {
 
 /** Contains se::Data stored in se::Node and appropriate methods. Partial template specilization is
- * used so that se::Node doesn't contain unnecessary data.
+ * used so that se::Node doesn't contain unnecessary data. This non-specialized version contains no
+ * data.
  */
 template<typename DataT, typename DerivedT>
 struct NodeData {
     protected:
-    NodeData() = default;
-};
-
-/** Specialization of se::NodeData containing no data. */
-template<Field FldT, Colour ColB, Semantics SemB, typename DerivedT>
-struct NodeData<Data<FldT, ColB, SemB>, DerivedT> {
-    typedef Data<FldT, ColB, SemB> DataType;
-
-    protected:
-    NodeData(const DataType&)
+    NodeData(const DataT&)
     {
     }
 
@@ -34,9 +26,9 @@ struct NodeData<Data<FldT, ColB, SemB>, DerivedT> {
     /** Always returns the default data. This method allows simplifying the implementation of
      * certain algorithms.
      */
-    const DataType& getData() const
+    const DataT& getData() const
     {
-        static const DataType default_data = DataType();
+        static const DataT default_data;
         return default_data;
     }
 };
