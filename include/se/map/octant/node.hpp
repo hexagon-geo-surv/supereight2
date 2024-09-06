@@ -13,25 +13,24 @@ namespace se {
 
 /** Contains se::Data stored in se::Node and appropriate methods. Partial template specilization is
  * used so that se::Node doesn't contain unnecessary data.
- *
- * \warning This class shouldn't be used directly. Its methods are available through se::Node.
  */
 template<typename DataT, typename DerivedT>
 struct NodeData {
+    protected:
+    NodeData() = default;
 };
 
-/** Specialization of se::NodeData containing no data.
- *
- * \warning This class shouldn't be used directly. Its methods are available through se::Node.
- */
+/** Specialization of se::NodeData containing no data. */
 template<Field FldT, Colour ColB, Semantics SemB, typename DerivedT>
 struct NodeData<Data<FldT, ColB, SemB>, DerivedT> {
     typedef Data<FldT, ColB, SemB> DataType;
 
+    protected:
     NodeData(const DataType&)
     {
     }
 
+    public:
     const DataType& getData() const
     {
         static const DataType default_data = DataType();
@@ -43,13 +42,12 @@ struct NodeData<Data<FldT, ColB, SemB>, DerivedT> {
 
 /** Specialization of se::NodeData for se::Field::Occupancy. It contains minimum and maximum
  * up-propagated data.
- *
- * \warning This class shouldn't be used directly. Its methods are available through se::Node.
  */
 template<Colour ColB, Semantics SemB, typename DerivedT>
 struct NodeData<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
     typedef Data<Field::Occupancy, ColB, SemB> DataType;
 
+    protected:
     /** Construct a node with both its minimum and maximum data initialized to \p init_data. */
     NodeData(const DataType& init_data)
     {
@@ -57,6 +55,7 @@ struct NodeData<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
         max_data_ = init_data;
     }
 
+    public:
     /** Return the node data. If the node is not observed and not a leaf the default data is
      * returned.
      */
