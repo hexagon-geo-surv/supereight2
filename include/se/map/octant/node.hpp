@@ -119,7 +119,7 @@ struct NodeData<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
  * \tparam DataT The type of data stored in the octree.
  * \tparam ResT  The value of se::Res for the octree.
  */
-template<typename DataT, Res ResT = Res::Single>
+template<typename DataT, Res ResT>
 class Node : public OctantBase, public NodeData<DataT, Node<DataT, ResT>> {
     public:
     typedef DataT DataType;
