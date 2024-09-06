@@ -37,6 +37,7 @@ class OctantBase {
 
 
 
+    protected:
     /** Construct an octant given its coordinates (\p coord), whether it's a voxel block (\p
      * is_block) and the pointer to its parent octant (\p parent_ptr). When constructing the root of
      * an se::Octree \p parent_ptr must be nullptr.
@@ -46,6 +47,7 @@ class OctantBase {
     {
     }
 
+    public:
     /** Return the pointer to the octant's parent. */
     OctantBase* parent()
     {
