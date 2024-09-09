@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <se/map/utils/setup_util.hpp>
 #include <se/map/utils/type_util.hpp>
+#include <se/supereight_config.hpp> // Required for the SE_TBB macro
 
 namespace se {
 
