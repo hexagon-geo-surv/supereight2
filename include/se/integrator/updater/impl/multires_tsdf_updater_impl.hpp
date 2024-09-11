@@ -105,17 +105,19 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Upd
                         child_data_union.data.field.weight = parent_data_union.data.field.weight;
                         child_data_union.past_data.field.tsdf = child_data_union.data.field.tsdf;
                         child_data_union.past_data.field.weight = 0;
-                        // Whether interpolation succeeds depends only on the field data.
                         if constexpr (ColB == Colour::On) {
                             const auto interp_colour_value = visitor::getColourInterp(
                                 octree, child_sample_coord_f, child_data_union.scale);
-                            assert(interp_colour_value);
-                            child_data_union.data.colour.colour = *interp_colour_value;
-                            child_data_union.data.colour.weight =
-                                parent_data_union.data.colour.weight;
-                            child_data_union.past_data.colour.colour =
-                                child_data_union.data.colour.colour;
-                            child_data_union.past_data.colour.weight = 0;
+                            // Colour interpolation may fail even if field interpolation succeeded
+                            // as it requires both field and colour data to be valid.
+                            if (interp_colour_value) {
+                                child_data_union.data.colour.colour = *interp_colour_value;
+                                child_data_union.data.colour.weight =
+                                    parent_data_union.data.colour.weight;
+                                child_data_union.past_data.colour.colour =
+                                    child_data_union.data.colour.colour;
+                                child_data_union.past_data.colour.weight = 0;
+                            }
                         }
                     }
                 }

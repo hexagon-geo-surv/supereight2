@@ -1069,7 +1069,7 @@ getColourInterp(const OctreeT& octree,
     return getInterp(
         octree,
         voxel_coord_f,
-        [](const typename OctreeT::DataType& d) { return is_valid(d); },
+        [](const typename OctreeT::DataType& d) { return is_valid(d) && d.colour.weight > 0; },
         [](const typename OctreeT::DataType& d) { return d.colour.colour; },
         desired_scale,
         returned_scale);
@@ -1085,7 +1085,7 @@ getColourInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
     return getInterp(
         octree,
         voxel_coord_f,
-        [](const typename OctreeT::DataType& d) { return is_valid(d); },
+        [](const typename OctreeT::DataType& d) { return is_valid(d) && d.colour.weight > 0; },
         [](const typename OctreeT::DataType& d) { return d.colour.colour; });
 }
 
