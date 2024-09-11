@@ -109,12 +109,13 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getMinData(const Eigen::Vector3f& 
 
 
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
-template<typename GetF, Safe SafeB, Res ResTDummy>
+template<typename ValidF, typename GetF, Safe SafeB, Res ResTDummy>
 typename std::enable_if_t<ResTDummy == Res::Multi,
                           std::optional<std::invoke_result_t<
                               GetF,
                               typename Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::DataType>>>
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getInterp(const Eigen::Vector3f& point_W,
+                                                        ValidF valid,
                                                         GetF get,
                                                         int& returned_scale) const
 {
@@ -125,16 +126,17 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getInterp(const Eigen::Vector3f& p
             return std::nullopt;
         }
     }
-    return se::visitor::getInterp(octree_, voxel_coord_f, get, 0, &returned_scale);
+    return se::visitor::getInterp(octree_, voxel_coord_f, valid, get, 0, &returned_scale);
 }
 
 
 
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
-template<Safe SafeB, typename GetF>
+template<Safe SafeB, typename ValidF, typename GetF>
 std::optional<
     std::invoke_result_t<GetF, typename Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::DataType>>
 Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getInterp(const Eigen::Vector3f& point_W,
+                                                        ValidF valid,
                                                         GetF get) const
 {
     Eigen::Vector3f voxel_coord_f;
@@ -144,7 +146,7 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::getInterp(const Eigen::Vector3f& p
             return std::nullopt;
         }
     }
-    return se::visitor::getInterp(octree_, voxel_coord_f, get);
+    return se::visitor::getInterp(octree_, voxel_coord_f, valid, get);
 }
 
 

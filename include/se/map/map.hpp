@@ -216,6 +216,12 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      *
      * \param[in] point_W         The coordinates in metres of the point in the world frame W the
      *                            member will be interpolated at.
+     * \param[in] valid           A functor with the following prototype, returning whether the
+     *                            supplied data is valid and should be used for interpolation:
+     *                            \code{.cpp}
+     *                            template<typename OctreeT>
+     *                            bool valid(const typename OctreeT::DataType& data);
+     *                            \endcode
      * \param[in] get             A functor with the following prototype, returning the member of
      *                            type `T` to be interpolated:
      *                            \code{.cpp}
@@ -231,18 +237,18 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      *                            `std::nullopt` is returned.
      * \return The interpolated member if the data is valid, `std::nullopt` otherwise.
      */
-    template<typename GetF, Safe SafeB = Safe::Off, Res ResTDummy = ResT>
+    template<typename ValidF, typename GetF, Safe SafeB = Safe::Off, Res ResTDummy = ResT>
     typename std::enable_if_t<ResTDummy == Res::Multi,
                               std::optional<std::invoke_result_t<GetF, DataType>>>
-    getInterp(const Eigen::Vector3f& point_W, GetF get, int& returned_scale) const;
+    getInterp(const Eigen::Vector3f& point_W, ValidF valid, GetF get, int& returned_scale) const;
 
     /** \overload
      * \details This overload works for both single- and multi-resolution maps. In the case of a
      * multi-resolution map the member is interpolated at the finest possible scale.
      */
-    template<Safe SafeB = Safe::Off, typename GetF>
-    std::optional<std::invoke_result_t<GetF, DataType>> getInterp(const Eigen::Vector3f& point_W,
-                                                                  GetF get) const;
+    template<Safe SafeB = Safe::Off, typename ValidF, typename GetF>
+    std::optional<std::invoke_result_t<GetF, DataType>>
+    getInterp(const Eigen::Vector3f& point_W, ValidF valid, GetF get) const;
 
     /**
      * \brief Get the interpolated field value at the provided coordinates.

@@ -905,11 +905,12 @@ getField(const OctreeT& octree,
 
 
 
-template<typename OctreeT, typename GetF>
+template<typename OctreeT, typename ValidF, typename GetF>
 typename std::enable_if_t<OctreeT::res_ == Res::Multi,
                           std::optional<std::invoke_result_t<GetF, typename OctreeT::DataType>>>
 getInterp(const OctreeT& octree,
           const Eigen::Vector3f& voxel_coord_f,
+          ValidF valid,
           GetF get,
           const int desired_scale,
           int* returned_scale)
@@ -947,7 +948,7 @@ getInterp(const OctreeT& octree,
             continue;
         }
         for (const auto& d : data) {
-            if (!is_valid(d)) {
+            if (!valid(d)) {
                 return std::nullopt;
             }
         }
@@ -974,10 +975,10 @@ getInterp(const OctreeT& octree,
 
 
 
-template<typename OctreeT, typename GetF>
+template<typename OctreeT, typename ValidF, typename GetF>
 typename std::enable_if_t<OctreeT::res_ == Res::Single,
                           std::optional<std::invoke_result_t<GetF, typename OctreeT::DataType>>>
-getInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, GetF get)
+getInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, ValidF valid, GetF get)
 {
     // Interpolate in a single-resolution octree.
 
@@ -1007,7 +1008,7 @@ getInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, GetF get)
         return std::nullopt;
     }
     for (const auto& d : data) {
-        if (!is_valid(d)) {
+        if (!valid(d)) {
             return std::nullopt;
         }
     }
@@ -1036,6 +1037,7 @@ getFieldInterp(const OctreeT& octree,
     return getInterp(
         octree,
         voxel_coord_f,
+        [](const typename OctreeT::DataType& d) { return is_valid(d); },
         [](const typename OctreeT::DataType& d) { return get_field(d); },
         desired_scale,
         returned_scale);
@@ -1048,7 +1050,10 @@ typename std::enable_if_t<OctreeT::res_ == Res::Single, std::optional<field_t>>
 getFieldInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 {
     return getInterp(
-        octree, voxel_coord_f, [](const typename OctreeT::DataType& d) { return get_field(d); });
+        octree,
+        voxel_coord_f,
+        [](const typename OctreeT::DataType& d) { return is_valid(d); },
+        [](const typename OctreeT::DataType& d) { return get_field(d); });
 }
 
 
@@ -1064,6 +1069,7 @@ getColourInterp(const OctreeT& octree,
     return getInterp(
         octree,
         voxel_coord_f,
+        [](const typename OctreeT::DataType& d) { return is_valid(d); },
         [](const typename OctreeT::DataType& d) { return d.colour.colour; },
         desired_scale,
         returned_scale);
@@ -1077,7 +1083,10 @@ typename std::enable_if_t<OctreeT::res_ == Res::Single && OctreeT::col_ == Colou
 getColourInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
 {
     return getInterp(
-        octree, voxel_coord_f, [](const typename OctreeT::DataType& d) { return d.colour.colour; });
+        octree,
+        voxel_coord_f,
+        [](const typename OctreeT::DataType& d) { return is_valid(d); },
+        [](const typename OctreeT::DataType& d) { return d.colour.colour; });
 }
 
 

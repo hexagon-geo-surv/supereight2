@@ -217,6 +217,12 @@ getField(const OctreeT& octree,
  * \param[in] octree          The multi-resolution octree containing the data.
  * \param[in] voxel_coord_f   The voxel coordinates the member will be interpolated at. The
  *                            coordinates may have a fractional part.
+ * \param[in] valid           A functor with the following prototype, returning whether the supplied
+ *                            data is valid and should be used for interpolation:
+ *                            \code{.cpp}
+ *                            template<typename OctreeT>
+ *                            bool valid(const typename OctreeT::DataType& data);
+ *                            \endcode
  * \param[in] get             A functor with the following prototype, returning the member of type
  *                            `T` to be interpolated:
  *                            \code{.cpp}
@@ -235,11 +241,12 @@ getField(const OctreeT& octree,
  *                            `*returned_scale` will not be less than \p desired_scale.
  * \return The interpolated member if the data is valid, `std::nullopt` otherwise.
  */
-template<typename OctreeT, typename GetF>
+template<typename OctreeT, typename ValidF, typename GetF>
 typename std::enable_if_t<OctreeT::res_ == Res::Multi,
                           std::optional<std::invoke_result_t<GetF, typename OctreeT::DataType>>>
 getInterp(const OctreeT& octree,
           const Eigen::Vector3f& voxel_coord_f,
+          ValidF valid,
           GetF get,
           const int desired_scale = 0,
           int* returned_scale = nullptr);
@@ -248,10 +255,10 @@ getInterp(const OctreeT& octree,
  * \details This overload works only for single-resolution octrees. The member is interpolated at
  * scale 0, the finest and only scale.
  */
-template<typename OctreeT, typename GetF>
+template<typename OctreeT, typename ValidF, typename GetF>
 typename std::enable_if_t<OctreeT::res_ == Res::Single,
                           std::optional<std::invoke_result_t<GetF, typename OctreeT::DataType>>>
-getInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, GetF get);
+getInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, ValidF valid, GetF get);
 
 
 
