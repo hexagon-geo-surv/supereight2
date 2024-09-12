@@ -23,7 +23,7 @@ struct IntegrateDepthImplD {
     static void integrate(MapT& map,
                           const timestamp_t timestamp,
                           const Measurements<SensorT>& measurements,
-                          std::vector<const OctantBase*>* updated_octants);
+                          std::set<const OctantBase*>* updated_octants);
 };
 
 
@@ -41,7 +41,7 @@ struct IntegrateRayBatchImplD {
                           Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
             rayPoseBatch,
         const timestamp_t timestamp,
-        std::vector<const OctantBase*>* updated_octants);
+        std::set<const OctantBase*>* updated_octants);
 };
 
 
@@ -55,7 +55,7 @@ struct IntegrateDepthImplD<se::Field::TSDF, ResT> {
     static void integrate(MapT& map,
                           const timestamp_t timestamp,
                           const Measurements<SensorT>& measurements,
-                          std::vector<const OctantBase*>* updated_octants)
+                          std::set<const OctantBase*>* updated_octants)
     {
         assert(measurements.depth.sensor.model.imageWidth() == measurements.depth.image.width());
         assert(measurements.depth.sensor.model.imageHeight() == measurements.depth.image.height());
@@ -78,8 +78,7 @@ struct IntegrateDepthImplD<se::Field::TSDF, ResT> {
             // TODO: Currently returning allocated, not updated octants. Remove non-updated blocks from
             // block_ptrs during the call to se::Updater::update() to return only updated octants.
             updated_octants->clear();
-            updated_octants->reserve(block_ptrs.size());
-            updated_octants->insert(updated_octants->end(), block_ptrs.begin(), block_ptrs.end());
+            updated_octants->insert(block_ptrs.begin(), block_ptrs.end());
         }
     }
 };
@@ -95,7 +94,7 @@ struct IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi> {
     static void integrate(MapT& map,
                           const timestamp_t timestamp,
                           const Measurements<SensorT>& measurements_,
-                          std::vector<const OctantBase*>* updated_octants)
+                          std::set<const OctantBase*>* updated_octants)
     {
         // Create a (shallow) copy of the measurements to generate a depth sigma image if needed.
         // The std::optional allows skipping the Image<float> initialization if it's not needed.
@@ -146,7 +145,7 @@ struct IntegrateRayBatchImplD<se::Field::Occupancy, se::Res::Multi> {
                           Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
             rayPoseBatch,
         const timestamp_t timestamp,
-        std::vector<const OctantBase*>* updated_octants)
+        std::set<const OctantBase*>* updated_octants)
     {
         se::RayIntegrator<MapT, SensorT> rayIntegrator(
             map, sensor, rayPoseBatch[0].second, rayPoseBatch[0].first, timestamp, updated_octants);
@@ -174,7 +173,6 @@ struct IntegrateRayBatchImplD<se::Field::Occupancy, se::Res::Multi> {
         TICK("propagateToRoot")
         rayIntegrator.propagateToRoot();
         TOCK("propagateToRoot")
-        rayIntegrator.updatedOctants(updated_octants);
     }
 };
 
@@ -200,7 +198,7 @@ template<typename MapT>
 template<typename SensorT>
 void MapIntegrator<MapT>::integrateDepth(const timestamp_t timestamp,
                                          const Measurements<SensorT>& measurements,
-                                         std::vector<const OctantBase*>* updated_octants)
+                                         std::set<const OctantBase*>* updated_octants)
 {
     se::details::IntegrateDepthImpl<MapT>::template integrate<SensorT>(
         map_, timestamp, measurements, updated_octants);
@@ -216,7 +214,7 @@ void MapIntegrator<MapT>::integrateRayBatch(
                       Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
         rayPoseBatch,
     const SensorT& sensor,
-    std::vector<const OctantBase*>* updated_octants)
+    std::set<const OctantBase*>* updated_octants)
 {
     se::details::IntegrateRayBatchImpl<MapT>::integrate(
         map_, sensor, rayPoseBatch, timestamp, updated_octants);

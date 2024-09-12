@@ -97,14 +97,13 @@ TEST(RayIntegrator, SingleRay)
 
     // ========= Integration =========
     const Eigen::Vector3f ray(d, 0., 0.);
-    std::vector<const se::OctantBase*> updated_octants;
+    std::set<const se::OctantBase*> updated_octants;
 
     se::RayIntegrator rayIntegrator(
         map, sensor, ray, Eigen::Isometry3f::Identity(), 0, &updated_octants);
     rayIntegrator();
     rayIntegrator.propagateBlocksToCoarsestScale();
     rayIntegrator.propagateToRoot();
-    rayIntegrator.updatedOctants(&updated_octants);
     EXPECT_FALSE(updated_octants.empty());
     std::cout << "Number of updated octants: " << updated_octants.size() << std::endl;
 
@@ -219,7 +218,7 @@ TEST(RayIntegrator, Propagation)
     se::MapIntegrator integrator(map);
 
     // ========= Integration (Batched)
-    std::vector<const se::OctantBase*> updated_octants;
+    std::set<const se::OctantBase*> updated_octants;
     integrator.integrateRayBatch(0, rayBatch, sensor, &updated_octants);
     std::cout << "Number of updated octants: " << updated_octants.size() << std::endl;
     // Un-Comment if needed for debugging

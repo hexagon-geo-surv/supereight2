@@ -47,7 +47,7 @@ Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
 template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
 void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::operator()(
     VolumeCarverAllocation& allocation_list,
-    std::vector<const OctantBase*>* updated_octants)
+    std::set<const OctantBase*>* updated_octants)
 {
     TICK("fusion-total")
 
@@ -90,16 +90,17 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
     // deallocating blocks and removing elements from updated_octants_, so this prevents having
     // stale pointers in updated_octants_. Leaf nodes won't be traversed in propagateToRoot() so
     // they have to be added as well.
-    track_updated_octants_ = updated_octants;
-    if (track_updated_octants_) {
-        updated_octants_.clear();
-        updated_octants_.insert(allocation_list.block_list.begin(),
-                                allocation_list.block_list.end());
-        updated_octants_.insert(freed_block_list_.begin(), freed_block_list_.end());
-        std::copy_if(allocation_list.node_list.begin(),
-                     allocation_list.node_list.end(),
-                     std::inserter(updated_octants_, updated_octants_.end()),
-                     [](const auto octant) { return octant && octant->isLeaf(); });
+    updated_octants_ = updated_octants;
+    if (updated_octants_) {
+        updated_octants_->clear();
+        updated_octants_->insert(allocation_list.block_list.begin(),
+                                 allocation_list.block_list.end());
+        updated_octants_->insert(freed_block_list_.begin(), freed_block_list_.end());
+        for (const OctantBase* octant : allocation_list.node_list) {
+            if (octant && octant->isLeaf()) {
+                updated_octants_->insert(octant);
+            }
+        }
     }
 
     TICK("propagation-to-root")
@@ -107,13 +108,6 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
     TOCK("propagation-to-root")
 
     TOCK("propagation-total")
-
-    if (track_updated_octants_) {
-        updated_octants->clear();
-        updated_octants->reserve(updated_octants_.size());
-        updated_octants->insert(
-            updated_octants->end(), updated_octants_.begin(), updated_octants_.end());
-    }
 }
 
 
@@ -140,18 +134,18 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
                 auto node_data =
                     updater::propagate_to_parent_node<NodeType, BlockType>(octant_ptr, timestamp_);
                 node_set_[d - 1].insert(octant_ptr->parent());
-                if (track_updated_octants_) {
-                    updated_octants_.insert(octant_ptr);
+                if (updated_octants_) {
+                    updated_octants_->insert(octant_ptr);
                 }
 
                 if (node_data.field.observed
                     && get_field(node_data) <= 0.95 * MapType::DataType::FieldType::min_occupancy) {
                     auto* node_ptr = static_cast<NodeType*>(octant_ptr);
-                    if (track_updated_octants_) {
+                    if (updated_octants_) {
                         for (int i = 0; i < 8; i++) {
                             OctantBase* const child_ptr = node_ptr->getChild(i);
                             if (child_ptr) {
-                                updated_octants_.erase(child_ptr);
+                                updated_octants_->erase(child_ptr);
                             }
                         }
                     }

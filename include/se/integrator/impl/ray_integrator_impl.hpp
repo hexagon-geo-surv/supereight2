@@ -18,7 +18,7 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockS
                                       const Eigen::Vector3f& ray,
                                       const Eigen::Isometry3f& T_WS,
                                       const timestamp_t timestamp,
-                                      std::vector<const OctantBase*>* updated_octants) :
+                                      std::set<const OctantBase*>* updated_octants) :
         map_(map),
         octree_(map.getOctree()),
         sensor_(sensor),
@@ -37,7 +37,7 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockS
                                          config_.sigma_max,
                                          map_.getDataConfig()))
 {
-    track_updated_octants_ = updated_octants;
+    updated_octants_ = updated_octants;
 }
 
 template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
@@ -218,6 +218,9 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockS
             updated_blocks_set_.insert(finest_octant_ptr);
             updated_blocks_vector_.push_back(finest_octant_ptr);
         }
+        if (updated_octants_) {
+            updated_octants_->insert(finest_octant_ptr);
+        }
     }
     else {
         octree_.allocateChildren(static_cast<NodeType*>(finest_octant_ptr));
@@ -321,19 +324,21 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
                 auto node_data = ray_integrator::propagate_to_parent_node<NodeType, BlockType>(
                     octant_ptr, timestamp_);
                 node_set_[d - 1].insert(octant_ptr->parent());
-                if (track_updated_octants_) {
+                if (updated_octants_) {
                     updated_blocks_set_.insert(octant_ptr);
+                    updated_octants_->insert(octant_ptr);
                 }
 
                 // If all nodes free space, delete children and just leave coarser resolution
                 if (node_data.field.observed
                     && get_field(node_data) <= 0.95 * MapType::DataType::FieldType::min_occupancy) {
                     auto* node_ptr = static_cast<NodeType*>(octant_ptr);
-                    if (track_updated_octants_) {
+                    if (updated_octants_) {
                         for (int i = 0; i < 8; i++) {
                             OctantBase* const child_ptr = node_ptr->getChild(i);
                             if (child_ptr) {
                                 updated_blocks_set_.erase(child_ptr);
+                                updated_octants_->erase(octant_ptr);
                             }
                         }
                     }
@@ -345,18 +350,6 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
     }         // depth d
 
     ray_integrator::propagate_to_parent_node<NodeType, BlockType>(octree_.getRoot(), timestamp_);
-}
-
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
-                   SensorT>::updatedOctants(std::vector<const OctantBase*>* updated_octants)
-{
-    if (track_updated_octants_) {
-        updated_octants->clear();
-        updated_octants->reserve(updated_blocks_set_.size());
-        updated_octants->insert(
-            updated_octants->end(), updated_blocks_set_.begin(), updated_blocks_set_.end());
-    }
 }
 
 } // namespace se
