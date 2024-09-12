@@ -92,7 +92,6 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
     // they have to be added as well.
     updated_octants_ = updated_octants;
     if (updated_octants_) {
-        updated_octants_->clear();
         updated_octants_->insert(allocation_list.block_list.begin(),
                                  allocation_list.block_list.end());
         updated_octants_->insert(freed_block_list_.begin(), freed_block_list_.end());

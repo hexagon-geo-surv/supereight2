@@ -77,7 +77,6 @@ struct IntegrateDepthImplD<se::Field::TSDF, ResT> {
         if (updated_octants) {
             // TODO: Currently returning allocated, not updated octants. Remove non-updated blocks from
             // block_ptrs during the call to se::Updater::update() to return only updated octants.
-            updated_octants->clear();
             updated_octants->insert(block_ptrs.begin(), block_ptrs.end());
         }
     }
