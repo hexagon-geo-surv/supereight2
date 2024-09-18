@@ -3,10 +3,10 @@
 
 cmake_minimum_required(VERSION 3.10...3.16)
 
-add_executable(occupancy-integrator-unittest occupancy_integrator_unittest.cpp)
-target_compile_options(occupancy-integrator-unittest PRIVATE ${SE_PRIVATE_CXX_FLAGS})
-target_link_libraries(occupancy-integrator-unittest PRIVATE SRL::Supereight2 gtest_main)
-add_test(NAME occupancy-integrator-unittest COMMAND occupancy-integrator-unittest)
+add_executable(depth-integrator-unittest depth_integrator_unittest.cpp)
+target_compile_options(depth-integrator-unittest PRIVATE ${SE_PRIVATE_CXX_FLAGS})
+target_link_libraries(depth-integrator-unittest PRIVATE SRL::Supereight2 gtest_main)
+add_test(NAME depth-integrator-unittest COMMAND depth-integrator-unittest)
 
 add_executable(ray-integrator-unittest ray_integrator_unittest.cpp)
 target_compile_options(ray-integrator-unittest PRIVATE ${SE_PRIVATE_CXX_FLAGS})
