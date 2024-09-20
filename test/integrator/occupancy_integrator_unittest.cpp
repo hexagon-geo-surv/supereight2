@@ -76,8 +76,8 @@ class OccupancyIntegrator : public ::testing::Test {
             for (int y = 0; y < stride; y += stride / 2) {
                 for (int x = 0; x < stride; x += stride / 2) {
                     const Eigen::Vector3i child_coord = parent_coord + Eigen::Vector3i(x, y, z);
-                    const auto& child_min_data = block.getMinData(child_coord, scale);
-                    const auto& child_max_data = block.getMaxData(child_coord, scale);
+                    const auto& child_min_data = block.getMinData(child_coord, scale - 1);
+                    const auto& child_max_data = block.getMaxData(child_coord, scale - 1);
                     std::stringstream failure_message;
                     failure_message << "for block (" << parent_coord.transpose() << ") at scale "
                                     << scale;
