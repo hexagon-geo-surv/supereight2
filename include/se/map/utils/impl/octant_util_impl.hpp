@@ -62,14 +62,14 @@ sort_blocks(std::vector<se::OctantBase*>& block_ptrs)
 
 
 
-inline int size_to_scale(const int octant_size)
+constexpr int size_to_scale(const int octant_size)
 {
     return se::math::log2_const(octant_size);
 }
 
 
 
-inline int scale_to_size(const int scale)
+constexpr int scale_to_size(const int scale)
 {
     return 1 << scale;
 }

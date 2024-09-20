@@ -49,7 +49,7 @@ sort_blocks(std::vector<se::OctantBase*>& block_ptrs);
  * \param[in] octant_size  The size of the octant in [voxel]
  * \return The scale of the octant
  */
-inline int size_to_scale(const int octant_size);
+constexpr int size_to_scale(const int octant_size);
 
 /**
  * \brief Convert the scale of a octant to its size in [voxel].
@@ -57,7 +57,7 @@ inline int size_to_scale(const int octant_size);
  * \param[in] octant_scale  The scale of the octant
  * \return The size of the octant in [voxel]
  */
-inline int scale_to_size(const int octant_scale);
+constexpr int scale_to_size(const int octant_scale);
 
 /**
  * \brief Get the octant's size.
