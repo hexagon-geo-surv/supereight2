@@ -41,22 +41,10 @@ template<typename BlockT, se::Sort SortT>
 inline typename std::enable_if_t<SortT == se::Sort::LargeToSmall>
 sort_blocks(std::vector<se::OctantBase*>& block_ptrs);
 
-
-
-/**
- * \brief Convert the size of an octant in [voxel] to its scale in the octree.
- *
- * \param[in] octant_size  The size of the octant in [voxel]
- * \return The scale of the octant
- */
+/** Return the octree scale corresponding to \p octant_size in voxels. */
 constexpr int size_to_scale(const int octant_size);
 
-/**
- * \brief Convert the scale of a octant to its size in [voxel].
- *
- * \param[in] octant_scale  The scale of the octant
- * \return The size of the octant in [voxel]
- */
+/** Return the octant size in voxels corresponding to \p octant_scale. */
 constexpr int scale_to_size(const int octant_scale);
 
 /**
