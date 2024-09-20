@@ -125,17 +125,17 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr,
         node.setMinData(node_min_data);
     }
 
-    typename NodeT::DataType node_data = node.getData();
+    typename NodeT::DataType node_max_data = node.getMaxData();
 
     if (max_data_count > 0) {
-        node_data.field.occupancy = max_mean_occupancy; // TODO: Need to check update?
-        node_data.field.weight = max_weight;
+        node_max_data.field.occupancy = max_mean_occupancy; // TODO: Need to check update?
+        node_max_data.field.weight = max_weight;
         if (observed_count == 8) {
-            node_data.field.observed = true;
+            node_max_data.field.observed = true;
         }
-        node.setMaxData(node_data);
+        node.setMaxData(node_max_data);
     }
-    return node_data;
+    return node_max_data;
 }
 
 template<typename BlockT>

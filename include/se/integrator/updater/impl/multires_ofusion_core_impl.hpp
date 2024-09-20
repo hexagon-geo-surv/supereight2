@@ -120,7 +120,7 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr,
     data::up_prop_min(node_min_data, child_min_data);
     node.setMinData(node_min_data);
 
-    typename NodeT::DataType node_max_data = node.getData();
+    typename NodeT::DataType node_max_data = node.getMaxData();
     data::up_prop_max(node_max_data, child_max_data);
     node.setMaxData(node_max_data);
 
