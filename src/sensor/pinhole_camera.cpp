@@ -235,6 +235,24 @@ bool se::PinholeCamera::sphereInFrustumInfImpl(const Eigen::Vector3f& center_S,
 
 
 
+se::PinholeCamera se::PinholeCamera::testInstance()
+{
+    constexpr int width = 640;
+    constexpr int height = 480;
+    // The focal length was scientifically eyeballed so that there's minimal overlap between frusta
+    // when integrating 4 uniform depth images at 5 metres from 4 poses at 0°, 90°, 180° and 270°
+    // yaw in a map with a 1 cm resolution.
+    constexpr float f = 315.0f;
+    constexpr float cx = width / 2 - 0.5f;
+    constexpr float cy = height / 2 - 0.5f;
+    // Transforms from the z-forward, x-right frame S to the x-forward, z-up frame B.
+    const Eigen::Isometry3f T_BS(Eigen::AngleAxisf(M_PI / 2, Eigen::Vector3f::UnitY())
+                                 * Eigen::AngleAxisf(M_PI / 2, Eigen::Vector3f::UnitZ()));
+    return se::PinholeCamera({{width, height, 0.1f, 10.0f, T_BS}, f, f, cx, cy});
+}
+
+
+
 void se::PinholeCamera::computeFrustumVertices()
 {
     Eigen::Vector3f point_S;

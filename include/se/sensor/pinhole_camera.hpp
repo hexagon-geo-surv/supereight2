@@ -97,6 +97,9 @@ class PinholeCamera : public SensorBase<PinholeCamera> {
 
     static std::string typeImpl();
 
+    /** Return an se::PinholeCamera instance for use in unit tests requiring one. */
+    static PinholeCamera testInstance();
+
     srl::projection::PinholeCamera<srl::projection::NoDistortion> model;
     float scaled_pixel;
 
