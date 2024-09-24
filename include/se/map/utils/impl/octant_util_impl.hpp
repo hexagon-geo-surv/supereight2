@@ -64,6 +64,7 @@ sort_blocks(std::vector<se::OctantBase*>& block_ptrs)
 
 constexpr int size_to_scale(const int octant_size)
 {
+    assert(math::is_power_of_two(octant_size));
     return se::math::log2_const(octant_size);
 }
 
@@ -71,6 +72,7 @@ constexpr int size_to_scale(const int octant_size)
 
 constexpr int scale_to_size(const int scale)
 {
+    assert(scale >= 0);
     return 1 << scale;
 }
 
