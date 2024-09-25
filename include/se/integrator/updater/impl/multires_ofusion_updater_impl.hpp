@@ -485,6 +485,11 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                             buffer_data, range_diff, tau, three_sigma, map_.getDataConfig()));
                         const bool field_updated = range_diff < tau;
 
+                        // Never update colour or semantics beyond the far plane.
+                        if (depth_value > sensor_.far_plane) {
+                            continue;
+                        }
+
                         // Compute the coordinates of the depth hit in the depth sensor frame C if
                         // data other than depth needs to be integrated.
                         Eigen::Vector3f hit_C;
@@ -586,6 +591,11 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                     block_ptr->incrCurrObservedCount(updater::update_voxel(
                         voxel_data, range_diff, tau, three_sigma, map_.getDataConfig()));
                     const bool field_updated = range_diff < tau;
+
+                    // Never update colour or semantics beyond the far plane.
+                    if (depth_value > sensor_.far_plane) {
+                        continue;
+                    }
 
                     // Compute the coordinates of the depth hit in the depth sensor frame C if
                     // data other than depth needs to be integrated.
