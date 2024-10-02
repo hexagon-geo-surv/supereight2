@@ -53,7 +53,7 @@ void subnode_as_eigen_vector_x(const cv::FileNode& base_node,
 {
     std::vector<T> v;
     subnode_as_vector<T>(base_node, subnode_name, v);
-    eigen_v = Eigen::Map<Eigen::VectorXf, Eigen::Unaligned>(v.data(), v.size());
+    eigen_v = Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, 1>, Eigen::Unaligned>(v.data(), v.size());
 }
 
 
