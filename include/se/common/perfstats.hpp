@@ -11,14 +11,9 @@
 #ifndef SE_PERFSTATS_HPP
 #define SE_PERFSTATS_HPP
 
-#ifdef __APPLE__
-#    include <mach/clock.h>
-#    include <mach/mach.h>
-#endif
-
-
 #include <Eigen/Geometry>
 #include <algorithm>
+#include <chrono>
 #include <fstream>
 #include <iomanip>
 #include <map>
@@ -273,8 +268,6 @@ struct PerfStats {
 
     double getSampleTime(const std::string& key);
 
-    static double getTime();
-
     Type getType(const std::string& key);
 
     void reset();
@@ -329,6 +322,9 @@ struct PerfStats {
     void writeToOStream(std::ostream& ostream);
 
     void writeSummaryToOStream(std::ostream& ostream, const bool include_iter_data = true);
+
+    /** Return the current seconds since the epoch, as measured by std::chrono::steady_clock. */
+    static double timeNow();
 
     /** The order the different types are added to the output. */
     std::vector<PerfStats::Type> header_order_ = {

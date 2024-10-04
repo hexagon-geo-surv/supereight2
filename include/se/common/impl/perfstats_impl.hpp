@@ -286,23 +286,6 @@ inline double PerfStats::getSampleTime(const std::string& key)
 
 
 
-inline double PerfStats::getTime()
-{
-#ifdef __APPLE__
-    clock_serv_t cclock;
-    mach_timespec_t clockData;
-    host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &cclock);
-    clock_get_time(cclock, &clockData);
-    mach_port_deallocate(mach_task_self(), cclock);
-#else
-    struct timespec clockData;
-    clock_gettime(CLOCK_MONOTONIC, &clockData);
-#endif
-    return (double) clockData.tv_sec + clockData.tv_nsec / 1000000000.0;
-}
-
-
-
 inline PerfStats::Type PerfStats::getType(const std::string& key)
 {
     std::map<std::string, Stats>::iterator s = stats_.find(key);
@@ -420,7 +403,7 @@ inline void PerfStats::reset(const std::string& key)
 inline double
 PerfStats::sample(const std::string& key, const double value, const Type type, const bool detailed)
 {
-    double now = getTime();
+    double now = timeNow();
     Stats& s = stats_[key];
 
     s.mutex_.lock();
@@ -454,14 +437,14 @@ inline double PerfStats::sampleT_WB(const Eigen::Isometry3f& T_WB, const bool de
     sample("qy", q_WS.y(), ORIENTATION, detailed);
     sample("qz", q_WS.z(), ORIENTATION, detailed);
     sample("qw", q_WS.w(), ORIENTATION, detailed);
-    return getTime();
+    return timeNow();
 }
 
 
 
 inline double PerfStats::sampleDurationStart(const std::string& key, const bool detailed)
 {
-    double now = getTime();
+    double now = timeNow();
     Stats& s = stats_[key];
 
     s.mutex_.lock();
@@ -485,7 +468,7 @@ inline double PerfStats::sampleDurationStart(const std::string& key, const bool 
 
 inline double PerfStats::sampleDurationEnd(const std::string& key)
 {
-    double now = getTime();
+    double now = timeNow();
     Stats& s = stats_[key];
 
     s.mutex_.lock();
@@ -599,6 +582,14 @@ inline void PerfStats::writeSummaryToOStream(std::ostream& ostream, bool include
 
     free(res_ptr);
     return;
+}
+
+
+
+inline double PerfStats::timeNow()
+{
+    const auto t = std::chrono::steady_clock::now();
+    return std::chrono::duration<double>(t.time_since_epoch()).count();
 }
 
 } // namespace se
