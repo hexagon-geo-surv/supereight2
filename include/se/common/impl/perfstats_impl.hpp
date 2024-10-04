@@ -11,6 +11,8 @@
 #ifndef SE_PERFSTATS_IMPL_HPP
 #define SE_PERFSTATS_IMPL_HPP
 
+namespace se {
+
 inline double PerfStats::Stats::meanIter(const std::vector<double>& iter_data_vec)
 {
     return sumIter(iter_data_vec) / std::max(iter_data_vec.size(), size_t(1));
@@ -598,5 +600,7 @@ inline void PerfStats::writeSummaryToOStream(std::ostream& ostream, bool include
     free(res_ptr);
     return;
 }
+
+} // namespace se
 
 #endif // SE_PERFSTATS_IMPL_HPP

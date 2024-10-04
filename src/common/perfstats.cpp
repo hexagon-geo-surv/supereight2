@@ -8,6 +8,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include "se/common/perfstats.hpp"
+#include <se/common/perfstats.hpp>
 
-PerfStats se::perfstats;
+se::PerfStats se::perfstats;

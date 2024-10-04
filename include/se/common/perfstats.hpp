@@ -29,6 +29,8 @@
 #include <string>
 #include <vector>
 
+namespace se {
+
 struct PerfStats {
     enum Type {
         BOOL,
@@ -350,12 +352,10 @@ struct PerfStats {
     size_t ostream_last_iter_;
 };
 
-#include "impl/perfstats_impl.hpp"
-
-namespace se {
-
 extern PerfStats perfstats;
 
 } // namespace se
+
+#include "impl/perfstats_impl.hpp"
 
 #endif // SE_PERFSTATS_HPP
