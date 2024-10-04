@@ -8,12 +8,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-/*
-
- This code is licensed under the MIT License.
-
- */
-
 #ifndef SE_PERFSTATS_HPP
 #define SE_PERFSTATS_HPP
 
@@ -252,33 +246,12 @@ struct PerfStats {
      */
     std::string createHeaderString();
 
-    /**
-     * \brief
-     *
-     * \return
-     */
     std::string createDataIterString();
 
-    /**
-     * \brief
-     *
-     * \param[in] iter
-     * \return
-     */
     std::string createDataIterString(const size_t iter);
 
-    /**
-     * \brief
-     *
-     * \return
-     */
     std::string createDataString();
 
-    /**
-     * \brief
-     *
-     * \return
-     */
     void debug();
 
     /**
@@ -292,69 +265,20 @@ struct PerfStats {
         return stats_.find(key)->second;
     }
 
-    /**
-     * \brief
-     *
-     * \param[in] key
-     * \return
-     */
     std::vector<double> getLastData(const std::string& key);
 
-    /**
-     * \brief
-     *
-     * \param[in]
-     * \return
-     */
     double getLastDataMerged(const std::string& key);
 
-    /**
-     * \brief
-     *
-     * \param[in]
-     * \return
-     */
     double getSampleTime(const std::string& key);
 
-    /**
-     * \brief
-     *
-     * \return
-     */
     static double getTime();
 
-    /**
-     * \brief
-     *
-     * \param[in]
-     * \return
-     */
     Type getType(const std::string& key);
 
-    /**
-     * \brief
-     *
-     * \return
-     */
     void reset();
 
-    /**
-     * \brief
-     *
-     * \param[in]
-     * \return
-     */
     void reset(const std::string& key);
 
-    /**
-     * \brief
-     *
-     * \param[in] key
-     * \param[in] value
-     * \param[in] type
-     * \param[in] detailed
-     * \return
-     */
     double sample(const std::string& key,
                   const double value,
                   const Type type = COUNT,
@@ -362,27 +286,10 @@ struct PerfStats {
 
     double sampleT_WB(const Eigen::Isometry3f& T_WB, const bool detailed = false);
 
-    /**
-     * \brief
-     *
-     * \param[in] key
-     * \param[in] detailed
-     * \return
-     */
     double sampleDurationStart(const std::string& key, const bool detailed = false);
-    /**
-     * \brief
-     *
-     * \param[in] key
-     * \return
-     */
+
     double sampleDurationEnd(const std::string& key);
 
-    /**
-     * \brief
-     *
-     * \param[in] stats_stream
-     */
     void setFilestream(std::ofstream* filestream);
 
     /**
@@ -417,19 +324,8 @@ struct PerfStats {
      */
     void writeToFilestream();
 
-    /**
-     * \brief
-     *
-     * \param[in] ostream
-     */
     void writeToOStream(std::ostream& ostream);
 
-    /**
-     * \brief
-     *
-     * \param[in] ostream
-     * \param[in] include_iter_data
-     */
     void writeSummaryToOStream(std::ostream& ostream, const bool include_iter_data = true);
 
     /** The order the different types are added to the output. */
@@ -445,24 +341,20 @@ struct PerfStats {
         order_; ///< The order the stats are added to the stats_ map | map idx -> stat name
     std::map<std::string, Stats> stats_; ///< The map stat name -> stat
 
-    /// IO function
-    std::ofstream* filestream_;     ///<
-    bool filestream_aligned_;       ///<
-    size_t filestream_last_iter_;   ///<
-    std::streampos filestream_pos_; ///<
+    std::ofstream* filestream_;
+    bool filestream_aligned_;
+    size_t filestream_last_iter_;
+    std::streampos filestream_pos_;
 
-    bool ostream_aligned_;     ///<
-    size_t ostream_last_iter_; ///<
+    bool ostream_aligned_;
+    size_t ostream_last_iter_;
 };
 
 #include "impl/perfstats_impl.hpp"
 
 namespace se {
 
-
-
 extern PerfStats perfstats;
-
 
 } // namespace se
 
