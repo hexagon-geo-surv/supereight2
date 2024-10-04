@@ -4,7 +4,7 @@
  * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
  * SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
  * SPDX-FileCopyrightText: 2021 Nils Funk
- * SPDX-FileCopyrightText: 2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2021-2024 Sotiris Papatheodorou
  * SPDX-License-Identifier: MIT
  */
 
@@ -218,8 +218,6 @@ struct PerfStats {
 
         // <iteration/frame, vector of values at iteration/frame>
         std::map<size_t, std::vector<double>> data_;
-        bool
-            detailed_; ///< Flag indicating if the stat should be excluded from basic string output.
         double last_absolute_; ///< The last absolute time the stat data was updated.
         std::mutex mutex_;
         Type type_; ///< The type of data stored in the stat struct.
@@ -233,8 +231,6 @@ struct PerfStats {
     };
 
     PerfStats();
-
-    PerfStats(const bool include_detailed);
 
     /**
      * \brief
@@ -274,32 +270,15 @@ struct PerfStats {
 
     void reset(const std::string& key);
 
-    double sample(const std::string& key,
-                  const double value,
-                  const Type type = COUNT,
-                  const bool detailed = false);
+    double sample(const std::string& key, const double value, const Type type = COUNT);
 
-    double sampleT_WB(const Eigen::Isometry3f& T_WB, const bool detailed = false);
+    double sampleT_WB(const Eigen::Isometry3f& T_WB);
 
-    double sampleDurationStart(const std::string& key, const bool detailed = false);
+    double sampleDurationStart(const std::string& key);
 
     double sampleDurationEnd(const std::string& key);
 
     void setFilestream(std::ofstream* filestream);
-
-    /**
-     * \brief Set flag to include detailed stats to std::string output.
-     *
-     * \param[in] include_detailed
-     */
-    void includeDetailed(const bool include_detailed)
-    {
-        if (include_detailed != include_detailed_) {
-            filestream_aligned_ = false;
-            ostream_aligned_ = false;
-        }
-        include_detailed_ = include_detailed;
-    };
 
     /**
      * \brief Set the current iteration and add it to the stats.
@@ -331,7 +310,6 @@ struct PerfStats {
         FRAME,    ITERATION, TIME, DURATION, MEMORY,     POSITION, ORIENTATION,
         DISTANCE, FREQUENCY, BOOL, POWER,    ENERGY,     CURRENT,  VOLTAGE,
         VOLUME,   COUNT,     INT,  DOUBLE,   PERCENTAGE, UNDEFINED};
-    bool include_detailed_; ///< Flag to add stats marked as detailed to the output
 
     int insertion_idx_; ///< The index of the next stat to be inserted to performance stats
     size_t iter_;       ///< The current iteration

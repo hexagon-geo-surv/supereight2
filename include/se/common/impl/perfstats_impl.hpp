@@ -4,7 +4,7 @@
  * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
  * SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
  * SPDX-FileCopyrightText: 2021 Nils Funk
- * SPDX-FileCopyrightText: 2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2021-2024 Sotiris Papatheodorou
  * SPDX-License-Identifier: MIT
  */
 
@@ -223,21 +223,6 @@ inline std::string PerfStats::Stats::unitString()
 
 
 inline PerfStats::PerfStats() :
-        include_detailed_(false),
-        insertion_idx_(0),
-        iter_(SIZE_MAX),
-        filestream_(nullptr),
-        filestream_aligned_(false),
-        filestream_last_iter_(0),
-        ostream_aligned_(false),
-        ostream_last_iter_(0)
-{
-}
-
-
-
-inline PerfStats::PerfStats(const bool include_detailed) :
-        include_detailed_(include_detailed),
         insertion_idx_(0),
         iter_(SIZE_MAX),
         filestream_(nullptr),
@@ -306,12 +291,7 @@ inline std::string PerfStats::createHeaderString()
     for (const auto& type : header_order_) {
         for (const auto& o : order_) {
             std::map<std::string, Stats>::iterator s = stats_.find(o.second);
-            if (s == stats_.end()
-                || s->second.detailed_
-                    > include_detailed_) { // if include_detailed == false (0) only include non detailed i.e. detailed == false (0)
-                continue;
-            }
-            if (s->second.type_ == type) {
+            if (s != stats_.end() && s->second.type_ == type) {
                 header_ss << s->first << " " << s->second.unitString()
                           << "\t"; // s->first := stat name; s->second := stat struct
             }
@@ -341,12 +321,7 @@ inline std::string PerfStats::createDataIterString(const size_t iter)
     for (const auto& type : header_order_) {
         for (const auto& o : order_) {
             std::map<std::string, Stats>::iterator s = stats_.find(o.second);
-            if (s == stats_.end()
-                || s->second.detailed_
-                    > include_detailed_) { // if include_detailed == false (0) only include non detailed i.e. detailed == false (0)
-                continue;
-            }
-            if (s->second.type_ == type) {
+            if (s != stats_.end() && s->second.type_ == type) {
                 std::map<size_t, std::vector<double>>::iterator d = s->second.data_.find(iter);
                 if (d != s->second.data_.end()) {
                     data_ss << s->second.mergeIter(s->second.data_[iter], s->second.type_) << "\t";
@@ -400,8 +375,7 @@ inline void PerfStats::reset(const std::string& key)
 
 
 
-inline double
-PerfStats::sample(const std::string& key, const double value, const Type type, const bool detailed)
+inline double PerfStats::sample(const std::string& key, const double value, const Type type)
 {
     double now = timeNow();
     Stats& s = stats_[key];
@@ -418,7 +392,6 @@ PerfStats::sample(const std::string& key, const double value, const Type type, c
     s.data_[iter_].push_back(value);
     s.type_ = type;
     s.last_absolute_ = now;
-    s.detailed_ = detailed;
 
     s.mutex_.unlock();
     return (now);
@@ -426,23 +399,23 @@ PerfStats::sample(const std::string& key, const double value, const Type type, c
 
 
 
-inline double PerfStats::sampleT_WB(const Eigen::Isometry3f& T_WB, const bool detailed)
+inline double PerfStats::sampleT_WB(const Eigen::Isometry3f& T_WB)
 {
     const Eigen::Vector3f t_WS = T_WB.translation();
     const Eigen::Quaternionf q_WS(T_WB.linear());
-    sample("tx", t_WS.x(), POSITION, detailed);
-    sample("ty", t_WS.y(), POSITION, detailed);
-    sample("tz", t_WS.z(), POSITION, detailed);
-    sample("qx", q_WS.x(), ORIENTATION, detailed);
-    sample("qy", q_WS.y(), ORIENTATION, detailed);
-    sample("qz", q_WS.z(), ORIENTATION, detailed);
-    sample("qw", q_WS.w(), ORIENTATION, detailed);
+    sample("tx", t_WS.x(), POSITION);
+    sample("ty", t_WS.y(), POSITION);
+    sample("tz", t_WS.z(), POSITION);
+    sample("qx", q_WS.x(), ORIENTATION);
+    sample("qy", q_WS.y(), ORIENTATION);
+    sample("qz", q_WS.z(), ORIENTATION);
+    sample("qw", q_WS.w(), ORIENTATION);
     return timeNow();
 }
 
 
 
-inline double PerfStats::sampleDurationStart(const std::string& key, const bool detailed)
+inline double PerfStats::sampleDurationStart(const std::string& key)
 {
     double now = timeNow();
     Stats& s = stats_[key];
@@ -453,7 +426,6 @@ inline double PerfStats::sampleDurationStart(const std::string& key, const bool 
         order_[insertion_idx_] = key;
         insertion_idx_++;
         s.type_ = DURATION;
-        s.detailed_ = detailed;
         filestream_aligned_ = false;
         ostream_aligned_ = false;
     }
