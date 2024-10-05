@@ -235,54 +235,6 @@ inline PerfStats::PerfStats() :
 
 
 
-inline std::vector<double> PerfStats::getLastData(const std::string& key)
-{
-    std::map<std::string, Stats>::iterator s = stats_.find(key);
-    if (s != stats_.end()) {
-        return (s->second.data_.rbegin()->second);
-    }
-
-    return std::vector<double>();
-}
-
-
-
-inline double PerfStats::getLastDataMerged(const std::string& key)
-{
-    std::map<std::string, Stats>::iterator s = stats_.find(key);
-    if (s != stats_.end()) {
-        return Stats::mergeIter(s->second.data_.rbegin()->second, s->second.type_);
-    }
-
-    return double(0);
-}
-
-
-
-inline double PerfStats::getSampleTime(const std::string& key)
-{
-    std::map<std::string, Stats>::iterator s = stats_.find(key);
-    if (s != stats_.end()) {
-        return s->second.last_absolute_;
-    }
-
-    return double(0);
-}
-
-
-
-inline PerfStats::Type PerfStats::getType(const std::string& key)
-{
-    std::map<std::string, Stats>::iterator s = stats_.find(key);
-    if (s != stats_.end()) {
-        return (s->second.type_);
-    }
-
-    return (UNDEFINED);
-}
-
-
-
 inline std::string PerfStats::createHeaderString()
 {
     std::stringstream header_ss;
@@ -353,24 +305,6 @@ inline std::string PerfStats::createDataString()
     data_ss << createDataIterString(iter_);
     std::string data_string = data_ss.str().c_str();
     return data_string;
-}
-
-
-
-inline void PerfStats::reset()
-{
-    stats_.clear();
-    filestream_aligned_ = false;
-    ostream_aligned_ = false;
-}
-
-
-
-inline void PerfStats::reset(const std::string& key)
-{
-    std::map<std::string, Stats>::iterator s = stats_.find(key);
-    if (s != stats_.end())
-        s->second.data_.clear();
 }
 
 

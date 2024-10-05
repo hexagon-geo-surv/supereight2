@@ -245,8 +245,6 @@ struct PerfStats {
 
     std::string createDataString();
 
-    void debug();
-
     /**
      * \brief
      *
@@ -257,18 +255,6 @@ struct PerfStats {
     {
         return stats_.find(key)->second;
     }
-
-    std::vector<double> getLastData(const std::string& key);
-
-    double getLastDataMerged(const std::string& key);
-
-    double getSampleTime(const std::string& key);
-
-    Type getType(const std::string& key);
-
-    void reset();
-
-    void reset(const std::string& key);
 
     double sample(const std::string& key, const double value, const Type type = COUNT);
 
