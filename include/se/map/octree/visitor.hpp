@@ -249,7 +249,7 @@ getInterp(const OctreeT& octree,
           ValidF valid,
           GetF get,
           const int desired_scale = 0,
-          int* returned_scale = nullptr);
+          int* const returned_scale = nullptr);
 
 /** \overload
  * \details This overload works only for single-resolution octrees. The member is interpolated at
@@ -280,7 +280,7 @@ typename std::enable_if_t<OctreeT::res_ == Res::Multi, std::optional<field_t>>
 getFieldInterp(const OctreeT& octree,
                const Eigen::Vector3f& voxel_coord_f,
                const int desired_scale = 0,
-               int* returned_scale = nullptr);
+               int* const returned_scale = nullptr);
 
 /** \overload
  * \details This overload works only for single-resolution octrees. The field is interpolated at
@@ -309,7 +309,7 @@ typename std::enable_if_t<OctreeT::res_ == Res::Multi && OctreeT::col_ == Colour
 getColourInterp(const OctreeT& octree,
                 const Eigen::Vector3f& voxel_coord_f,
                 const int desired_scale = 0,
-                int* returned_scale = nullptr);
+                int* const returned_scale = nullptr);
 
 /** \overload
  * \details This overload works only for single-resolution octrees. The colour is interpolated at

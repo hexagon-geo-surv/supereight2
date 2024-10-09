@@ -913,7 +913,7 @@ getInterp(const OctreeT& octree,
           ValidF valid,
           GetF get,
           const int desired_scale,
-          int* returned_scale)
+          int* const returned_scale)
 {
     typedef typename OctreeT::NodeType NodeType;
     typedef typename OctreeT::BlockType BlockType;
@@ -1032,7 +1032,7 @@ typename std::enable_if_t<OctreeT::res_ == Res::Multi, std::optional<field_t>>
 getFieldInterp(const OctreeT& octree,
                const Eigen::Vector3f& voxel_coord_f,
                const int desired_scale,
-               int* returned_scale)
+               int* const returned_scale)
 {
     return getInterp(
         octree,
@@ -1064,7 +1064,7 @@ typename std::enable_if_t<OctreeT::res_ == Res::Multi && OctreeT::col_ == Colour
 getColourInterp(const OctreeT& octree,
                 const Eigen::Vector3f& voxel_coord_f,
                 const int desired_scale,
-                int* returned_scale)
+                int* const returned_scale)
 {
     return getInterp(
         octree,
