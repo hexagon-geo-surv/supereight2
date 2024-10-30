@@ -1,8 +1,8 @@
 /*
  * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
- * SPDX-FileCopyrightText: 2020-2023 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2020-2024 Smart Robotics Lab, Imperial College London, Technical University of Munich
  * SPDX-FileCopyrightText: 2020-2021 Nils Funk
- * SPDX-FileCopyrightText: 2020-2023 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2020-2024 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -20,14 +20,12 @@ namespace se {
 template<typename NodeT, typename BlockT>
 class MemoryPool {
     public:
-    typedef typename NodeT::DataType DataType;
-
     /** Allocate the root node with coordinates in voxels \p coord and edge length in voxels \p
      * size.
      */
     NodeT* allocateRoot(const Eigen::Vector3i& coord, const int size)
     {
-        return new (node_buffer_.malloc()) NodeT(coord, size, DataType());
+        return new (node_buffer_.malloc()) NodeT(coord, size, typename NodeT::DataType());
     }
 
     /** Allocate a node.
@@ -38,7 +36,8 @@ class MemoryPool {
      *
      * \return The pointer to the allocated node.
      */
-    NodeT* allocateNode(NodeT* parent_ptr, const int child_idx, const DataType& init_data)
+    NodeT*
+    allocateNode(NodeT* parent_ptr, const int child_idx, const typename NodeT::DataType& init_data)
     {
         return new (node_buffer_.malloc()) NodeT(parent_ptr, child_idx, init_data);
     }
@@ -51,7 +50,9 @@ class MemoryPool {
      *
      * \return The pointer to the allocated block.
      */
-    BlockT* allocateBlock(NodeT* parent_ptr, const int child_idx, const DataType& init_data)
+    BlockT* allocateBlock(NodeT* parent_ptr,
+                          const int child_idx,
+                          const typename BlockT::DataType& init_data)
     {
         return new (block_buffer_.malloc()) BlockT(parent_ptr, child_idx, init_data);
     }
