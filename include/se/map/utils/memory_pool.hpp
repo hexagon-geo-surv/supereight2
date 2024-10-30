@@ -72,6 +72,7 @@ class MemoryPool {
         block_buffer_.destroy(block_ptr);
     }
 
+    private:
     boost::object_pool<NodeT> node_buffer_;
     boost::object_pool<BlockT> block_buffer_;
 };
