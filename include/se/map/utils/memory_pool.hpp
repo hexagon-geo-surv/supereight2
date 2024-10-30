@@ -36,8 +36,9 @@ class MemoryPool {
      *
      * \return The pointer to the allocated node.
      */
-    NodeT*
-    allocateNode(NodeT* parent_ptr, const int child_idx, const typename NodeT::DataType& init_data)
+    NodeT* allocateNode(NodeT* const parent_ptr,
+                        const int child_idx,
+                        const typename NodeT::DataType& init_data)
     {
         return new (node_buffer_.malloc()) NodeT(parent_ptr, child_idx, init_data);
     }
@@ -50,7 +51,7 @@ class MemoryPool {
      *
      * \return The pointer to the allocated block.
      */
-    BlockT* allocateBlock(NodeT* parent_ptr,
+    BlockT* allocateBlock(NodeT* const parent_ptr,
                           const int child_idx,
                           const typename BlockT::DataType& init_data)
     {
@@ -59,14 +60,14 @@ class MemoryPool {
 
     /** Destruct and deallocate the node pointed to by \p node_ptr.
      */
-    void deleteNode(NodeT* node_ptr)
+    void deleteNode(NodeT* const node_ptr)
     {
         node_buffer_.destroy(node_ptr);
     }
 
     /** Destruct and deallocate the block pointed to by \p block_ptr.
      */
-    void deleteBlock(BlockT* block_ptr)
+    void deleteBlock(BlockT* const block_ptr)
     {
         block_buffer_.destroy(block_ptr);
     }
