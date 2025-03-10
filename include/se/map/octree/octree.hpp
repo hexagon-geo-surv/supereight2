@@ -165,7 +165,7 @@ class Octree {
     /** The edge length of a block in voxels. */
     static constexpr int block_size = BlockSize;
     /** The maximum scale of a block. */
-    static constexpr scale_t max_block_scale = math::log2_const(BlockSize);
+    static constexpr scale_t max_block_scale = octantops::size_to_scale(BlockSize);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 

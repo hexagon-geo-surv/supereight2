@@ -32,7 +32,7 @@ void propagateBlockUp(const OctreeT& /* octree */,
     const Eigen::Vector3i block_coord = block_ptr->coord;
     const int block_size = BlockType::getSize();
 
-    for (int child_scale = init_scale; child_scale < se::math::log2_const(block_size);
+    for (int child_scale = init_scale; child_scale < octantops::size_to_scale(block_size);
          ++child_scale) {
         const int child_stride = octantops::scale_to_size(child_scale);
         const int parent_stride = child_stride << 1;

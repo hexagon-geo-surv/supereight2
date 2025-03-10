@@ -1280,7 +1280,7 @@ getFieldGrad(const OctreeT& octree,
                 // uniform occupancy, meaning a gradient of 0. This isn't strictly true near the
                 // boundary of the node where there can be small non-zero gradients. It's a rather
                 // good and simple approximation though.
-                scale_returned = math::log2_const(node.getSize());
+                scale_returned = octantops::size_to_scale(node.getSize());
                 return field_vec_t::Zero();
             }
             else {
@@ -1331,7 +1331,7 @@ getFieldGrad(const OctreeT& octree,
             const auto& node = *static_cast<const typename OctreeT::NodeType*>(octant_ptr);
             if (node.isLeaf() && is_valid(node.getData())) {
                 // Attempting to compute the gradient at a node, approximate with 0 as before.
-                scale_returned = math::log2_const(node.getSize());
+                scale_returned = octantops::size_to_scale(node.getSize());
                 return field_vec_t::Zero();
             }
             else {

@@ -23,15 +23,13 @@ sort_blocks(std::vector<se::OctantBase*>& block_ptrs)
     auto has_smaller_key = [](const se::OctantBase* block_ptr_lhs,
                               const se::OctantBase* block_ptr_rhs) {
         se::key_t key_lhs;
-        se::keyops::encode_key(
-            block_ptr_lhs->coord,
-            se::math::log2_const(static_cast<const BlockT*>(block_ptr_lhs)->getSize()),
-            key_lhs);
+        se::keyops::encode_key(block_ptr_lhs->coord,
+                               size_to_scale(static_cast<const BlockT*>(block_ptr_lhs)->getSize()),
+                               key_lhs);
         se::key_t key_rhs;
-        se::keyops::encode_key(
-            block_ptr_rhs->coord,
-            se::math::log2_const(static_cast<const BlockT*>(block_ptr_rhs)->getSize()),
-            key_rhs);
+        se::keyops::encode_key(block_ptr_rhs->coord,
+                               size_to_scale(static_cast<const BlockT*>(block_ptr_rhs)->getSize()),
+                               key_rhs);
         return key_lhs < key_rhs;
     };
     std::sort(block_ptrs.begin(), block_ptrs.end(), has_smaller_key);
@@ -46,15 +44,13 @@ sort_blocks(std::vector<se::OctantBase*>& block_ptrs)
     auto has_smaller_key = [](const se::OctantBase* block_ptr_lhs,
                               const se::OctantBase* block_ptr_rhs) {
         se::key_t key_lhs;
-        se::keyops::encode_key(
-            block_ptr_lhs->coord,
-            se::math::log2_const(static_cast<const BlockT*>(block_ptr_lhs)->getSize()),
-            key_lhs);
+        se::keyops::encode_key(block_ptr_lhs->coord,
+                               size_to_scale(static_cast<const BlockT*>(block_ptr_lhs)->getSize()),
+                               key_lhs);
         se::key_t key_rhs;
-        se::keyops::encode_key(
-            block_ptr_rhs->coord,
-            se::math::log2_const(static_cast<const BlockT*>(block_ptr_rhs)->getSize()),
-            key_rhs);
+        se::keyops::encode_key(block_ptr_rhs->coord,
+                               size_to_scale(static_cast<const BlockT*>(block_ptr_rhs)->getSize()),
+                               key_rhs);
         return key_lhs < key_rhs;
     };
     std::sort(block_ptrs.begin(), block_ptrs.end(), has_smaller_key);
