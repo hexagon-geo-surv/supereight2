@@ -55,7 +55,8 @@ bool RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
             // Make sure that measurements can only be jumped in case of not too large deltas
             const float angle_to_prev_ray = std::acos(ray.normalized().dot(ray_.normalized()));
             const float dist_to_prev_update = std::sin(angle_to_prev_ray) * ray.norm();
-            if (dist_to_prev_update < map_res_ * (1 << computed_integration_scale_)) {
+            if (dist_to_prev_update
+                < map_res_ * octantops::scale_to_size(computed_integration_scale_)) {
                 return false;
             }
         }
@@ -120,13 +121,14 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
 
         if (voxel_coord == last_visited_voxel_) {
             // can jump to next sample
-            r_i_S += 0.5 * map_res_ * (1 << computed_integration_scale_) * ray_dir_S;
+            r_i_S +=
+                0.5 * map_res_ * octantops::scale_to_size(computed_integration_scale_) * ray_dir_S;
             continue;
         }
         last_visited_voxel_ = voxel_coord;
 
         (*this)(r_i_S, voxel_coord, ray_state, root_ptr);
-        r_i_S += 0.5 * map_res_ * (1 << computed_integration_scale_) * ray_dir_S;
+        r_i_S += 0.5 * map_res_ * octantops::scale_to_size(computed_integration_scale_) * ray_dir_S;
     }
 }
 

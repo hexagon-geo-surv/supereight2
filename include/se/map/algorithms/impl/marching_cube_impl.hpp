@@ -278,7 +278,7 @@ void gather_dual_data(const BlockT* block_ptr,
 
     // In the local case:        actual_dual_offset = actual_dual_scaling * norm_dual_offset_f and
     // dual_corner_coords_f = primal_corner_coord_f + actual_dual_scaling * norm_dual_offset_f
-    const float actual_dual_scaling = (float) (1 << scale) / 2;
+    const float actual_dual_scaling = (float) octantops::scale_to_size(scale) / 2;
     for (int corner_idx = 0; corner_idx < 8; corner_idx++) {
         dual_corner_coords_i[corner_idx] = primal_corner_coord + logical_dual_offset[corner_idx];
         dual_corner_coords_f[corner_idx] =
@@ -1022,7 +1022,7 @@ dual_marching_cube_kernel_new(const OctreeT& octree,
     for (size_t block_idx = 0; block_idx < block_ptrs.size(); block_idx++) {
         const typename OctreeT::BlockType* const block_ptr = block_ptrs[block_idx];
         const int voxel_scale = block_ptr->getCurrentScale();
-        const int voxel_stride = 1 << voxel_scale;
+        const int voxel_stride = octantops::scale_to_size(voxel_scale);
         const Eigen::Vector3i& start_coord = block_ptr->coord;
         const Eigen::Vector3i last_coord =
             (start_coord + Eigen::Vector3i::Constant(OctreeT::BlockType::getSize()))

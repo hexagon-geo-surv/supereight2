@@ -34,7 +34,7 @@ void propagateBlockUp(const OctreeT& /* octree */,
 
     for (int child_scale = init_scale; child_scale < se::math::log2_const(block_size);
          ++child_scale) {
-        const int child_stride = 1 << child_scale;
+        const int child_stride = octantops::scale_to_size(child_scale);
         const int parent_stride = child_stride << 1;
 
         for (int z = 0; z < block_size; z += parent_stride) {
@@ -90,7 +90,7 @@ void propagateBlockDown(const OctreeT& octree,
     const int block_size = BlockType::getSize();
     for (int parent_scale = block_ptr->getCurrentScale(); parent_scale > target_scale;
          --parent_scale) {
-        const int parent_stride = 1 << parent_scale;
+        const int parent_stride = octantops::scale_to_size(parent_scale);
         for (int z = 0; z < block_size; z += parent_stride) {
             for (int y = 0; y < block_size; y += parent_stride) {
                 for (int x = 0; x < block_size; x += parent_stride) {

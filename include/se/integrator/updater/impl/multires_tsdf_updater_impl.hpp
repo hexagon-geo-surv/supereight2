@@ -131,7 +131,7 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Upd
         }
 
         block.setCurrentScale(curr_scale);
-        const int stride = 1 << curr_scale;
+        const int stride = octantops::scale_to_size(curr_scale);
 
         for (int x = 0; x < BlockType::getSize(); x += stride) {
             for (int y = 0; y < BlockType::getSize(); y += stride) {

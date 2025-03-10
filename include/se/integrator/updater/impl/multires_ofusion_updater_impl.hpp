@@ -425,7 +425,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
         }
 
         // Integrate data into buffer.
-        const unsigned int recommended_stride = 1 << recommended_scale;
+        const unsigned int recommended_stride = octantops::scale_to_size(recommended_scale);
         const unsigned int size_at_recommended_scale_li = BlockType::size >> recommended_scale;
         const unsigned int size_at_recommended_scale_sq = math::sq(size_at_recommended_scale_li);
 
@@ -532,7 +532,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
         block_ptr->resetBuffer();
     }
 
-    const unsigned int integration_stride = 1 << integration_scale;
+    const unsigned int integration_stride = octantops::scale_to_size(integration_scale);
     const unsigned int size_at_integration_scale_li = BlockType::size >> integration_scale;
     const unsigned int size_at_integration_scale_sq = math::sq(size_at_integration_scale_li);
 
