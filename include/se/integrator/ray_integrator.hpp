@@ -23,7 +23,7 @@ class RayIntegrator {
                   const Eigen::Vector3f& /*ray*/,
                   const Eigen::Isometry3f& /* T_SW need Lidar frame?*/,
                   const timestamp_t /* timestamp */,
-                  std::set<const OctantBase*>* /*updated_octants = nullptr*/){};
+                  std::set<const OctantBase*>* const /*updated_octants = nullptr*/){};
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
@@ -73,7 +73,7 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, 
                   const Eigen::Vector3f& ray,
                   const Eigen::Isometry3f& T_WS,
                   const timestamp_t timestamp,
-                  std::set<const OctantBase*>* updated_octants = nullptr);
+                  std::set<const OctantBase*>* const updated_octants = nullptr);
 
     /**
      * \brief Reset ray, pose and timestamp for the integrator

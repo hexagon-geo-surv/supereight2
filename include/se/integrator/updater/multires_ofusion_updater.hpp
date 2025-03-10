@@ -51,7 +51,7 @@ class Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Se
     Updater(MapType& map, const timestamp_t timestamp, const Measurements<SensorT>& measurements);
 
     void operator()(VolumeCarverAllocation& allocation_list,
-                    std::set<const OctantBase*>* updated_octants = nullptr);
+                    std::set<const OctantBase*>* const updated_octants = nullptr);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
