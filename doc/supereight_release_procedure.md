@@ -19,12 +19,11 @@ git remote add public git@bitbucket.org:smartroboticslab/supereight2.git
 ## Releasing a new version
 
 1. Run the test suite from
-   [supereight-testbot](https://bitbucket.org/smartroboticslab/supereight-testbot)
-   on the `devel` branch and ensure there are no issues. This typically means
-   running
+   [scripts/supereight-test.bash](./scripts/supereight-test.bash) on the `devel`
+   branch and ensure there are no issues. This typically means running
 
    ``` sh
-   ./run_tests.sh -u 18.04,22.04 devel; ./run_tests.sh -d ~/Documents/Datasets/ -u 20.04 devel
+   ./scripts/supereight-test.bash /tmp/se2results
    ```
 
 1. Pull the latest commits in the `devel` and `master` branches from the private
