@@ -33,7 +33,7 @@ sudo apt --yes install git g++ cmake libeigen3-dev libopencv-dev libtbb-dev free
 Clone the repository and its submodules:
 
 ``` sh
-git clone --recurse-submodules https://bitbucket.org/smartroboticslab/supereight2.git
+git clone --recurse-submodules https://github.com/smartroboticslab/supereight2
 cd supereight2
 # If you cloned without the --recurse-submodules run the following command:
 git submodule update --init --recursive
@@ -277,7 +277,7 @@ dataset/
 
 ##### From TUM
 
-To convert TUM datasets clone [dataset-tools](https://bitbucket.org/smartroboticslab/dataset-tools.git) and run
+To convert TUM datasets clone [dataset-tools](https://github.com/smartroboticslab/dataset-tools) and run
 
 ``` sh
 cd dataset-tools/TUM/tum2raw
@@ -290,7 +290,7 @@ Read (Section TUM, Subsection ICL NUIM dataset) when downloading the dataset man
 
 ##### From Newer College
 
-To convert Newer College datasets clone [dataset-tools](https://bitbucket.org/smartroboticslab/dataset-tools.git) and run
+To convert Newer College datasets clone [dataset-tools](https://github.com/smartroboticslab/dataset-tools) and run
 
 ``` sh
 cd dataset-tools/NewerCollege

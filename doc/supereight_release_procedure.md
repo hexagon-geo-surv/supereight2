@@ -11,7 +11,7 @@ Add the public repository as a remote to your local clone of the private
 repository. This only needs to be done once for each local clone.
 
 ``` sh
-git remote add public git@bitbucket.org:smartroboticslab/supereight2.git
+git remote add public git@github.com:smartroboticslab/supereight2.git
 ```
 
 
